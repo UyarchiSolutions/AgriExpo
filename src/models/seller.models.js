@@ -36,11 +36,14 @@ const SellerSchema = new mongoose.Schema(
     email: {
       type: String,
     },
+    category: {
+      type: String,
+    },
     address: {
       type: String,
     },
     country: {
-      type: String
+      type: String,
     },
     state: {
       type: String,
@@ -69,7 +72,13 @@ const SellerSchema = new mongoose.Schema(
     },
     Pincode: {
       type: Number,
-    }
+    },
+    how_did_you_know_us: {
+      type: String,
+    },
+    webSite: {
+      type: String,
+    },
   },
   {
     timestamps: { createdAt: 'createdDate', updatedAt: 'updatedDate' },
