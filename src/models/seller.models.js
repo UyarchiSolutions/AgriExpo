@@ -79,6 +79,9 @@ const SellerSchema = new mongoose.Schema(
     webSite: {
       type: String,
     },
+    Designation: {
+      type: String,
+    },
   },
   {
     timestamps: { createdAt: 'createdDate', updatedAt: 'updatedDate' },
