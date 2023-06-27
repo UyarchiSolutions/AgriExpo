@@ -5707,8 +5707,9 @@ const getSalesExecutives = async () => {
   return values;
 };
 
-const getVisitors_With_Page = async (page) => {
+const getVisitors_With_Page = async (page, type) => {
   let values = await Shop.aggregate([
+    { $match: { SType: type } },
     {
       $skip: 10 * page,
     },
@@ -5716,7 +5717,7 @@ const getVisitors_With_Page = async (page) => {
       $limit: 10,
     },
   ]);
-  let next = await Shop.aggregate([{ $skip: 10 * (page + 1) }, { $limit: 10 }]);
+  let next = await Shop.aggregate([{ $match: { SType: type } }, { $skip: 10 * (page + 1) }, { $limit: 10 }]);
   return { values: values, next: next.length != 0 };
 };
 
