@@ -592,6 +592,11 @@ const getSalesExecutives = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getVisitors_With_Page = catchAsync(async (req, res) => {
+  const data = await b2bCloneService.getVisitors_With_Page(req.params.page);
+  res.send(data);
+});
+
 module.exports = {
   createB2bShopClone,
   getAllB2BshopClone,
@@ -666,4 +671,5 @@ module.exports = {
   update_reverification_custmer,
   get_final_customer_shops,
   getSalesExecutives,
+  getVisitors_With_Page,
 };

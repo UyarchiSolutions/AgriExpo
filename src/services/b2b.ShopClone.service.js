@@ -5703,7 +5703,21 @@ const getSalesExecutives = async () => {
       },
     },
   ]);
+
   return values;
+};
+
+const getVisitors_With_Page = async (page) => {
+  let values = await Shop.aggregate([
+    {
+      $skip: 10 * page,
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+  let next = await Shop.aggregate([{ $skip: 10 * (page + 1) }, { $limit: 10 }]);
+  return { values: values, next: next.length != 0 };
 };
 
 module.exports = {
@@ -5779,4 +5793,5 @@ module.exports = {
   update_reverification_custmer,
   get_final_customer_shops,
   getSalesExecutives,
+  getVisitors_With_Page,
 };
