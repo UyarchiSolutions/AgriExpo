@@ -5721,6 +5721,15 @@ const getVisitors_With_Page = async (page, type) => {
   return { values: values, next: next.length != 0 };
 };
 
+const DisableVisitors = async (id) => {
+  let values = await Shop.findById(id);
+  if (!values) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Visitors Not Available');
+  }
+  values = await Shop.findByIdAndUpdate({ _id: id }, { active: false }, { new: true });
+  return values;
+};
+
 module.exports = {
   createShopClone,
   getAllShopClone,
@@ -5795,4 +5804,5 @@ module.exports = {
   get_final_customer_shops,
   getSalesExecutives,
   getVisitors_With_Page,
+  DisableVisitors,
 };
