@@ -164,21 +164,25 @@ const update_profile = catchAsync(async (req, res) => {
   res.send(data);
 });
 
-const update_changepassword= catchAsync(async (req, res) => {
+const update_changepassword = catchAsync(async (req, res) => {
   const data = await registerShop.update_changepassword(req);
   res.send(data);
 });
 
-const get_my_orders_all= catchAsync(async (req, res) => {
+const get_my_orders_all = catchAsync(async (req, res) => {
   const data = await registerShop.get_my_orders_all(req);
   res.send(data);
 });
 
-const get_my_orders_single= catchAsync(async (req, res) => {
+const get_my_orders_single = catchAsync(async (req, res) => {
   const data = await registerShop.get_my_orders_single(req);
   res.send(data);
 });
 
+const NewRegister_Shop = catchAsync(async (req, res) => {
+  const data = await registerShop.NewRegister_Shop(req.body);
+  res.send(data);
+});
 
 module.exports = {
   register_shop,
@@ -207,5 +211,6 @@ module.exports = {
   update_profile,
   update_changepassword,
   get_my_orders_all,
-  get_my_orders_single
+  get_my_orders_single,
+  NewRegister_Shop,
 };
