@@ -36,5 +36,5 @@ router.route('/:id').get(SellerController.GetSellerById).put(SellerController.Up
 // Agri Expo
 
 router.route('/getSellers/With/Paginations/:page').get(SellerController.getSellers_With_Paginations);
-
+router.route('/DisableSeller/:id').get(SellerController.DisableSeller);
 module.exports = router;

@@ -121,6 +121,11 @@ const getSellers_With_Paginations = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const DisableSeller = catchAsync(async (req, res) => {
+  const data = await SellerService.DisableSeller(req.params.id);
+  res.send(data);
+});
+
 module.exports = {
   createSeller,
   verifyOTP,
@@ -146,4 +151,5 @@ module.exports = {
   change_password,
   update_my_profile,
   getSellers_With_Paginations,
+  DisableSeller,
 };

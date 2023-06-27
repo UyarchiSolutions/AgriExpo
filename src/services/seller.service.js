@@ -462,6 +462,15 @@ const getSellers_With_Paginations = async (page) => {
   return { values: values, next: next.length != 0 };
 };
 
+const DisableSeller = async (id) => {
+  let values = await Seller.findById(id);
+  if (!values) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Seller Not Available');
+  }
+  values = await Seller.findByIdAndUpdate({ _id: id }, { active: false }, { new: true });
+  return values;
+};
+
 module.exports = {
   createSeller,
   verifyOTP,
@@ -487,4 +496,5 @@ module.exports = {
   change_password,
   update_my_profile,
   getSellers_With_Paginations,
+  DisableSeller,
 };
