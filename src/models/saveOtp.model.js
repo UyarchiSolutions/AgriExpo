@@ -86,5 +86,4 @@ sellerotpsave.plugin(toJSON);
 sellerotpsave.plugin(paginate);
 const sellerOTP = mongoose.model('sellerOTP', sellerotpsave);
 
-
 module.exports = { OTP, sellerOTP };

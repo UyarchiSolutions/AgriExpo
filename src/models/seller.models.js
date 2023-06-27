@@ -106,4 +106,107 @@ SellerSchema.pre('save', async function (next) {
 });
 const Seller = mongoose.model('Seller', SellerSchema);
 
-module.exports = { Seller };
+const VisitorSchema = new mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    status: {
+      type: String,
+      default: 'Pending',
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+    archive: {
+      type: Boolean,
+      default: false,
+    },
+    Name: {
+      type: String,
+    },
+    VisitorType: {
+      type: String,
+    },
+    mobileNumber: {
+      type: Number,
+    },
+    email: {
+      type: String,
+    },
+    intrested_In: {
+      type: String,
+    },
+    companyName: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
+    country: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
+    city: {
+      type: String,
+    },
+    mainSeller: {
+      type: String,
+    },
+    sellerType: {
+      type: String,
+    },
+    sellerRole: {
+      type: Array,
+    },
+    registered: {
+      type: Boolean,
+      default: false,
+    },
+    password: {
+      type: String,
+    },
+    roleNum: {
+      type: Array,
+    },
+    Pincode: {
+      type: Number,
+    },
+    how_did_you_know_us: {
+      type: String,
+    },
+    webSite: {
+      type: String,
+    },
+    Designation: {
+      type: String,
+    },
+  },
+  {
+    timestamps: { createdAt: 'createdDate', updatedAt: 'updatedDate' },
+  }
+);
+/**
+ * Check if password matches the user's password
+ * @param {string} password
+ * @returns {Promise<boolean>}
+ */
+VisitorSchema.methods.isPasswordMatch = async function (password) {
+  const user = this;
+  return bcrypt.compare(password, user.password);
+};
+
+VisitorSchema.pre('save', async function (next) {
+  const user = this;
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(user.password, 8);
+  }
+  next();
+});
+const Visitor = mongoose.model('visitors', VisitorSchema);
+
+module.exports = { Seller, Visitor };

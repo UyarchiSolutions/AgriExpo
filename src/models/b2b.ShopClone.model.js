@@ -22,6 +22,18 @@ const shopSchema = mongoose.Schema({
   address: {
     type: String,
   },
+  companyName: {
+    type: String,
+  },
+  designation: {
+    type: String,
+  },
+  website: {
+    type: String,
+  },
+  intrested_In: {
+    type: String,
+  },
   shopNo: {
     type: String,
   },
@@ -191,6 +203,18 @@ const shopSchema = mongoose.Schema({
   },
   Pincode: {
     type: Number,
+  },
+  country: {
+    type: String,
+  },
+  state: {
+    type: String,
+  },
+  city: {
+    type: String,
+  },
+  how_did_you_know_us: {
+    type: String,
   },
   salesmanOrderStatus: {
     type: String,
