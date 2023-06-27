@@ -122,7 +122,7 @@ const getSellers_With_Paginations = catchAsync(async (req, res) => {
 });
 
 const DisableSeller = catchAsync(async (req, res) => {
-  const data = await SellerService.DisableSeller(req.params.id);
+  const data = await SellerService.DisableSeller(req.params.id, req.params.type);
   res.send(data);
 });
 

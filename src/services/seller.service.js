@@ -462,12 +462,16 @@ const getSellers_With_Paginations = async (page) => {
   return { values: values, next: next.length != 0 };
 };
 
-const DisableSeller = async (id) => {
+const DisableSeller = async (id, type) => {
   let values = await Seller.findById(id);
   if (!values) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Seller Not Available');
   }
-  values = await Seller.findByIdAndUpdate({ _id: id }, { active: false }, { new: true });
+  if (type == 'disable') {
+    values = await Seller.findByIdAndUpdate({ _id: id }, { active: false }, { new: true });
+  } else {
+    values = await Seller.findByIdAndUpdate({ _id: id }, { active: true }, { new: true });
+  }
   return values;
 };
 
