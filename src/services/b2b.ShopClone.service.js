@@ -5721,12 +5721,17 @@ const getVisitors_With_Page = async (page, type) => {
   return { values: values, next: next.length != 0 };
 };
 
-const DisableVisitors = async (id) => {
+const DisableVisitors = async (id, type) => {
   let values = await Shop.findById(id);
   if (!values) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Visitors Not Available');
   }
-  values = await Shop.findByIdAndUpdate({ _id: id }, { active: false }, { new: true });
+  if (type == 'disable') {
+    values = await Shop.findByIdAndUpdate({ _id: id }, { active: false }, { new: true });
+  } else {
+    values = await Shop.findByIdAndUpdate({ _id: id }, { active: true }, { new: true });
+  }
+
   return values;
 };
 
