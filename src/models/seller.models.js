@@ -82,6 +82,9 @@ const SellerSchema = new mongoose.Schema(
     Designation: {
       type: String,
     },
+    companyName: {
+      type: String,
+    },
   },
   {
     timestamps: { createdAt: 'createdDate', updatedAt: 'updatedDate' },
