@@ -30,7 +30,7 @@ const NewRegister_Shop = async (body) => {
   const mobileNumber = body.mobile;
   let shop = await Shop.findOne({ mobile: mobileNumber });
   if (shop) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Shop-Already-Register');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Shop-Already-Register');
   }
   const creations = await Shop.create(body);
   const otp = await sentOTP(mobileNumber, creations);
