@@ -33,4 +33,8 @@ router.route('/mydetails/profile').put(SellerAuth, SellerController.update_my_pr
 
 router.route('/:id').get(SellerController.GetSellerById).put(SellerController.UpdateSellerById);
 
+// Agri Expo
+
+router.route('/getSellers/With/Paginations/:page').get(SellerController.getSellers_With_Paginations);
+
 module.exports = router;
