@@ -46,9 +46,9 @@ const get_all_token = async (req) => {
   return { value: appId, next: next.length != 0 };
 
 }
-const  { Country, State, City } = require('country-state-city');
+const { Country, State, City } = require('country-state-city');
 
-const get_country_list= async (req) => {
+const get_country_list = async (req) => {
   // const csc = require('country-state-city').Country;
   const countries = Country.getAllCountries();
   console.log(countries);
@@ -56,21 +56,22 @@ const get_country_list= async (req) => {
 
 }
 
-const get_state_list= async (req) => {
- // const csc = require('country-state-city').Country;
- const state = State.getStatesOfCountry("IN");
- console.log(state);
- return state;
+const get_state_list = async (req) => {
+
+  // const csc = require('country-state-city').Country;
+  const state = State.getStatesOfCountry(req.query.county);
+  console.log(state);
+  return state;
 
 
 }
-const get_city_list= async (req) => {
+const get_city_list = async (req) => {
   // const csc = require('country-state-city').Country;
-  const cities = City.getCitiesOfState('IN', 'TN');
+  const cities = City.getCitiesOfState(req.query.county, req.query.state);
   return cities;
- 
- 
- }
+
+
+}
 module.exports = {
   InsertAppId,
   InsertAget_app_id,
