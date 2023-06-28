@@ -45,6 +45,9 @@ const agoraAppIdschema = mongoose.Schema({
     },
     userId: {
         type: String,
+    },
+    agorapassword:{
+        type: String,
     }
 
 
