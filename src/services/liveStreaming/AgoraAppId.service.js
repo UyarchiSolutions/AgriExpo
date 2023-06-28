@@ -52,7 +52,7 @@ const get_country_list= async (req) => {
   // const csc = require('country-state-city').Country;
   const countries = Country.getAllCountries();
   console.log(countries);
-  return {countries};
+  return countries;
 
 }
 
@@ -60,14 +60,14 @@ const get_state_list= async (req) => {
  // const csc = require('country-state-city').Country;
  const state = State.getStatesOfCountry("IN");
  console.log(state);
- return {state};
+ return state;
 
 
 }
 const get_city_list= async (req) => {
   // const csc = require('country-state-city').Country;
   const cities = City.getCitiesOfState('IN', 'TN');
-  return {cities};
+  return cities;
  
  
  }
