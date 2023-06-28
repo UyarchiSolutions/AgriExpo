@@ -127,6 +127,6 @@ router.route('/get/final/customer/final').get(b2bShopCloneController.get_final_c
 router.route('/getSales/Executives').get(b2bShopCloneController.getSalesExecutives);
 
 // aggre expo
-router.route('/agree/expo/:page/:type').get(b2bShopCloneController.getVisitors_With_Page);
-router.route('/agree/Visitors/Disable/:id').get(b2bShopCloneController.DisableVisitors);
+router.route('/agree/expo/:page').get(b2bShopCloneController.getVisitors_With_Page);
+router.route('/agree/Visitors/Disable/:id/:type').get(b2bShopCloneController.DisableVisitors);
 module.exports = router;

@@ -593,12 +593,12 @@ const getSalesExecutives = catchAsync(async (req, res) => {
 });
 
 const getVisitors_With_Page = catchAsync(async (req, res) => {
-  const data = await b2bCloneService.getVisitors_With_Page(req.params.page, req.params.type);
+  const data = await b2bCloneService.getVisitors_With_Page(req.params.pag);
   res.send(data);
 });
 
 const DisableVisitors = catchAsync(async (req, res) => {
-  const data = await b2bCloneService.DisableVisitors(req.params.id);
+  const data = await b2bCloneService.DisableVisitors(req.params.id, req.params.type);
   res.send(data);
 });
 
