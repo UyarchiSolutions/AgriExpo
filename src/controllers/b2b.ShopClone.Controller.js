@@ -112,7 +112,7 @@ const getB2BShopById = catchAsync(async (req, res) => {
 });
 
 const updateB2BShopById = catchAsync(async (req, res) => {
-  const shop = await b2bCloneService.updateB2BShopById(req.params.id, req.params.body);
+  const shop = await b2bCloneService.updateShopById(req.params.id, req.params.body);
   if (req.files) {
     req.files.forEach(function (files, index, arr) {
       shop.photoCapture.push('images/shopClone/' + files.filename);
