@@ -11,6 +11,9 @@ const AgoraAppId = require('../../../controllers/liveStreaming/AgoraAppId.contro
 router.route('/insert/app/id').post(authorization, AgoraAppId.InsertAppId);
 router.get('/get/app/id', AgoraAppId.InsertAget_app_id);
 router.get('/get/token', AgoraAppId.get_all_token);
+router.get('/get/country', AgoraAppId.get_country_list);
+router.get('/get/state', AgoraAppId.get_state_list);
+router.get('/get/city', AgoraAppId.get_city_list);
 
 
 module.exports = router;

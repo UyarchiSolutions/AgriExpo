@@ -16,11 +16,27 @@ const InsertAppId= catchAsync(async (req, res) => {
     const data = await AgoraAppId.get_all_token(req);
     res.status(httpStatus.CREATED).send(data);
   });
+const get_country_list= catchAsync(async (req, res) => {
+  const data = await AgoraAppId.get_country_list(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+const get_state_list= catchAsync(async (req, res) => {
+  const data = await AgoraAppId.get_state_list(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
+const get_city_list= catchAsync(async (req, res) => {
+  const data = await AgoraAppId.get_city_list(req);
+  res.status(httpStatus.CREATED).send(data);
+});
 
 
 module.exports = {
   InsertAppId,
   InsertAget_app_id,
-  get_all_token
+  get_all_token,
+  get_country_list,
+  get_state_list,
+  get_city_list
   };
   
