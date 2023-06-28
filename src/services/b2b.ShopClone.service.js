@@ -5703,6 +5703,35 @@ const getSalesExecutives = async () => {
       },
     },
   ]);
+
+  return values;
+};
+
+const getVisitors_With_Page = async (page, type) => {
+  let values = await Shop.aggregate([
+    { $match: { SType: type } },
+    {
+      $skip: 10 * page,
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+  let next = await Shop.aggregate([{ $match: { SType: type } }, { $skip: 10 * (page + 1) }, { $limit: 10 }]);
+  return { values: values, next: next.length != 0 };
+};
+
+const DisableVisitors = async (id, type) => {
+  let values = await Shop.findById(id);
+  if (!values) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Visitors Not Available');
+  }
+  if (type == 'disable') {
+    values = await Shop.findByIdAndUpdate({ _id: id }, { active: false }, { new: true });
+  } else {
+    values = await Shop.findByIdAndUpdate({ _id: id }, { active: true }, { new: true });
+  }
+
   return values;
 };
 
@@ -5779,4 +5808,6 @@ module.exports = {
   update_reverification_custmer,
   get_final_customer_shops,
   getSalesExecutives,
+  getVisitors_With_Page,
+  DisableVisitors,
 };

@@ -12,7 +12,7 @@ const createSeller = catchAsync(async (req, res) => {
 
 const verifyOTP = catchAsync(async (req, res) => {
   const data = await SellerService.verifyOTP(req);
-  const token = await tokenService.generateAuthTokens_verifedOTP(data)
+  const token = await tokenService.generateAuthTokens_verifedOTP(data);
   res.send(token);
 });
 const setPassword = catchAsync(async (req, res) => {
@@ -65,7 +65,6 @@ const update_single_host = catchAsync(async (req, res) => {
   res.send(data);
 });
 
-
 const getsubuserAll = catchAsync(async (req, res) => {
   const data = await SellerService.getsubuserAll(req);
   res.send(data);
@@ -84,19 +83,15 @@ const update_single_user = catchAsync(async (req, res) => {
   res.send(data);
 });
 
-
 const createSubUser = catchAsync(async (req, res) => {
   const data = await SellerService.createSubUser(req);
   res.send(data);
 });
 
-
 const mydetails = catchAsync(async (req, res) => {
   const data = await SellerService.mydetails(req);
   res.send(data);
 });
-
-
 
 const GetAllSeller = catchAsync(async (req, res) => {
   const data = await SellerService.GetAllSeller();
@@ -120,6 +115,17 @@ const update_my_profile = catchAsync(async (req, res) => {
   const data = await SellerService.update_my_profile(req);
   res.send(data);
 });
+
+const getSellers_With_Paginations = catchAsync(async (req, res) => {
+  const data = await SellerService.getSellers_With_Paginations(req.params.page);
+  res.send(data);
+});
+
+const DisableSeller = catchAsync(async (req, res) => {
+  const data = await SellerService.DisableSeller(req.params.id, req.params.type);
+  res.send(data);
+});
+
 module.exports = {
   createSeller,
   verifyOTP,
@@ -143,5 +149,7 @@ module.exports = {
   get_single_user,
   update_single_user,
   change_password,
-  update_my_profile
+  update_my_profile,
+  getSellers_With_Paginations,
+  DisableSeller,
 };

@@ -7,6 +7,7 @@ const Issue = require('../../middlewares/issue');
 
 router.route('/getmyorders/vieworder').get(shopverify, shopregister.getmyorder_byId);
 router.route('/regiter').post(shopregister.register_shop);
+router.route('/new/register').post(shopregister.NewRegister_Shop);
 router.route('/forget').post(shopregister.forget_password);
 router.route('/verify').post(shopregister.verify_otp);
 router.route('/setpassword').post(shopregister.set_password);

@@ -26,6 +26,18 @@ const register_shop = async (body) => {
   return { message: 'Otp Send Successfull' };
 };
 
+const NewRegister_Shop = async (body) => {
+  const mobileNumber = body.mobile;
+  let shop = await Shop.findOne({ mobile: mobileNumber });
+  if (shop) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Shop-Already-Register');
+  }
+  const creations = await Shop.create(body);
+  const otp = await sentOTP(mobileNumber, creations);
+  console.log(otp);
+  return { message: 'OTP Send Success' };
+};
+
 const forget_password = async (body) => {
   const mobileNumber = body.mobile;
   let shop = await Shop.findOne({ mobile: mobileNumber });
@@ -54,6 +66,7 @@ const verify_otp = async (body) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Invalid OTP');
   }
   let shop = await Shop.findById({ _id: findOTP.userId });
+  await Shop.findByIdAndUpdate({ _id: findOTP.userId }, { registered: true }, { new: true });
   return shop;
 };
 const set_password = async (body) => {
@@ -160,7 +173,6 @@ const get_myDetails = async (req) => {
         shopTypename: '$shoplists.shopList',
         email: 1,
         Pincode: 1,
-
       },
     },
   ]);
@@ -1554,8 +1566,8 @@ const getIssuedProduct = async (id) => {
                     videos: 1,
                     image: 1,
                     product: '$products.productTitle',
-                  }
-                }
+                  },
+                },
               ],
               as: 'productorderclones',
             },
@@ -1622,11 +1634,11 @@ const getIssuedProduct = async (id) => {
         videos: 1,
         image: 1,
         product: '$products.productTitle',
-        productorderclones: "$shoporderclones.productorderclones",
-        SName: "$shoporderclones.b2bshopclones.SName",
-        createdDate: "$shoporderclones.created",
-        delivered_date: "$shoporderclones.delivered_date",
-        delivered_users: "$shoporderclones.b2busers.name"
+        productorderclones: '$shoporderclones.productorderclones',
+        SName: '$shoporderclones.b2bshopclones.SName',
+        createdDate: '$shoporderclones.created',
+        delivered_date: '$shoporderclones.delivered_date',
+        delivered_users: '$shoporderclones.b2busers.name',
       },
     },
   ]);
@@ -1733,7 +1745,7 @@ const getissuedOrders = async (page) => {
         issue_Res: 1,
         pick_up_charge: 1,
         advance_delivery_charge: 1,
-        damage_deduction: 1
+        damage_deduction: 1,
       },
     },
     {
@@ -1805,22 +1817,18 @@ const update_profile = async (req) => {
 
   if (!value) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Shop Not Fount');
-
   }
 
   value = await Shop.findByIdAndUpdate({ _id: req.shopId }, req.body, { new: true });
 
   return value;
-
-
-}
+};
 
 const update_changepassword = async (req) => {
   let value = await Shop.findById(req.shopId);
 
   if (!value) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Shop Not Fount');
-
   }
 
   if (!(await value.isPasswordMatch(req.body.oldpassword))) {
@@ -1832,9 +1840,7 @@ const update_changepassword = async (req) => {
   value = await Shop.findByIdAndUpdate({ _id: req.shopId }, { password: password }, { new: true });
 
   return value;
-
-
-}
+};
 
 const get_my_orders_all = async (req) => {
   let page = req.query.page == '' || req.query.page == null ? 0 : parseInt(req.query.page);
@@ -1855,29 +1861,29 @@ const get_my_orders_all = async (req) => {
               as: 'products',
             },
           },
-          { $unwind: "$products" },
+          { $unwind: '$products' },
           {
             $project: {
               _id: 1,
               purchase_quantity: 1,
               purchase_price: 1,
               status: 1,
-              productTitle: "$products.productTitle",
-              OrderAmount: { $multiply: ["$purchase_quantity", "$purchase_price"] }
-            }
+              productTitle: '$products.productTitle',
+              OrderAmount: { $multiply: ['$purchase_quantity', '$purchase_price'] },
+            },
           },
           {
             $group: {
               _id: null,
-              productTitle: { $push: "$productTitle" },
-              orderAmount: { $sum: "$OrderAmount" }
-            }
-          }
+              productTitle: { $push: '$productTitle' },
+              orderAmount: { $sum: '$OrderAmount' },
+            },
+          },
         ],
         as: 'streamingorderproducts',
       },
     },
-    { $unwind: "$streamingorderproducts" },
+    { $unwind: '$streamingorderproducts' },
 
     {
       $lookup: {
@@ -1888,14 +1894,14 @@ const get_my_orders_all = async (req) => {
           {
             $group: {
               _id: null,
-              totalPaidAmound: { $sum: "$paidAmt" }
-            }
-          }
+              totalPaidAmound: { $sum: '$paidAmt' },
+            },
+          },
         ],
         as: 'streamingorderpayments',
       },
     },
-    { $unwind: "$streamingorderpayments" },
+    { $unwind: '$streamingorderpayments' },
     {
       $lookup: {
         from: 'streamrequests',
@@ -1910,22 +1916,22 @@ const get_my_orders_all = async (req) => {
               as: 'sellers',
             },
           },
-          { $unwind: "$sellers" },
+          { $unwind: '$sellers' },
           {
             $project: {
               _id: 1,
-              contactName: "$sellers.contactName",
-              mobileNumber: "$sellers.mobileNumber",
-              tradeName: "$sellers.tradeName",
+              contactName: '$sellers.contactName',
+              mobileNumber: '$sellers.mobileNumber',
+              tradeName: '$sellers.tradeName',
               streamName: 1,
               created: 1,
-            }
-          }
+            },
+          },
         ],
         as: 'streamrequests',
       },
     },
-    { $unwind: "$streamrequests" },
+    { $unwind: '$streamrequests' },
     {
       $project: {
         _id: 1,
@@ -1941,27 +1947,27 @@ const get_my_orders_all = async (req) => {
         Amount: 1,
         DateIso: 1,
         created: 1,
-        productTitle: "$streamingorderproducts.productTitle",
+        productTitle: '$streamingorderproducts.productTitle',
         // productTitle: "$streamingorderproducts",
-        orderAmount: "$streamingorderproducts.orderAmount",
-        totalPaidAmound: "$streamingorderpayments.totalPaidAmound",
-        contactName: "$streamrequests.contactName",
-        mobileNumber: "$streamrequests.mobileNumber",
-        streamName: "$streamrequests.streamName",
-        streamDate: "$streamrequests.created",
-        tradeName: "$streamrequests.tradeName"
-      }
+        orderAmount: '$streamingorderproducts.orderAmount',
+        totalPaidAmound: '$streamingorderpayments.totalPaidAmound',
+        contactName: '$streamrequests.contactName',
+        mobileNumber: '$streamrequests.mobileNumber',
+        streamName: '$streamrequests.streamName',
+        streamDate: '$streamrequests.created',
+        tradeName: '$streamrequests.tradeName',
+      },
     },
     { $skip: 10 * page },
     { $limit: 10 },
-  ])
+  ]);
   let total = await streamingOrder.aggregate([
     { $match: { $and: [{ shopId: { $eq: shopId } }] } },
     { $skip: 10 * (page + 1) },
     { $limit: 10 },
-  ])
+  ]);
   return { value, next: total != 0 };
-}
+};
 
 const get_my_orders_single = async (req) => {
   let page = req.query.page == '' || req.query.page == null ? 0 : parseInt(req.query.page);
@@ -1983,29 +1989,29 @@ const get_my_orders_single = async (req) => {
               as: 'products',
             },
           },
-          { $unwind: "$products" },
+          { $unwind: '$products' },
           {
             $project: {
               _id: 1,
               purchase_quantity: 1,
               purchase_price: 1,
               status: 1,
-              productTitle: "$products.productTitle",
-              OrderAmount: { $multiply: ["$purchase_quantity", "$purchase_price"] }
-            }
+              productTitle: '$products.productTitle',
+              OrderAmount: { $multiply: ['$purchase_quantity', '$purchase_price'] },
+            },
           },
           {
             $group: {
               _id: null,
-              productTitle: { $push: "$productTitle" },
-              orderAmount: { $sum: "$OrderAmount" }
-            }
-          }
+              productTitle: { $push: '$productTitle' },
+              orderAmount: { $sum: '$OrderAmount' },
+            },
+          },
         ],
         as: 'streamingorderproducts',
       },
     },
-    { $unwind: "$streamingorderproducts" },
+    { $unwind: '$streamingorderproducts' },
     {
       $lookup: {
         from: 'streamingorderproducts',
@@ -2020,23 +2026,22 @@ const get_my_orders_single = async (req) => {
               as: 'products',
             },
           },
-          { $unwind: "$products" },
+          { $unwind: '$products' },
           {
             $project: {
               _id: 1,
               purchase_quantity: 1,
               purchase_price: 1,
               status: 1,
-              productTitle: "$products.productTitle",
-              OrderAmount: { $multiply: ["$purchase_quantity", "$purchase_price"] }
-            }
+              productTitle: '$products.productTitle',
+              OrderAmount: { $multiply: ['$purchase_quantity', '$purchase_price'] },
+            },
           },
-
         ],
         as: 'streamingorderproducts_orders',
       },
     },
-    { $unwind: "$streamingorderproducts_orders" },
+    { $unwind: '$streamingorderproducts_orders' },
     {
       $lookup: {
         from: 'streamingorderpayments',
@@ -2046,14 +2051,14 @@ const get_my_orders_single = async (req) => {
           {
             $group: {
               _id: null,
-              totalPaidAmound: { $sum: "$paidAmt" }
-            }
-          }
+              totalPaidAmound: { $sum: '$paidAmt' },
+            },
+          },
         ],
         as: 'streamingorderpayments',
       },
     },
-    { $unwind: "$streamingorderpayments" },
+    { $unwind: '$streamingorderpayments' },
     {
       $lookup: {
         from: 'streamrequests',
@@ -2068,22 +2073,22 @@ const get_my_orders_single = async (req) => {
               as: 'sellers',
             },
           },
-          { $unwind: "$sellers" },
+          { $unwind: '$sellers' },
           {
             $project: {
               _id: 1,
-              contactName: "$sellers.contactName",
-              mobileNumber: "$sellers.mobileNumber",
-              tradeName: "$sellers.tradeName",
+              contactName: '$sellers.contactName',
+              mobileNumber: '$sellers.mobileNumber',
+              tradeName: '$sellers.tradeName',
               streamName: 1,
               created: 1,
-            }
-          }
+            },
+          },
         ],
         as: 'streamrequests',
       },
     },
-    { $unwind: "$streamrequests" },
+    { $unwind: '$streamrequests' },
     {
       $project: {
         _id: 1,
@@ -2099,28 +2104,26 @@ const get_my_orders_single = async (req) => {
         Amount: 1,
         DateIso: 1,
         created: 1,
-        productTitle: "$streamingorderproducts.productTitle",
+        productTitle: '$streamingorderproducts.productTitle',
         // productTitle: "$streamingorderproducts",
-        orderAmount: "$streamingorderproducts.orderAmount",
-        totalPaidAmound: "$streamingorderpayments.totalPaidAmound",
-        contactName: "$streamrequests.contactName",
-        mobileNumber: "$streamrequests.mobileNumber",
-        streamName: "$streamrequests.streamName",
-        streamDate: "$streamrequests.created",
-        tradeName: "$streamrequests.tradeName",
-        streamingorderproducts_orders: "$streamingorderproducts_orders"
-      }
+        orderAmount: '$streamingorderproducts.orderAmount',
+        totalPaidAmound: '$streamingorderpayments.totalPaidAmound',
+        contactName: '$streamrequests.contactName',
+        mobileNumber: '$streamrequests.mobileNumber',
+        streamName: '$streamrequests.streamName',
+        streamDate: '$streamrequests.created',
+        tradeName: '$streamrequests.tradeName',
+        streamingorderproducts_orders: '$streamingorderproducts_orders',
+      },
     },
-  ])
+  ]);
 
   if (value.length == 0) {
     throw new ApiError(403, 'Order Not found');
   }
 
-  return value[0]
-}
-
-
+  return value[0];
+};
 
 module.exports = {
   register_shop,
@@ -2149,5 +2152,6 @@ module.exports = {
   update_profile,
   update_changepassword,
   get_my_orders_all,
-  get_my_orders_single
+  get_my_orders_single,
+  NewRegister_Shop,
 };
