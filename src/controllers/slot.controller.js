@@ -13,7 +13,13 @@ const Fetch_Slot = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const UpdateSlotById = catchAsync(async (req, res) => {
+  const data = await SlotService.UpdateSlotById(req.params.id, req.body);
+  res.send(data);
+});
+
 module.exports = {
   SlotCreation,
   Fetch_Slot,
+  UpdateSlotById,
 };

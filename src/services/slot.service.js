@@ -51,7 +51,17 @@ const Fetch_Slot = async (query) => {
   return values;
 };
 
+const UpdateSlotById = async (id, body) => {
+  let values = await Slot.findById(id);
+  if (!values) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Slot Not Availbale');
+  }
+  values = await Slot.findByIdAndUpdate({ _id: id }, body, { new: true });
+  return values;
+};
+
 module.exports = {
   createSlot,
   Fetch_Slot,
+  UpdateSlotById,
 };
