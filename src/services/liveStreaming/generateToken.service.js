@@ -5,11 +5,11 @@ const Agora = require('agora-access-token');
 const moment = require('moment');
 const { tempTokenModel, Joinusers } = require('../../models/liveStreaming/generateToken.model');
 const axios = require('axios'); //
-const appID = '1ba2592b16b74f3497e232e1b01f66b0';
-const appCertificate = '8ae85f97802448c2a47b98715ff90ffb';
-const Authorization = `Basic ${Buffer.from(`61b817e750214d58ba9d8148e7c89a1b:88401de254b2436a9da15b2f872937de`).toString(
-  'base64'
-)}`;
+// const appID = '1ba2592b16b74f3497e232e1b01f66b0';
+// const appCertificate = '8ae85f97802448c2a47b98715ff90ffb';
+// const Authorization = `Basic ${Buffer.from(`61b817e750214d58ba9d8148e7c89a1b:88401de254b2436a9da15b2f872937de`).toString(
+//   'base64'
+// )}`;
 const Dates = require('../Date.serive');
 const {
   Streamplan,
@@ -19,6 +19,8 @@ const {
   StreamPreRegister,
 } = require('../../models/ecomplan.model');
 const { request } = require('express');
+
+const { AgoraAppId, UsageAppID } = require('../../models/liveStreaming/AgoraAppId.model');
 
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
@@ -78,8 +80,9 @@ const generateToken = async (req) => {
   req.io.emit(streamId + '_golive', { streamId: streamId });
   return { uid, token, value, cloud_recording, stream };
 };
-const geenerate_rtc_token = async (chennel, uid, role, expirationTimestamp) => {
-  return Agora.RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, chennel, uid, role, expirationTimestamp);
+const geenerate_rtc_token = async (chennel, uid, role, expirationTimestamp, agoraID) => {
+  let agoraToken = await AgoraAppId.findById(agoraID)
+  return Agora.RtcTokenBuilder.buildTokenWithUid(agoraToken.appID, agoraToken.appCertificate, chennel, uid, role, expirationTimestamp);
 };
 const generateToken_sub_record = async (channel, isPublisher, req, hostIdss, expire) => {
   const expirationTimeInSeconds = 3600;
@@ -282,12 +285,16 @@ const participents_limit = async (req) => {
   return { participents: value >= participents.participents ? false : true };
 };
 
-const agora_acquire = async (req, id) => {
+const agora_acquire = async (req, id,agroaID) => {
   let temtoken = id;
+    let agoraToken = await AgoraAppId.findById(agroaID)
   // let temtoken=req.body.id;
   let token = await tempTokenModel.findById(temtoken);
+   const Authorization = `Basic ${Buffer.from(agoraToken.Authorization).toString(
+    'base64'
+  )}`;
   const acquire = await axios.post(
-    `https://api.agora.io/v1/apps/${appID}/cloud_recording/acquire`,
+    `https://api.agora.io/v1/apps/${agoraToken.appID}/cloud_recording/acquire`,
     {
       cname: token.chennel,
       uid: token.Uid.toString(),
@@ -296,7 +303,7 @@ const agora_acquire = async (req, id) => {
         scene: 0,
       },
     },
-    { headers: { Authorization } }
+    { headers: { Authorization} }
   );
   token.resourceId = acquire.data.resourceId;
   token.recoredStart = 'acquire';
@@ -311,6 +318,11 @@ const agora_acquire = async (req, id) => {
 const recording_start = async (req, id) => {
   // let temtoken = id;
   let token = await tempTokenModel.findOne({ chennel: id, type: 'CloudRecording', recoredStart: { $eq: "acquire" } });
+  let str = await Streamrequest.findById(token.streamId);
+  let agoraToken = await AgoraAppId.findById(str.agroaID);
+  const Authorization = `Basic ${Buffer.from(agoraToken.Authorization).toString(
+    'base64'
+  )}`;
   // let temtoken=req.body.id;
   // let token = await tempTokenModel.findById(temtoken);
   if (token) {
@@ -320,7 +332,7 @@ const recording_start = async (req, id) => {
       //console.log(token)
       const mode = 'mix';
       const start = await axios.post(
-        `https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resource}/mode/${mode}/start`,
+        `https://api.agora.io/v1/apps/${agoraToken.appID}/cloud_recording/resourceid/${resource}/mode/${mode}/start`,
         {
           cname: token.chennel,
           uid: token.Uid.toString(),
@@ -360,7 +372,7 @@ const recording_start = async (req, id) => {
       token.recoredStart = 'start';
       token.save();
       setTimeout(async () => {
-        await recording_query(req, token._id);
+        await recording_query(req, token._id,agoraToken);
       }, 3000);
       return start.data;
     }
@@ -372,7 +384,10 @@ const recording_start = async (req, id) => {
     return { message: 'Already Started' };
   }
 };
-const recording_query = async (req, id) => {
+const recording_query = async (req, id,agoraToken) => {
+  const Authorization = `Basic ${Buffer.from(agoraToken.Authorization).toString(
+    'base64'
+  )}`;
   let temtoken = id;
   // let temtoken=req.body.id;
   // //console.log(req.body);
@@ -382,7 +397,7 @@ const recording_query = async (req, id) => {
   const mode = 'mix';
   // //console.log(`https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`);
   const query = await axios.get(
-    `https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
+    `https://api.agora.io/v1/apps/${agoraToken.appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
     { headers: { Authorization } }
   );
   token.videoLink = query.data.serverResponse.fileList;
@@ -1060,7 +1075,7 @@ const production_supplier_token = async (req) => {
         type: 'Supplier',
       },
     });
-    const token = await geenerate_rtc_token(streamId, uid, role, expirationTimestamp);
+    const token = await geenerate_rtc_token(streamId, uid, role, expirationTimestamp, stream.agoraID);
     value.token = token;
     value.chennel = streamId;
     value.save();
@@ -1071,13 +1086,14 @@ const production_supplier_token = async (req) => {
 
   req.io.emit(streamId + '_golive', { streamId: streamId });
   console.log(streamId);
-  await production_supplier_token_cloudrecording(req, streamId);
+  await production_supplier_token_cloudrecording(req, streamId,stream.agoraID);
   return value;
 };
 
-const production_supplier_token_cloudrecording = async (req, id) => {
+const production_supplier_token_cloudrecording = async (req, id,agroaID) => {
   let streamId = id;
   // let streamId = req.body.streamId;
+  let agoraToken = await AgoraAppId.findById(agroaID)
   let stream = await Streamrequest.findById(streamId);
   if (!stream) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
@@ -1101,12 +1117,12 @@ const production_supplier_token_cloudrecording = async (req, id) => {
         type: 'CloudRecording',
       },
     });
-    const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp);
+    const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp,agroaID);
     value.token = token;
     value.store = value._id.replace(/[^a-zA-Z0-9]/g, '');
     value.save();
     if (value.videoLink == '' || value.videoLink == null) {
-      await agora_acquire(req, value._id);
+      await agora_acquire(req, value._id,agroaID);
     }
   } else {
     // try {
@@ -1115,9 +1131,12 @@ const production_supplier_token_cloudrecording = async (req, id) => {
     const sid = token.sid;
     console.log(1234567890123456, resource)
     const mode = 'mix';
+    const Authorization = `Basic ${Buffer.from(agoraToken.Authorization).toString(
+      'base64'
+    )}`;
     // //console.log(`https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`);
     await axios.get(
-      `https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
+      `https://api.agora.io/v1/apps/${agoraToken.appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
       { headers: { Authorization } }
     ).then((res) => {
 
@@ -1139,7 +1158,7 @@ const production_supplier_token_cloudrecording = async (req, id) => {
           type: 'CloudRecording',
         },
       });
-      const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp);
+      const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp,agroaID);
       value.token = token;
       value.store = value._id.replace(/[^a-zA-Z0-9]/g, '');
       value.save();
