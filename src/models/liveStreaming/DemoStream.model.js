@@ -46,48 +46,11 @@ const agoraAppIdschema = mongoose.Schema({
     userId: {
         type: String,
     },
-    agorapassword: {
+    agorapassword:{
         type: String,
-    },
-    userMinutes: {
-        type: Number,
-        default: 0
     }
-
 
 });
 
-const AgoraAppId = mongoose.model('AgoraAppId', agoraAppIdschema);
-
-
-const UsageAppIDschema = mongoose.Schema({
-    _id: {
-        type: String,
-        default: v4,
-    },
-    dateISO: {
-        type: Number,
-    },
-    date: {
-        type: String,
-    },
-    expired: {
-        type: Boolean,
-        default: false,
-    },
-    appID: {
-        type: String,
-    },
-    streamID: {
-        type: String,
-    },
-    minutes: {
-        type: Number,
-    },
-    streamType: {
-        type: String,
-    }
-});
-
-const UsageAppID = mongoose.model('appidusage', UsageAppIDschema);
-module.exports = { AgoraAppId, UsageAppID };
+const AgoraAppId = mongoose.model('demostream', agoraAppIdschema);
+module.exports = { AgoraAppId };

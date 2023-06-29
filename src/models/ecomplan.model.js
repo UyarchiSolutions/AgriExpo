@@ -184,10 +184,10 @@ const streamPostschema = mongoose.Schema({
     type: String,
     default: 'Active',
   },
-  uploadStreamVideo:{
+  uploadStreamVideo: {
     type: String,
   },
-  newVideoUpload:{
+  newVideoUpload: {
     type: String,
     default: 'Pending'
   }
@@ -344,6 +344,12 @@ const streamRequestschema = mongoose.Schema({
   videoconvertStatus: {
     type: String,
     default: "Pending"
+  },
+  agoraID: {
+    type: String,
+  },
+  totalMinues: {
+    type: Number,
   }
 });
 

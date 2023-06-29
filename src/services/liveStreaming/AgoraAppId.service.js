@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const ApiError = require('../../utils/ApiError');
 const moment = require('moment');
-const { AgoraAppId } = require('../../models/liveStreaming/AgoraAppId.model');
+const { AgoraAppId, UsageAppID } = require('../../models/liveStreaming/AgoraAppId.model');
 
 
 const InsertAppId = async (req) => {
@@ -19,7 +19,7 @@ const InsertAppId = async (req) => {
 const InsertAget_app_id = async (req) => {
   let id = req.query.id;
   let appId = await AgoraAppId.findById(id)
-
+  // return await token_assign(400, 65778,"demo");
   return appId;
 
 }
@@ -72,11 +72,43 @@ const get_city_list = async (req) => {
 
 
 }
+
+const token_assign = async (minutes, streamID,streamType) => {
+  let token = await AgoraAppId.find({ expired: false });
+  return new Promise(async (resolve) => {
+    for (let i = 0; i < token.length; i++) {
+      let element = token[i];
+      let usedMinutes = element.userMinutes ? element.userMinutes : 0;
+      console.log(element)
+      if (usedMinutes + minutes < 9500) {
+        let vals = await UsageAppID.create({
+          dateISO: moment(),
+          date: moment().format('YYYY-MM-DD'),
+          streamID: streamID,
+          appID: element._id,
+          minutes: minutes,
+          streamType:streamType
+        })
+        element.userMinutes = usedMinutes + minutes;
+        element.save();
+        resolve({vals,element});
+        break;
+      }
+      else {
+        if (9400 < usedMinutes) {
+          element.expired = true;
+        }
+      }
+      element.save();
+    }
+  });
+}
 module.exports = {
   InsertAppId,
   InsertAget_app_id,
   get_all_token,
   get_state_list,
   get_country_list,
-  get_city_list
+  get_city_list,
+  token_assign
 };

@@ -5,6 +5,7 @@ const checkout = require('./checkout.route');
 const docsRoute = require('../docs.route');
 const config = require('../../../config/config');
 const agora = require('./AgoraAppId.route');
+const demostream = require('./DemoStream.route');
 
 const router = express.Router();
 
@@ -24,6 +25,10 @@ const defaultRoutes = [
   {
     path: '/agora',
     route: agora,
+  },
+  {
+    path: '/demostream',
+    route: demostream,
   },
 ];
 

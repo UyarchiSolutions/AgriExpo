@@ -21,6 +21,8 @@ const generateLink = require('./liveStreaming/generatelink.service');
 const moment = require('moment');
 const { findById } = require('../models/token.model');
 
+const agoraToken = require("./liveStreaming/AgoraAppId.service");
+
 const create_Plans = async (req) => {
   //console.log(req.body);
   const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal' } });
@@ -1356,6 +1358,19 @@ const create_stream_one = async (req) => {
     },
     { new: true }
   );
+  let Duration = myplan.Duration;
+  let numberOfParticipants = myplan.numberOfParticipants * Duration;
+  let no_of_host = myplan.no_of_host * Duration;
+
+  let totalMinutes = numberOfParticipants + no_of_host + Duration;
+  let agoraID = await agoraToken.token_assign(totalMinutes, value._id, "agri");
+  if (agoraID) {
+    agoraID.element._id;
+    await Streamrequest.findByIdAndUpdate(
+      { _id: value._id }, { agoraID: agoraID.element._id, totalMinues: totalMinutes }, { new: true }
+    );
+  }
+
   return value;
 };
 
@@ -7277,8 +7292,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-        ? 'RAC'
-        : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -7287,8 +7302,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+            ? 'RAC'
+            : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -11719,7 +11734,7 @@ const get_stream_post_after_live_stream = async (req) => {
       ffmpeg(inputFilePath)
         .outputOptions('-c', 'copy')
         .output(outputFilePath)
-        .on('end', (e) => {})
+        .on('end', (e) => { })
         .on('error', (err) => {
           console.error('Error while converting:', err);
         })
