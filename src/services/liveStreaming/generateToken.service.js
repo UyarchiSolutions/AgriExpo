@@ -319,7 +319,7 @@ const recording_start = async (req, id) => {
   // let temtoken = id;
   let token = await tempTokenModel.findOne({ chennel: id, type: 'CloudRecording', recoredStart: { $eq: "acquire" } });
   let str = await Streamrequest.findById(token.streamId);
-  let agoraToken = await AgoraAppId.findById(str.agroaID);
+  let agoraToken = await AgoraAppId.findById(str.agoraID);
   const Authorization = `Basic ${Buffer.from(agoraToken.Authorization).toString(
     'base64'
   )}`;
