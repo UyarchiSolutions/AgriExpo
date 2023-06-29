@@ -1938,7 +1938,7 @@ const verifyRegisterOTP = async (body) => {
 const deleteShopById = async (id) => {
   let shop = await getShopById(id);
   if (!shop) {
-    throw new ApiError(httpStatus.NOT_FOUNDm, 'Shop Not Found');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Shop Not Found');
   }
   (shop.active = false), (shop.archive = true);
   await shop.save();

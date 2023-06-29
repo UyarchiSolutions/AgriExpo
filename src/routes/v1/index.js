@@ -113,10 +113,15 @@ const purchasePlan = require('./purchasePlan.route');
 const subHostRoute = require('./subHost.route');
 const SellerRoute = require('./seller.route');
 const partnerSetPrice = require('./partner.setPrice.route');
+const SlotRoute = require('./slot.route');
 const defaultRoutes = [
   {
     path: '/purchaseplan',
     route: purchasePlan,
+  },
+  {
+    path: '/slot',
+    route: SlotRoute,
   },
   {
     path: '/partnersetPrice',
