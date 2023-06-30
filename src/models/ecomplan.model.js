@@ -84,6 +84,54 @@ const streamplanschema = mongoose.Schema({
   no_of_host: {
     type: Number,
   },
+  slotInfo: {
+    type: Array,
+  },
+  date: {
+    type: String,
+  },
+  Teaser: {
+    type: String,
+  },
+  Pdf: {
+    type: String,
+  },
+  description: {
+    type: String,
+  },
+  image: {
+    type: String,
+  },
+  PostCount: {
+    type: Number,
+  },
+  chat_Option: {
+    type: String,
+  },
+  RaiseHands: {
+    type: String,
+  },
+  No_of_host: {
+    type: Number,
+  },
+  salesCommission: {
+    type: String,
+  },
+  Special_Notification: {
+    type: String,
+  },
+  StreamVideos: {
+    type: String,
+  },
+  completedStream: {
+    type: String,
+  },
+  Advertisement_Display: {
+    type: String,
+  },
+  Price: {
+    type: Number,
+  },
 });
 
 const Streamplan = mongoose.model('streamplan', streamplanschema);
@@ -109,15 +157,15 @@ const streamPostschema = mongoose.Schema({
   },
   quantity: {
     type: Number,
-    default: 0
+    default: 0,
   },
   orderedQTY: {
     type: Number,
-    default: 0
+    default: 0,
   },
   pendingQTY: {
     type: Number,
-    default: 0
+    default: 0,
   },
   marketPlace: {
     type: Number,
@@ -189,9 +237,8 @@ const streamPostschema = mongoose.Schema({
   },
   newVideoUpload: {
     type: String,
-    default: 'Pending'
-  }
-
+    default: 'Pending',
+  },
 });
 
 const StreamPost = mongoose.model('Streampost', streamPostschema);
@@ -343,14 +390,14 @@ const streamRequestschema = mongoose.Schema({
   },
   videoconvertStatus: {
     type: String,
-    default: "Pending"
+    default: 'Pending',
   },
   agoraID: {
     type: String,
   },
   totalMinues: {
     type: Number,
-  }
+  },
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);
@@ -518,7 +565,6 @@ const Slabschema = mongoose.Schema({
 
 const Slab = mongoose.model('slabdetails', Slabschema);
 
-
 const shopNotificationschema = mongoose.Schema({
   _id: {
     type: String,
@@ -570,5 +616,42 @@ const shopNotificationschema = mongoose.Schema({
 
 const shopNotification = mongoose.model('shopNotification', shopNotificationschema);
 
+const PlanSlotSchema = new mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    slotType: {
+      type: String,
+    },
+    Duration: {
+      type: Number,
+    },
+    No_Of_Slot: {
+      type: String,
+    },
+    streamPlanId: {
+      type: String,
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  { timestamps: true }
+);
 
-module.exports = { Streamplan, StreamPost, Streamrequest, StreamrequestPost, StreamPreRegister, streamPlanlink, Slab, shopNotification };
+const PlanSlot = mongoose.model('planslot', PlanSlotSchema);
+
+module.exports = {
+  Streamplan,
+  StreamPost,
+  Streamrequest,
+  StreamrequestPost,
+  StreamPreRegister,
+  streamPlanlink,
+  Slab,
+  shopNotification,
+  PlanSlot,
+};
