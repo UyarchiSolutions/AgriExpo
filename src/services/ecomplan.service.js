@@ -3100,6 +3100,20 @@ const get_subhost_token = async (req, userId) => {
       },
     },
     {
+      $lookup: {
+        from: 'agoraappids',
+        localField: 'agoraID',
+        foreignField: '_id',
+        as: 'agoraappids',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$agoraappids',
+      },
+    },
+    {
       $project: {
         _id: 1,
         supplierName: '$suppliers.contactName',
@@ -3130,6 +3144,7 @@ const get_subhost_token = async (req, userId) => {
         chat_need: 1,
         temptokens_sub: '$temptokens_sub',
         no_of_host: '$purchasedplans.no_of_host',
+        agoraappids:"$agoraappids"
       },
     },
   ]);

@@ -318,14 +318,15 @@ const agora_acquire = async (req, id,agroaID) => {
 const recording_start = async (req, id) => {
   // let temtoken = id;
   let token = await tempTokenModel.findOne({ chennel: id, type: 'CloudRecording', recoredStart: { $eq: "acquire" } });
-  let str = await Streamrequest.findById(token.streamId);
-  let agoraToken = await AgoraAppId.findById(str.agoraID);
-  const Authorization = `Basic ${Buffer.from(agoraToken.Authorization).toString(
-    'base64'
-  )}`;
+
   // let temtoken=req.body.id;
   // let token = await tempTokenModel.findById(temtoken);
   if (token) {
+    let str = await Streamrequest.findById(token.streamId);
+    let agoraToken = await AgoraAppId.findById(str.agoraID);
+    const Authorization = `Basic ${Buffer.from(agoraToken.Authorization).toString(
+      'base64'
+    )}`;
     if (token.recoredStart == 'acquire') {
       const resource = token.resourceId;
       //console.log(resource)
@@ -999,7 +1000,7 @@ const create_subhost_token = async (req) => {
         type: 'subhost',
       },
     });
-    const token = await geenerate_rtc_token(streamId, uid, Agora.RtcRole.PUBLISHER, expirationTimestamp);
+    const token = await geenerate_rtc_token(streamId, uid, Agora.RtcRole.PUBLISHER, expirationTimestamp,stream.agoraID);
     value.token = token;
     value.chennel = streamId;
     value.save();
@@ -1008,7 +1009,7 @@ const create_subhost_token = async (req) => {
     stream.save();
   }
   req.io.emit(streamId + '_golive', { streamId: streamId });
-  await production_supplier_token_cloudrecording(req, streamId);
+  await production_supplier_token_cloudrecording(req, streamId,stream.agoraID);
   return value;
 };
 
