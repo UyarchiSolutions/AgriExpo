@@ -152,7 +152,7 @@ const generateToken_sub = async (req) => {
         joinedUser: user._id,
       },
     });
-    const token = await geenerate_rtc_token(channel, uid, role, str.endTime / 1000);
+    const token = await geenerate_rtc_token(channel, uid, role, str.endTime / 1000,str.agoraID);
     value.token = token;
     value.save();
     stream = value;
@@ -318,14 +318,15 @@ const agora_acquire = async (req, id,agroaID) => {
 const recording_start = async (req, id) => {
   // let temtoken = id;
   let token = await tempTokenModel.findOne({ chennel: id, type: 'CloudRecording', recoredStart: { $eq: "acquire" } });
-  let str = await Streamrequest.findById(token.streamId);
-  let agoraToken = await AgoraAppId.findById(str.agroaID);
-  const Authorization = `Basic ${Buffer.from(agoraToken.Authorization).toString(
-    'base64'
-  )}`;
+
   // let temtoken=req.body.id;
   // let token = await tempTokenModel.findById(temtoken);
   if (token) {
+    let str = await Streamrequest.findById(token.streamId);
+    let agoraToken = await AgoraAppId.findById(str.agoraID);
+    const Authorization = `Basic ${Buffer.from(agoraToken.Authorization).toString(
+      'base64'
+    )}`;
     if (token.recoredStart == 'acquire') {
       const resource = token.resourceId;
       //console.log(resource)
@@ -564,6 +565,20 @@ const get_sub_golive = async (req, io) => {
             },
           },
           { $unwind: '$purchasedplans' },
+          {
+            $lookup: {
+              from: 'agoraappids',
+              localField: 'agoraID',
+              foreignField: '_id',
+              as: 'agoraappids',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$agoraappids',
+            },
+          },
         ],
         as: 'streamrequests',
       },
@@ -683,6 +698,7 @@ const get_sub_golive = async (req, io) => {
         as: 'temptokens_sub',
       },
     },
+    
     {
       $project: {
         _id: 1,
@@ -709,6 +725,7 @@ const get_sub_golive = async (req, io) => {
         chat_need: '$streamrequests.chat_need',
         temptokens_sub: '$temptokens_sub',
         joindedUserBan: 1,
+        appID:"$streamrequests.agoraappids.appID"
       },
     },
   ]);
@@ -999,7 +1016,7 @@ const create_subhost_token = async (req) => {
         type: 'subhost',
       },
     });
-    const token = await geenerate_rtc_token(streamId, uid, Agora.RtcRole.PUBLISHER, expirationTimestamp);
+    const token = await geenerate_rtc_token(streamId, uid, Agora.RtcRole.PUBLISHER, expirationTimestamp,stream.agoraID);
     value.token = token;
     value.chennel = streamId;
     value.save();
@@ -1008,7 +1025,7 @@ const create_subhost_token = async (req) => {
     stream.save();
   }
   req.io.emit(streamId + '_golive', { streamId: streamId });
-  await production_supplier_token_cloudrecording(req, streamId);
+  await production_supplier_token_cloudrecording(req, streamId,stream.agoraID);
   return value;
 };
 
