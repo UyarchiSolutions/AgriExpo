@@ -92,6 +92,9 @@ const token_assign = async (minutes, streamID, streamType) => {
         element.userMinutes = usedMinutes + minutes;
         element.save();
         resolve({ vals, element });
+        if (9450 < element.userMinutes) {
+          element.expired = true;
+        }
         break;
       }
       else {
