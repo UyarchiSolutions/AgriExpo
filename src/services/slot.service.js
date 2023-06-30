@@ -10,7 +10,6 @@ const createSlot = async (body) => {
   const end = moment(Start).add(Duration, 'minutes');
   const startFormat = moment(`${date}T${chooseTime}`).format('HH:mm');
   const endFormat = moment(Start).add(Duration, 'minutes').format('HH:mm');
-
   const existSlot = await Slot.findOne({ date: date, startFormat: chooseTime });
   if (existSlot) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'This Slot Already Booked');
@@ -70,8 +69,18 @@ const UpdateSlotById = async (id, body) => {
   return values;
 };
 
+const DeleteSlotById = async (id) => {
+  let values = await Slot.findById(id);
+  if (!values) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Slot Not Availbale');
+  }
+  await values.remove();
+  return user;
+};
+
 module.exports = {
   createSlot,
   Fetch_Slot,
   UpdateSlotById,
+  DeleteSlotById,
 };

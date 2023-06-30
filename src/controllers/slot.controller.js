@@ -18,8 +18,14 @@ const UpdateSlotById = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const DeleteSlotById = catchAsync(async (req, res) => {
+  const data = await SlotService.DeleteSlotById(req.params.id);
+  res.send(data);
+});
+
 module.exports = {
   SlotCreation,
   Fetch_Slot,
   UpdateSlotById,
+  DeleteSlotById,
 };
