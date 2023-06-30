@@ -10,6 +10,11 @@ const createSlot = async (body) => {
   const end = moment(Start).add(Duration, 'minutes');
   const startFormat = moment(`${date}T${chooseTime}`).format('HH:mm');
   const endFormat = moment(Start).add(Duration, 'minutes').format('HH:mm');
+
+  const existSlot = await Slot.findOne({ date: date, startFormat: chooseTime });
+  if (existSlot) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'This Slot Already Booked');
+  }
   const data = {
     chooseTime: isoDateTime,
     start: Start,
