@@ -8,6 +8,7 @@ const {
   streamPlanlink,
   Slab,
   shopNotification,
+  PlanSlot,
 } = require('../models/ecomplan.model');
 const axios = require('axios'); //
 const { streamingOrder, streamingorderProduct, streamingorderPayments } = require('../models/liveStreaming/checkout.model');
@@ -21,15 +22,19 @@ const generateLink = require('./liveStreaming/generatelink.service');
 const moment = require('moment');
 const { findById } = require('../models/token.model');
 
-const agoraToken = require("./liveStreaming/AgoraAppId.service");
+const agoraToken = require('./liveStreaming/AgoraAppId.service');
 
 const create_Plans = async (req) => {
-  //console.log(req.body);
+  const { Slots } = req.body;
   const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal' } });
+  Slots.forEach(async (e) => {
+    let datas = { slotType: e.slotType, Duration: e.Duration, No_Of_Slot: e.No_Of_Slot, streamPlanId: value._id };
+    await PlanSlot.create(datas);
+  });
   await Dates.create_date(value);
-  //console.log(value);
   return value;
 };
+
 const create_Plans_addon = async (req) => {
   const value = await Streamplan.create({ ...req.body, ...{ planType: 'addon' } });
   await Dates.create_date(value);
@@ -1363,11 +1368,13 @@ const create_stream_one = async (req) => {
   let no_of_host = myplan.no_of_host * Duration;
 
   let totalMinutes = numberOfParticipants + no_of_host + Duration;
-  let agoraID = await agoraToken.token_assign(totalMinutes, value._id, "agri");
+  let agoraID = await agoraToken.token_assign(totalMinutes, value._id, 'agri');
   if (agoraID) {
     agoraID.element._id;
     await Streamrequest.findByIdAndUpdate(
-      { _id: value._id }, { agoraID: agoraID.element._id, totalMinues: totalMinutes }, { new: true }
+      { _id: value._id },
+      { agoraID: agoraID.element._id, totalMinues: totalMinutes },
+      { new: true }
     );
   }
 
@@ -7292,8 +7299,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+        ? 'RAC'
+        : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -7302,8 +7309,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-            ? 'RAC'
-            : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -11734,7 +11741,7 @@ const get_stream_post_after_live_stream = async (req) => {
       ffmpeg(inputFilePath)
         .outputOptions('-c', 'copy')
         .output(outputFilePath)
-        .on('end', (e) => { })
+        .on('end', (e) => {})
         .on('error', (err) => {
           console.error('Error while converting:', err);
         })
