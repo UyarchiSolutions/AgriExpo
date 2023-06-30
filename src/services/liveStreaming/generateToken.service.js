@@ -152,7 +152,7 @@ const generateToken_sub = async (req) => {
         joinedUser: user._id,
       },
     });
-    const token = await geenerate_rtc_token(channel, uid, role, str.endTime / 1000);
+    const token = await geenerate_rtc_token(channel, uid, role, str.endTime / 1000,str.agoraID);
     value.token = token;
     value.save();
     stream = value;
@@ -565,6 +565,20 @@ const get_sub_golive = async (req, io) => {
             },
           },
           { $unwind: '$purchasedplans' },
+          {
+            $lookup: {
+              from: 'agoraappids',
+              localField: 'agoraID',
+              foreignField: '_id',
+              as: 'agoraappids',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$agoraappids',
+            },
+          },
         ],
         as: 'streamrequests',
       },
@@ -684,6 +698,7 @@ const get_sub_golive = async (req, io) => {
         as: 'temptokens_sub',
       },
     },
+    
     {
       $project: {
         _id: 1,
@@ -710,6 +725,7 @@ const get_sub_golive = async (req, io) => {
         chat_need: '$streamrequests.chat_need',
         temptokens_sub: '$temptokens_sub',
         joindedUserBan: 1,
+        appID:"$streamrequests.agoraappids.appID"
       },
     },
   ]);
