@@ -18,6 +18,7 @@ const createSlot = async (body) => {
     startFormat: startFormat,
     endFormat: endFormat,
     Duration: Duration,
+    date: date,
   };
 
   const creation = await Slot.create(data);
@@ -25,11 +26,12 @@ const createSlot = async (body) => {
 };
 
 const Fetch_Slot = async (query) => {
-  let { Type, Duration, start, end } = query;
+  let { Type, Duration, start, end, date } = query;
   let TypeMatch = { active: true };
   let DuarationMatch = { active: true };
   let startMatch = { active: true };
   let endMatch = { active: true };
+  let dateMatch = { active: true };
 
   if (Type) {
     TypeMatch = { Type: Type };
@@ -46,8 +48,11 @@ const Fetch_Slot = async (query) => {
   if (end) {
     endMatch = { endFormat: end };
   }
+  if (date) {
+    dateMatch = { date: date };
+  }
 
-  const values = await Slot.aggregate([{ $match: { $and: [TypeMatch, DuarationMatch, startMatch, endMatch] } }]);
+  const values = await Slot.aggregate([{ $match: { $and: [TypeMatch, DuarationMatch, startMatch, endMatch, dateMatch] } }]);
   return values;
 };
 

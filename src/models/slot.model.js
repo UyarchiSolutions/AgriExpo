@@ -25,6 +25,9 @@ const SlotSchema = new mongoose.Schema(
       type: String,
       default: 'Pending',
     },
+    date: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
