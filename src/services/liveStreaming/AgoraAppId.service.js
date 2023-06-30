@@ -28,18 +28,18 @@ const get_all_token = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
   let appId = await AgoraAppId.aggregate([
     {
-      $skip: 10 * parseInt(page),
+      $skip: 20 * parseInt(page),
     },
     {
-      $limit: 10,
+      $limit: 20,
     },
   ])
   let next = await AgoraAppId.aggregate([
     {
-      $skip: 10 * (parseInt(page) + 1),
+      $skip: 20 * (parseInt(page) + 1),
     },
     {
-      $limit: 10,
+      $limit: 20,
     },
   ])
 
