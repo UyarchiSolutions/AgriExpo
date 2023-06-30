@@ -288,7 +288,7 @@ const participents_limit = async (req) => {
 const agora_acquire = async (req, id,agroaID) => {
   let temtoken = id;
     let agoraToken = await AgoraAppId.findById(agroaID);
-    console.log(agoraToken)
+    console.log(agoraToken,8888)
   // let temtoken=req.body.id;
   let token = await tempTokenModel.findById(temtoken);
    const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
@@ -309,11 +309,6 @@ const agora_acquire = async (req, id,agroaID) => {
   token.resourceId = acquire.data.resourceId;
   token.recoredStart = 'acquire';
   token.save();
-  // setTimeout(async () => {
-  //   console.log(2, 3);
-  //   await recording_start(req, temtoken);
-  // }, 8000);
-  // return acquire.data;
 };
 
 const recording_start = async (req, id) => {
@@ -1180,10 +1175,7 @@ const production_supplier_token_cloudrecording = async (req, id,agroaID) => {
       value.token = token;
       value.store = value._id.replace(/[^a-zA-Z0-9]/g, '');
       value.save();
-
-      if (value.videoLink == '' || value.videoLink == null) {
-        await agora_acquire(req, value._id);
-      }
+      await agora_acquire(req, value._id,agroaID);
     });
   }
   return value;

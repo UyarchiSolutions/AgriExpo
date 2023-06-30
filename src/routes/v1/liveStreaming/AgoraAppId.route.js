@@ -14,6 +14,8 @@ router.get('/get/token', AgoraAppId.get_all_token);
 router.get('/get/country', AgoraAppId.get_country_list);
 router.get('/get/state', AgoraAppId.get_state_list);
 router.get('/get/city', AgoraAppId.get_city_list);
+router.get('/get/token/usage/agri', AgoraAppId.get_token_usage_agri);
+router.get('/get/token/usage/demo', AgoraAppId.get_token_usage_demo);
 
 
 module.exports = router;

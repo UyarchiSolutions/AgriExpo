@@ -29,7 +29,15 @@ const get_city_list= catchAsync(async (req, res) => {
   const data = await AgoraAppId.get_city_list(req);
   res.status(httpStatus.CREATED).send(data);
 });
+const get_token_usage_agri= catchAsync(async (req, res) => {
+  const data = await AgoraAppId.get_token_usage_agri(req);
+  res.status(httpStatus.CREATED).send(data);
+});
 
+const get_token_usage_demo= catchAsync(async (req, res) => {
+  const data = await AgoraAppId.get_token_usage_demo(req);
+  res.status(httpStatus.CREATED).send(data);
+});
 
 module.exports = {
   InsertAppId,
@@ -37,6 +45,8 @@ module.exports = {
   get_all_token,
   get_country_list,
   get_state_list,
-  get_city_list
+  get_city_list,
+  get_token_usage_demo,
+  get_token_usage_agri
   };
   
