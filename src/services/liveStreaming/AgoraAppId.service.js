@@ -28,18 +28,18 @@ const get_all_token = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
   let appId = await AgoraAppId.aggregate([
     {
-      $skip: 10 * parseInt(page),
+      $skip: 20 * parseInt(page),
     },
     {
-      $limit: 10,
+      $limit: 20,
     },
   ])
   let next = await AgoraAppId.aggregate([
     {
-      $skip: 10 * (parseInt(page) + 1),
+      $skip: 20 * (parseInt(page) + 1),
     },
     {
-      $limit: 10,
+      $limit: 20,
     },
   ])
 
@@ -73,7 +73,7 @@ const get_city_list = async (req) => {
 
 }
 
-const token_assign = async (minutes, streamID,streamType) => {
+const token_assign = async (minutes, streamID, streamType) => {
   let token = await AgoraAppId.find({ expired: false });
   return new Promise(async (resolve) => {
     for (let i = 0; i < token.length; i++) {
@@ -87,11 +87,14 @@ const token_assign = async (minutes, streamID,streamType) => {
           streamID: streamID,
           appID: element._id,
           minutes: minutes,
-          streamType:streamType
+          streamType: streamType
         })
         element.userMinutes = usedMinutes + minutes;
         element.save();
-        resolve({vals,element});
+        resolve({ vals, element });
+        if (9450 < element.userMinutes) {
+          element.expired = true;
+        }
         break;
       }
       else {
@@ -103,6 +106,74 @@ const token_assign = async (minutes, streamID,streamType) => {
     }
   });
 }
+
+const get_token_usage_agri = async (req) => {
+  let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
+  let appId = req.query.id;
+  let value = await UsageAppID.aggregate([
+    { $match: { $and: [{ appID: { $eq: appId } }, { streamType: { $eq: "agri" } }] } },
+    {
+      $lookup: {
+        from: 'streamrequests',
+        localField: 'streamID',
+        foreignField: '_id',
+        as: 'streamrequests',
+      },
+    },
+    {
+      $unwind: '$streamrequests',
+    },
+    {
+      $project: {
+        _id: 1,
+        dateISO: 1,
+        streamID: 1,
+        date: 1,
+        minutes: 1,
+        streamType: 1,
+        streamName: "$streamrequests.streamName",
+        startTime: "$streamrequests.startTime"
+      }
+    },
+    {
+      $skip: 10 * parseInt(page),
+    },
+    {
+      $limit: 10,
+    },
+
+  ])
+  let next = await UsageAppID.aggregate([
+    { $match: { $and: [{ appID: { $eq: appId } }, { streamType: { $eq: "agri" } }] } },
+    {
+      $lookup: {
+        from: 'streamrequests',
+        localField: 'streamID',
+        foreignField: '_id',
+        as: 'streamrequests',
+      },
+    },
+    {
+      $unwind: '$streamrequests',
+    },
+    {
+      $skip: 10 * (parseInt(page) + 1),
+    },
+    {
+      $limit: 10,
+    },
+  ])
+
+  return { value: value, next: next.length != 0 };
+}
+const get_token_usage_demo = async (req) => {
+  let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
+  let appId = req.query.id;
+  let value = await UsageAppID.aggregate([
+    { $match: { $and: [{ appID: { $eq: appId } }, { streamType: { $eq: "demo" } }] } },
+
+  ])
+}
 module.exports = {
   InsertAppId,
   InsertAget_app_id,
@@ -110,5 +181,7 @@ module.exports = {
   get_state_list,
   get_country_list,
   get_city_list,
-  token_assign
+  token_assign,
+  get_token_usage_agri,
+  get_token_usage_demo
 };

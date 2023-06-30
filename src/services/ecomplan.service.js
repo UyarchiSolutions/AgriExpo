@@ -1855,11 +1855,11 @@ const cancel_stream = async (req) => {
   });
   return value;
 };
-const appID = '1ba2592b16b74f3497e232e1b01f66b0';
-const appCertificate = '8ae85f97802448c2a47b98715ff90ffb';
-const Authorization = `Basic ${Buffer.from(`61b817e750214d58ba9d8148e7c89a1b:88401de254b2436a9da15b2f872937de`).toString(
-  'base64'
-)}`;
+// const appID = '1ba2592b16b74f3497e232e1b01f66b0';
+// const appCertificate = '8ae85f97802448c2a47b98715ff90ffb';
+// const Authorization = `Basic ${Buffer.from(`61b817e750214d58ba9d8148e7c89a1b:88401de254b2436a9da15b2f872937de`).toString(
+//   'base64'
+// )}`;
 const end_stream = async (req) => {
   let value = await Streamrequest.findByIdAndUpdate(
     { _id: req.query.id },
@@ -1875,12 +1875,16 @@ const end_stream = async (req) => {
   // value = await tempTokenModel.findOne({ chennel: streamId, type: 'CloudRecording', recoredStart: { $ne: "stop" } });
   let token = await tempTokenModel.findOne({ chennel: req.query.id, type: 'CloudRecording', recoredStart: { $ne: 'stop' } });
   if (token != null) {
+    let agoraToken = await AgoraAppId.findById(value.agroaID)
+    const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
+      'base64'
+    )}`;
     token.recoredStart = 'stop';
     token.save();
     const resource = token.resourceId;
     const sid = token.sid;
     const stop = await axios.post(
-      `https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
+      `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
       {
         cname: token.chennel,
         uid: token.Uid.toString(),
