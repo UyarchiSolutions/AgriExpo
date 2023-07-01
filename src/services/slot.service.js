@@ -124,4 +124,5 @@ module.exports = {
   Fetch_Slot,
   UpdateSlotById,
   DeleteSlotById,
+  getSlots_Minutse_Wise,
 };
