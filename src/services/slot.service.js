@@ -75,7 +75,7 @@ const DeleteSlotById = async (id) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Slot Not Availbale');
   }
   await values.remove();
-  return user;
+  return values;
 };
 
 module.exports = {
