@@ -25,12 +25,15 @@ const { findById } = require('../models/token.model');
 const agoraToken = require('./liveStreaming/AgoraAppId.service');
 
 const create_Plans = async (req) => {
-  const { Slots } = req.body;
+  const { slotInfo } = req.body;
   const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal' } });
-  Slots.forEach(async (e) => {
+
+  slotInfo.forEach(async (e) => {
     let datas = { slotType: e.slotType, Duration: e.Duration, No_Of_Slot: e.No_Of_Slot, streamPlanId: value._id };
+    console.log(datas);
     await PlanSlot.create(datas);
   });
+
   await Dates.create_date(value);
   return value;
 };
@@ -1875,16 +1878,17 @@ const end_stream = async (req) => {
   // value = await tempTokenModel.findOne({ chennel: streamId, type: 'CloudRecording', recoredStart: { $ne: "stop" } });
   let token = await tempTokenModel.findOne({ chennel: req.query.id, type: 'CloudRecording', recoredStart: { $ne: 'stop' } });
   if (token != null) {
-    let agoraToken = await AgoraAppId.findById(value.agroaID)
-    const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
-      'base64'
-    )}`;
+    let agoraToken = await AgoraAppId.findById(value.agroaID);
+    const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString('base64')}`;
     token.recoredStart = 'stop';
     token.save();
     const resource = token.resourceId;
     const sid = token.sid;
     const stop = await axios.post(
-      `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
+      `https://api.agora.io/v1/apps/${agoraToken.appID.replace(
+        /\s/g,
+        ''
+      )}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
       {
         cname: token.chennel,
         uid: token.Uid.toString(),
@@ -2849,7 +2853,7 @@ const go_live_stream_host = async (req, userId) => {
         chat_need: 1,
         temptokens_sub: '$temptokens_sub',
         no_of_host: '$purchasedplans.no_of_host',
-        agoraappids:"$agoraappids"
+        agoraappids: '$agoraappids',
       },
     },
   ]);
@@ -3155,7 +3159,7 @@ const get_subhost_token = async (req, userId) => {
         chat_need: 1,
         temptokens_sub: '$temptokens_sub',
         no_of_host: '$purchasedplans.no_of_host',
-        agoraappids:"$agoraappids"
+        agoraappids: '$agoraappids',
       },
     },
   ]);
