@@ -8,7 +8,8 @@ const authorization = require('../../../controllers/tokenVerify.controller');
 const router = express.Router();
 const demostream = require('../../../controllers/liveStreaming/DemoStream.controller');
 
-router.route('/insert/app/id').post(demostream.send_Link);
+router.route('/send/livestream/link').post(demostream.send_livestream_link);
+router.route('/get/livestream/details').get(demostream.get_stream_details);
 
 
 
