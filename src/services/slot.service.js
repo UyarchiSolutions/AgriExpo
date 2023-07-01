@@ -78,6 +78,47 @@ const DeleteSlotById = async (id) => {
   return values;
 };
 
+const getSlots_Minutse_Wise = async () => {
+  // normal
+  let tenNormal = Slot.find({ Type: 'Normal', Duration: 10 }).count();
+  let fifteenNormal = Slot.find({ Type: 'Normal', Duration: 15 }).count();
+  let thirtyNormal = Slot.find({ Type: 'Normal', Duration: 30 }).count();
+  let fourtyFiveNormal = Slot.find({ Type: 'Normal', Duration: 45 }).count();
+  let SixtyNormal = Slot.find({ Type: 'Normal', Duration: 60 }).count();
+
+  // Exclusive
+  let tenExclusive = Slot.find({ Type: 'Exclusive', Duration: 10 }).count();
+  let fifteenExclusive = Slot.find({ Type: 'Exclusive', Duration: 15 }).count();
+  let thirtyExclusive = Slot.find({ Type: 'Exclusive', Duration: 30 }).count();
+  let fourtyExclusive = Slot.find({ Type: 'Exclusive', Duration: 45 }).count();
+  let SixtyExclusive = Slot.find({ Type: 'Exclusive', Duration: 60 }).count();
+
+  // Peak
+  let tenPeak = Slot.find({ Type: 'Peak', Duration: 10 }).count();
+  let fifteenPeak = Slot.find({ Type: 'Peak', Duration: 15 }).count();
+  let thirtyPeak = Slot.find({ Type: 'Peak', Duration: 30 }).count();
+  let fourtyPeak = Slot.find({ Type: 'Peak', Duration: 45 }).count();
+  let SixtyPeak = Slot.find({ Type: 'Peak', Duration: 60 }).count();
+
+  return {
+    tenNormal: tenNormal,
+    fifteenNormal: fifteenNormal,
+    thirtyNormal: thirtyNormal,
+    fourtyFiveNormal: fourtyFiveNormal,
+    SixtyNormal: SixtyNormal,
+    tenExclusive: tenExclusive,
+    fifteenExclusive: fifteenExclusive,
+    thirtyExclusive: thirtyExclusive,
+    fourtyExclusive: fourtyExclusive,
+    SixtyExclusive: SixtyExclusive,
+    tenPeak: tenPeak,
+    fifteenPeak: fifteenPeak,
+    thirtyPeak: thirtyPeak,
+    fourtyPeak: fourtyPeak,
+    SixtyPeak: SixtyPeak,
+  };
+};
+
 module.exports = {
   createSlot,
   Fetch_Slot,
