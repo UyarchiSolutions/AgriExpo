@@ -80,27 +80,27 @@ const DeleteSlotById = async (id) => {
 
 const getSlots_Minutse_Wise = async () => {
   // normal
-  let tenNormal = Slot.find({ Type: 'Normal', Duration: 10 }).count();
-  let fifteenNormal = Slot.find({ Type: 'Normal', Duration: 15 }).count();
-  let thirtyNormal = Slot.find({ Type: 'Normal', Duration: 30 }).count();
-  let fourtyFiveNormal = Slot.find({ Type: 'Normal', Duration: 45 }).count();
-  let SixtyNormal = Slot.find({ Type: 'Normal', Duration: 60 }).count();
+  let tenNormal = await Slot.countDocuments({ Type: 'Normal', Duration: 10 });
+  let fifteenNormal = await Slot.countDocuments({ Type: 'Normal', Duration: 15 });
+  let thirtyNormal = await Slot.countDocuments({ Type: 'Normal', Duration: 30 });
+  let fourtyFiveNormal = await Slot.countDocuments({ Type: 'Normal', Duration: 45 });
+  let SixtyNormal = await Slot.countDocuments({ Type: 'Normal', Duration: 60 });
 
   // Exclusive
-  let tenExclusive = Slot.find({ Type: 'Exclusive', Duration: 10 }).count();
-  let fifteenExclusive = Slot.find({ Type: 'Exclusive', Duration: 15 }).count();
-  let thirtyExclusive = Slot.find({ Type: 'Exclusive', Duration: 30 }).count();
-  let fourtyExclusive = Slot.find({ Type: 'Exclusive', Duration: 45 }).count();
-  let SixtyExclusive = Slot.find({ Type: 'Exclusive', Duration: 60 }).count();
+  let tenExclusive = await Slot.find({ Type: 'Exclusive', Duration: 10 }).count();
+  let fifteenExclusive = await Slot.find({ Type: 'Exclusive', Duration: 15 }).count();
+  let thirtyExclusive = await Slot.find({ Type: 'Exclusive', Duration: 30 }).count();
+  let fourtyExclusive = await Slot.find({ Type: 'Exclusive', Duration: 45 }).count();
+  let SixtyExclusive = await Slot.find({ Type: 'Exclusive', Duration: 60 }).count();
 
   // Peak
-  let tenPeak = Slot.find({ Type: 'Peak', Duration: 10 }).count();
-  let fifteenPeak = Slot.find({ Type: 'Peak', Duration: 15 }).count();
-  let thirtyPeak = Slot.find({ Type: 'Peak', Duration: 30 }).count();
-  let fourtyPeak = Slot.find({ Type: 'Peak', Duration: 45 }).count();
-  let SixtyPeak = Slot.find({ Type: 'Peak', Duration: 60 }).count();
+  let tenPeak = await Slot.find({ Type: 'Peak', Duration: 10 }).count();
+  let fifteenPeak = await Slot.find({ Type: 'Peak', Duration: 15 }).count();
+  let thirtyPeak = await Slot.find({ Type: 'Peak', Duration: 30 }).count();
+  let fourtyPeak = await Slot.find({ Type: 'Peak', Duration: 45 }).count();
+  let SixtyPeak = await Slot.find({ Type: 'Peak', Duration: 60 }).count();
 
-  return {
+  let data = {
     tenNormal: tenNormal,
     fifteenNormal: fifteenNormal,
     thirtyNormal: thirtyNormal,
@@ -117,6 +117,7 @@ const getSlots_Minutse_Wise = async () => {
     fourtyPeak: fourtyPeak,
     SixtyPeak: SixtyPeak,
   };
+  return data;
 };
 
 module.exports = {
