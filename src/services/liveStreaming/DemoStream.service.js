@@ -1,13 +1,47 @@
 const httpStatus = require('http-status');
 const ApiError = require('../../utils/ApiError');
 const moment = require('moment');
-const { AgoraAppId } = require('../../models/liveStreaming/DemoStream.model');
-const { Product, Stock, ConfirmStock, LoadingExecute, BillRaise, ManageBill, ShopList } = require('../../models/product.model');
-const { Demoseller, Demostream, Demopost, Demobuyer, Demoorder, Demoorderproduct } = require('../../models/liveStreaming/DemoStream.model');
+const { AgoraAppId } = require('../../models/liveStreaming/AgoraAppId.model');
+const {
+  Product,
+  Stock,
+  ConfirmStock,
+  LoadingExecute,
+  BillRaise,
+  ManageBill,
+  ShopList,
+} = require('../../models/product.model');
+const {
+  Demoseller,
+  Demostream,
+  Demopost,
+  Demobuyer,
+  Demoorder,
+  Demoorderproduct,
+  DemostreamToken,
+} = require('../../models/liveStreaming/DemoStream.model');
 const jwt = require('jsonwebtoken');
+const agoraToken = require('./AgoraAppId.service');
 
-const secret = "demoStream"
+const secret = 'demoStream';
+const Agora = require('agora-access-token');
 
+const geenerate_rtc_token = async (chennel, uid, role, expirationTimestamp, agoraID) => {
+  let agoraToken = await AgoraAppId.findById(agoraID);
+  return Agora.RtcTokenBuilder.buildTokenWithUid(
+    agoraToken.appID.replace(/\s/g, ''),
+    agoraToken.appCertificate.replace(/\s/g, ''),
+    chennel,
+    uid,
+    role,
+    expirationTimestamp
+  );
+};
+const generateUid = async () => {
+  const length = 5;
+  const randomNo = Math.floor(Math.pow(10, length - 1) + Math.random() * 9 * Math.pow(10, length - 1));
+  return randomNo;
+};
 
 const send_livestream_link = async (req) => {
   const { phoneNumber, name } = req.body;
@@ -17,26 +51,43 @@ const send_livestream_link = async (req) => {
   if (!user) {
     user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
   }
-  let streamCount = await Demostream.find().count()
-
-
+  const uid = await generateUid();
+  let streamCount = await Demostream.find().count();
+  console.log(moment().add(15, 'minutes').format('hh:mm a'));
   let demostream = await Demostream.create({
     userID: user._id,
     dateISO: moment(),
     phoneNumber: phoneNumber,
     name: name,
-    streamName: "Demo Stream - " + (parseInt(streamCount) + 1)
-  })
-  const accessTokenExpires = moment().add(30, 'minutes');
+    streamName: 'Demo Stream - ' + (parseInt(streamCount) + 1),
+    endTime: moment().add(15, 'minutes'),
+  });
+  let agoraID = await agoraToken.token_assign(105, demostream._id, 'demo');
+  if (agoraID) {
+    demostream.agoraID = agoraID.element._id;
+  }
+  const role = Agora.RtcRole.PUBLISHER;
+  let expirationTimestamp = moment().add(3000, 'minutes') / 1000;
+  const token = await geenerate_rtc_token(demostream._id, uid, role, expirationTimestamp, demostream.agoraID);
 
+  let demotoken = await DemostreamToken.create({
+    expirationTimestamp: moment().add(3000, 'minutes'),
+    streamID: demostream._id,
+    type: 'HOST',
+    uid: uid,
+    agoraID: demostream.agoraID,
+    token: token,
+    channel: demostream._id,
+    dateISO: moment(),
+  });
   const payload = {
     _id: user._id,
     streamID: demostream._id,
-    iat: moment().unix(),
-    exp: accessTokenExpires.unix(),
-    type: "demostream",
+    type: 'demostream',
   };
-  let valitity = jwt.sign(payload, secret);
+  let valitity = jwt.sign(payload, secret, {
+    expiresIn: '3000m', // Set token expiration to 30 minutes
+  });
   demostream.streamValitity = valitity;
   demostream.save();
   let product = await Product.find().limit(10);
@@ -55,7 +106,7 @@ const send_livestream_link = async (req) => {
       marketPlace: 50,
       offerPrice: 30,
       minLots: 5,
-      incrementalLots: 5
+      incrementalLots: 5,
     });
     let streampost1 = await Demopost.create({
       productTitle: element[1].productTitle,
@@ -69,7 +120,7 @@ const send_livestream_link = async (req) => {
       marketPlace: 100,
       offerPrice: 80,
       minLots: 5,
-      incrementalLots: 5
+      incrementalLots: 5,
     });
     let streampost2 = await Demopost.create({
       productTitle: element[2].productTitle,
@@ -83,7 +134,7 @@ const send_livestream_link = async (req) => {
       marketPlace: 50,
       offerPrice: 30,
       minLots: 5,
-      incrementalLots: 5
+      incrementalLots: 5,
     });
     let streampost3 = await Demopost.create({
       productTitle: element[3].productTitle,
@@ -97,7 +148,7 @@ const send_livestream_link = async (req) => {
       marketPlace: 60,
       offerPrice: 50,
       minLots: 5,
-      incrementalLots: 5
+      incrementalLots: 5,
     });
     let streampost4 = await Demopost.create({
       productTitle: element[4].productTitle,
@@ -111,7 +162,7 @@ const send_livestream_link = async (req) => {
       marketPlace: 50,
       offerPrice: 30,
       minLots: 5,
-      incrementalLots: 5
+      incrementalLots: 5,
     });
     let streampost5 = await Demopost.create({
       productTitle: element[5].productTitle,
@@ -125,7 +176,7 @@ const send_livestream_link = async (req) => {
       marketPlace: 90,
       offerPrice: 75,
       minLots: 5,
-      incrementalLots: 5
+      incrementalLots: 5,
     });
     let streampost6 = await Demopost.create({
       productTitle: element[6].productTitle,
@@ -139,7 +190,7 @@ const send_livestream_link = async (req) => {
       marketPlace: 60,
       offerPrice: 40,
       minLots: 5,
-      incrementalLots: 5
+      incrementalLots: 5,
     });
 
     let streampost7 = await Demopost.create({
@@ -154,7 +205,7 @@ const send_livestream_link = async (req) => {
       marketPlace: 50,
       offerPrice: 30,
       minLots: 5,
-      incrementalLots: 5
+      incrementalLots: 5,
     });
     let streampost8 = await Demopost.create({
       productTitle: element[8].productTitle,
@@ -168,7 +219,7 @@ const send_livestream_link = async (req) => {
       marketPlace: 40,
       offerPrice: 25,
       minLots: 5,
-      incrementalLots: 5
+      incrementalLots: 5,
     });
     let streampost9 = await Demopost.create({
       productTitle: element[9].productTitle,
@@ -182,7 +233,7 @@ const send_livestream_link = async (req) => {
       marketPlace: 30,
       offerPrice: 19,
       minLots: 5,
-      incrementalLots: 5
+      incrementalLots: 5,
     });
     demopoat.push(streampost0);
     demopoat.push(streampost1);
@@ -198,9 +249,58 @@ const send_livestream_link = async (req) => {
       resolve({ demopoat, demostream });
     }
   });
+};
 
+const verifyToken = async (req) => {
+  console.log(req.query.id);
+  const token = await Demostream.findById(req.query.id);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  try {
+    const payload = jwt.verify(token.streamValitity, 'demoStream');
+  } catch (err) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+  }
 
-}
+  return token;
+};
+
+const get_stream_details_check = async (req) => {
+  const token = await Demostream.findById(req.query.id);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  try {
+    const payload = jwt.verify(token.streamValitity, 'demoStream');
+  } catch (err) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+  }
+  const streampost = await Demopost.find({ streamID: req.query.id });
+  const agora = await DemostreamToken.findOne({ streamID: req.query.id, type: 'HOST' });
+  const agoraID = await AgoraAppId.findById(token.agoraID);
+
+  return { token, streampost, agora ,agoraID };
+};
+
+const go_live_stream = async (req) => {
+  const token = await Demostream.findById(req.query.id);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  try {
+    const payload = jwt.verify(token.streamValitity, 'demoStream');
+  } catch (err) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+  }
+  const streampost = await Demopost.find({ streamID: req.query.id });
+
+  return { token, streampost };
+};
+
 module.exports = {
   send_livestream_link,
+  verifyToken,
+  get_stream_details_check,
+  go_live_stream,
 };
