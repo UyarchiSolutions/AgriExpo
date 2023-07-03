@@ -94,6 +94,9 @@ io.sockets.on('connection', async (socket) => {
   socket.on('ban_user_chat', async (data) => {
     await socketService.ban_user_chat(data, io)
   });
+  socket.on('groupchathost_demo', async (data) => {
+    await chetModule.chat_room_create_host_demo(data, io)
+  });
   socket.on('joinRoom', (room) => {
     //console.log(room)
     socket.join(room);
