@@ -128,6 +128,15 @@ const update_one_Plans = async (req) => {
   return value;
 };
 
+const updatePlanById = async (id, body) => {
+  let plan = await Streamplan.findById(id);
+  if (!plan) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
+  }
+  plan = await Streamplan.findByIdAndUpdate({ _id: id }, body, { new: true });
+  return plan;
+};
+
 const delete_one_Plans = async (req) => {
   await Streamplan.findByIdAndDelete({ _id: req.query.id });
   return { message: 'deleted' };
@@ -12189,4 +12198,5 @@ module.exports = {
   get_watch_live_steams_current,
   get_post_view,
   on_going_stream,
+  updatePlanById,
 };

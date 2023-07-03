@@ -3,6 +3,7 @@ const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const Ecomserive = require('../services/ecomplan.service');
+const { EventContext } = require('twilio/lib/rest/monitor/v1/event');
 
 const create_Plans = catchAsync(async (req, res) => {
   const value = await Ecomserive.create_Plans(req);
@@ -258,7 +259,7 @@ const get_watch_live_steams_upcoming = catchAsync(async (req, res) => {
   res.send(value);
 });
 
-const get_watch_live_steams_current= catchAsync(async (req, res) => {
+const get_watch_live_steams_current = catchAsync(async (req, res) => {
   //console.log('sdas');
   const value = await Ecomserive.get_watch_live_steams_current(req);
   res.send(value);
@@ -547,6 +548,11 @@ const get_post_view = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const updatePlanById = catchAsync(async (req, res) => {
+  const data = await Ecomserive.updatePlanById(req.params.id, req.body);
+  res.send(data);
+});
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -647,13 +653,12 @@ module.exports = {
   get_video_link,
   get_order_details_by_stream,
 
-
-
   get_watch_live_steams_upcoming,
   get_watch_live_steams_interested,
   get_watch_live_steams_completed,
   get_watch_live_steams_upcoming_byid,
   getall_homeage_streams,
   get_watch_live_steams_current,
-  on_going_stream
+  on_going_stream,
+  updatePlanById,
 };
