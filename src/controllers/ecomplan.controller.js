@@ -553,6 +553,11 @@ const updatePlanById = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getPlanById = catchAsync(async (req, res) => {
+  const data = await Ecomserive.getPlanById(req.params.id);
+  res.send(data);
+});
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -661,4 +666,5 @@ module.exports = {
   get_watch_live_steams_current,
   on_going_stream,
   updatePlanById,
+  getPlanById,
 };
