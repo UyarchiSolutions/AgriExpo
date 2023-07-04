@@ -242,5 +242,5 @@ module.exports = {
   admin_allow_controls,
   stream_view_change,
   romove_message,
-  ban_user_chat
+  ban_user_chat,
 };

@@ -79,45 +79,27 @@ const DeleteSlotById = async (id) => {
 };
 
 const getSlots_Minutse_Wise = async () => {
-  // normal
-  let tenNormal = await Slot.countDocuments({ Type: 'Normal', Duration: 10 });
-  let fifteenNormal = await Slot.countDocuments({ Type: 'Normal', Duration: 15 });
-  let thirtyNormal = await Slot.countDocuments({ Type: 'Normal', Duration: 30 });
-  let fourtyFiveNormal = await Slot.countDocuments({ Type: 'Normal', Duration: 45 });
-  let SixtyNormal = await Slot.countDocuments({ Type: 'Normal', Duration: 60 });
+  let value = await Slot.aggregate([
+    {
+      $group: {
+        _id: {
+          Type: '$Type',
+          Duration: '$Duration',
+        },
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        Type: '$_id.Type',
+        Duration: '$_id.Duration',
+        count: '$count',
+      },
+    },
+  ]);
 
-  // Exclusive
-  let tenExclusive = await Slot.find({ Type: 'Exclusive', Duration: 10 }).count();
-  let fifteenExclusive = await Slot.find({ Type: 'Exclusive', Duration: 15 }).count();
-  let thirtyExclusive = await Slot.find({ Type: 'Exclusive', Duration: 30 }).count();
-  let fourtyExclusive = await Slot.find({ Type: 'Exclusive', Duration: 45 }).count();
-  let SixtyExclusive = await Slot.find({ Type: 'Exclusive', Duration: 60 }).count();
-
-  // Peak
-  let tenPeak = await Slot.find({ Type: 'Peak', Duration: 10 }).count();
-  let fifteenPeak = await Slot.find({ Type: 'Peak', Duration: 15 }).count();
-  let thirtyPeak = await Slot.find({ Type: 'Peak', Duration: 30 }).count();
-  let fourtyPeak = await Slot.find({ Type: 'Peak', Duration: 45 }).count();
-  let SixtyPeak = await Slot.find({ Type: 'Peak', Duration: 60 }).count();
-
-  let data = {
-    tenNormal: tenNormal,
-    fifteenNormal: fifteenNormal,
-    thirtyNormal: thirtyNormal,
-    fourtyFiveNormal: fourtyFiveNormal,
-    SixtyNormal: SixtyNormal,
-    tenExclusive: tenExclusive,
-    fifteenExclusive: fifteenExclusive,
-    thirtyExclusive: thirtyExclusive,
-    fourtyExclusive: fourtyExclusive,
-    SixtyExclusive: SixtyExclusive,
-    tenPeak: tenPeak,
-    fifteenPeak: fifteenPeak,
-    thirtyPeak: thirtyPeak,
-    fourtyPeak: fourtyPeak,
-    SixtyPeak: SixtyPeak,
-  };
-  return data;
+  return value;
 };
 
 module.exports = {

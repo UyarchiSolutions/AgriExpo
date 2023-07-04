@@ -28,6 +28,8 @@ router.route('/get/all/plan/addon').get(Ecomcontroller.get_all_Plans_addon);
 router.route('/get/one/plan').get(Ecomcontroller.get_one_Plans);
 router.route('/update/one/plan').put(Ecomcontroller.update_one_Plans);
 router.route('/delete/one/plan').delete(Ecomcontroller.delete_one_Plans);
+router.route('/updatePlanById/:id').put(Ecomcontroller.updatePlanById);
+router.route('/getPlanById/:id').get(Ecomcontroller.getPlanById);
 
 // post APIS
 router.route('/create/post').post(SellerAuth, uploadimage.fields([{ name: 'galleryImages' }]), Ecomcontroller.create_post);
@@ -36,8 +38,6 @@ router.route('/get/all/post').get(SellerAuth, Ecomcontroller.get_all_post);
 router.route('/get/all/post').get(SellerAuth, Ecomcontroller.get_all_post);
 router.route('/get/all/post/pagenation').get(SellerAuth, Ecomcontroller.get_all_Post_with_page);
 router.route('/get/stream/post/view').get(Ecomcontroller.get_post_view);
-
-
 
 router.route('/get/one/post').get(SellerAuth, Ecomcontroller.get_one_post);
 router

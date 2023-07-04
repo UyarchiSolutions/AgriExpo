@@ -10,7 +10,8 @@ const demostream = require('../../../controllers/liveStreaming/DemoStream.contro
 
 router.route('/send/livestream/link').post(demostream.send_livestream_link);
 router.route('/get/livestream/details').get(demostream.get_stream_details);
-
-
+router.route('/verify/token/stream').get(demostream.get_stream_verify);
+router.route('/get/stream/details').get(demostream.get_stream_details_check);
+router.route('/go/live/stream').get(demostream.get_stream_details_check);
 
 module.exports = router;

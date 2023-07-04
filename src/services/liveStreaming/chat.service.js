@@ -10,7 +10,15 @@ const Supplier = require('../../models/supplier.model');
 const { Seller } = require('../../models/seller.models');
 
 const { tempTokenModel, Joinusers } = require('../../models/liveStreaming/generateToken.model');
-
+const {
+  Demoseller,
+  Demostream,
+  Demopost,
+  Demobuyer,
+  Demoorder,
+  Demoorderproduct,
+  DemostreamToken,
+} = require('../../models/liveStreaming/DemoStream.model');
 
 const chat_room_create = async (req, io) => {
   // //console.log(req)
@@ -47,6 +55,14 @@ const chat_room_create_host = async (req, io) => {
   // //console.log(req)
   io.sockets.emit(req.channel, data);
 }
+
+const chat_room_create_host_demo= async (req, io) => {
+  let dateIso = new Date(new Date(moment().format('YYYY-MM-DD') + ' ' + moment().format('HH:mm:ss'))).getTime();
+  let token = await Demostream.findById(req.id)
+  let user = await Demoseller.findById(token.userID)
+  let data = await Groupchat.create({ ...req, ...{ created: moment(), dateISO: dateIso, userName: user.phoneNumber, userType: "supplier", supplierId: user._id, joinuser: user._id, user } })
+  io.sockets.emit(req.channel, data);
+}
 const change_controls = async (req, io) => {
   // //console.log(req)
   let token = await Streamrequest.findById(req.channel);
@@ -61,5 +77,6 @@ module.exports = {
   getoldchats,
   chat_room_create_subhost,
   chat_room_create_host,
-  change_controls
+  change_controls,
+  chat_room_create_host_demo
 };

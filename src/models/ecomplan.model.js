@@ -132,6 +132,9 @@ const streamplanschema = mongoose.Schema({
   Price: {
     type: Number,
   },
+  Transtraction: {
+    type: String,
+  },
 });
 
 const Streamplan = mongoose.model('streamplan', streamplanschema);
