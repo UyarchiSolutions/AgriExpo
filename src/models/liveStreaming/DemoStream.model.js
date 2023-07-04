@@ -67,6 +67,9 @@ const demostreamchema = mongoose.Schema({
   agoraID: {
     type: String,
   },
+  joined: {
+    type: Boolean,
+  }
 });
 
 const Demostream = mongoose.model('demostream', demostreamchema);
@@ -143,6 +146,13 @@ const Demobuyerschema = mongoose.Schema({
   appID: {
     type: String,
   },
+  phoneNumber: {
+    type: Number,
+  },
+  name: {
+    type: String,
+  }
+
 });
 
 const Demobuyer = mongoose.model('demobuyer', Demobuyerschema);
@@ -152,41 +162,118 @@ const Demoorderschema = mongoose.Schema({
     type: String,
     default: v4,
   },
-  dateISO: {
+  DateIso: {
     type: Number,
   },
   date: {
-    type: Number,
-  },
-  expired: {
-    type: Boolean,
-    default: false,
-  },
-  appID: {
     type: String,
   },
+  created: {
+    type: Date,
+  },
+  time: {
+    type: Number,
+  },
+  streamId: {
+    type: String,
+  },
+  cart: {
+    type: Array,
+  },
+  shopId: {
+    type: String,
+  },
+  status: {
+    type: String,
+    default: 'ordered',
+  },
+  orderStatus: {
+    type: String,
+    default: 'Pending',
+  },
+  approvalStatus: {
+    type: String,
+    default: 'Pending',
+  },
+  orderId: {
+    type: String,
+  },
+  name: {
+    type: String,
+  },
+  state: {
+    type: String,
+  },
+  city: {
+    type: String,
+  },
+  pincode: {
+    type: String,
+  },
+  address: {
+    type: String,
+  },
+  Amount: {
+    type: Number,
+  },
+  bookingtype: {
+    type: String,
+  },
+  totalAmount: {
+    type: Number,
+  },
+  userId: {
+    type: String,
+  }
 });
 
-const Demoorder = mongoose.model('demoorder', Demobuyerschema);
+const Demoorder = mongoose.model('demoorder', Demoorderschema);
 
 const Demoorderproductschema = mongoose.Schema({
   _id: {
     type: String,
     default: v4,
   },
-  dateISO: {
+  DateIso: {
     type: Number,
   },
   date: {
-    type: Number,
-  },
-  expired: {
-    type: Boolean,
-    default: false,
-  },
-  appID: {
     type: String,
   },
+  created: {
+    type: Date,
+  },
+  time: {
+    type: Number,
+  },
+  orderId: {
+    type: String,
+  },
+  postId: {
+    type: String,
+  },
+  productId: {
+    type: String,
+  },
+  purchase_price: {
+    type: Number,
+  },
+  purchase_quantity: {
+    type: Number,
+  },
+  shopId: {
+    type: String,
+  },
+  streamId: {
+    type: String,
+  },
+  status: {
+    type: String,
+    default: 'Pending',
+  },
+  streamPostId: {
+    type: String,
+  }
 });
 
 const Demoorderproduct = mongoose.model('demoorderproduct', Demoorderproductschema);
@@ -227,8 +314,250 @@ const Demostreamchema = mongoose.Schema({
   channel: {
     type: String,
   },
+  userID: {
+    type: String,
+  },
+  status: {
+    type: String,
+  },
+  golive: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 const DemostreamToken = mongoose.model('demostreamtoken', Demostreamchema);
 
-module.exports = { Demoseller, Demostream, Demopost, Demobuyer, Demoorder, Demoorderproduct, DemostreamToken };
+
+const Democartchame = mongoose.Schema({
+  _id: {
+    type: String,
+    default: v4,
+  },
+  DateIso: {
+    type: Number,
+  },
+  date: {
+    type: String,
+  },
+  created: {
+    type: Date,
+  },
+  time: {
+    type: Number,
+  },
+  streamId: {
+    type: String,
+  },
+  cart: {
+    type: Array,
+  },
+  shopId: {
+    type: String,
+  },
+  status: {
+    type: String,
+    default: 'Pending',
+  },
+  proceed_To_Pay: {
+    type: String,
+  },
+  startTime: {
+    type: Number,
+  },
+  endTime: {
+    type: Number,
+  },
+  userId: {
+    type: String,
+  }
+});
+
+
+
+
+const Democart = mongoose.model('democart', Democartchame);
+
+
+const Democartproductschema = mongoose.Schema({
+  _id: {
+    type: String,
+    default: v4,
+  },
+  DateIso: {
+    type: Number,
+  },
+  categoryId: {
+    type: String,
+  },
+  created: {
+    type: String,
+  },
+  image: {
+    type: String,
+  },
+  incrementalLots: {
+    type: Number,
+  },
+  marketPlace: {
+    type: Number,
+  },
+  offerPrice: {
+    type: Number,
+  },
+  postLiveStreamingPirce: {
+    type: Number,
+  },
+  productTitle: {
+    type: String,
+  },
+  minLots: {
+    type: Number,
+  },
+  suppierId: {
+    type: String,
+  },
+  cartQTY: {
+    type: Number,
+  },
+  productId: {
+    type: String,
+  },
+  bookingAmount: {
+    type: String,
+  },
+  streamPostId: {
+    type: String,
+  },
+  streamrequestpostId: {
+    type: String,
+  },
+  streamingCart: {
+    type: String,
+  },
+  cardStatus: {
+    type: Boolean,
+    default: true
+  },
+  add_to_cart: {
+    type: Boolean,
+  },
+  quantity: {
+    type: Number,
+  },
+  proceed_To_Pay: {
+    type: String,
+  },
+  startTime: {
+    type: Number,
+  },
+  endTime: {
+    type: Number,
+  },
+  userId: {
+    type: String,
+  }
+});
+
+const Democartproduct = mongoose.model('democartproduct', Democartproductschema);
+
+const streamingPaymant = mongoose.Schema({
+  _id: {
+    type: String,
+    default: v4,
+  },
+  DateIso: {
+    type: Number,
+  },
+  date: {
+    type: String,
+  },
+  created: {
+    type: Date,
+  },
+  time: {
+    type: Number,
+  },
+  paidAmt: {
+    type: Number,
+  },
+  type: {
+    type: String,
+  },
+  orderId: {
+    type: String,
+  },
+  uid: {
+    type: String,
+  },
+  payment: {
+    type: String,
+  },
+  active: {
+    type: Boolean,
+    default: true,
+  },
+  archive: {
+    type: Boolean,
+    default: false,
+  },
+  pay_type: {
+    type: String,
+  },
+  paymentMethod: {
+    type: String,
+  },
+  paymentstutes: {
+    type: String,
+  },
+  RE_order_Id: {
+    type: String,
+  },
+  reorder_status: {
+    type: Boolean,
+  },
+  creditBillStatus: {
+    type: String,
+  },
+  reasonScheduleOrDate: {
+    type: String,
+  },
+  creditID: {
+    type: String,
+  },
+  Schedulereason: {
+    type: String,
+  },
+  creditApprovalStatus: {
+    type: String,
+    default: 'Pending',
+  },
+  onlinepaymentId: {
+    type: String,
+  },
+  onlineorderId: {
+    type: String,
+  },
+  paymentTypes: {
+    type: String,
+    default: 'offline',
+  },
+  paymentGatway: {
+    type: String,
+  },
+  shopId: {
+    type: String,
+  },
+  streamId: {
+    type: String,
+  },
+  bookingtype: {
+    type: String,
+  },
+  totalAmount: {
+    type: Number,
+  },
+});
+const Demopaymnt = mongoose.model('demopayment', streamingPaymant);
+
+module.exports = { Demoseller, Demostream, Demopost, Demobuyer, Demoorder, Demoorderproduct, DemostreamToken, Democart, Democartproduct, Demopaymnt };

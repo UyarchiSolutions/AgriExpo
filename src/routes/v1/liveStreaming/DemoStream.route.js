@@ -11,7 +11,14 @@ const demostream = require('../../../controllers/liveStreaming/DemoStream.contro
 router.route('/send/livestream/link').post(demostream.send_livestream_link);
 router.route('/get/livestream/details').get(demostream.get_stream_details);
 router.route('/verify/token/stream').get(demostream.get_stream_verify);
+router.route('/verify/token/stream/buyer').get(demostream.get_stream_verify_buyer);
 router.route('/get/stream/details').get(demostream.get_stream_details_check);
 router.route('/go/live/stream').get(demostream.get_stream_details_check);
-
+router.route('/join/stream/buyer').post(demostream.join_stream_buyer);
+router.route('/get/buyer/token').get(demostream.get_buyer_token);
+router.route('/register/buyer/stream').get(demostream.stream_register_buyer);
+router.route('/get/get_add_to_cart').get(demostream.get_get_add_to_cart);
+router.route('/add-to-cart').post(demostream.add_to_cart);
+router.route('/razorpay/success/confirmorder').post(demostream.confirmOrder_razerpay);
+router.route('/success/confirmorder').post(demostream.confirmOrder_cod);
 module.exports = router;
