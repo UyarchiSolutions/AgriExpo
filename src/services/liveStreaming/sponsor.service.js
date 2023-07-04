@@ -22,7 +22,31 @@ const get_Sponsor = async (page) => {
   return values;
 };
 
+const updateSponsorById = async (id, body) => {
+  let values = await Sponsor.findById(id);
+  if (!values) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Sponsor Not Available');
+  }
+  values = await Sponsor.findByIdAndUpdate({ _id: id }, body, { new: true });
+  return values;
+};
+
+const disable_enable = async (id, body) => {
+  let values = await Sponsor.findById(id);
+  if (!values) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Sponsor Not Available');
+  }
+  if (body.status == 'disable') {
+    values = await Sponsor.findByIdAndUpdate({ _id: id }, { active: false }, { new: true });
+  } else {
+    values = await Sponsor.findByIdAndUpdate({ _id: id }, { active: true }, { new: true });
+  }
+  return values;
+};
+
 module.exports = {
   sponsor_registretion,
   get_Sponsor,
+  updateSponsorById,
+  disable_enable,
 };

@@ -12,7 +12,19 @@ const get_Sponsor = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const updateSponsorById = catchAsync(async (req, res) => {
+  const data = await sponsor.updateSponsorById(req.params.id, req.body);
+  res.send(data);
+});
+
+const disable_enable = catchAsync(async (req, res) => {
+  const data = await sponsor.disable_enable(req.params.id, req.body);
+  res.send(data);
+});
+
 module.exports = {
   sponsor_registretion,
   get_Sponsor,
+  updateSponsorById,
+  disable_enable,
 };
