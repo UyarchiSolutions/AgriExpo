@@ -30,7 +30,8 @@ router.route('/update/one/plan').put(Ecomcontroller.update_one_Plans);
 router.route('/delete/one/plan').delete(Ecomcontroller.delete_one_Plans);
 router.route('/updatePlanById/:id').put(Ecomcontroller.updatePlanById);
 router.route('/getPlanById/:id').get(Ecomcontroller.getPlanById);
-
+router.route('/deletePlanById/:id').delete(Ecomcontroller.deletePlanById);
+router.route('/disable/Enable/Plan/:id').put(Ecomcontroller.disable_Enable_Plan);
 // post APIS
 router.route('/create/post').post(SellerAuth, uploadimage.fields([{ name: 'galleryImages' }]), Ecomcontroller.create_post);
 router.route('/create/post/teaser').post(upload, Ecomcontroller.create_post_teaser);
