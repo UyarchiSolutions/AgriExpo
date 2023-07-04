@@ -369,7 +369,7 @@ const get_stream_details_check = async (req) => {
       $project: {
         _id: 1,
         productTitle: '$products.productTitle',
-        productImage: '$products.image',
+        image: '$products.image',
         productId: 1,
         categoryId: 1,
         quantity: 1,
