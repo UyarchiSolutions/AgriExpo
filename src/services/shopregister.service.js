@@ -173,6 +173,9 @@ const get_myDetails = async (req) => {
         shopTypename: '$shoplists.shopList',
         email: 1,
         Pincode: 1,
+        designation: 1,
+        companyName: 1,
+        website: 1,
       },
     },
   ]);
