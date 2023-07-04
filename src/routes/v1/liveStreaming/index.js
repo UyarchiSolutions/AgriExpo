@@ -6,6 +6,7 @@ const docsRoute = require('../docs.route');
 const config = require('../../../config/config');
 const agora = require('./AgoraAppId.route');
 const demostream = require('./DemoStream.route');
+const sponsor = require('./sponsor.route');
 
 const router = express.Router();
 
@@ -29,6 +30,10 @@ const defaultRoutes = [
   {
     path: '/demostream',
     route: demostream,
+  },
+  {
+    path: '/sponsor',
+    route: sponsor,
   },
 ];
 
