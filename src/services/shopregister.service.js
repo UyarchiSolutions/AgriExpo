@@ -176,6 +176,10 @@ const get_myDetails = async (req) => {
         designation: 1,
         companyName: 1,
         website: 1,
+        country: 1,
+        state: 1,
+        city: 1,
+        intrested_In: 1,
       },
     },
   ]);
