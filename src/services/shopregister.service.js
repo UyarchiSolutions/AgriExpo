@@ -173,6 +173,13 @@ const get_myDetails = async (req) => {
         shopTypename: '$shoplists.shopList',
         email: 1,
         Pincode: 1,
+        designation: 1,
+        companyName: 1,
+        website: 1,
+        country: 1,
+        state: 1,
+        city: 1,
+        intrested_In: 1,
       },
     },
   ]);

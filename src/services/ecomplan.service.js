@@ -12091,6 +12091,29 @@ const get_post_view = async (req) => {
   return value[0];
 };
 
+const deletePlanById = async (id) => {
+  let plan = await Streamplan.findById(id);
+  if (!plan) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
+  }
+  plan.remove();
+  return plan;
+};
+
+const disable_Enable_Plan = async (id, body) => {
+  const { type } = body;
+  let plan = await Streamplan.findById(id);
+  if (!plan) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
+  }
+  if (type == 'disable') {
+    plan = await Streamplan.findByIdAndUpdate({ _id: id }, { active: false }, { new: true });
+  } else {
+    plan = await Streamplan.findByIdAndUpdate({ _id: id }, { active: true }, { new: true });
+  }
+  return plan;
+};
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -12208,4 +12231,6 @@ module.exports = {
   on_going_stream,
   updatePlanById,
   getPlanById,
+  deletePlanById,
+  disable_Enable_Plan,
 };
