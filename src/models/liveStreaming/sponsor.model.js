@@ -6,100 +6,97 @@ const { roles } = require('../../config/roles');
 const { StringDecoder } = require('string_decoder');
 const { v4 } = require('uuid');
 
-
-
-const Sponsorschema = mongoose.Schema({
-
+const Sponsorschema = mongoose.Schema(
+  {
     _id: {
-        type: String,
-        default: v4,
+      type: String,
+      default: v4,
     },
     status: {
-        type: String,
-        default: 'Pending',
+      type: String,
+      default: 'Pending',
     },
     dateISO: {
-        type: Number,
+      type: Number,
     },
     active: {
-        type: Boolean,
-        default: true,
+      type: Boolean,
+      default: true,
     },
     archive: {
-        type: Boolean,
-        default: false,
+      type: Boolean,
+      default: false,
     },
     tradeName: {
-        type: String,
+      type: String,
     },
     businessType: {
-        type: String,
+      type: String,
     },
     contactName: {
-        type: String,
+      type: String,
     },
     mobileNumber: {
-        type: Number,
+      type: Number,
     },
     email: {
-        type: String,
+      type: String,
     },
     category: {
-        type: String,
+      type: String,
     },
     address: {
-        type: String,
+      type: String,
     },
     country: {
-        type: String,
+      type: String,
     },
     state: {
-        type: String,
+      type: String,
     },
     city: {
-        type: String,
+      type: String,
     },
     mainSeller: {
-        type: String,
+      type: String,
     },
     sellerType: {
-        type: String,
+      type: String,
     },
     sellerRole: {
-        type: Array,
+      type: Array,
     },
     registered: {
-        type: Boolean,
-        default: false,
+      type: Boolean,
+      default: false,
     },
     password: {
-        type: String,
+      type: String,
     },
     roleNum: {
-        type: Array,
+      type: Array,
     },
     Pincode: {
-        type: Number,
+      type: Number,
     },
     how_did_you_know_us: {
-        type: String,
+      type: String,
     },
     webSite: {
-        type: String,
+      type: String,
     },
     Designation: {
-        type: String,
+      type: String,
     },
     companyName: {
-        type: String,
+      type: String,
     },
-},
-    {
-        timestamps: { createdAt: 'createdDate', updatedAt: 'updatedDate' },
-    }
+  },
+  {
+    timestamps: { createdAt: 'createdDate', updatedAt: 'updatedDate' },
+  }
 );
 
 const Sponsor = mongoose.model('sponsor', Sponsorschema);
-
 
 module.exports = { Sponsor };
