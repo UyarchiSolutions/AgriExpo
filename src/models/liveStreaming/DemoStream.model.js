@@ -69,6 +69,22 @@ const demostreamchema = mongoose.Schema({
   },
   joined: {
     type: Boolean,
+  },
+  current_watching_stream: {
+    type: Number,
+  },
+  userList: {
+    type: Array,
+    default: []
+  },
+  end_Status: {
+    type: String,
+  },
+  streamEnd_Time: {
+    type: Number,
+  },
+  status: {
+    type: String,
   }
 });
 

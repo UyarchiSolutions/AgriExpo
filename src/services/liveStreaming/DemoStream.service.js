@@ -73,11 +73,11 @@ const send_livestream_link = async (req) => {
     demostream.agoraID = agoraID.element._id;
   }
   const role = Agora.RtcRole.PUBLISHER;
-  let expirationTimestamp = moment().add(3000, 'minutes') / 1000;
+  let expirationTimestamp = moment().add(15, 'minutes') / 1000;
   const token = await geenerate_rtc_token(demostream._id, uid, role, expirationTimestamp, demostream.agoraID);
 
   let demotoken = await DemostreamToken.create({
-    expirationTimestamp: moment().add(3000, 'minutes'),
+    expirationTimestamp: moment().add(30, 'minutes'),
     streamID: demostream._id,
     type: 'HOST',
     uid: uid,
@@ -392,7 +392,6 @@ const get_stream_details_check = async (req) => {
   const agora = await DemostreamToken.findOne({ streamID: req.query.id, type: 'HOST' });
   const agoraID = await AgoraAppId.findById(token.agoraID);
   const allowed_count = await DemostreamToken.find({ golive: true, status: "resgistered", streamID: token._id }).count();
-
   return { token, streampost, agora, agoraID, allowed_count };
 };
 
@@ -432,10 +431,10 @@ const join_stream_buyer = async (req) => {
   if (!demotoken) {
     const uid = await generateUid();
     const role = Agora.RtcRole.PUBLISHER;
-    let expirationTimestamp = moment().add(3000, 'minutes') / 1000;
+    let expirationTimestamp = moment().add(15, 'minutes') / 1000;
     const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp, stream.agoraID);
     demotoken = await DemostreamToken.create({
-      expirationTimestamp: moment().add(3000, 'minutes'),
+      expirationTimestamp: moment().add(15, 'minutes'),
       streamID: streamId,
       type: 'BUYER',
       uid: uid,
@@ -794,6 +793,16 @@ const add_odrerPayment_cod = async (shopId, body, orders) => {
   return value;
 };
 
+const end_stream = async (req) => {
+  let value = await Demostream.findByIdAndUpdate(
+    { _id: req.query.id },
+    { status: 'Completed', streamEnd_Time: moment(), end_Status: 'HostLeave' },
+    { new: true }
+  );
+  req.io.emit(req.query.id + '_stream_end', { value: true });
+  return value;
+}
+
 
 module.exports = {
   send_livestream_link,
@@ -808,6 +817,7 @@ module.exports = {
   addTocart,
   confirmOrder_razerpay,
   confirmOrder_cod,
-  emit_cart_qty
+  emit_cart_qty,
+  end_stream
 
 };

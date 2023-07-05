@@ -56,7 +56,7 @@ const chat_room_create_host = async (req, io) => {
   io.sockets.emit(req.channel, data);
 }
 
-const chat_room_create_host_demo= async (req, io) => {
+const chat_room_create_host_demo = async (req, io) => {
   let dateIso = new Date(new Date(moment().format('YYYY-MM-DD') + ' ' + moment().format('HH:mm:ss'))).getTime();
   let token = await Demostream.findById(req.id)
   let user = await Demoseller.findById(token.userID)
@@ -64,16 +64,45 @@ const chat_room_create_host_demo= async (req, io) => {
   io.sockets.emit(req.channel, data);
 }
 
-const chat_room_create_host_demo_sub= async (req, io) => {
+const chat_room_create_host_demo_sub = async (req, io) => {
   console.log(req)
 
-  let temp=await DemostreamToken.findById(req.userId);
-  let user =await Demobuyer.findById(temp.userID);
+  let temp = await DemostreamToken.findById(req.userId);
+  let user = await Demobuyer.findById(temp.userID);
   let dateIso = new Date(new Date(moment().format('YYYY-MM-DD') + ' ' + moment().format('HH:mm:ss'))).getTime();
   // let user = await Demoseller.findById(token.userID)
   let data = await Groupchat.create({ ...req, ...{ created: moment(), dateISO: dateIso, userName: user.name, userType: "buyer", supplierId: user._id, joinuser: temp._id, user } })
   io.sockets.emit(req.channel, data);
 }
+
+const livejoined_now = async (req, io, type) => {
+  console.log(req)
+
+  let temp = await DemostreamToken.findById(req.user);
+  if (temp) {
+    let stream = await Demostream.findById(temp.streamID);
+    if (stream) {
+      let joined = stream.userList != null ? stream.userList : [];
+      if (type == "join") {
+        let index = joined.indexOf(req.user);
+        if (index == -1) {
+          joined.push(req.user)
+        }
+      }
+      else {
+        let index = joined.indexOf(req.user);
+        if (index != -1) {
+          joined.splice(index, 1)
+        }
+      }
+      stream.userList = joined;
+      stream.current_watching_stream = joined.length
+      stream.save();
+      io.sockets.emit(stream._id + "_stream_joins", stream);
+    }
+  }
+}
+
 const change_controls = async (req, io) => {
   // //console.log(req)
   let token = await Streamrequest.findById(req.channel);
@@ -90,5 +119,6 @@ module.exports = {
   chat_room_create_host,
   change_controls,
   chat_room_create_host_demo,
-  chat_room_create_host_demo_sub
+  chat_room_create_host_demo_sub,
+  livejoined_now
 };

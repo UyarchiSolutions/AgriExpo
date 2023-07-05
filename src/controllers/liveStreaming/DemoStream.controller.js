@@ -71,6 +71,11 @@ const confirmOrder_cod = catchAsync(async (req, res) => {
   }, 3000)
   res.send(category);
 });
+
+const end_stream = catchAsync(async (req, res) => {
+  const category = await demostream.end_stream(req);
+  res.send(category);
+});
 module.exports = {
   send_livestream_link,
   get_stream_details,
@@ -84,7 +89,8 @@ module.exports = {
   get_get_add_to_cart,
   add_to_cart,
   confirmOrder_razerpay,
-  confirmOrder_cod
+  confirmOrder_cod,
+  end_stream
 
 
 };
