@@ -476,7 +476,7 @@ const get_buyer_token = async (req) => {
 const stream_register_buyer = async (req) => {
   let join_token = req.query.id
   let demotoken = await DemostreamToken.findById(join_token);
-  let register = await DemostreamToken.find({ streamID: demotoken._id, status: "resgistered" }).count();
+  let register = await DemostreamToken.find({ streamID: demotoken.streamID, status: "resgistered" }).count();
   if (register < 5) {
     demotoken.golive = true;
   }
