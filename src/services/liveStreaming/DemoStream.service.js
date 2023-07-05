@@ -77,7 +77,7 @@ const send_livestream_link = async (req) => {
   const token = await geenerate_rtc_token(demostream._id, uid, role, expirationTimestamp, demostream.agoraID);
 
   let demotoken = await DemostreamToken.create({
-    expirationTimestamp: expirationTimestamp,
+    expirationTimestamp: expirationTimestamp*1000,
     streamID: demostream._id,
     type: 'HOST',
     uid: uid,
