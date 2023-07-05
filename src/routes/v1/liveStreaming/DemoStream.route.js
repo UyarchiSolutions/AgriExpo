@@ -22,5 +22,9 @@ router.route('/add-to-cart').post(demostream.add_to_cart);
 router.route('/razorpay/success/confirmorder').post(demostream.confirmOrder_razerpay);
 router.route('/success/confirmorder').post(demostream.confirmOrder_cod);
 router.route('/end/stream').get(demostream.end_stream);
+router.route('/main/go/live').get(demostream.go_live);
+router.route('/buyer/go/live').get(demostream.buyer_go_live_stream);
+
+
 
 module.exports = router;

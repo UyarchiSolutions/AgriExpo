@@ -51,13 +51,10 @@ const generateUid = async () => {
 
 const send_livestream_link = async (req) => {
   const { phoneNumber, name } = req.body;
-
   let user = await Demoseller.findOne({ phoneNumber: phoneNumber });
-
   if (!user) {
     user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
   }
-  const uid = await generateUid();
   let streamCount = await Demostream.find().count();
   console.log(moment().add(15, 'minutes').format('hh:mm a'));
   let demostream = await Demostream.create({
@@ -66,34 +63,20 @@ const send_livestream_link = async (req) => {
     phoneNumber: phoneNumber,
     name: name,
     streamName: 'Demo Stream - ' + (parseInt(streamCount) + 1),
-    endTime: moment().add(15, 'minutes'),
+    // endTime: moment().add(15, 'minutes'),
   });
   let agoraID = await agoraToken.token_assign(105, demostream._id, 'demo');
   if (agoraID) {
     demostream.agoraID = agoraID.element._id;
   }
-  const role = Agora.RtcRole.PUBLISHER;
-  let expirationTimestamp = moment().add(15, 'minutes') / 1000;
-  const token = await geenerate_rtc_token(demostream._id, uid, role, expirationTimestamp, demostream.agoraID);
 
-  let demotoken = await DemostreamToken.create({
-    expirationTimestamp: expirationTimestamp*1000,
-    streamID: demostream._id,
-    type: 'HOST',
-    uid: uid,
-    agoraID: demostream.agoraID,
-    token: token,
-    channel: demostream._id,
-    dateISO: moment(),
-    userID: user._id,
-  });
   const payload = {
     _id: user._id,
     streamID: demostream._id,
     type: 'demostream',
   };
   let valitity = jwt.sign(payload, secret, {
-    expiresIn: '3000m', // Set token expiration to 30 minutes
+    expiresIn: '30m', // Set token expiration to 30 minutes
   });
   demostream.streamValitity = valitity;
   demostream.save();
@@ -429,17 +412,17 @@ const join_stream_buyer = async (req) => {
 
   let demotoken = await DemostreamToken.findOne({ userID: user._id, streamID: stream._id })
   if (!demotoken) {
-    const uid = await generateUid();
-    const role = Agora.RtcRole.PUBLISHER;
-    let expirationTimestamp = moment().add(15, 'minutes') / 1000;
-    const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp, stream.agoraID);
+    // const uid = await generateUid();
+    // const role = Agora.RtcRole.PUBLISHER;
+    // let expirationTimestamp = moment().add(15, 'minutes') / 1000;
+    // const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp, stream.agoraID);
     demotoken = await DemostreamToken.create({
-      expirationTimestamp: moment().add(15, 'minutes'),
+      // expirationTimestamp: moment().add(15, 'minutes'),
       streamID: streamId,
       type: 'BUYER',
-      uid: uid,
+      // uid: uid,
       agoraID: stream.agoraID,
-      token: token,
+      // token: token,
       channel: streamId,
       dateISO: moment(),
       userID: user._id,
@@ -447,6 +430,25 @@ const join_stream_buyer = async (req) => {
 
   }
 
+  return demotoken;
+}
+
+const buyer_go_live_stream = async (req) => {
+  let demotoken = await DemostreamToken.findById(req.query.id)
+  if (!demotoken) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
+  }
+  if (demotoken.token == null) {
+    const stream = await Demostream.findById(demotoken.streamID);
+    const uid = await generateUid();
+    const role = Agora.RtcRole.PUBLISHER;
+    let expirationTimestamp = stream.endTime / 1000;
+    const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp, stream.agoraID);
+    demotoken.expirationTimestamp = stream.endTime;
+    demotoken.uid = uid;
+    demotoken.token = token;
+    demotoken.save();
+  }
   return demotoken;
 }
 
@@ -802,6 +804,35 @@ const end_stream = async (req) => {
   req.io.emit(req.query.id + '_stream_end', { value: true });
   return value;
 }
+const go_live = async (req) => {
+  const uid = await generateUid();
+  const role = Agora.RtcRole.PUBLISHER;
+  let expirationTimestamp = moment().add(15, 'minutes') / 1000;
+  let demostream = await Demostream.findById(req.query.id);
+  const token = await geenerate_rtc_token(demostream._id, uid, role, expirationTimestamp, demostream.agoraID);
+  if (!demostream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  let demotoken = await DemostreamToken.findOne({ type: 'HOST', streamID: demostream._id })
+  if (!demotoken) {
+    demotoken = await DemostreamToken.create({
+      expirationTimestamp: expirationTimestamp * 1000,
+      streamID: demostream._id,
+      type: 'HOST',
+      uid: uid,
+      agoraID: demostream.agoraID,
+      token: token,
+      channel: demostream._id,
+      dateISO: moment(),
+      userID: demostream.userID,
+    });
+    demostream.endTime = expirationTimestamp * 1000;
+    demostream.status = "On-Going";
+    demostream.save();
+    req.io.emit(demostream._id + "stream_on_going", demostream);
+  }
+  return demotoken;
+}
 
 
 module.exports = {
@@ -818,6 +849,8 @@ module.exports = {
   confirmOrder_razerpay,
   confirmOrder_cod,
   emit_cart_qty,
-  end_stream
+  end_stream,
+  go_live,
+  buyer_go_live_stream
 
 };

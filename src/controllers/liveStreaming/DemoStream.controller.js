@@ -34,6 +34,10 @@ const join_stream_buyer = catchAsync(async (req, res) => {
   const data = await demostream.join_stream_buyer(req);
   res.status(httpStatus.CREATED).send(data);
 });
+const buyer_go_live_stream= catchAsync(async (req, res) => {
+  const data = await demostream.buyer_go_live_stream(req);
+  res.status(httpStatus.CREATED).send(data);
+});
 
 const get_buyer_token = catchAsync(async (req, res) => {
   const data = await demostream.get_buyer_token(req);
@@ -76,6 +80,11 @@ const end_stream = catchAsync(async (req, res) => {
   const category = await demostream.end_stream(req);
   res.send(category);
 });
+
+const go_live = catchAsync(async (req, res) => {
+  const category = await demostream.go_live(req);
+  res.send(category);
+});
 module.exports = {
   send_livestream_link,
   get_stream_details,
@@ -90,7 +99,9 @@ module.exports = {
   add_to_cart,
   confirmOrder_razerpay,
   confirmOrder_cod,
-  end_stream
+  end_stream,
+  go_live,
+  buyer_go_live_stream
 
 
 };
