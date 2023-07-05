@@ -97,6 +97,18 @@ io.sockets.on('connection', async (socket) => {
   socket.on('groupchathost_demo', async (data) => {
     await chetModule.chat_room_create_host_demo(data, io)
   });
+  socket.on('groupchathost_demo_buyer', async (data) => {
+    await chetModule.chat_room_create_host_demo_sub(data, io)
+  });
+  socket.on('liveleave', async (data) => {
+    await chetModule.livejoined_now(data, io, 'leave')
+  });
+  socket.on('livejoined', async (data) => {
+    await chetModule.livejoined_now(data, io, 'join')
+  });
+  // socket.on('curent_live_count', async (data) => {
+  //   await chetModule.get_curren_live_count(data, io)
+  // });
   socket.on('joinRoom', (room) => {
     //console.log(room)
     socket.join(room);
