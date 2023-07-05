@@ -391,8 +391,9 @@ const get_stream_details_check = async (req) => {
   ])
   const agora = await DemostreamToken.findOne({ streamID: req.query.id, type: 'HOST' });
   const agoraID = await AgoraAppId.findById(token.agoraID);
+  const allowed_count = await DemostreamToken.find({ golive: true, status: "resgistered", streamID: token._id }).count();
 
-  return { token, streampost, agora, agoraID };
+  return { token, streampost, agora, agoraID, allowed_count };
 };
 
 const go_live_stream = async (req) => {
