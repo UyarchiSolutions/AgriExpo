@@ -34,7 +34,7 @@ const join_stream_buyer = catchAsync(async (req, res) => {
   const data = await demostream.join_stream_buyer(req);
   res.status(httpStatus.CREATED).send(data);
 });
-const buyer_go_live_stream= catchAsync(async (req, res) => {
+const buyer_go_live_stream = catchAsync(async (req, res) => {
   const data = await demostream.buyer_go_live_stream(req);
   res.status(httpStatus.CREATED).send(data);
 });
@@ -58,13 +58,12 @@ const add_to_cart = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(tokens);
 });
 
-
 const confirmOrder_razerpay = catchAsync(async (req, res) => {
   const category = await demostream.confirmOrder_razerpay(req.shopId, req.body, req);
-  console.log(category)
+  console.log(category);
   setTimeout(async () => {
     await demostream.emit_cart_qty(req, req.body.OdrerDetails.streamId);
-  }, 3000)
+  }, 3000);
   res.send(category);
 });
 
@@ -72,7 +71,7 @@ const confirmOrder_cod = catchAsync(async (req, res) => {
   const category = await demostream.confirmOrder_cod(req.shopId, req.body, req);
   setTimeout(async () => {
     await demostream.emit_cart_qty(req, req.body.OdrerDetails.streamId);
-  }, 3000)
+  }, 3000);
   res.send(category);
 });
 
@@ -85,6 +84,12 @@ const go_live = catchAsync(async (req, res) => {
   const category = await demostream.go_live(req);
   res.send(category);
 });
+
+const get_DemoStream_By_Admin = catchAsync(async (req, res) => {
+  const data = await demostream.get_DemoStream_By_Admin(req.userId);
+  res.send(data);
+});
+
 module.exports = {
   send_livestream_link,
   get_stream_details,
@@ -101,7 +106,6 @@ module.exports = {
   confirmOrder_cod,
   end_stream,
   go_live,
-  buyer_go_live_stream
-
-
+  buyer_go_live_stream,
+  get_DemoStream_By_Admin,
 };
