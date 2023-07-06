@@ -24,7 +24,7 @@ const {
   DemostreamToken,
   Democart,
   Democartproduct,
-  Demopaymnt,
+  Demopaymnt
 } = require('../../models/liveStreaming/DemoStream.model');
 const jwt = require('jsonwebtoken');
 const agoraToken = require('./AgoraAppId.service');
@@ -50,14 +50,12 @@ const generateUid = async () => {
 };
 
 const send_livestream_link = async (req) => {
+  let userID = req.userId;
   const { phoneNumber, name } = req.body;
-
   let user = await Demoseller.findOne({ phoneNumber: phoneNumber });
-
   if (!user) {
     user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
   }
-  const uid = await generateUid();
   let streamCount = await Demostream.find().count();
   console.log(moment().add(15, 'minutes').format('hh:mm a'));
   let demostream = await Demostream.create({
@@ -66,34 +64,18 @@ const send_livestream_link = async (req) => {
     phoneNumber: phoneNumber,
     name: name,
     streamName: 'Demo Stream - ' + (parseInt(streamCount) + 1),
-    endTime: moment().add(15, 'minutes'),
+    createdBy: userID
+    // endTime: moment().add(15, 'minutes'),
   });
-  let agoraID = await agoraToken.token_assign(105, demostream._id, 'demo');
-  if (agoraID) {
-    demostream.agoraID = agoraID.element._id;
-  }
-  const role = Agora.RtcRole.PUBLISHER;
-  let expirationTimestamp = moment().add(15, 'minutes') / 1000;
-  const token = await geenerate_rtc_token(demostream._id, uid, role, expirationTimestamp, demostream.agoraID);
 
-  let demotoken = await DemostreamToken.create({
-    expirationTimestamp: expirationTimestamp * 1000,
-    streamID: demostream._id,
-    type: 'HOST',
-    uid: uid,
-    agoraID: demostream.agoraID,
-    token: token,
-    channel: demostream._id,
-    dateISO: moment(),
-    userID: user._id,
-  });
+
   const payload = {
     _id: user._id,
     streamID: demostream._id,
     type: 'demostream',
   };
   let valitity = jwt.sign(payload, secret, {
-    expiresIn: '3000m', // Set token expiration to 30 minutes
+    expiresIn: '30m', // Set token expiration to 30 minutes
   });
   demostream.streamValitity = valitity;
   demostream.save();
@@ -315,19 +297,19 @@ const get_stream_details_check = async (req) => {
               localField: 'streamingCart',
               foreignField: '_id',
               pipeline: [
-                { $match: { $and: [{ status: { $ne: 'ordered' } }] } },
+                { $match: { $and: [{ status: { $ne: "ordered" } }] } },
                 {
                   $project: {
-                    _id: 1,
-                  },
-                },
+                    _id: 1
+                  }
+                }
               ],
               as: 'streamingcarts',
-            },
+            }
           },
-          { $unwind: '$streamingcarts' },
+          { $unwind: "$streamingcarts" },
           { $match: { $and: [{ cardStatus: { $eq: true } }, { add_to_cart: { $eq: true } }] } },
-          { $group: { _id: null, count: { $sum: '$cartQTY' } } },
+          { $group: { _id: null, count: { $sum: "$cartQTY" } } },
         ],
         as: 'stream_cart',
       },
@@ -343,7 +325,9 @@ const get_stream_details_check = async (req) => {
         from: 'demoorderproducts',
         localField: '_id',
         foreignField: 'postId',
-        pipeline: [{ $group: { _id: null, count: { $sum: '$purchase_quantity' } } }],
+        pipeline: [
+          { $group: { _id: null, count: { $sum: "$purchase_quantity" } } },
+        ],
         as: 'stream_checkout',
       },
     },
@@ -382,14 +366,14 @@ const get_stream_details_check = async (req) => {
         created: 1,
         streamStart: 1,
         streamEnd: 1,
-        stream_cart: { $ifNull: ['$stream_cart.count', 0] },
-        stream_checkout: { $ifNull: ['$stream_checkout.count', 0] },
+        stream_cart: { $ifNull: ["$stream_cart.count", 0] },
+        stream_checkout: { $ifNull: ["$stream_checkout.count", 0] },
       },
     },
-  ]);
+  ])
   const agora = await DemostreamToken.findOne({ streamID: req.query.id, type: 'HOST' });
   const agoraID = await AgoraAppId.findById(token.agoraID);
-  const allowed_count = await DemostreamToken.find({ golive: true, status: 'resgistered', streamID: token._id }).count();
+  const allowed_count = await DemostreamToken.find({ golive: true, status: "resgistered", streamID: token._id }).count();
   return { token, streampost, agora, agoraID, allowed_count };
 };
 
@@ -409,7 +393,8 @@ const go_live_stream = async (req) => {
 };
 
 const join_stream_buyer = async (req) => {
-  const { phoneNumber, name } = req.body;
+
+  const { phoneNumber, name } = req.body
 
   const streamId = req.query.id;
 
@@ -424,32 +409,53 @@ const join_stream_buyer = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
   }
 
-  let demotoken = await DemostreamToken.findOne({ userID: user._id, streamID: stream._id });
+  let demotoken = await DemostreamToken.findOne({ userID: user._id, streamID: stream._id })
   if (!demotoken) {
-    const uid = await generateUid();
-    const role = Agora.RtcRole.PUBLISHER;
-    let expirationTimestamp = moment().add(15, 'minutes') / 1000;
-    const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp, stream.agoraID);
+    // const uid = await generateUid();
+    // const role = Agora.RtcRole.PUBLISHER;
+    // let expirationTimestamp = moment().add(15, 'minutes') / 1000;
+    // const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp, stream.agoraID);
     demotoken = await DemostreamToken.create({
-      expirationTimestamp: moment().add(15, 'minutes'),
+      // expirationTimestamp: moment().add(15, 'minutes'),
       streamID: streamId,
       type: 'BUYER',
-      uid: uid,
+      // uid: uid,
       agoraID: stream.agoraID,
-      token: token,
+      // token: token,
       channel: streamId,
       dateISO: moment(),
       userID: user._id,
     });
+
   }
 
   return demotoken;
-};
+}
+
+const buyer_go_live_stream = async (req) => {
+  let demotoken = await DemostreamToken.findById(req.query.id)
+  if (!demotoken) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
+  }
+  if (demotoken.token == null) {
+    const stream = await Demostream.findById(demotoken.streamID);
+    const uid = await generateUid();
+    const role = Agora.RtcRole.PUBLISHER;
+    let expirationTimestamp = stream.endTime / 1000;
+    const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp, stream.agoraID);
+    demotoken.expirationTimestamp = stream.endTime;
+    demotoken.uid = uid;
+    demotoken.token = token;
+    demotoken.save();
+  }
+  return demotoken;
+}
 
 const get_buyer_token = async (req) => {
-  let join_token = req.query.id;
 
-  let demotoken = await DemostreamToken.findById(join_token);
+  let join_token = req.query.id
+
+  let demotoken = await DemostreamToken.findById(join_token)
   if (!demotoken) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Join token not found');
   }
@@ -463,31 +469,35 @@ const get_buyer_token = async (req) => {
   }
   const streampost = await Demopost.find({ streamID: demotoken.streamID });
 
-  return { demotoken, stream, appID, streampost };
-};
+  return { demotoken, stream, appID, streampost }
+
+}
+
 
 const stream_register_buyer = async (req) => {
-  let join_token = req.query.id;
+  let join_token = req.query.id
   let demotoken = await DemostreamToken.findById(join_token);
-  let register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
+  let register = await DemostreamToken.find({ streamID: demotoken.streamID, status: "resgistered" }).count();
   if (register < 5) {
     demotoken.golive = true;
-  } else {
+  }
+  else {
     demotoken.golive = false;
   }
-  demotoken.status = 'resgistered';
+  demotoken.status = "resgistered";
   demotoken.save();
   return demotoken;
-};
+}
 
 const get_get_add_to_cart = async (req) => {
   let temp = req.query.streamId;
   let temptoken = await DemostreamToken.findById(temp);
-  let stream = await Demostream.findById(temptoken.streamID);
+  let stream = await Demostream.findById(temptoken.streamID)
   let value = await Democart.findOne({ userId: temp, streamId: stream._id, status: { $ne: 'ordered' } });
 
   return value;
-};
+
+}
 
 const addTocart = async (req) => {
   // //console.log("asdas",2321312)
@@ -502,37 +512,40 @@ const addTocart = async (req) => {
     cart.forEach(async (a) => {
       // streamingCart
       let obj = { ...a, ...{ streamingCart: value._id, streamrequestpostId: a._id, userId: req.body.userId } };
-      delete obj._id;
-      await Democartproduct.create(obj);
-    });
+      delete obj._id
+      await Democartproduct.create(obj)
+    })
     await Dates.create_date(value);
   } else {
-    await Democartproduct.updateMany({ streamingCart: value._id }, { $set: { cardStatus: false } }, { new: true });
+    await Democartproduct.updateMany({ streamingCart: value._id }, { $set: { cardStatus: false } }, { new: true })
     // value.cart = cart;
     cart.forEach(async (a) => {
-      // streamingCart
+      // streamingCart  
       let cartproduct = await Democartproduct.findOne({ streamingCart: value._id, streamrequestpostId: a._id });
       // //console.log(cartproduct)
       if (cartproduct) {
         cartproduct.cartQTY = a.cartQTY;
-      } else {
+      }
+      else {
         let obj = { ...a, ...{ streamingCart: value._id, streamrequestpostId: a._id } };
-        delete obj._id;
-        cartproduct = await Democartproduct.create(obj);
+        delete obj._id
+        cartproduct = await Democartproduct.create(obj)
       }
       cartproduct.cardStatus = true;
       cartproduct.add_to_cart = a.add_to_cart;
       cartproduct.save();
-    });
+    })
     // //console.log(value)
     // //console.log(value)
-    value = await Democart.findByIdAndUpdate({ _id: value._id }, { cart: cart }, { new: true });
+    value = await Democart.findByIdAndUpdate({ _id: value._id }, { cart: cart }, { new: true })
   }
 
   let cart_value = await emit_cart_qty(req, streamId);
-  console.log(cart_value);
+  console.log(cart_value)
   return value;
-};
+
+
+}
 
 const emit_cart_qty = async (req, streamId) => {
   let socket_cart = await Demopost.aggregate([
@@ -549,19 +562,19 @@ const emit_cart_qty = async (req, streamId) => {
               localField: 'streamingCart',
               foreignField: '_id',
               pipeline: [
-                { $match: { $and: [{ status: { $ne: 'ordered' } }] } },
+                { $match: { $and: [{ status: { $ne: "ordered" } }] } },
                 {
                   $project: {
-                    _id: 1,
-                  },
-                },
+                    _id: 1
+                  }
+                }
               ],
               as: 'streamingcarts',
-            },
+            }
           },
-          { $unwind: '$streamingcarts' },
+          { $unwind: "$streamingcarts" },
           { $match: { $and: [{ cardStatus: { $eq: true } }, { add_to_cart: { $eq: true } }] } },
-          { $group: { _id: null, count: { $sum: '$cartQTY' } } },
+          { $group: { _id: null, count: { $sum: "$cartQTY" } } },
         ],
         as: 'stream_cart',
       },
@@ -577,7 +590,9 @@ const emit_cart_qty = async (req, streamId) => {
         from: 'demoorderproducts',
         localField: '_id',
         foreignField: 'postId',
-        pipeline: [{ $group: { _id: null, count: { $sum: '$purchase_quantity' } } }],
+        pipeline: [
+          { $group: { _id: null, count: { $sum: "$purchase_quantity" } } },
+        ],
         as: 'stream_checkout',
       },
     },
@@ -616,15 +631,17 @@ const emit_cart_qty = async (req, streamId) => {
         created: 1,
         streamStart: 1,
         streamEnd: 1,
-        stream_cart: { $ifNull: ['$stream_cart.count', 0] },
-        stream_checkout: { $ifNull: ['$stream_checkout.count', 0] },
+        stream_cart: { $ifNull: ["$stream_cart.count", 0] },
+        stream_checkout: { $ifNull: ["$stream_checkout.count", 0] },
       },
     },
-  ]);
+  ])
 
-  req.io.emit(streamId + 'cart_qty', socket_cart);
+  req.io.emit(streamId + "cart_qty", socket_cart);
   return socket_cart;
-};
+}
+
+
 
 const confirmOrder_cod = async (shopId, body, req) => {
   let orders;
@@ -712,14 +729,15 @@ const addstreaming_order_product = async (shopId, event, order) => {
     shopId: shopId,
     purchase_price: event.offerPrice,
     streamId: order.streamId,
-    streamPostId: event.postId,
+    streamPostId: event.postId
   });
   let post = await Demopost.findById(event.postId);
   if (post) {
     let total = 0;
     if (post.orderedQTY) {
       total = post.orderedQTY + event.cartQTY;
-    } else {
+    }
+    else {
       total = event.cartQTY;
     }
     post.orderedQTY = total;
@@ -784,12 +802,45 @@ const end_stream = async (req) => {
   );
   req.io.emit(req.query.id + '_stream_end', { value: true });
   return value;
-};
+}
+const go_live = async (req) => {
+  const uid = await generateUid();
+  const role = Agora.RtcRole.PUBLISHER;
+  let expirationTimestamp = moment().add(15, 'minutes') / 1000;
+  let demostream = await Demostream.findById(req.query.id);
+  if (demostream.agoraID == null) {
+    let agoraID = await agoraToken.token_assign(105, demostream._id, 'demo');
+    if (agoraID) {
+      demostream.agoraID = agoraID.element._id;
+    }
+  }
+  const token = await geenerate_rtc_token(demostream._id, uid, role, expirationTimestamp, demostream.agoraID);
+  if (!demostream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  let demotoken = await DemostreamToken.findOne({ type: 'HOST', streamID: demostream._id });
 
-const get_DemoStream_By_Admin = async (id) => {
-  const data = await Demostream.aggregate([{ $match: { createdBy: id } }]);
-  return data;
-};
+  if (!demotoken) {
+
+    demotoken = await DemostreamToken.create({
+      expirationTimestamp: expirationTimestamp * 1000,
+      streamID: demostream._id,
+      type: 'HOST',
+      uid: uid,
+      agoraID: demostream.agoraID,
+      token: token,
+      channel: demostream._id,
+      dateISO: moment(),
+      userID: demostream.userID,
+    });
+    demostream.endTime = expirationTimestamp * 1000;
+    demostream.status = "On-Going";
+    demostream.save();
+    req.io.emit(demostream._id + "stream_on_going", demostream);
+  }
+  return demotoken;
+}
+
 
 module.exports = {
   send_livestream_link,
@@ -806,5 +857,7 @@ module.exports = {
   confirmOrder_cod,
   emit_cart_qty,
   end_stream,
-  get_DemoStream_By_Admin,
+  go_live,
+  buyer_go_live_stream
+
 };
