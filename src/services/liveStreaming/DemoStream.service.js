@@ -808,18 +808,18 @@ const go_live = async (req) => {
   const role = Agora.RtcRole.PUBLISHER;
   let expirationTimestamp = moment().add(15, 'minutes') / 1000;
   let demostream = await Demostream.findById(req.query.id);
-
-  const token = await geenerate_rtc_token(demostream._id, uid, role, expirationTimestamp, demostream.agoraID);
-  if (!demostream) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
-  }
-  let demotoken = await DemostreamToken.findOne({ type: 'HOST', streamID: demostream._id });
   if (demostream.agoraID == null) {
     let agoraID = await agoraToken.token_assign(105, demostream._id, 'demo');
     if (agoraID) {
       demostream.agoraID = agoraID.element._id;
     }
   }
+  const token = await geenerate_rtc_token(demostream._id, uid, role, expirationTimestamp, demostream.agoraID);
+  if (!demostream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  let demotoken = await DemostreamToken.findOne({ type: 'HOST', streamID: demostream._id });
+
   if (!demotoken) {
 
     demotoken = await DemostreamToken.create({
