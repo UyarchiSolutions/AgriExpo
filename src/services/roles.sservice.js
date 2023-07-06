@@ -873,11 +873,13 @@ const get_user_menu = async (userRole) => {
         delete: "$menueassigns.delete",
         point: "$menueassigns.point",
         child: "$menueassigns.menues",
+        createdDate:1
       }
     },
     {
       $sort: {
-        point: 1
+        createdDate:1,
+        point: 1,
       }
     }
   ])
