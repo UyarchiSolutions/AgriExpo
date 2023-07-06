@@ -50,6 +50,7 @@ const generateUid = async () => {
 };
 
 const send_livestream_link = async (req) => {
+  let userID = req.userId;
   const { phoneNumber, name } = req.body;
   let user = await Demoseller.findOne({ phoneNumber: phoneNumber });
   if (!user) {
@@ -63,6 +64,7 @@ const send_livestream_link = async (req) => {
     phoneNumber: phoneNumber,
     name: name,
     streamName: 'Demo Stream - ' + (parseInt(streamCount) + 1),
+    createdBy: userID
     // endTime: moment().add(15, 'minutes'),
   });
   let agoraID = await agoraToken.token_assign(105, demostream._id, 'demo');

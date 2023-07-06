@@ -86,6 +86,9 @@ const demostreamchema = mongoose.Schema({
   status: {
     type: String,
     default:"Pending"
+  },
+  createdBy:{
+    type: String,
   }
 });
 
