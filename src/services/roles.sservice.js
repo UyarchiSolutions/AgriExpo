@@ -879,10 +879,6 @@ const get_user_menu = async (userRole) => {
     {
       $sort: {
         createdDate:1,
-      }
-    },
-    {
-      $sort: {
         point: 1,
       }
     }
