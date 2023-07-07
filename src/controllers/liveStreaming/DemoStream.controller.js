@@ -90,6 +90,11 @@ const get_DemoStream_By_Admin = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const my_orders_buyer = catchAsync(async(req,res)=>{
+  const data = await demostream.my_orders_buyer(req);
+  res.send(data);
+})
+
 module.exports = {
   send_livestream_link,
   get_stream_details,
@@ -108,4 +113,5 @@ module.exports = {
   go_live,
   buyer_go_live_stream,
   get_DemoStream_By_Admin,
+  my_orders_buyer
 };

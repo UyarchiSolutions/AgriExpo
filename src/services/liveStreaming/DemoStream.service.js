@@ -822,7 +822,7 @@ const go_live = async (req) => {
       channel: demostream._id,
       dateISO: moment(),
       userID: demostream.userID,
-    }); 
+    });
     demostream.endTime = expirationTimestamp * 1000;
     demostream.status = 'On-Going';
     demostream.save();
@@ -835,6 +835,18 @@ const get_DemoStream_By_Admin = async (id) => {
   const data = await Demostream.aggregate([{ $match: { createdBy: id } }]);
   return data;
 };
+
+const my_orders_buyer = async (req) => {
+
+  let userId = req.query.id;
+
+  let value = await Demoorder.aggregate([
+    { $match: { $and: [{ userId: { $eq: userId } }] } },
+
+  ])
+  return value;
+
+}
 
 module.exports = {
   send_livestream_link,
@@ -854,4 +866,5 @@ module.exports = {
   go_live,
   buyer_go_live_stream,
   get_DemoStream_By_Admin,
+  my_orders_buyer
 };
