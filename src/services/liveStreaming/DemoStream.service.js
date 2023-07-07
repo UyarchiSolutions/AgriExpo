@@ -822,7 +822,7 @@ const go_live = async (req) => {
       channel: demostream._id,
       dateISO: moment(),
       userID: demostream.userID,
-    }); zp
+    }); 
     demostream.endTime = expirationTimestamp * 1000;
     demostream.status = 'On-Going';
     demostream.save();
