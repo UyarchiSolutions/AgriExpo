@@ -216,7 +216,6 @@ const deviceDetais = async (req, res, next) => {
   return next();
 }
 
-
 app.use('/v1', deviceDetais, routes);
 app.use('/v2', deviceDetais, routes_v2);
 

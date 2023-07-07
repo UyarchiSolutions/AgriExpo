@@ -30,7 +30,7 @@ const Demoseller = mongoose.model('demoseller', demosellerschema);
 const demostreamchema = mongoose.Schema({
   _id: {
     type: String,
-    default: v4,
+    // default: v4,
   },
   dateISO: {
     type: Number,

@@ -49,6 +49,13 @@ const generateUid = async () => {
   return randomNo;
 };
 
+const { v4: uuidv4 } = require('uuid');
+function generateUniqueID() {
+  const uuid = uuidv4(); // Generate a UUID
+  const uniqueID = uuid.replace(/-/g, '').slice(0, 10); // Remove dashes and take the first 10 characters
+  return uniqueID;
+}
+
 const send_livestream_link = async (req) => {
   let userID = req.userId;
   const { phoneNumber, name } = req.body;
@@ -56,6 +63,7 @@ const send_livestream_link = async (req) => {
   if (!user) {
     user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
   }
+  const id = generateUniqueID();
   let streamCount = await Demostream.find().count();
   console.log(moment().add(15, 'minutes').format('hh:mm a'));
   let demostream = await Demostream.create({
@@ -64,11 +72,10 @@ const send_livestream_link = async (req) => {
     phoneNumber: phoneNumber,
     name: name,
     streamName: 'Demo Stream - ' + (parseInt(streamCount) + 1),
-    createdBy: userID
+    createdBy: userID,
+    _id: id
     // endTime: moment().add(15, 'minutes'),
   });
-
-
   const payload = {
     _id: user._id,
     streamID: demostream._id,
@@ -832,7 +839,7 @@ const go_live = async (req) => {
       channel: demostream._id,
       dateISO: moment(),
       userID: demostream.userID,
-    });
+    }); zp
     demostream.endTime = expirationTimestamp * 1000;
     demostream.status = "On-Going";
     demostream.save();
