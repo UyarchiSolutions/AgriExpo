@@ -488,7 +488,7 @@ const stream_register_buyer = async (req) => {
   demotoken.save();
 
 
-  setTimeout(() => {
+  setTimeout(async() => {
     register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
     req.io.emit(demotoken.streamID + "_buyer_registor", { register })
   }, 300)
