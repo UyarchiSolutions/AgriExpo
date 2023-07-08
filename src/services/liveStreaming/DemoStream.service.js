@@ -486,6 +486,10 @@ const stream_register_buyer = async (req) => {
   }
   demotoken.status = 'resgistered';
   demotoken.save();
+
+  register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
+
+  req.io.emit(demotoken.streamID + "_buyer_registor", { register })
   return demotoken;
 };
 
@@ -859,7 +863,7 @@ const view_order_details = async (req) => {
         from: 'demoorderproducts',
         localField: '_id',
         foreignField: 'orderId',
-        pipeline:[
+        pipeline: [
           {
             $lookup: {
               from: 'demoposts',
