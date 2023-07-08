@@ -127,8 +127,37 @@ const purchasePlanSchema = mongoose.Schema({
     no_of_host: {
         type: Number,
 
+    },
+    Transtraction:{
+        type:String
+    },
+    Teaser:{
+        type:String
+    },
+    StreamVideos:{
+        type:String
+    },
+    completedStream:{
+        type:String
+    },
+    Pdf:{
+        type:String
+    },
+    image:{
+        type:String
+    },
+    RaiseHands:{
+        type:String,
+    },
+    Advertisement_Display:{
+        type:String
+    },
+    Special_Notification:{
+        type:String
+    },
+    Price:{
+        type:String
     }
-
 });
 
 const purchasePlan = mongoose.model('purchasedPlans', purchasePlanSchema);
