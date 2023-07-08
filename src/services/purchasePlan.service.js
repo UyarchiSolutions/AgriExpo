@@ -303,6 +303,12 @@ const create_PurchasePlan_EXpo = async(body, userId)=>{
     return creations
 }
 
+const getPurchasedPlan = async(userId)=>{
+    let values = await purchasePlan.aggregate([{$match:{suppierId:userId}}])
+    return values
+
+}
+
 module.exports = {
     create_purchase_plan,
     get_order_details,
@@ -311,5 +317,6 @@ module.exports = {
     get_all_my_orders_normal,
     get_all_purchasePlans,
     create_purchase_plan_private,
-    create_PurchasePlan_EXpo
+    create_PurchasePlan_EXpo,
+    getPurchasedPlan
 }

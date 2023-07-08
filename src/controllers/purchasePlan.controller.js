@@ -70,6 +70,12 @@ const create_PurchasePlan_EXpo = catchAsync(async (req,res)=>{
     res.send(value)
 })
 
+const getPurchasedPlan = catchAsync(async (req,res)=>{
+    let userId = req.userId
+    const value = await purchasePlan.getPurchasedPlan(userId);
+    res.send(value)
+})
+
 module.exports = {
     create_purchase_plan,
     get_order_details,
@@ -78,5 +84,6 @@ module.exports = {
     get_all_my_orders_normal,
     get_all_purchasePlans,
     create_purchase_plan_private,
-    create_PurchasePlan_EXpo
+    create_PurchasePlan_EXpo,
+    getPurchasedPlan
 }
