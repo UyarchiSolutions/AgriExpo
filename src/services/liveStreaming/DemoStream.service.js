@@ -848,6 +848,79 @@ const my_orders_buyer = async (req) => {
 
 }
 
+const view_order_details = async (req) => {
+
+  let userId = req.query.id;
+
+  let value = await Demoorder.aggregate([
+    { $match: { $and: [{ _id: { $eq: userId } }] } },
+    {
+      $lookup: {
+        from: 'demoorderproducts',
+        localField: '_id',
+        foreignField: 'orderId',
+        pipeline:[
+          {
+            $lookup: {
+              from: 'demoposts',
+              localField: 'postId',
+              foreignField: '_id',
+              as: 'demoposts',
+            },
+          },
+          { $unwind: "$demoposts" }
+        ],
+        as: 'demoorderproducts',
+      },
+    },
+    {
+      $lookup: {
+        from: 'demostreams',
+        localField: 'streamId',
+        foreignField: '_id',
+        as: 'demostreams',
+      },
+    },
+    { $unwind: "$demostreams" }
+  ])
+
+  if (value.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  return value[0];
+
+
+}
+
+const get_exhibitor_order = async (req) => {
+  let streamId = req.query.id;
+  let value = await Demoorder.aggregate([
+    { $match: { $and: [{ streamId: { $eq: streamId } }] } },
+    {
+      $lookup: {
+        from: 'demostreamtokens',
+        localField: 'userId',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'demobuyers',
+              localField: 'userID',
+              foreignField: '_id',
+              as: 'demobuyers',
+            },
+          },
+          { $unwind: "$demobuyers" }
+        ],
+        as: 'demostreamtokens',
+      },
+    },
+    { $unwind: "$demostreamtokens" }
+  ])
+  return value;
+}
+
+
 module.exports = {
   send_livestream_link,
   verifyToken,
@@ -866,5 +939,7 @@ module.exports = {
   go_live,
   buyer_go_live_stream,
   get_DemoStream_By_Admin,
-  my_orders_buyer
+  my_orders_buyer,
+  view_order_details,
+  get_exhibitor_order
 };
