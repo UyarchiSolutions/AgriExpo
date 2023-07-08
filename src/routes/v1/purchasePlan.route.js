@@ -13,6 +13,7 @@ router.route('/getpayment/details/all/normal').get(SellerAuth, purchasePlan.get_
 router.route('/mypurchase/plans/gellall').get(SellerAuth, purchasePlan.get_all_purchasePlans);
 router.route('/purchase/suceess/private').post(purchasePlan.create_purchase_plan_private);
 router.route('/purchase/PurchasePlan/EXpo').post(SellerAuth, purchasePlan.create_PurchasePlan_EXpo)
-router.route('/fetch/getPurchasedPlan').get(SellerAuth, purchasePlan.getPurchasedPlan)
+router.route('/fetch/getPurchasedPlan').get(SellerAuth, purchasePlan.getPurchasedPlan);
+router.route('/:id').put(purchasePlan.updatePurchasedPlan);
 
 module.exports = router;
