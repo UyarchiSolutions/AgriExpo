@@ -295,6 +295,14 @@ const get_all_purchasePlans = async (req) => {
 }
 
 
+// AGRI EXPO
+
+const create_PurchasePlan_EXpo = async(body, userId)=>{
+    const data = {...body, DateIso:moment(),suppierId:userId}
+    const creations = await purchasePlan.create(data)
+    return creations
+}
+
 module.exports = {
     create_purchase_plan,
     get_order_details,
@@ -302,5 +310,6 @@ module.exports = {
     create_purchase_plan_addon,
     get_all_my_orders_normal,
     get_all_purchasePlans,
-    create_purchase_plan_private
+    create_purchase_plan_private,
+    create_PurchasePlan_EXpo
 }

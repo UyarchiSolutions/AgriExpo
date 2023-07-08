@@ -157,6 +157,9 @@ const purchasePlanSchema = mongoose.Schema({
     },
     Price:{
         type:String
+    },
+    slotInfo:{
+        type:Array,
     }
 });
 
