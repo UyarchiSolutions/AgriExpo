@@ -12,7 +12,7 @@ router.route('/getpayment/details/all').get(SellerAuth, purchasePlan.get_all_my_
 router.route('/getpayment/details/all/normal').get(SellerAuth, purchasePlan.get_all_my_orders_normal);
 router.route('/mypurchase/plans/gellall').get(SellerAuth, purchasePlan.get_all_purchasePlans);
 router.route('/purchase/suceess/private').post(purchasePlan.create_purchase_plan_private);
-router.route('/purchase/PurchasePlan/EXpo').get(SellerAuth, purchasePlan.create_PurchasePlan_EXpo)
+router.route('/purchase/PurchasePlan/EXpo').post(SellerAuth, purchasePlan.create_PurchasePlan_EXpo)
 
 
 module.exports = router;
