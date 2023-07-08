@@ -26,5 +26,8 @@ router.route('/main/go/live').get(demostream.go_live);
 router.route('/buyer/go/live').get(demostream.buyer_go_live_stream);
 router.route('/get/DemoStream/By/Admin').get(authorization, demostream.get_DemoStream_By_Admin);
 router.route('/get/my/orders/buyer').get(demostream.my_orders_buyer);
+router.route('/view/order/details').get(demostream.view_order_details);
+router.route('/get/exhibitor/order').get(demostream.get_exhibitor_order);
+
 
 module.exports = router;
