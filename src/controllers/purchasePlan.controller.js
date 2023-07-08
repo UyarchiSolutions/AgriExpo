@@ -65,7 +65,8 @@ const get_all_purchasePlans = catchAsync(async (req, res) => {
 });
 
 const create_PurchasePlan_EXpo = catchAsync(async (req,res)=>{
-    const value = await purchasePlan.create_PurchasePlan_EXpo(req.body);
+    let userId = req.userId
+    const value = await purchasePlan.create_PurchasePlan_EXpo(req.body,userId);
     res.send(value)
 })
 

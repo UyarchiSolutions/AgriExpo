@@ -73,7 +73,7 @@ const send_livestream_link = async (req) => {
     name: name,
     streamName: 'Demo Stream - ' + (parseInt(streamCount) + 1),
     createdBy: userID,
-    _id: id
+    _id: id,
     // endTime: moment().add(15, 'minutes'),
   });
   // endTime: moment().add(15, 'minutes'),
@@ -837,16 +837,10 @@ const get_DemoStream_By_Admin = async (id) => {
 };
 
 const my_orders_buyer = async (req) => {
-
   let userId = req.query.id;
-
-  let value = await Demoorder.aggregate([
-    { $match: { $and: [{ userId: { $eq: userId } }] } },
-
-  ])
+  let value = await Demoorder.aggregate([{ $match: { $and: [{ userId: { $eq: userId } }] } }]);
   return value;
-
-}
+};
 
 module.exports = {
   send_livestream_link,
@@ -866,5 +860,5 @@ module.exports = {
   go_live,
   buyer_go_live_stream,
   get_DemoStream_By_Admin,
-  my_orders_buyer
+  my_orders_buyer,
 };
