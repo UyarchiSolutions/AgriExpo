@@ -164,7 +164,29 @@ const purchasePlanSchema = mongoose.Schema({
     status:{
         type:String,
         default:"Pending",
-    }
+    },
+    PayementMode:{
+        type:String
+    },
+    TransactionId:{
+        type:String
+    },
+    image:{
+        type:String
+    },
+    FromBank:{
+        type:String
+    },
+    AccountNo:{
+        type:String
+    },
+    ChequeDDNo:{
+        type:String
+    },
+    ChequeDDdate:{
+        type:String
+    },
+    
 });
 
 const purchasePlan = mongoose.model('purchasedPlans', purchasePlanSchema);
