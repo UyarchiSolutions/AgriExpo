@@ -160,6 +160,10 @@ const purchasePlanSchema = mongoose.Schema({
     },
     slotInfo:{
         type:Array,
+    },
+    status:{
+        type:String,
+        default:"Pending",
     }
 });
 
