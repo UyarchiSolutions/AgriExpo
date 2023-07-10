@@ -88,6 +88,11 @@ const updatePurchasedPlanById = catchAsync(async(req,res)=>{
     res.send(values)
 })
 
+const get_All_Planes = catchAsync(async(req,res)=>{
+    const value = await purchasePlan.get_All_Planes(req.params.page)
+    res.send(value)
+})
+
 module.exports = {
     create_purchase_plan,
     get_order_details,
@@ -99,5 +104,6 @@ module.exports = {
     create_PurchasePlan_EXpo,
     getPurchasedPlan,
     updatePurchasedPlan,
-    updatePurchasedPlanById
+    updatePurchasedPlanById,
+    get_All_Planes
 }
