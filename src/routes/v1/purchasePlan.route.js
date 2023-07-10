@@ -15,5 +15,6 @@ router.route('/purchase/suceess/private').post(purchasePlan.create_purchase_plan
 router.route('/purchase/PurchasePlan/EXpo').post(SellerAuth, purchasePlan.create_PurchasePlan_EXpo)
 router.route('/fetch/getPurchasedPlan').get(SellerAuth, purchasePlan.getPurchasedPlan);
 router.route('/:id').put(SellerAuth,purchasePlan.updatePurchasedPlan);
+router.route('update/:id').put(purchasePlan.updatePurchasedPlanById);
 
 module.exports = router;

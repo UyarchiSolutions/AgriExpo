@@ -320,6 +320,15 @@ const updatePurchasedPlan = async(id,body,userId)=>{
     return values
 }
 
+const updatePurchasedPlanById = async (id,body)=>{
+    let values = await purchasePlan.findById(id)
+    if(!values){
+        throw new ApiError(httpStatus.BAD_REQUEST, 'plan Not Found');
+    }
+    values =  await purchasePlan.findByIdAndUpdate({_id:id},body,{new:true})
+    return values
+}
+
 module.exports = {
     create_purchase_plan,
     get_order_details,
@@ -330,5 +339,6 @@ module.exports = {
     create_purchase_plan_private,
     create_PurchasePlan_EXpo,
     getPurchasedPlan,
-    updatePurchasedPlan
+    updatePurchasedPlan,
+    updatePurchasedPlanById
 }
