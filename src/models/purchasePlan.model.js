@@ -143,7 +143,7 @@ const purchasePlanSchema = mongoose.Schema({
     Pdf:{
         type:String
     },
-    image:{
+    Paidimage:{
         type:String
     },
     RaiseHands:{
@@ -186,7 +186,7 @@ const purchasePlanSchema = mongoose.Schema({
     ChequeDDdate:{
         type:String
     },
-    
+
 });
 
 const purchasePlan = mongoose.model('purchasedPlans', purchasePlanSchema);
