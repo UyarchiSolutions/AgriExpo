@@ -77,7 +77,9 @@ const getPurchasedPlan = catchAsync(async (req,res)=>{
 })
 
 const updatePurchasedPlan = catchAsync(async (req,res)=>{
-    const value = await purchasePlan.updatePurchasedPlan(req.params.id,req.body)
+    let userId = req.userId
+
+    const value = await purchasePlan.updatePurchasedPlan(req.params.id,req.body,userId)
     res.send(value)
 })
 

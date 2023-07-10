@@ -309,12 +309,14 @@ const getPurchasedPlan = async(userId)=>{
 
 }
 
-const updatePurchasedPlan = async(id,body)=>{
+const updatePurchasedPlan = async(id,body,userId)=>{
     let values = await purchasePlan.findById(id)
     if(!values){
         throw new ApiError(httpStatus.BAD_REQUEST, 'plan Not Found');
     }
-    values =  await purchasePlan.findByIdAndUpdate({_id:id},body,{new:true})
+    values =  await purchasePlan.findByIdAndDelete({_id:id})
+    const data = {...body, DateIso:moment(),suppierId:userId,_id:body._id}
+    values = await purchasePlan.create(data)
     return values
 }
 
