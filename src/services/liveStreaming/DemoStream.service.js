@@ -58,7 +58,7 @@ function generateUniqueID() {
 
 const send_livestream_link = async (req) => {
   let userID = req.userId;
-  const { phoneNumber, name } = req.body;
+  const { phoneNumber, name, transaction } = req.body;
   let user = await Demoseller.findOne({ phoneNumber: phoneNumber });
   if (!user) {
     user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
@@ -74,6 +74,7 @@ const send_livestream_link = async (req) => {
     streamName: 'Demo Stream - ' + (parseInt(streamCount) + 1),
     createdBy: userID,
     _id: id,
+    transaction: transaction
     // endTime: moment().add(15, 'minutes'),
   });
   // endTime: moment().add(15, 'minutes'),
@@ -488,7 +489,7 @@ const stream_register_buyer = async (req) => {
   demotoken.save();
 
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
     req.io.emit(demotoken.streamID + "_buyer_registor", { register })
   }, 300)
