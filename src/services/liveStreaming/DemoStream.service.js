@@ -1160,92 +1160,92 @@ const exhibitor_interested_get = async (req) => {
         ]
       }
     },
-    {
-      $lookup: {
-        from: 'demoposts',
-        localField: 'productID',
-        foreignField: '_id',
-        // pipeline: [
-        //   {
-        //     $lookup: {
-        //       from: 'demobuyers',
-        //       localField: 'userID',
-        //       foreignField: '_id',
-        //       as: 'demobuyers',
-        //     },
-        //   },
-        //   { $unwind: "$demobuyers" }
-        // ],
-        as: 'demoposts',
-      },
-    },
-    { $unwind: "$demoposts" },
-    {
-      $addFields: {
-        productTitle: { $ifNull: ["$demoposts.productTitle", ''] },
-      },
-    },
-    {
-      $lookup: {
-        from: 'demostreams',
-        localField: 'streamID',
-        foreignField: '_id',
-        as: 'demostreams',
-      },
-    },
-    { $unwind: "$demostreams" },
-    {
-      $addFields: {
-        streamName: { $ifNull: ["$demostreams.streamName", ''] },
-      },
-    },
-    {
-      $lookup: {
-        from: 'demostreamtokens',
-        localField: 'userID',
-        foreignField: '_id',
-        pipeline: [
-          {
-            $lookup: {
-              from: 'demobuyers',
-              localField: 'userID',
-              foreignField: '_id',
-              as: 'demobuyers',
-            },
-          },
-          { $unwind: "$demobuyers" },
-        ],
-        as: 'demostreamtokens',
-      },
-    },
-    { $unwind: "$demostreamtokens" },
-    {
-      $addFields: {
-        userName: { $ifNull: ["$demostreamtokens.demobuyers.name", ''] },
-        mobileNumber: { $ifNull: ["$demostreamtokens.demobuyers.phoneNumber", ''] },
-      },
-    },
-    {
-      $group: {
-        _id: {
-          streamName: "$streamName",
-          userName: "$userName",
-          mobileNumber: "$mobileNumber",
-          userID: "$userID",
-        },
-        productCount: { $sum: 1 }
-      }
-    },
-    {
-      $project: {
-        _id: 0,
-        streamName: "$_id.streamName",
-        userName: "$_id.userName",
-        mobileNumber: "$_id.mobileNumber",
-        productCount: "$productCount",
-        userID: "$_id.userID"
-      }
-    }
+    // {
+    //   $lookup: {
+    //     from: 'demoposts',
+    //     localField: 'productID',
+    //     foreignField: '_id',
+    //     // pipeline: [
+    //     //   {
+    //     //     $lookup: {
+    //     //       from: 'demobuyers',
+    //     //       localField: 'userID',
+    //     //       foreignField: '_id',
+    //     //       as: 'demobuyers',
+    //     //     },
+    //     //   },
+    //     //   { $unwind: "$demobuyers" }
+    //     // ],
+    //     as: 'demoposts',
+    //   },
+    // },
+    // { $unwind: "$demoposts" },
+    // {
+    //   $addFields: {
+    //     productTitle: { $ifNull: ["$demoposts.productTitle", ''] },
+    //   },
+    // },
+    // {
+    //   $lookup: {
+    //     from: 'demostreams',
+    //     localField: 'streamID',
+    //     foreignField: '_id',
+    //     as: 'demostreams',
+    //   },
+    // },
+    // { $unwind: "$demostreams" },
+    // {
+    //   $addFields: {
+    //     streamName: { $ifNull: ["$demostreams.streamName", ''] },
+    //   },
+    // },
+    // {
+    //   $lookup: {
+    //     from: 'demostreamtokens',
+    //     localField: 'userID',
+    //     foreignField: '_id',
+    //     pipeline: [
+    //       {
+    //         $lookup: {
+    //           from: 'demobuyers',
+    //           localField: 'userID',
+    //           foreignField: '_id',
+    //           as: 'demobuyers',
+    //         },
+    //       },
+    //       { $unwind: "$demobuyers" },
+    //     ],
+    //     as: 'demostreamtokens',
+    //   },
+    // },
+    // { $unwind: "$demostreamtokens" },
+    // {
+    //   $addFields: {
+    //     userName: { $ifNull: ["$demostreamtokens.demobuyers.name", ''] },
+    //     mobileNumber: { $ifNull: ["$demostreamtokens.demobuyers.phoneNumber", ''] },
+    //   },
+    // },
+    // {
+    //   $group: {
+    //     _id: {
+    //       streamName: "$streamName",
+    //       userName: "$userName",
+    //       mobileNumber: "$mobileNumber",
+    //       userID: "$userID",
+    //     },
+    //     productCount: { $sum: 1 }
+    //   }
+    // },
+    // {
+    //   $project: {
+    //     _id: 0,
+    //     streamName: "$_id.streamName",
+    //     userName: "$_id.userName",
+    //     mobileNumber: "$_id.mobileNumber",
+    //     productCount: "$productCount",
+    //     userID: "$_id.userID"
+    //   }
+    // }
 
   ])
 
