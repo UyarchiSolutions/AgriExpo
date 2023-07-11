@@ -651,6 +651,9 @@ const demosavedproductschema = mongoose.Schema({
   },
   joinedUSER: {
     type: String,
+  },
+  saved: {
+    type: Boolean,
   }
 });
 const Demosavedproduct = mongoose.model('demosavedproduct', demosavedproductschema);

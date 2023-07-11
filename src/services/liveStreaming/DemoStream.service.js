@@ -473,7 +473,60 @@ const get_buyer_token = async (req) => {
   if (!stream) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
   }
-  const streampost = await Demopost.find({ streamID: demotoken.streamID });
+
+  const streampost = await Demopost.aggregate([
+    {
+      $match: {
+        $and: [
+          { streamID: { $eq: demotoken.streamID } }
+        ]
+      }
+    },
+    {
+      $lookup: {
+        from: 'demosavedproducts',
+        localField: '_id',
+        foreignField: 'productID',
+        pipeline: [
+          { $match: { $and: [{ userID: { $eq: join_token } }] } },
+        ],
+        as: 'demosavedproducts',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$demosavedproducts',
+      },
+    },
+    {
+      $addFields: {
+        saved: { $ifNull: ["$demosavedproducts.saved", false] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'demointresteds',
+        localField: '_id',
+        foreignField: 'productID',
+        pipeline: [
+          { $match: { $and: [{ userID: { $eq: join_token } }] } },
+        ],
+        as: 'demointresteds',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$demointresteds',
+      },
+    },
+    {
+      $addFields: {
+        interested: { $ifNull: ["$demointresteds.intrested", false] },
+      },
+    },
+  ])
 
   return { demotoken, stream, appID, streampost };
 };
@@ -930,7 +983,7 @@ const visitor_interested = async (req) => {
   let interested = await DemoInstested.findOne({ productID: postID, streamID: streamID, userID: userID });
 
   if (!interested) {
-    interested = await DemoInstested.create({ productID: postID, streamID: streamID, userID: userID, DateIso: moment(), created: moment(), intrested: true })
+    interested = await DemoInstested.create({ interested: true, productID: postID, streamID: streamID, userID: userID, DateIso: moment(), created: moment(), intrested: true })
   }
   return interested;
 
@@ -941,7 +994,7 @@ const visitor_saved = async (req) => {
   let saveproducts = await Demosavedproduct.findOne({ productID: postID, streamID: streamID, userID: userID });
 
   if (!saveproducts) {
-    saveproducts = await Demosavedproduct.create({ productID: postID, streamID: streamID, userID: userID, DateIso: moment(), created: moment(), intrested: true })
+    saveproducts = await Demosavedproduct.create({ saved: true, productID: postID, streamID: streamID, userID: userID, DateIso: moment(), created: moment(), intrested: true })
   }
   return saveproducts;
 
