@@ -28,6 +28,7 @@ router.route('/get/DemoStream/By/Admin').get(authorization, demostream.get_DemoS
 router.route('/get/my/orders/buyer').get(demostream.my_orders_buyer);
 router.route('/view/order/details').get(demostream.view_order_details);
 router.route('/get/exhibitor/order').get(demostream.get_exhibitor_order);
-
+router.route('/visitor/interested').post(demostream.visitor_interested).get(demostream.visitor_interested_get);
+router.route('/visitor/saved').post(demostream.visitor_saved).get(demostream.visitor_saved_get);
 
 module.exports = router;

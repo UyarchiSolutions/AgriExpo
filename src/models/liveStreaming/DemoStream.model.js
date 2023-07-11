@@ -583,4 +583,76 @@ const streamingPaymant = mongoose.Schema({
 });
 const Demopaymnt = mongoose.model('demopayment', streamingPaymant);
 
-module.exports = { Demoseller, Demostream, Demopost, Demobuyer, Demoorder, Demoorderproduct, DemostreamToken, Democart, Democartproduct, Demopaymnt };
+
+
+
+const demointrestedschema = mongoose.Schema({
+  _id: {
+    type: String,
+    default: v4,
+  },
+  DateIso: {
+    type: Number,
+  },
+  date: {
+    type: String,
+  },
+  created: {
+    type: Date,
+  },
+  time: {
+    type: Number,
+  },
+  productID: {
+    type: String,
+  },
+  streamID: {
+    type: String,
+  },
+  userID: {
+    type: String,
+  },
+  joinedUSER: {
+    type: String,
+  },
+  intrested: {
+    type: Boolean,
+  }
+});
+const DemoInstested = mongoose.model('demointrested', demointrestedschema);
+
+
+
+const demosavedproductschema = mongoose.Schema({
+  _id: {
+    type: String,
+    default: v4,
+  },
+  DateIso: {
+    type: Number,
+  },
+  date: {
+    type: String,
+  },
+  created: {
+    type: Date,
+  },
+  time: {
+    type: Number,
+  },
+  productID: {
+    type: String,
+  },
+  streamID: {
+    type: String,
+  },
+  userID: {
+    type: String,
+  },
+  joinedUSER: {
+    type: String,
+  }
+});
+const Demosavedproduct = mongoose.model('demosavedproduct', demosavedproductschema);
+
+module.exports = { Demoseller, Demostream, Demopost, Demobuyer, Demoorder, Demoorderproduct, DemostreamToken, Democart, Democartproduct, Demopaymnt, DemoInstested, Demosavedproduct };
