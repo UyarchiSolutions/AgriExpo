@@ -25,6 +25,8 @@ const {
   Democart,
   Democartproduct,
   Demopaymnt,
+  DemoInstested,
+  Demosavedproduct,
 } = require('../../models/liveStreaming/DemoStream.model');
 const jwt = require('jsonwebtoken');
 const agoraToken = require('./AgoraAppId.service');
@@ -471,7 +473,60 @@ const get_buyer_token = async (req) => {
   if (!stream) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
   }
-  const streampost = await Demopost.find({ streamID: demotoken.streamID });
+
+  const streampost = await Demopost.aggregate([
+    {
+      $match: {
+        $and: [
+          { streamID: { $eq: demotoken.streamID } }
+        ]
+      }
+    },
+    {
+      $lookup: {
+        from: 'demosavedproducts',
+        localField: '_id',
+        foreignField: 'productID',
+        pipeline: [
+          { $match: { $and: [{ userID: { $eq: join_token } }] } },
+        ],
+        as: 'demosavedproducts',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$demosavedproducts',
+      },
+    },
+    {
+      $addFields: {
+        saved: { $ifNull: ["$demosavedproducts.saved", false] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'demointresteds',
+        localField: '_id',
+        foreignField: 'productID',
+        pipeline: [
+          { $match: { $and: [{ userID: { $eq: join_token } }] } },
+        ],
+        as: 'demointresteds',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$demointresteds',
+      },
+    },
+    {
+      $addFields: {
+        interested: { $ifNull: ["$demointresteds.intrested", false] },
+      },
+    },
+  ])
 
   return { demotoken, stream, appID, streampost };
 };
@@ -921,6 +976,67 @@ const get_exhibitor_order = async (req) => {
   return value;
 }
 
+const visitor_interested = async (req) => {
+
+  const { postID, streamID, userID } = req.body;
+
+  let interested = await DemoInstested.findOne({ productID: postID, streamID: streamID, userID: userID });
+
+  if (!interested) {
+    interested = await DemoInstested.create({ interested: true, productID: postID, streamID: streamID, userID: userID, DateIso: moment(), created: moment(), intrested: true })
+  }
+  return interested;
+
+}
+const visitor_saved = async (req) => {
+  const { postID, streamID, userID } = req.body;
+
+  let saveproducts = await Demosavedproduct.findOne({ productID: postID, streamID: streamID, userID: userID });
+
+  if (!saveproducts) {
+    saveproducts = await Demosavedproduct.create({ saved: true, productID: postID, streamID: streamID, userID: userID, DateIso: moment(), created: moment(), intrested: true })
+  }
+  return saveproducts;
+
+}
+
+const visitor_interested_get = async (req) => {
+
+  let stream = req.query.stream;
+  let join = req.query.join;
+  let interested = await DemoInstested.aggregate([
+    {
+      $match: {
+        $and: [
+          { userID: { $eq: join } },
+          { streamID: { $eq: stream } },
+        ]
+      }
+    }
+  ])
+
+
+  return interested;
+
+}
+
+const visitor_saved_get = async (req) => {
+
+  let stream = req.query.stream;
+  let join = req.query.join;
+  let savedProduct = await Demosavedproduct.aggregate([
+    {
+      $match: {
+        $and: [
+          { userID: { $eq: join } },
+          { streamID: { $eq: stream } },
+        ]
+      }
+    }
+  ])
+
+  return savedProduct;
+}
 
 module.exports = {
   send_livestream_link,
@@ -942,5 +1058,9 @@ module.exports = {
   get_DemoStream_By_Admin,
   my_orders_buyer,
   view_order_details,
-  get_exhibitor_order
+  get_exhibitor_order,
+  visitor_interested,
+  visitor_saved,
+  visitor_interested_get,
+  visitor_saved_get
 };

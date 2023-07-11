@@ -90,20 +90,36 @@ const get_DemoStream_By_Admin = catchAsync(async (req, res) => {
   res.send(data);
 });
 
-const my_orders_buyer = catchAsync(async(req,res)=>{
+const my_orders_buyer = catchAsync(async (req, res) => {
   const data = await demostream.my_orders_buyer(req);
   res.send(data);
 })
-const view_order_details = catchAsync(async(req,res)=>{
+const view_order_details = catchAsync(async (req, res) => {
   const data = await demostream.view_order_details(req);
   res.send(data);
 })
 
-const get_exhibitor_order = catchAsync(async(req,res)=>{
+const get_exhibitor_order = catchAsync(async (req, res) => {
   const data = await demostream.get_exhibitor_order(req);
   res.send(data);
 })
+const visitor_interested = catchAsync(async (req, res) => {
+  const data = await demostream.visitor_interested(req);
+  res.send(data);
+})
+const visitor_saved = catchAsync(async (req, res) => {
+  const data = await demostream.visitor_saved(req);
+  res.send(data);
+})
 
+const visitor_interested_get= catchAsync(async (req, res) => {
+  const data = await demostream.visitor_interested_get(req);
+  res.send(data);
+})
+const visitor_saved_get= catchAsync(async (req, res) => {
+  const data = await demostream.visitor_saved_get(req);
+  res.send(data);
+})
 module.exports = {
   send_livestream_link,
   get_stream_details,
@@ -124,5 +140,9 @@ module.exports = {
   get_DemoStream_By_Admin,
   my_orders_buyer,
   view_order_details,
-  get_exhibitor_order
+  get_exhibitor_order,
+  visitor_interested,
+  visitor_saved,
+  visitor_interested_get,
+  visitor_saved_get
 };
