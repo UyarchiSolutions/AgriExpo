@@ -1196,8 +1196,19 @@ const exhibitor_interested_get = async (req) => {
     {
       $addFields: {
         userName: { $ifNull: ["$demostreams.demobuyers.name", ''] },
+        mobileNumber: { $ifNull: ["$demostreams.demobuyers.phoneNumber", ''] },
       },
     },
+    {
+      $group: {
+        _id: {
+          streamName: "$streamName",
+          userName: "$userName",
+          mobileNumber: "$mobileNumber"
+        },
+        productCount: { $sum: 1 }
+      }
+    }
   ])
 
   return savedProduct;
