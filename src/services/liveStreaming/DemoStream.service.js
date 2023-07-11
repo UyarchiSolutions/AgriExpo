@@ -1204,7 +1204,8 @@ const exhibitor_interested_get = async (req) => {
         _id: {
           streamName: "$streamName",
           userName: "$userName",
-          mobileNumber: "$mobileNumber"
+          mobileNumber: "$mobileNumber",
+          userID: "$userID",
         },
         productCount: { $sum: 1 }
       }
@@ -1216,6 +1217,7 @@ const exhibitor_interested_get = async (req) => {
         userName: "$_id.userName",
         mobileNumber: "$_id.mobileNumber",
         productCount: "$productCount",
+        userID: "$_id.userID"
       }
     }
 
