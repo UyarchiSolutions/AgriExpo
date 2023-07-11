@@ -1038,6 +1038,20 @@ const visitor_interested_get = async (req) => {
         productTitle: { $ifNull: ["$demoposts.productTitle", ''] },
       },
     },
+    {
+      $lookup: {
+        from: 'demostreams',
+        localField: 'streamID',
+        foreignField: '_id',
+        as: 'demoposts',
+      },
+    },
+    { $unwind: "$demostreams" },
+    {
+      $addFields: {
+        streamName: { $ifNull: ["$demostreams.streamName", ''] },
+      },
+    },
   ])
 
 
@@ -1081,6 +1095,20 @@ const visitor_saved_get = async (req) => {
     {
       $addFields: {
         productTitle: { $ifNull: ["$demoposts.productTitle", ''] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'demostreams',
+        localField: 'streamID',
+        foreignField: '_id',
+        as: 'demoposts',
+      },
+    },
+    { $unwind: "$demostreams" },
+    {
+      $addFields: {
+        streamName: { $ifNull: ["$demostreams.streamName", ''] },
       },
     },
   ])
