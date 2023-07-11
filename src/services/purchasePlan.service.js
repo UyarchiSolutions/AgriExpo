@@ -404,6 +404,17 @@ const get_All_Planes = async (page) => {
   return { values, total: total.length };
 };
 
+const ChangePurchasedPlan = async (id, body) => {
+  let values = await purchasePlan.findById(id);
+  if (!values) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'plan Not Found');
+  }
+  values = await purchasePlan.findByIdAndDelete({ _id: id });
+  const data = { ...body, DateIso: moment(), _id: body._id };
+  values = await purchasePlan.create(data);
+  return values;
+};
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -417,4 +428,5 @@ module.exports = {
   updatePurchasedPlan,
   updatePurchasedPlanById,
   get_All_Planes,
+  ChangePurchasedPlan,
 };
