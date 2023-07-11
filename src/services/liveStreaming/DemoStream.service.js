@@ -1210,12 +1210,15 @@ const exhibitor_interested_get = async (req) => {
       }
     },
     {
-      _id:0,
-      streamName:"$_id.streamName",
-      userName:"$_id.userName",
-      mobileNumber:"$_id.mobileNumber",
-      productCount:"$productCount",
+      $project: {
+        _id: 0,
+        streamName: "$_id.streamName",
+        userName: "$_id.userName",
+        mobileNumber: "$_id.mobileNumber",
+        productCount: "$productCount",
+      }
     }
+
   ])
 
   return savedProduct;
