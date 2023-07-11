@@ -90,6 +90,11 @@ const get_DemoStream_By_Admin = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const manageDemoStream = catchAsync(async (req, res) => {
+  const data = await demostream.manageDemoStream();
+  res.send(data);
+})
+
 const my_orders_buyer = catchAsync(async (req, res) => {
   const data = await demostream.my_orders_buyer(req);
   res.send(data);
@@ -144,5 +149,6 @@ module.exports = {
   visitor_interested,
   visitor_saved,
   visitor_interested_get,
-  visitor_saved_get
+  visitor_saved_get,
+  manageDemoStream,
 };

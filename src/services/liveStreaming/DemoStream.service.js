@@ -76,7 +76,7 @@ const send_livestream_link = async (req) => {
     streamName: 'Demo Stream - ' + (parseInt(streamCount) + 1),
     createdBy: userID,
     _id: id,
-    transaction: transaction
+    transaction: transaction,
     // endTime: moment().add(15, 'minutes'),
   });
   // endTime: moment().add(15, 'minutes'),
@@ -477,19 +477,15 @@ const get_buyer_token = async (req) => {
   const streampost = await Demopost.aggregate([
     {
       $match: {
-        $and: [
-          { streamID: { $eq: demotoken.streamID } }
-        ]
-      }
+        $and: [{ streamID: { $eq: demotoken.streamID } }],
+      },
     },
     {
       $lookup: {
         from: 'demosavedproducts',
         localField: '_id',
         foreignField: 'productID',
-        pipeline: [
-          { $match: { $and: [{ userID: { $eq: join_token } }] } },
-        ],
+        pipeline: [{ $match: { $and: [{ userID: { $eq: join_token } }] } }],
         as: 'demosavedproducts',
       },
     },
@@ -501,7 +497,7 @@ const get_buyer_token = async (req) => {
     },
     {
       $addFields: {
-        saved: { $ifNull: ["$demosavedproducts.saved", false] },
+        saved: { $ifNull: ['$demosavedproducts.saved', false] },
       },
     },
     {
@@ -509,9 +505,7 @@ const get_buyer_token = async (req) => {
         from: 'demointresteds',
         localField: '_id',
         foreignField: 'productID',
-        pipeline: [
-          { $match: { $and: [{ userID: { $eq: join_token } }] } },
-        ],
+        pipeline: [{ $match: { $and: [{ userID: { $eq: join_token } }] } }],
         as: 'demointresteds',
       },
     },
@@ -523,10 +517,10 @@ const get_buyer_token = async (req) => {
     },
     {
       $addFields: {
-        interested: { $ifNull: ["$demointresteds.intrested", false] },
+        interested: { $ifNull: ['$demointresteds.intrested', false] },
       },
     },
-  ])
+  ]);
 
   return { demotoken, stream, appID, streampost };
 };
@@ -543,11 +537,10 @@ const stream_register_buyer = async (req) => {
   demotoken.status = 'resgistered';
   demotoken.save();
 
-
   setTimeout(async () => {
     register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
-    req.io.emit(demotoken.streamID + "_buyer_registor", { register })
-  }, 300)
+    req.io.emit(demotoken.streamID + '_buyer_registor', { register });
+  }, 300);
   return demotoken;
 };
 
@@ -898,6 +891,14 @@ const get_DemoStream_By_Admin = async (id) => {
   return data;
 };
 
+const manageDemoStream = async () => {
+  const data = await Demostream.aggregate([
+    { $match: { _id: { $ne: null } } },
+    { $lookup: { from: 'b2busers', localField: 'createdBy', foreignField: '_id', as: 'users' } },
+  ]);
+  return data;
+};
+
 const my_orders_buyer = async (req) => {
   let userId = req.query.id;
   let value = await Demoorder.aggregate([{ $match: { $and: [{ userId: { $eq: userId } }] } }]);
@@ -905,7 +906,6 @@ const my_orders_buyer = async (req) => {
 };
 
 const view_order_details = async (req) => {
-
   let userId = req.query.id;
 
   let value = await Demoorder.aggregate([
@@ -924,7 +924,7 @@ const view_order_details = async (req) => {
               as: 'demoposts',
             },
           },
-          { $unwind: "$demoposts" }
+          { $unwind: '$demoposts' },
         ],
         as: 'demoorderproducts',
       },
@@ -937,16 +937,14 @@ const view_order_details = async (req) => {
         as: 'demostreams',
       },
     },
-    { $unwind: "$demostreams" }
-  ])
+    { $unwind: '$demostreams' },
+  ]);
 
   if (value.length == 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
   }
   return value[0];
-
-
-}
+};
 
 const get_exhibitor_order = async (req) => {
   let streamId = req.query.id;
@@ -966,42 +964,54 @@ const get_exhibitor_order = async (req) => {
               as: 'demobuyers',
             },
           },
-          { $unwind: "$demobuyers" }
+          { $unwind: '$demobuyers' },
         ],
         as: 'demostreamtokens',
       },
     },
-    { $unwind: "$demostreamtokens" }
-  ])
+    { $unwind: '$demostreamtokens' },
+  ]);
   return value;
-}
+};
 
 const visitor_interested = async (req) => {
-
   const { postID, streamID, userID } = req.body;
 
   let interested = await DemoInstested.findOne({ productID: postID, streamID: streamID, userID: userID });
 
   if (!interested) {
-    interested = await DemoInstested.create({ interested: true, productID: postID, streamID: streamID, userID: userID, DateIso: moment(), created: moment(), intrested: true })
+    interested = await DemoInstested.create({
+      interested: true,
+      productID: postID,
+      streamID: streamID,
+      userID: userID,
+      DateIso: moment(),
+      created: moment(),
+      intrested: true,
+    });
   }
   return interested;
-
-}
+};
 const visitor_saved = async (req) => {
   const { postID, streamID, userID } = req.body;
 
   let saveproducts = await Demosavedproduct.findOne({ productID: postID, streamID: streamID, userID: userID });
 
   if (!saveproducts) {
-    saveproducts = await Demosavedproduct.create({ saved: true, productID: postID, streamID: streamID, userID: userID, DateIso: moment(), created: moment(), intrested: true })
+    saveproducts = await Demosavedproduct.create({
+      saved: true,
+      productID: postID,
+      streamID: streamID,
+      userID: userID,
+      DateIso: moment(),
+      created: moment(),
+      intrested: true,
+    });
   }
   return saveproducts;
-
-}
+};
 
 const visitor_interested_get = async (req) => {
-
   let stream = req.query.stream;
   let join = req.query.join;
   let interested = await DemoInstested.aggregate([
@@ -1056,11 +1066,9 @@ const visitor_interested_get = async (req) => {
 
 
   return interested;
-
-}
+};
 
 const visitor_saved_get = async (req) => {
-
   let stream = req.query.stream;
   let join = req.query.join;
   let savedProduct = await Demosavedproduct.aggregate([
@@ -1114,7 +1122,7 @@ const visitor_saved_get = async (req) => {
   ])
 
   return savedProduct;
-}
+};
 
 module.exports = {
   send_livestream_link,
@@ -1140,5 +1148,6 @@ module.exports = {
   visitor_interested,
   visitor_saved,
   visitor_interested_get,
-  visitor_saved_get
+  visitor_saved_get,
+  manageDemoStream,
 };
