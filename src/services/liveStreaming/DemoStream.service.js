@@ -891,12 +891,58 @@ const get_DemoStream_By_Admin = async (id) => {
   return data;
 };
 
-const manageDemoStream = async () => {
+const manageDemoStream = async (page) => {
   const data = await Demostream.aggregate([
     { $match: { _id: { $ne: null } } },
     { $lookup: { from: 'b2busers', localField: 'createdBy', foreignField: '_id', as: 'users' } },
+    { $unwind: { preserveNullAndEmptyArrays: true, path: '$users' } },
+    {
+      $project: {
+        _id: 1,
+        expired: 1,
+        livestart: 1,
+        userList: 1,
+        status: 1,
+        userID: 1,
+        dateISO: 1,
+        phoneNumber: 1,
+        name: 1,
+        streamName: 1,
+        streamValitity: 1,
+        agoraID: 1,
+        endTime: 1,
+        createdBy: { $ifNull: ['$users.name', 'Nill'] },
+      },
+    },
+    { $skip: 10 * page },
+    { $limit: 10 },
   ]);
-  return data;
+
+  const total = await Demostream.aggregate([
+    { $match: { _id: { $ne: null } } },
+    { $lookup: { from: 'b2busers', localField: 'createdBy', foreignField: '_id', as: 'users' } },
+    { $unwind: { preserveNullAndEmptyArrays: true, path: '$users' } },
+    {
+      $project: {
+        _id: 1,
+        expired: 1,
+        livestart: 1,
+        userList: 1,
+        status: 1,
+        userID: 1,
+        dateISO: 1,
+        phoneNumber: 1,
+        name: 1,
+        streamName: 1,
+        streamValitity: 1,
+        agoraID: 1,
+        endTime: 1,
+        createdBy: { $ifNull: ['$users.name', 'Nill'] },
+      },
+    },
+  ]);
+
+  return { data: data, total: total.length };
 };
 
 const my_orders_buyer = async (req) => {
@@ -1017,11 +1063,8 @@ const visitor_interested_get = async (req) => {
   let interested = await DemoInstested.aggregate([
     {
       $match: {
-        $and: [
-          { userID: { $eq: join } },
-          { streamID: { $eq: stream } },
-        ]
-      }
+        $and: [{ userID: { $eq: join } }, { streamID: { $eq: stream } }],
+      },
     },
     {
       $lookup: {
@@ -1042,14 +1085,13 @@ const visitor_interested_get = async (req) => {
         as: 'demoposts',
       },
     },
-    { $unwind: "$demoposts" },
+    { $unwind: '$demoposts' },
     {
       $addFields: {
-        productTitle: { $ifNull: ["$demoposts.productTitle", ''] },
+        productTitle: { $ifNull: ['$demoposts.productTitle', ''] },
       },
     },
-  ])
-
+  ]);
 
   return interested;
 };
@@ -1060,11 +1102,8 @@ const visitor_saved_get = async (req) => {
   let savedProduct = await Demosavedproduct.aggregate([
     {
       $match: {
-        $and: [
-          { userID: { $eq: join } },
-          { streamID: { $eq: stream } },
-        ]
-      }
+        $and: [{ userID: { $eq: join } }, { streamID: { $eq: stream } }],
+      },
     },
     {
       $lookup: {
@@ -1085,13 +1124,13 @@ const visitor_saved_get = async (req) => {
         as: 'demoposts',
       },
     },
-    { $unwind: "$demoposts" },
+    { $unwind: '$demoposts' },
     {
       $addFields: {
-        productTitle: { $ifNull: ["$demoposts.productTitle", ''] },
+        productTitle: { $ifNull: ['$demoposts.productTitle', ''] },
       },
     },
-  ])
+  ]);
 
   return savedProduct;
 };
