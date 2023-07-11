@@ -1091,7 +1091,48 @@ const visitor_interested_get = async (req) => {
         productTitle: { $ifNull: ['$demoposts.productTitle', ''] },
       },
     },
-  ]);
+    {
+      $lookup: {
+        from: 'demostreams',
+        localField: 'streamID',
+        foreignField: '_id',
+        as: 'demostreams',
+      },
+    },
+    { $unwind: "$demostreams" },
+    {
+      $addFields: {
+        streamName: { $ifNull: ["$demostreams.streamName", ''] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'demostreamtokens',
+        localField: 'userID',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'demobuyers',
+              localField: 'userID',
+              foreignField: '_id',
+              as: 'demobuyers',
+            },
+          },
+          { $unwind: "$demobuyers" },
+        ],
+        as: 'demostreamtokens',
+      },
+    },
+    { $unwind: "$demostreamtokens" },
+    {
+      $addFields: {
+        userName: { $ifNull: ["$demostreamtokens.demobuyers.name", ''] },
+        mobileNumber: { $ifNull: ["$demostreamtokens.demobuyers.phoneNumber", ''] },
+      },
+    },
+  ])
+
 
   return interested;
 };
@@ -1130,10 +1171,127 @@ const visitor_saved_get = async (req) => {
         productTitle: { $ifNull: ['$demoposts.productTitle', ''] },
       },
     },
-  ]);
+    {
+      $lookup: {
+        from: 'demostreams',
+        localField: 'streamID',
+        foreignField: '_id',
+        as: 'demostreams',
+      },
+    },
+    { $unwind: "$demostreams" },
+    {
+      $addFields: {
+        streamName: { $ifNull: ["$demostreams.streamName", ''] },
+      },
+    },
+  ])
 
   return savedProduct;
 };
+
+const exhibitor_interested_get = async (req) => {
+  let stream = req.query.stream;
+  let savedProduct = await DemoInstested.aggregate([
+    {
+      $match: {
+        $and: [
+          { streamID: { $eq: stream } },
+        ]
+      }
+    },
+    {
+      $lookup: {
+        from: 'demoposts',
+        localField: 'productID',
+        foreignField: '_id',
+        // pipeline: [
+        //   {
+        //     $lookup: {
+        //       from: 'demobuyers',
+        //       localField: 'userID',
+        //       foreignField: '_id',
+        //       as: 'demobuyers',
+        //     },
+        //   },
+        //   { $unwind: "$demobuyers" }
+        // ],
+        as: 'demoposts',
+      },
+    },
+    { $unwind: "$demoposts" },
+    {
+      $addFields: {
+        productTitle: { $ifNull: ["$demoposts.productTitle", ''] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'demostreams',
+        localField: 'streamID',
+        foreignField: '_id',
+        as: 'demostreams',
+      },
+    },
+    { $unwind: "$demostreams" },
+    {
+      $addFields: {
+        streamName: { $ifNull: ["$demostreams.streamName", ''] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'demostreamtokens',
+        localField: 'userID',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'demobuyers',
+              localField: 'userID',
+              foreignField: '_id',
+              as: 'demobuyers',
+            },
+          },
+          { $unwind: "$demobuyers" },
+        ],
+        as: 'demostreamtokens',
+      },
+    },
+    { $unwind: "$demostreamtokens" },
+    {
+      $addFields: {
+        userName: { $ifNull: ["$demostreamtokens.demobuyers.name", ''] },
+        mobileNumber: { $ifNull: ["$demostreamtokens.demobuyers.phoneNumber", ''] },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          streamName: "$streamName",
+          userName: "$userName",
+          mobileNumber: "$mobileNumber",
+          userID: "$userID",
+        },
+        productCount: { $sum: 1 }
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        streamName: "$_id.streamName",
+        userName: "$_id.userName",
+        mobileNumber: "$_id.mobileNumber",
+        productCount: "$productCount",
+        userID: "$_id.userID"
+      }
+    }
+
+  ])
+
+  return savedProduct;
+};
+
 
 module.exports = {
   send_livestream_link,
@@ -1161,4 +1319,5 @@ module.exports = {
   visitor_interested_get,
   visitor_saved_get,
   manageDemoStream,
+  exhibitor_interested_get,
 };

@@ -117,12 +117,17 @@ const visitor_saved = catchAsync(async (req, res) => {
   res.send(data);
 })
 
-const visitor_interested_get= catchAsync(async (req, res) => {
+const visitor_interested_get = catchAsync(async (req, res) => {
   const data = await demostream.visitor_interested_get(req);
   res.send(data);
 })
-const visitor_saved_get= catchAsync(async (req, res) => {
+const visitor_saved_get = catchAsync(async (req, res) => {
   const data = await demostream.visitor_saved_get(req);
+  res.send(data);
+})
+
+const exhibitor_interested_get = catchAsync(async (req, res) => {
+  const data = await demostream.exhibitor_interested_get(req);
   res.send(data);
 })
 module.exports = {
@@ -151,4 +156,5 @@ module.exports = {
   visitor_interested_get,
   visitor_saved_get,
   manageDemoStream,
+  exhibitor_interested_get,
 };
