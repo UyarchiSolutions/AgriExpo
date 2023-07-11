@@ -1032,7 +1032,12 @@ const visitor_interested_get = async (req) => {
         as: 'demoposts',
       },
     },
-    { $unwind: "$demoposts" }
+    { $unwind: "$demoposts" },
+    {
+      $addFields: {
+        productTitle: { $ifNull: ["$demoposts.productTitle", ''] },
+      },
+    },
   ])
 
 
@@ -1072,7 +1077,12 @@ const visitor_saved_get = async (req) => {
         as: 'demoposts',
       },
     },
-    { $unwind: "$demoposts" }
+    { $unwind: "$demoposts" },
+    {
+      $addFields: {
+        productTitle: { $ifNull: ["$demoposts.productTitle", ''] },
+      },
+    },
   ])
 
   return savedProduct;
