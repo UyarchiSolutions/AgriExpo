@@ -1195,20 +1195,27 @@ const exhibitor_interested_get = async (req) => {
     { $unwind: "$demostreamtokens" },
     {
       $addFields: {
-        userName: { $ifNull: ["$demostreams.demobuyers.name", ''] },
-        mobileNumber: { $ifNull: ["$demostreams.demobuyers.phoneNumber", ''] },
+        userName: { $ifNull: ["$demostreamtokens.demobuyers.name", ''] },
+        mobileNumber: { $ifNull: ["$demostreamtokens.demobuyers.phoneNumber", ''] },
       },
     },
-    // {
-    //   $group: {
-    //     _id: {
-    //       streamName: "$streamName",
-    //       userName: "$userName",
-    //       mobileNumber: "$mobileNumber"
-    //     },
-    //     productCount: { $sum: 1 }
-    //   }
-    // }
+    {
+      $group: {
+        _id: {
+          streamName: "$streamName",
+          userName: "$userName",
+          mobileNumber: "$mobileNumber"
+        },
+        productCount: { $sum: 1 }
+      }
+    },
+    {
+      _id:0,
+      streamName:"$_id.streamName",
+      userName:"$_id.userName",
+      mobileNumber:"$_id.mobileNumber",
+      productCount:"$productCount",
+    }
   ])
 
   return savedProduct;
