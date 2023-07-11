@@ -1062,6 +1062,32 @@ const visitor_interested_get = async (req) => {
         streamName: { $ifNull: ["$demostreams.streamName", ''] },
       },
     },
+    {
+      $lookup: {
+        from: 'demostreamtokens',
+        localField: 'userID',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'demobuyers',
+              localField: 'userID',
+              foreignField: '_id',
+              as: 'demobuyers',
+            },
+          },
+          { $unwind: "$demobuyers" },
+        ],
+        as: 'demostreamtokens',
+      },
+    },
+    { $unwind: "$demostreamtokens" },
+    {
+      $addFields: {
+        userName: { $ifNull: ["$demostreamtokens.demobuyers.name", ''] },
+        mobileNumber: { $ifNull: ["$demostreamtokens.demobuyers.phoneNumber", ''] },
+      },
+    },
   ])
 
 
