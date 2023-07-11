@@ -1012,7 +1012,27 @@ const visitor_interested_get = async (req) => {
           { streamID: { $eq: stream } },
         ]
       }
-    }
+    },
+    {
+      $lookup: {
+        from: 'demoposts',
+        localField: 'productID',
+        foreignField: '_id',
+        // pipeline: [
+        //   {
+        //     $lookup: {
+        //       from: 'demobuyers',
+        //       localField: 'userID',
+        //       foreignField: '_id',
+        //       as: 'demobuyers',
+        //     },
+        //   },
+        //   { $unwind: "$demobuyers" }
+        // ],
+        as: 'demoposts',
+      },
+    },
+    { $unwind: "$demoposts" }
   ])
 
 
@@ -1032,7 +1052,27 @@ const visitor_saved_get = async (req) => {
           { streamID: { $eq: stream } },
         ]
       }
-    }
+    },
+    {
+      $lookup: {
+        from: 'demoposts',
+        localField: 'productID',
+        foreignField: '_id',
+        // pipeline: [
+        //   {
+        //     $lookup: {
+        //       from: 'demobuyers',
+        //       localField: 'userID',
+        //       foreignField: '_id',
+        //       as: 'demobuyers',
+        //     },
+        //   },
+        //   { $unwind: "$demobuyers" }
+        // ],
+        as: 'demoposts',
+      },
+    },
+    { $unwind: "$demoposts" }
   ])
 
   return savedProduct;
