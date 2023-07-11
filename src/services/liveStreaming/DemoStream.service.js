@@ -1017,10 +1017,39 @@ const visitor_interested_get = async (req) => {
   let interested = await DemoInstested.aggregate([
     {
       $match: {
-        $and: [{ userID: { $eq: join } }, { streamID: { $eq: stream } }],
+        $and: [
+          { userID: { $eq: join } },
+          { streamID: { $eq: stream } },
+        ]
+      }
+    },
+    {
+      $lookup: {
+        from: 'demoposts',
+        localField: 'productID',
+        foreignField: '_id',
+        // pipeline: [
+        //   {
+        //     $lookup: {
+        //       from: 'demobuyers',
+        //       localField: 'userID',
+        //       foreignField: '_id',
+        //       as: 'demobuyers',
+        //     },
+        //   },
+        //   { $unwind: "$demobuyers" }
+        // ],
+        as: 'demoposts',
       },
     },
-  ]);
+    { $unwind: "$demoposts" },
+    {
+      $addFields: {
+        productTitle: { $ifNull: ["$demoposts.productTitle", ''] },
+      },
+    },
+  ])
+
 
   return interested;
 };
@@ -1031,10 +1060,38 @@ const visitor_saved_get = async (req) => {
   let savedProduct = await Demosavedproduct.aggregate([
     {
       $match: {
-        $and: [{ userID: { $eq: join } }, { streamID: { $eq: stream } }],
+        $and: [
+          { userID: { $eq: join } },
+          { streamID: { $eq: stream } },
+        ]
+      }
+    },
+    {
+      $lookup: {
+        from: 'demoposts',
+        localField: 'productID',
+        foreignField: '_id',
+        // pipeline: [
+        //   {
+        //     $lookup: {
+        //       from: 'demobuyers',
+        //       localField: 'userID',
+        //       foreignField: '_id',
+        //       as: 'demobuyers',
+        //     },
+        //   },
+        //   { $unwind: "$demobuyers" }
+        // ],
+        as: 'demoposts',
       },
     },
-  ]);
+    { $unwind: "$demoposts" },
+    {
+      $addFields: {
+        productTitle: { $ifNull: ["$demoposts.productTitle", ''] },
+      },
+    },
+  ])
 
   return savedProduct;
 };
