@@ -1124,6 +1124,86 @@ const visitor_saved_get = async (req) => {
   return savedProduct;
 };
 
+const exhibitor_interested_get = async (req) => {
+  let stream = req.query.stream;
+  let savedProduct = await Demosavedproduct.aggregate([
+    {
+      $match: {
+        $and: [
+          { streamID: { $eq: stream } },
+        ]
+      }
+    },
+    {
+      $lookup: {
+        from: 'demoposts',
+        localField: 'productID',
+        foreignField: '_id',
+        // pipeline: [
+        //   {
+        //     $lookup: {
+        //       from: 'demobuyers',
+        //       localField: 'userID',
+        //       foreignField: '_id',
+        //       as: 'demobuyers',
+        //     },
+        //   },
+        //   { $unwind: "$demobuyers" }
+        // ],
+        as: 'demoposts',
+      },
+    },
+    { $unwind: "$demoposts" },
+    {
+      $addFields: {
+        productTitle: { $ifNull: ["$demoposts.productTitle", ''] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'demostreams',
+        localField: 'streamID',
+        foreignField: '_id',
+        as: 'demostreams',
+      },
+    },
+    { $unwind: "$demostreams" },
+    {
+      $addFields: {
+        streamName: { $ifNull: ["$demostreams.streamName", ''] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'demostreamtokens',
+        localField: 'userID',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'demobuyers',
+              localField: 'userID',
+              foreignField: '_id',
+              as: 'demobuyers',
+            },
+          },
+          { $unwind: "$demobuyers" },
+        ],
+        as: 'demostreamtokens',
+      },
+    },
+    { $unwind: "$demostreamtokens" },
+    {
+      $addFields: {
+        userName: { $ifNull: ["$demostreams.demobuyers.name", ''] },
+      },
+    },
+  ])
+
+  return savedProduct;
+};
+
+
 module.exports = {
   send_livestream_link,
   verifyToken,
@@ -1150,4 +1230,5 @@ module.exports = {
   visitor_interested_get,
   visitor_saved_get,
   manageDemoStream,
+  exhibitor_interested_get,
 };

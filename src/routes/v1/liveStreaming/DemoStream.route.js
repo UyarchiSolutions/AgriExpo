@@ -8,7 +8,7 @@ const authorization = require('../../../controllers/tokenVerify.controller');
 const router = express.Router();
 const demostream = require('../../../controllers/liveStreaming/DemoStream.controller');
 
-router.route('/send/livestream/link').post(authorization,demostream.send_livestream_link);
+router.route('/send/livestream/link').post(authorization, demostream.send_livestream_link);
 router.route('/get/livestream/details').get(demostream.get_stream_details);
 router.route('/verify/token/stream').get(demostream.get_stream_verify);
 router.route('/verify/token/stream/buyer').get(demostream.get_stream_verify_buyer);
@@ -31,5 +31,8 @@ router.route('/get/exhibitor/order').get(demostream.get_exhibitor_order);
 router.route('/visitor/interested').post(demostream.visitor_interested).get(demostream.visitor_interested_get);
 router.route('/visitor/saved').post(demostream.visitor_saved).get(demostream.visitor_saved_get);
 router.route('/manage/Demo/Stream').get(demostream.manageDemoStream)
+
+
+router.route('/exhibitor/interested').get(demostream.exhibitor_interested_get);
 
 module.exports = router;
