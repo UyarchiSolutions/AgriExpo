@@ -341,7 +341,65 @@ const updatePurchasedPlanById = async (id, body) => {
 };
 
 const get_All_Planes = async (page) => {
-  let values = await purchasePlan.aggregate([{ $match: { active: true } }, { $skip: 10 * page }, { $limit: 10 }]);
+  let values = await purchasePlan.aggregate([
+    { $match: { active: true } },
+    { $lookup: { from: 'sellers', localField: 'suppierId', foreignField: '_id', as: 'suppliers' } },
+    { $unwind: { preserveNullAndEmptyArrays: true, path: '$suppliers' } },
+    {
+        $project:{
+            _id:1,
+            active:1,
+            archived:1,
+            planType:1,
+            numberOfStreamused:1,
+            streamvalidity:1,
+            planId:1,
+            suppierId:1,
+            paidAmount:1,
+            paymentStatus:1,
+            order_id:1,
+            noOfParticipants:1,
+            chat:1,
+            max_post_per_stream:1,
+            Duration:1,
+            planName:1,
+            DurationType:1,
+            numberOfParticipants:1,
+            numberofStream:1,
+            validityofplan:1,
+            noOfParticipantsCost:1,
+            chatNeed:1,
+            commision:1,
+            commition_value:1,
+            regularPrice:1,
+            salesPrice:1,
+            description:1,
+            planmode:1,
+            expireDate:1,
+            no_of_host:1,
+            razorpay_payment_id:1,
+            razorpay_order_id:1,
+            razorpay_signature:1,
+            DateIso:1,
+            created:1,
+            suppliers:1,
+            status:{$ifNull:['$status','Pending']},
+            Teaser:1,
+            StreamVideos:1,
+            completedStream:1,
+            Pdf:1,
+            Paidimage:1,
+            RaiseHands:1,
+            Advertisement_Display:1,
+            Special_Notification:1,
+            Price:1,
+            slotInfo:1,
+            PayementMode:1,
+        }
+    },
+    { $skip: 10 * page },
+    { $limit: 10 },
+  ]);
   let total = await purchasePlan.aggregate([{ $match: { active: true } }]);
   return { values, total: total.length };
 };
@@ -358,5 +416,5 @@ module.exports = {
   getPurchasedPlan,
   updatePurchasedPlan,
   updatePurchasedPlanById,
-  get_All_Planes
+  get_All_Planes,
 };

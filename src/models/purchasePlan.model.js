@@ -189,6 +189,7 @@ const purchasePlanSchema = mongoose.Schema({
 
 });
 
-const purchasePlan = mongoose.model('purchasedPlans', purchasePlanSchema);
+const 
+purchasePlan = mongoose.model('purchasedPlans', purchasePlanSchema);
 
 module.exports = { purchasePlan };
