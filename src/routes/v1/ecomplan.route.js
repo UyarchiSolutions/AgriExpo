@@ -87,6 +87,7 @@ router.route('/getAll/shop/live/stream/watch/admin').get(Ecomcontroller.get_watc
 router.route('/watchlive/go/live').get(Ecomcontroller.get_watch_live_token);
 router.route('/homepage/streamdatails/all').get(shopverify, Ecomcontroller.getall_homeage_streams);
 router.route('/on/going/stream').get(shopverify, Ecomcontroller.on_going_stream);
+router.route('/getStreamRequestById/:id').get(Ecomcontroller.getStreamRequestById)
 
 //live Stream pre register
 

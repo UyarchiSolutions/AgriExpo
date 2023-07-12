@@ -568,6 +568,11 @@ const disable_Enable_Plan = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getStreamRequestById = catchAsync(async(req,res)=>{
+  const data = await Ecomserive.getStreamRequestById(req.params.id);
+  res.send(data);
+})
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -679,4 +684,5 @@ module.exports = {
   getPlanById,
   deletePlanById,
   disable_Enable_Plan,
+  getStreamRequestById,
 };

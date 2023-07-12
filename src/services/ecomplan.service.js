@@ -12114,6 +12114,14 @@ const disable_Enable_Plan = async (id, body) => {
   return plan;
 };
 
+const getStreamRequestById = async (id)=>{
+  let streamRequest = await  Streamrequest.findById(id);
+    if (!streamRequest) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Stream Request Not Available');
+    }
+    return streamRequest;
+}
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -12233,4 +12241,5 @@ module.exports = {
   getPlanById,
   deletePlanById,
   disable_Enable_Plan,
+  getStreamRequestById
 };
