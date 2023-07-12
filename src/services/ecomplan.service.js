@@ -12148,13 +12148,13 @@ const getStreamRequestById = async (id) => {
                     from: 'products',
                     localField: 'productId',
                     foreignField: '_id',
-                    as: 'products',
+                    as: 'product',
                   },
                 },
                 {
                   $unwind: {
                     preserveNullAndEmptyArrays: true,
-                    path: '$prodcuts',
+                    path: '$product',
                   },
                 },
               ],
