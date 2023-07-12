@@ -12142,6 +12142,22 @@ const getStreamRequestById = async (id) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
+              pipeline: [
+                {
+                  $lookup: {
+                    from: 'products',
+                    localField: 'productId',
+                    foreignField: '_id',
+                    as: 'products',
+                  },
+                },
+                {
+                  $unwind: {
+                    preserveNullAndEmptyArrays: true,
+                    path: '$prodcuts',
+                  },
+                },
+              ],
               as: 'Posts',
             },
           },
