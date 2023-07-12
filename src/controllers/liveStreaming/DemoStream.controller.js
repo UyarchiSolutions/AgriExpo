@@ -92,6 +92,8 @@ const get_DemoStream_By_Admin = catchAsync(async (req, res) => {
 
 const manageDemoStream = catchAsync(async (req, res) => {
   const data = await demostream.manageDemoStream(req.params.page);
+
+  
   res.send(data);
 })
 
