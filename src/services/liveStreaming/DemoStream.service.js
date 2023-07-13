@@ -109,7 +109,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 1200,
       marketPlace: 50,
       offerPrice: 30,
-      minLots: 5,
+      minLots: 10,
       incrementalLots: 5,
     });
     let streampost1 = await Demopost.create({
@@ -123,7 +123,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 1500,
       marketPlace: 100,
       offerPrice: 80,
-      minLots: 5,
+      minLots: 6,
       incrementalLots: 5,
     });
     let streampost2 = await Demopost.create({
@@ -137,7 +137,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 2000,
       marketPlace: 50,
       offerPrice: 30,
-      minLots: 5,
+      minLots: 11,
       incrementalLots: 5,
     });
     let streampost3 = await Demopost.create({
@@ -151,7 +151,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 1000,
       marketPlace: 60,
       offerPrice: 50,
-      minLots: 5,
+      minLots: 20,
       incrementalLots: 5,
     });
     let streampost4 = await Demopost.create({
@@ -165,7 +165,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 1200,
       marketPlace: 50,
       offerPrice: 30,
-      minLots: 5,
+      minLots: 25,
       incrementalLots: 5,
     });
     let streampost5 = await Demopost.create({
@@ -179,7 +179,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 500,
       marketPlace: 90,
       offerPrice: 75,
-      minLots: 5,
+      minLots: 10,
       incrementalLots: 5,
     });
     let streampost6 = await Demopost.create({
@@ -193,7 +193,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 2500,
       marketPlace: 60,
       offerPrice: 40,
-      minLots: 5,
+      minLots: 20,
       incrementalLots: 5,
     });
 
@@ -222,7 +222,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 600,
       marketPlace: 40,
       offerPrice: 25,
-      minLots: 5,
+      minLots: 8,
       incrementalLots: 5,
     });
     let streampost9 = await Demopost.create({
@@ -236,7 +236,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 700,
       marketPlace: 30,
       offerPrice: 19,
-      minLots: 5,
+      minLots: 3,
       incrementalLots: 5,
     });
     demopoat.push(streampost0);
