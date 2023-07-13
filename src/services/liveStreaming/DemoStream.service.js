@@ -1301,6 +1301,27 @@ const exhibitor_interested_get = async (req) => {
   return savedProduct;
 };
 
+const exhibitor_myprofile = async (req) => {
+  const token = await Demostream.findById(req.query.id);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
+  }
+  let myprofile = await Demoseller.findById(token.userID);
+
+  return myprofile;
+
+}
+const visitor_myprofile = async (req) => {
+  const token = await DemostreamToken.findById(req.query.id);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
+  }
+  let myprofile = await Demoseller.findById(token.userID);
+
+  return myprofile;
+
+}
+
 
 module.exports = {
   send_livestream_link,
@@ -1329,4 +1350,6 @@ module.exports = {
   visitor_saved_get,
   manageDemoStream,
   exhibitor_interested_get,
+  exhibitor_myprofile,
+  visitor_myprofile
 };

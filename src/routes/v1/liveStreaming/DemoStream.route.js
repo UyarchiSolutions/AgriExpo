@@ -34,5 +34,7 @@ router.route('/manage/Demo/Stream/:page').get(demostream.manageDemoStream)
 
 
 router.route('/exhibitor/interested').get(demostream.exhibitor_interested_get);
+router.route('/exhibitor/myprofile').get(demostream.exhibitor_myprofile);
+router.route('/visitor/myprofile').get(demostream.visitor_myprofile);
 
 module.exports = router;
