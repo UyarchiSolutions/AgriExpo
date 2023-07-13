@@ -1316,8 +1316,7 @@ const visitor_myprofile = async (req) => {
   if (!token) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
   }
-  let myprofile = await Demoseller.findById(token.userID);
-
+  let myprofile = await Demobuyer.findById(token.userID);
   return myprofile;
 
 }
