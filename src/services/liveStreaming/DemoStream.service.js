@@ -568,7 +568,13 @@ const stream_register_buyer = async (req) => {
 const get_get_add_to_cart = async (req) => {
   let temp = req.query.streamId;
   let temptoken = await DemostreamToken.findById(temp);
+  if (!temptoken) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'cart not found 🖕');
+  }
   let stream = await Demostream.findById(temptoken.streamID);
+  if (!stream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream found 🖕');
+  }
   let value = await Democart.findOne({ userId: temp, streamId: stream._id, status: { $ne: 'ordered' } });
 
   return value;
