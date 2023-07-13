@@ -1006,6 +1006,26 @@ const view_order_details = async (req) => {
       },
     },
     { $unwind: '$demostreams' },
+    {
+      $lookup: {
+        from: 'demostreamtokens',
+        localField: 'userID',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'demobuyers',
+              localField: 'userID',
+              foreignField: '_id',
+              as: 'demobuyers',
+            },
+          },
+          { $unwind: '$demobuyers' },
+        ],
+        as: 'demostreamtokens',
+      },
+    },
+    { $unwind: '$demostreamtokens' },
   ]);
 
   if (value.length == 0) {
