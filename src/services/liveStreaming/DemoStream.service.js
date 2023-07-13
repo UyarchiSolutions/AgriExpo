@@ -1032,6 +1032,16 @@ const view_order_details = async (req) => {
       },
     },
     { $unwind: '$demostreamtokens' },
+    {
+      $lookup: {
+        from: 'demopayments',
+        localField: 'orderId',
+        foreignField: '_id',
+        as: 'demopayments',
+      },
+    },
+    { $unwind: '$demopayments' },
+
   ]);
 
   if (value.length == 0) {
