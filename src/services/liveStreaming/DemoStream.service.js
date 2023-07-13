@@ -1035,8 +1035,8 @@ const view_order_details = async (req) => {
     {
       $lookup: {
         from: 'demopayments',
-        localField: 'orderId',
-        foreignField: '_id',
+        localField: '_id',
+        foreignField: 'orderId',
         as: 'demopayments',
       },
     },
