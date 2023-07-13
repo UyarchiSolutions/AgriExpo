@@ -444,6 +444,19 @@ const join_stream_buyer = async (req) => {
     });
   }
 
+  let register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
+  if (register < 5) {
+    demotoken.golive = true;
+  } else {
+    demotoken.golive = false;
+  }
+  demotoken.status = 'resgistered';
+  demotoken.save();
+
+  setTimeout(async () => {
+    register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
+    req.io.emit(demotoken.streamID + '_buyer_registor', { register });
+  }, 300);
   return demotoken;
 };
 
