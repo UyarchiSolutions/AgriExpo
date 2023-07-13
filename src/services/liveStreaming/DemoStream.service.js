@@ -65,6 +65,10 @@ const send_livestream_link = async (req) => {
   if (!user) {
     user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
   }
+  else {
+    user.name = name;
+    user.save();
+  }
   const id = generateUniqueID();
   let streamCount = await Demostream.find().count();
   console.log(moment().add(15, 'minutes').format('hh:mm a'));
@@ -410,6 +414,10 @@ const join_stream_buyer = async (req) => {
 
   if (!user) {
     user = await Demobuyer.create({ phoneNumber: phoneNumber, name: name, dateISO: moment() });
+  }
+  else {
+    user.name = name;
+    user.save();
   }
 
   const stream = await Demostream.findById(streamId);
@@ -892,7 +900,7 @@ const get_DemoStream_By_Admin = async (id) => {
 };
 
 const manageDemoStream = async (page) => {
-  
+
   const data = await Demostream.aggregate([
     { $match: { _id: { $ne: null } } },
     { $lookup: { from: 'b2busers', localField: 'createdBy', foreignField: '_id', as: 'users' } },
