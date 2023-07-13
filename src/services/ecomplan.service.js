@@ -12114,13 +12114,63 @@ const disable_Enable_Plan = async (id, body) => {
   return plan;
 };
 
-const getStreamRequestById = async (id)=>{
-  let streamRequest = await  Streamrequest.findById(id);
-    if (!streamRequest) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Stream Request Not Available');
-    }
-    return streamRequest;
-}
+const getStreamRequestById = async (id) => {
+  let streamRequest = await Streamrequest.aggregate([
+    { $match: { _id: id } },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'suppliers',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$suppliers',
+      },
+    },
+    {
+      $lookup: {
+        from: 'streamrequestposts',
+        localField: '_id',
+        foreignField: 'streamRequest',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'streamposts',
+              localField: 'postId',
+              foreignField: '_id',
+              pipeline: [
+                {
+                  $lookup: {
+                    from: 'products',
+                    localField: 'productId',
+                    foreignField: '_id',
+                    as: 'product',
+                  },
+                },
+                {
+                  $unwind: {
+                    preserveNullAndEmptyArrays: true,
+                    path: '$product',
+                  },
+                },
+              ],
+              as: 'Posts',
+            },
+          },
+          {
+            $unwind: { path: '$Posts', preserveNullAndEmptyArrays: true },
+          },
+        ],
+        as: 'streamPosts',
+      },
+    },
+  ]);
+  return streamRequest;
+};
 
 module.exports = {
   create_Plans,
@@ -12241,5 +12291,5 @@ module.exports = {
   getPlanById,
   deletePlanById,
   disable_Enable_Plan,
-  getStreamRequestById
+  getStreamRequestById,
 };
