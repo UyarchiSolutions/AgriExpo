@@ -687,7 +687,7 @@ const demootp = mongoose.Schema({
   OTP: {
     type: Number,
   },
-  virify: {
+  verify: {
     type: Boolean,
     default: true
   },
