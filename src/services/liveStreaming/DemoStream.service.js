@@ -27,6 +27,7 @@ const {
   Demopaymnt,
   DemoInstested,
   Demosavedproduct,
+  Demootpverify
 } = require('../../models/liveStreaming/DemoStream.model');
 const jwt = require('jsonwebtoken');
 const agoraToken = require('./AgoraAppId.service');
@@ -275,9 +276,32 @@ const verifyToken = async (req) => {
   } catch (err) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
   }
+  let res = await send_otp(token)
 
-  return token;
+  return { token, res };
 };
+
+const send_otp = async (stream) => {
+  let OTPCODE = Math.floor(100000 + Math.random() * 900000);
+  const token = await Demoseller.findById(stream.userID);
+
+  let otp = await Demootpverify.create({
+    OTP: OTPCODE,
+    verify: false,
+    mobile: token.phoneNumber,
+    streamID: stream._id,
+    DateIso: moment(),
+    userID: stream.userID
+  })
+
+  let message = `Dear ${token.name},thank you for the registration to the event AgriExpoLive2023 .Your OTP for logging into the account is ${OTPCODE}- AgriExpoLive2023(An Ookam company event)`;
+  let reva = await axios.get(
+    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${token.phoneNumber}&text=${message}&route=6&peid=1707168908130209371&DLTTemplateId=1701168700339760716`,
+  )
+  // return reva.data;
+
+  return { otp, opt_Res: reva.data };
+}
 
 const get_stream_verify_buyer = async (req) => {
   console.log(req.query.id);
