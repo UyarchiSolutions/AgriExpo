@@ -276,9 +276,11 @@ const verifyToken = async (req) => {
   } catch (err) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
   }
+  let user = await Demoseller.findById(token.userID)
+  let mobileNumber = user.phoneNumber;
   let res = await send_otp(token)
 
-  return { token, res };
+  return { token, res, mobileNumber };
 };
 
 const send_otp = async (stream) => {
