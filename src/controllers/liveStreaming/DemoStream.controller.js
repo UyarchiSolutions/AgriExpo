@@ -140,6 +140,10 @@ const visitor_myprofile = catchAsync(async (req, res) => {
   const data = await demostream.visitor_myprofile(req);
   res.send(data);
 })
+const send_sms_now = catchAsync(async (req, res) => {
+  const data = await demostream.send_sms_now(req);
+  res.send(data);
+})
 module.exports = {
   send_livestream_link,
   get_stream_details,
@@ -168,5 +172,6 @@ module.exports = {
   manageDemoStream,
   exhibitor_interested_get,
   exhibitor_myprofile,
-  visitor_myprofile
+  visitor_myprofile,
+  send_sms_now
 };

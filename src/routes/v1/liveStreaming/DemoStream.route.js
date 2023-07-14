@@ -37,4 +37,7 @@ router.route('/exhibitor/interested').get(demostream.exhibitor_interested_get);
 router.route('/exhibitor/myprofile').get(demostream.exhibitor_myprofile);
 router.route('/visitor/myprofile').get(demostream.visitor_myprofile);
 
+router.route('/send/sms/now').get(demostream.send_sms_now);
+
+
 module.exports = router;

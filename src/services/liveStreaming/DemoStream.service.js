@@ -4,7 +4,7 @@ const moment = require('moment');
 const { AgoraAppId } = require('../../models/liveStreaming/AgoraAppId.model');
 const Dates = require('../Date.serive');
 const paymentgatway = require('../paymentgatway.service');
-
+const axios = require("axios");
 const {
   Product,
   Stock,
@@ -33,7 +33,13 @@ const agoraToken = require('./AgoraAppId.service');
 
 const secret = 'demoStream';
 const Agora = require('agora-access-token');
-
+const sms_send_seller = async (link, mobile) => {
+  let message = `Dear Client, Thanks for your interest in our services. You can test our service by using this link https://ag23.site/s/${link} - AgriExpoLive2023(An Ookam company event)`;
+  let reva = await axios.get(
+    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168924202023787`,
+  )
+  return reva.data;
+}
 const geenerate_rtc_token = async (chennel, uid, role, expirationTimestamp, agoraID) => {
   let agoraToken = await AgoraAppId.findById(agoraID);
   return Agora.RtcTokenBuilder.buildTokenWithUid(
@@ -250,9 +256,12 @@ const send_livestream_link = async (req) => {
     demopoat.push(streampost8);
     demopoat.push(streampost9);
     if (demopoat.length == 10) {
+      await sms_send_seller(demostream._id, phoneNumber)
       resolve({ demopoat, demostream });
     }
   });
+
+
 };
 
 const verifyToken = async (req) => {
@@ -1370,6 +1379,11 @@ const visitor_myprofile = async (req) => {
 
 }
 
+const send_sms_now = async (req) => {
+
+  return await sms_send_seller(req);;
+
+}
 
 module.exports = {
   send_livestream_link,
@@ -1399,5 +1413,6 @@ module.exports = {
   manageDemoStream,
   exhibitor_interested_get,
   exhibitor_myprofile,
-  visitor_myprofile
+  visitor_myprofile,
+  send_sms_now
 };
