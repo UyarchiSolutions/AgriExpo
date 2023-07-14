@@ -92,6 +92,13 @@ const demostreamchema = mongoose.Schema({
   },
   transaction: {
     type: String,
+  },
+  otp_verifiyed: {
+    type: String,
+  },
+  otp_verifiyed_status: {
+    type: String,
+    default: "Pending"
   }
 });
 

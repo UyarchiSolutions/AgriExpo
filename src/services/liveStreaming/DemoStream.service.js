@@ -1425,6 +1425,9 @@ const verify_otp = async (req) => {
     verify.verify = true;
     verify.expired = true;
     verify.save();
+    const stream = await Demostream.findById(verify.streamID);
+    stream.otp_verifiyed = verify._id;
+    stream.save();
   }
 
   return verify;
