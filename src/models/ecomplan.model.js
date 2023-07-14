@@ -135,6 +135,25 @@ const streamplanschema = mongoose.Schema({
   Transtraction: {
     type: String,
   },
+  BankName:{
+    type: String,
+  },
+  PaymentMethod:{
+    type: String,
+  },
+  AccNo:{
+    type:String,
+  },
+  TransactionId:{
+    type:String,
+  },
+  ChequeDDNo:{
+    type:String,
+  },
+  ChequeDDdate:{
+    type:String,
+  },
+  
 });
 
 const Streamplan = mongoose.model('streamplan', streamplanschema);
