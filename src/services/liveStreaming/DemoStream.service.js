@@ -1011,7 +1011,21 @@ const manageDemoStream = async (page) => {
 
 const my_orders_buyer = async (req) => {
   let userId = req.query.id;
-  let value = await Demoorder.aggregate([{ $match: { $and: [{ userId: { $eq: userId } }] } }]);
+  let value = await Demoorder.aggregate(
+    [
+      { $match: { $and: [{ userId: { $eq: userId } }] } },
+      {
+        $lookup: {
+          from: 'demostreams',
+          localField: 'streamId',
+          foreignField: '_id',
+          as: 'demostreams',
+        },
+      },
+      { $unwind: '$demostreams' },
+    ]
+
+  );
   return value;
 };
 
