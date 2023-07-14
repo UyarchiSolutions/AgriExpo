@@ -4,7 +4,7 @@ const moment = require('moment');
 const { AgoraAppId } = require('../../models/liveStreaming/AgoraAppId.model');
 const Dates = require('../Date.serive');
 const paymentgatway = require('../paymentgatway.service');
-
+const axios = require("axios");
 const {
   Product,
   Stock,
@@ -27,13 +27,20 @@ const {
   Demopaymnt,
   DemoInstested,
   Demosavedproduct,
+  Demootpverify
 } = require('../../models/liveStreaming/DemoStream.model');
 const jwt = require('jsonwebtoken');
 const agoraToken = require('./AgoraAppId.service');
 
 const secret = 'demoStream';
 const Agora = require('agora-access-token');
-
+const sms_send_seller = async (link, mobile) => {
+  let message = `Dear Client, Thanks for your interest in our services. You can test our service by using this link https://ag23.site/s/${link} - AgriExpoLive2023(An Ookam company event)`;
+  let reva = await axios.get(
+    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168924202023787`,
+  )
+  return reva.data;
+}
 const geenerate_rtc_token = async (chennel, uid, role, expirationTimestamp, agoraID) => {
   let agoraToken = await AgoraAppId.findById(agoraID);
   return Agora.RtcTokenBuilder.buildTokenWithUid(
@@ -64,6 +71,10 @@ const send_livestream_link = async (req) => {
   let user = await Demoseller.findOne({ phoneNumber: phoneNumber });
   if (!user) {
     user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
+  }
+  else {
+    user.name = name;
+    user.save();
   }
   const id = generateUniqueID();
   let streamCount = await Demostream.find().count();
@@ -105,7 +116,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 1200,
       marketPlace: 50,
       offerPrice: 30,
-      minLots: 5,
+      minLots: 10,
       incrementalLots: 5,
     });
     let streampost1 = await Demopost.create({
@@ -119,7 +130,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 1500,
       marketPlace: 100,
       offerPrice: 80,
-      minLots: 5,
+      minLots: 6,
       incrementalLots: 5,
     });
     let streampost2 = await Demopost.create({
@@ -133,7 +144,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 2000,
       marketPlace: 50,
       offerPrice: 30,
-      minLots: 5,
+      minLots: 11,
       incrementalLots: 5,
     });
     let streampost3 = await Demopost.create({
@@ -147,7 +158,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 1000,
       marketPlace: 60,
       offerPrice: 50,
-      minLots: 5,
+      minLots: 20,
       incrementalLots: 5,
     });
     let streampost4 = await Demopost.create({
@@ -161,7 +172,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 1200,
       marketPlace: 50,
       offerPrice: 30,
-      minLots: 5,
+      minLots: 25,
       incrementalLots: 5,
     });
     let streampost5 = await Demopost.create({
@@ -175,7 +186,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 500,
       marketPlace: 90,
       offerPrice: 75,
-      minLots: 5,
+      minLots: 10,
       incrementalLots: 5,
     });
     let streampost6 = await Demopost.create({
@@ -189,7 +200,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 2500,
       marketPlace: 60,
       offerPrice: 40,
-      minLots: 5,
+      minLots: 20,
       incrementalLots: 5,
     });
 
@@ -218,7 +229,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 600,
       marketPlace: 40,
       offerPrice: 25,
-      minLots: 5,
+      minLots: 8,
       incrementalLots: 5,
     });
     let streampost9 = await Demopost.create({
@@ -232,7 +243,7 @@ const send_livestream_link = async (req) => {
       pendingQTY: 700,
       marketPlace: 30,
       offerPrice: 19,
-      minLots: 5,
+      minLots: 3,
       incrementalLots: 5,
     });
     demopoat.push(streampost0);
@@ -246,9 +257,12 @@ const send_livestream_link = async (req) => {
     demopoat.push(streampost8);
     demopoat.push(streampost9);
     if (demopoat.length == 10) {
+      await sms_send_seller(demostream._id, phoneNumber)
       resolve({ demopoat, demostream });
     }
   });
+
+
 };
 
 const verifyToken = async (req) => {
@@ -262,9 +276,35 @@ const verifyToken = async (req) => {
   } catch (err) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
   }
+  let user = await Demoseller.findById(token.userID)
+  let mobileNumber = user.phoneNumber;
+  let res = await send_otp(token)
 
-  return token;
+  return { token, res, mobileNumber };
 };
+
+const send_otp = async (stream) => {
+  let OTPCODE = Math.floor(100000 + Math.random() * 900000);
+  const token = await Demoseller.findById(stream.userID);
+  await Demootpverify.updateMany({ streamID: stream._id, verify: false }, { $set: { verify: true, expired: true } }, { new: true })
+  let otp = await Demootpverify.create({
+    OTP: OTPCODE,
+    verify: false,
+    mobile: token.phoneNumber,
+    streamID: stream._id,
+    DateIso: moment(),
+    userID: stream.userID,
+    expired: false
+  })
+
+  let message = `Dear ${token.name},thank you for the registration to the event AgriExpoLive2023 .Your OTP for logging into the account is ${OTPCODE}- AgriExpoLive2023(An Ookam company event)`;
+  let reva = await axios.get(
+    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${token.phoneNumber}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168908130209371`,
+  )
+  // return reva.data;
+
+  return { otp, opt_Res: reva.data };
+}
 
 const get_stream_verify_buyer = async (req) => {
   console.log(req.query.id);
@@ -411,6 +451,10 @@ const join_stream_buyer = async (req) => {
   if (!user) {
     user = await Demobuyer.create({ phoneNumber: phoneNumber, name: name, dateISO: moment() });
   }
+  else {
+    user.name = name;
+    user.save();
+  }
 
   const stream = await Demostream.findById(streamId);
   if (!stream) {
@@ -436,6 +480,19 @@ const join_stream_buyer = async (req) => {
     });
   }
 
+  let register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
+  if (register < 5) {
+    demotoken.golive = true;
+  } else {
+    demotoken.golive = false;
+  }
+  demotoken.status = 'resgistered';
+  demotoken.save();
+
+  setTimeout(async () => {
+    register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
+    req.io.emit(demotoken.streamID + '_buyer_registor', { register });
+  }, 300);
   return demotoken;
 };
 
@@ -547,7 +604,13 @@ const stream_register_buyer = async (req) => {
 const get_get_add_to_cart = async (req) => {
   let temp = req.query.streamId;
   let temptoken = await DemostreamToken.findById(temp);
+  if (!temptoken) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'cart not found 🖕');
+  }
   let stream = await Demostream.findById(temptoken.streamID);
+  if (!stream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream found 🖕');
+  }
   let value = await Democart.findOne({ userId: temp, streamId: stream._id, status: { $ne: 'ordered' } });
 
   return value;
@@ -892,7 +955,7 @@ const get_DemoStream_By_Admin = async (id) => {
 };
 
 const manageDemoStream = async (page) => {
-  
+
   const data = await Demostream.aggregate([
     { $match: { _id: { $ne: null } } },
     { $lookup: { from: 'b2busers', localField: 'createdBy', foreignField: '_id', as: 'users' } },
@@ -948,7 +1011,30 @@ const manageDemoStream = async (page) => {
 
 const my_orders_buyer = async (req) => {
   let userId = req.query.id;
-  let value = await Demoorder.aggregate([{ $match: { $and: [{ userId: { $eq: userId } }] } }]);
+  let value = await Demoorder.aggregate(
+    [
+      { $match: { $and: [{ userId: { $eq: userId } }] } },
+      {
+        $lookup: {
+          from: 'demostreams',
+          localField: 'streamId',
+          foreignField: '_id',
+          as: 'demostreams',
+        },
+      },
+      { $unwind: '$demostreams' },
+      {
+        $lookup: {
+          from: 'demopayments',
+          localField: '_id',
+          foreignField: 'orderId',
+          as: 'demopayments',
+        },
+      },
+      { $unwind: '$demopayments' },
+    ]
+
+  );
   return value;
 };
 
@@ -985,6 +1071,36 @@ const view_order_details = async (req) => {
       },
     },
     { $unwind: '$demostreams' },
+    {
+      $lookup: {
+        from: 'demostreamtokens',
+        localField: 'userId',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'demobuyers',
+              localField: 'userID',
+              foreignField: '_id',
+              as: 'demobuyers',
+            },
+          },
+          { $unwind: '$demobuyers' },
+        ],
+        as: 'demostreamtokens',
+      },
+    },
+    { $unwind: '$demostreamtokens' },
+    {
+      $lookup: {
+        from: 'demopayments',
+        localField: '_id',
+        foreignField: 'orderId',
+        as: 'demopayments',
+      },
+    },
+    { $unwind: '$demopayments' },
+
   ]);
 
   if (value.length == 0) {
@@ -1293,6 +1409,52 @@ const exhibitor_interested_get = async (req) => {
   return savedProduct;
 };
 
+const exhibitor_myprofile = async (req) => {
+  const token = await Demostream.findById(req.query.id);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
+  }
+  let myprofile = await Demoseller.findById(token.userID);
+
+  return myprofile;
+
+}
+const visitor_myprofile = async (req) => {
+  const token = await DemostreamToken.findById(req.query.id);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
+  }
+  let myprofile = await Demobuyer.findById(token.userID);
+  return myprofile;
+
+}
+
+const send_sms_now = async (req) => {
+
+  return await sms_send_seller(req);;
+
+}
+
+const verify_otp = async (req) => {
+
+  let { otp, stream } = req.body;
+
+
+  let verify = await Demootpverify.findOne({ streamID: stream, OTP: otp, verify: false, expired: false })
+  if (!verify) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid OTP');
+  }
+  else {
+    verify.verify = true;
+    verify.expired = true;
+    verify.save();
+    const stream = await Demostream.findById(verify.streamID);
+    stream.otp_verifiyed = verify._id;
+    stream.save();
+  }
+
+  return verify;
+}
 
 module.exports = {
   send_livestream_link,
@@ -1321,4 +1483,8 @@ module.exports = {
   visitor_saved_get,
   manageDemoStream,
   exhibitor_interested_get,
+  exhibitor_myprofile,
+  visitor_myprofile,
+  send_sms_now,
+  verify_otp
 };

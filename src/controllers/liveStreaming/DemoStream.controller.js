@@ -93,7 +93,7 @@ const get_DemoStream_By_Admin = catchAsync(async (req, res) => {
 const manageDemoStream = catchAsync(async (req, res) => {
   const data = await demostream.manageDemoStream(req.params.page);
 
-  
+
   res.send(data);
 })
 
@@ -132,6 +132,23 @@ const exhibitor_interested_get = catchAsync(async (req, res) => {
   const data = await demostream.exhibitor_interested_get(req);
   res.send(data);
 })
+const exhibitor_myprofile = catchAsync(async (req, res) => {
+  const data = await demostream.exhibitor_myprofile(req);
+  res.send(data);
+})
+const visitor_myprofile = catchAsync(async (req, res) => {
+  const data = await demostream.visitor_myprofile(req);
+  res.send(data);
+})
+const send_sms_now = catchAsync(async (req, res) => {
+  const data = await demostream.send_sms_now(req);
+  res.send(data);
+})
+
+const verify_otp= catchAsync(async (req, res) => {
+  const data = await demostream.verify_otp(req);
+  res.send(data);
+})
 module.exports = {
   send_livestream_link,
   get_stream_details,
@@ -159,4 +176,8 @@ module.exports = {
   visitor_saved_get,
   manageDemoStream,
   exhibitor_interested_get,
+  exhibitor_myprofile,
+  visitor_myprofile,
+  send_sms_now,
+  verify_otp
 };

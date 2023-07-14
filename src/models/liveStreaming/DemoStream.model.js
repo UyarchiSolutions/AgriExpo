@@ -92,6 +92,13 @@ const demostreamchema = mongoose.Schema({
   },
   transaction: {
     type: String,
+  },
+  otp_verifiyed: {
+    type: String,
+  },
+  otp_verifiyed_status: {
+    type: String,
+    default: "Pending"
   }
 });
 
@@ -658,4 +665,45 @@ const demosavedproductschema = mongoose.Schema({
 });
 const Demosavedproduct = mongoose.model('demosavedproduct', demosavedproductschema);
 
-module.exports = { Demoseller, Demostream, Demopost, Demobuyer, Demoorder, Demoorderproduct, DemostreamToken, Democart, Democartproduct, Demopaymnt, DemoInstested, Demosavedproduct };
+
+
+
+const demootp = mongoose.Schema({
+  _id: {
+    type: String,
+    default: v4,
+  },
+  DateIso: {
+    type: Number,
+  },
+  date: {
+    type: String,
+  },
+  created: {
+    type: Date,
+  },
+  mobile: {
+    type: Number,
+  },
+  streamID: {
+    type: String,
+  },
+  userID: {
+    type: String,
+  },
+  OTP: {
+    type: Number,
+  },
+  verify: {
+    type: Boolean,
+    default: true
+  },
+  expired: {
+    type: Boolean,
+    default: true
+  }
+});
+const Demootpverify = mongoose.model('demootp', demootp);
+
+
+module.exports = { Demoseller, Demostream, Demopost, Demobuyer, Demoorder, Demoorderproduct, DemostreamToken, Democart, Democartproduct, Demopaymnt, DemoInstested, Demosavedproduct, Demootpverify };
