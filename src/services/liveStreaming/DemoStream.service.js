@@ -1023,6 +1023,15 @@ const my_orders_buyer = async (req) => {
         },
       },
       { $unwind: '$demostreams' },
+      {
+        $lookup: {
+          from: 'demopayments',
+          localField: '_id',
+          foreignField: 'orderId',
+          as: 'demopayments',
+        },
+      },
+      { $unwind: '$demopayments' },
     ]
 
   );
