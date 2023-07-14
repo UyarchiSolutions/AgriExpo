@@ -144,6 +144,11 @@ const send_sms_now = catchAsync(async (req, res) => {
   const data = await demostream.send_sms_now(req);
   res.send(data);
 })
+
+const verify_otp= catchAsync(async (req, res) => {
+  const data = await demostream.verify_otp(req);
+  res.send(data);
+})
 module.exports = {
   send_livestream_link,
   get_stream_details,
@@ -173,5 +178,6 @@ module.exports = {
   exhibitor_interested_get,
   exhibitor_myprofile,
   visitor_myprofile,
-  send_sms_now
+  send_sms_now,
+  verify_otp
 };

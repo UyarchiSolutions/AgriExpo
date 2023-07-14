@@ -690,6 +690,10 @@ const demootp = mongoose.Schema({
   virify: {
     type: Boolean,
     default: true
+  },
+  expired: {
+    type: Boolean,
+    default: true
   }
 });
 const Demootpverify = mongoose.model('demootp', demootp);

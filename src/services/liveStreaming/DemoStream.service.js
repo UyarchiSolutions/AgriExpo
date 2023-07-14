@@ -284,14 +284,15 @@ const verifyToken = async (req) => {
 const send_otp = async (stream) => {
   let OTPCODE = Math.floor(100000 + Math.random() * 900000);
   const token = await Demoseller.findById(stream.userID);
-
+  await Demootpverify.updateMany({ streamID: stream._id, verify: false }, { $set: { verify: true, expired: true } }, { new: true })
   let otp = await Demootpverify.create({
     OTP: OTPCODE,
     verify: false,
     mobile: token.phoneNumber,
     streamID: stream._id,
     DateIso: moment(),
-    userID: stream.userID
+    userID: stream.userID,
+    expired: false
   })
 
   let message = `Dear ${token.name},thank you for the registration to the event AgriExpoLive2023 .Your OTP for logging into the account is ${OTPCODE}- AgriExpoLive2023(An Ookam company event)`;
@@ -1409,6 +1410,24 @@ const send_sms_now = async (req) => {
 
 }
 
+const verify_otp = async (req) => {
+
+  let { otp, stream } = req.body;
+
+
+  let verify = await Demootpverify.findOne({ streamID: stream, OTP: otp, verify: false, expired: false })
+  if (!verify) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid OTP');
+  }
+  else {
+    verify.verify = true;
+    verify.expired = true;
+    verify.save();
+  }
+
+  return verify;
+}
+
 module.exports = {
   send_livestream_link,
   verifyToken,
@@ -1438,5 +1457,6 @@ module.exports = {
   exhibitor_interested_get,
   exhibitor_myprofile,
   visitor_myprofile,
-  send_sms_now
+  send_sms_now,
+  verify_otp
 };
