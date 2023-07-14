@@ -171,6 +171,5 @@ router.route('/get/video/link').get(changeVideo, Ecomcontroller.get_video_link);
 // Loading manager
 
 router.route('/loading-manager/get-order-details/:id').get(Ecomcontroller.get_order_details_by_stream);
-router.route('/UploadProof/:id').put(PlanImage.single('image'), Ecomcontroller.UploadProof);
-
+router.route('/UploadProof/plan/:id').put(PlanImage.single('image'), Ecomcontroller.UploadProof);
 module.exports = router;
