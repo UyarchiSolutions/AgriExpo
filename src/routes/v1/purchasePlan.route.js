@@ -2,7 +2,7 @@ const express = require('express');
 const purchasePlan = require('../../controllers/purchasePlan.controller');
 const supplierAuth = require('../../controllers/supplier.authorizations');
 const { SetPass, SellerAuth } = require('../../controllers/sellerAuth.controller');
-
+const PlanImage = require('../../middlewares/plan')
 const router = express.Router();
 
 router.route('/purchase/suceess').post(SellerAuth, purchasePlan.create_purchase_plan);
@@ -18,4 +18,6 @@ router.route('/:id').put(SellerAuth, purchasePlan.updatePurchasedPlan);
 router.route('/update/:id').put(purchasePlan.updatePurchasedPlanById);
 router.route('/get/All/Planes/:page').get(purchasePlan.get_All_Planes);
 router.route('/Change/Purchased/Plan/:id').put(purchasePlan.ChangePurchasedPlan);
+router.route('/UploadProof/plan/:id').put(PlanImage.single('Paidimage'), purchasePlan.UploadProof);
+
 module.exports = router;

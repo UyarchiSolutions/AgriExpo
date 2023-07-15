@@ -415,6 +415,16 @@ const ChangePurchasedPlan = async (id, body) => {
   return values;
 };
 
+const UploadProof = async (id, body) => {
+  let val = await purchasePlan.findById(id);
+  if (!val) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
+  }
+  val = await purchasePlan.findByIdAndUpdate({ _id: id }, body, { new: true });
+  return val;
+};
+
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -429,4 +439,5 @@ module.exports = {
   updatePurchasedPlanById,
   get_All_Planes,
   ChangePurchasedPlan,
+  UploadProof,
 };
