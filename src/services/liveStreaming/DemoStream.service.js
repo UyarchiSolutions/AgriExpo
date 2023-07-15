@@ -103,6 +103,10 @@ const send_livestream_link = async (req) => {
   demostream.save();
   let product = await Product.find().limit(10);
   let demopoat = [];
+  if(transaction='Without Transaction'){
+    product = await Product.find({category:"fde82b92-5caf-4539-af90-1fd15cfd389f"}).limit(10);
+    
+  }
   return new Promise(async (resolve) => {
     let element = product;
     let streampost0 = await Demopost.create({
