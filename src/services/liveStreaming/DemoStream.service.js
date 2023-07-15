@@ -4,7 +4,7 @@ const moment = require('moment');
 const { AgoraAppId } = require('../../models/liveStreaming/AgoraAppId.model');
 const Dates = require('../Date.serive');
 const paymentgatway = require('../paymentgatway.service');
-const axios = require("axios");
+const axios = require('axios');
 const {
   Product,
   Stock,
@@ -27,7 +27,7 @@ const {
   Demopaymnt,
   DemoInstested,
   Demosavedproduct,
-  Demootpverify
+  Demootpverify,
 } = require('../../models/liveStreaming/DemoStream.model');
 const jwt = require('jsonwebtoken');
 const agoraToken = require('./AgoraAppId.service');
@@ -37,10 +37,10 @@ const Agora = require('agora-access-token');
 const sms_send_seller = async (link, mobile) => {
   let message = `Dear Client, Thanks for your interest in our services. You can test our service by using this link https://ag23.site/s/${link} - AgriExpoLive2023(An Ookam company event)`;
   let reva = await axios.get(
-    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168924202023787`,
-  )
+    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168924202023787`
+  );
   return reva.data;
-}
+};
 const geenerate_rtc_token = async (chennel, uid, role, expirationTimestamp, agoraID) => {
   let agoraToken = await AgoraAppId.findById(agoraID);
   return Agora.RtcTokenBuilder.buildTokenWithUid(
@@ -71,8 +71,7 @@ const send_livestream_link = async (req) => {
   let user = await Demoseller.findOne({ phoneNumber: phoneNumber });
   if (!user) {
     user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
-  }
-  else {
+  } else {
     user.name = name;
     user.save();
   }
@@ -257,12 +256,10 @@ const send_livestream_link = async (req) => {
     demopoat.push(streampost8);
     demopoat.push(streampost9);
     if (demopoat.length == 10) {
-      await sms_send_seller(demostream._id, phoneNumber)
+      await sms_send_seller(demostream._id, phoneNumber);
       resolve({ demopoat, demostream });
     }
   });
-
-
 };
 
 const verifyToken = async (req) => {
@@ -276,9 +273,9 @@ const verifyToken = async (req) => {
   } catch (err) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
   }
-  let user = await Demoseller.findById(token.userID)
+  let user = await Demoseller.findById(token.userID);
   let mobileNumber = user.phoneNumber;
-  let res = await send_otp(token)
+  let res = await send_otp(token);
 
   return { token, res, mobileNumber };
 };
@@ -286,7 +283,11 @@ const verifyToken = async (req) => {
 const send_otp = async (stream) => {
   let OTPCODE = Math.floor(100000 + Math.random() * 900000);
   const token = await Demoseller.findById(stream.userID);
-  await Demootpverify.updateMany({ streamID: stream._id, verify: false }, { $set: { verify: true, expired: true } }, { new: true })
+  await Demootpverify.updateMany(
+    { streamID: stream._id, verify: false },
+    { $set: { verify: true, expired: true } },
+    { new: true }
+  );
   let otp = await Demootpverify.create({
     OTP: OTPCODE,
     verify: false,
@@ -294,17 +295,17 @@ const send_otp = async (stream) => {
     streamID: stream._id,
     DateIso: moment(),
     userID: stream.userID,
-    expired: false
-  })
+    expired: false,
+  });
 
   let message = `Dear ${token.name},thank you for the registration to the event AgriExpoLive2023 .Your OTP for logging into the account is ${OTPCODE}- AgriExpoLive2023(An Ookam company event)`;
   let reva = await axios.get(
-    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${token.phoneNumber}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168908130209371`,
-  )
+    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${token.phoneNumber}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168908130209371`
+  );
   // return reva.data;
 
   return { otp, opt_Res: reva.data };
-}
+};
 
 const get_stream_verify_buyer = async (req) => {
   console.log(req.query.id);
@@ -450,8 +451,7 @@ const join_stream_buyer = async (req) => {
 
   if (!user) {
     user = await Demobuyer.create({ phoneNumber: phoneNumber, name: name, dateISO: moment() });
-  }
-  else {
+  } else {
     user.name = name;
     user.save();
   }
@@ -955,8 +955,8 @@ const get_DemoStream_By_Admin = async (id) => {
 };
 
 const manageDemoStream = async (page) => {
-
   const data = await Demostream.aggregate([
+    { $sort: { dateISO: -1 } },
     { $match: { _id: { $ne: null } } },
     { $lookup: { from: 'b2busers', localField: 'createdBy', foreignField: '_id', as: 'users' } },
     { $unwind: { preserveNullAndEmptyArrays: true, path: '$users' } },
@@ -1011,30 +1011,27 @@ const manageDemoStream = async (page) => {
 
 const my_orders_buyer = async (req) => {
   let userId = req.query.id;
-  let value = await Demoorder.aggregate(
-    [
-      { $match: { $and: [{ userId: { $eq: userId } }] } },
-      {
-        $lookup: {
-          from: 'demostreams',
-          localField: 'streamId',
-          foreignField: '_id',
-          as: 'demostreams',
-        },
+  let value = await Demoorder.aggregate([
+    { $match: { $and: [{ userId: { $eq: userId } }] } },
+    {
+      $lookup: {
+        from: 'demostreams',
+        localField: 'streamId',
+        foreignField: '_id',
+        as: 'demostreams',
       },
-      { $unwind: '$demostreams' },
-      {
-        $lookup: {
-          from: 'demopayments',
-          localField: '_id',
-          foreignField: 'orderId',
-          as: 'demopayments',
-        },
+    },
+    { $unwind: '$demostreams' },
+    {
+      $lookup: {
+        from: 'demopayments',
+        localField: '_id',
+        foreignField: 'orderId',
+        as: 'demopayments',
       },
-      { $unwind: '$demopayments' },
-    ]
-
-  );
+    },
+    { $unwind: '$demopayments' },
+  ]);
   return value;
 };
 
@@ -1100,7 +1097,6 @@ const view_order_details = async (req) => {
       },
     },
     { $unwind: '$demopayments' },
-
   ]);
 
   if (value.length == 0) {
@@ -1216,10 +1212,10 @@ const visitor_interested_get = async (req) => {
         as: 'demostreams',
       },
     },
-    { $unwind: "$demostreams" },
+    { $unwind: '$demostreams' },
     {
       $addFields: {
-        streamName: { $ifNull: ["$demostreams.streamName", ''] },
+        streamName: { $ifNull: ['$demostreams.streamName', ''] },
       },
     },
     {
@@ -1236,20 +1232,19 @@ const visitor_interested_get = async (req) => {
               as: 'demobuyers',
             },
           },
-          { $unwind: "$demobuyers" },
+          { $unwind: '$demobuyers' },
         ],
         as: 'demostreamtokens',
       },
     },
-    { $unwind: "$demostreamtokens" },
+    { $unwind: '$demostreamtokens' },
     {
       $addFields: {
-        userName: { $ifNull: ["$demostreamtokens.demobuyers.name", ''] },
-        mobileNumber: { $ifNull: ["$demostreamtokens.demobuyers.phoneNumber", ''] },
+        userName: { $ifNull: ['$demostreamtokens.demobuyers.name', ''] },
+        mobileNumber: { $ifNull: ['$demostreamtokens.demobuyers.phoneNumber', ''] },
       },
     },
-  ])
-
+  ]);
 
   return interested;
 };
@@ -1296,13 +1291,13 @@ const visitor_saved_get = async (req) => {
         as: 'demostreams',
       },
     },
-    { $unwind: "$demostreams" },
+    { $unwind: '$demostreams' },
     {
       $addFields: {
-        streamName: { $ifNull: ["$demostreams.streamName", ''] },
+        streamName: { $ifNull: ['$demostreams.streamName', ''] },
       },
     },
-  ])
+  ]);
 
   return savedProduct;
 };
@@ -1312,10 +1307,8 @@ const exhibitor_interested_get = async (req) => {
   let savedProduct = await DemoInstested.aggregate([
     {
       $match: {
-        $and: [
-          { streamID: { $eq: stream } },
-        ]
-      }
+        $and: [{ streamID: { $eq: stream } }],
+      },
     },
     {
       $lookup: {
@@ -1336,10 +1329,10 @@ const exhibitor_interested_get = async (req) => {
         as: 'demoposts',
       },
     },
-    { $unwind: "$demoposts" },
+    { $unwind: '$demoposts' },
     {
       $addFields: {
-        productTitle: { $ifNull: ["$demoposts.productTitle", ''] },
+        productTitle: { $ifNull: ['$demoposts.productTitle', ''] },
       },
     },
     {
@@ -1350,10 +1343,10 @@ const exhibitor_interested_get = async (req) => {
         as: 'demostreams',
       },
     },
-    { $unwind: "$demostreams" },
+    { $unwind: '$demostreams' },
     {
       $addFields: {
-        streamName: { $ifNull: ["$demostreams.streamName", ''] },
+        streamName: { $ifNull: ['$demostreams.streamName', ''] },
       },
     },
     {
@@ -1370,41 +1363,40 @@ const exhibitor_interested_get = async (req) => {
               as: 'demobuyers',
             },
           },
-          { $unwind: "$demobuyers" },
+          { $unwind: '$demobuyers' },
         ],
         as: 'demostreamtokens',
       },
     },
-    { $unwind: "$demostreamtokens" },
+    { $unwind: '$demostreamtokens' },
     {
       $addFields: {
-        userName: { $ifNull: ["$demostreamtokens.demobuyers.name", ''] },
-        mobileNumber: { $ifNull: ["$demostreamtokens.demobuyers.phoneNumber", ''] },
+        userName: { $ifNull: ['$demostreamtokens.demobuyers.name', ''] },
+        mobileNumber: { $ifNull: ['$demostreamtokens.demobuyers.phoneNumber', ''] },
       },
     },
     {
       $group: {
         _id: {
-          streamName: "$streamName",
-          userName: "$userName",
-          mobileNumber: "$mobileNumber",
-          userID: "$userID",
+          streamName: '$streamName',
+          userName: '$userName',
+          mobileNumber: '$mobileNumber',
+          userID: '$userID',
         },
-        productCount: { $sum: 1 }
-      }
+        productCount: { $sum: 1 },
+      },
     },
     {
       $project: {
         _id: 0,
-        streamName: "$_id.streamName",
-        userName: "$_id.userName",
-        mobileNumber: "$_id.mobileNumber",
-        productCount: "$productCount",
-        userID: "$_id.userID"
-      }
-    }
-
-  ])
+        streamName: '$_id.streamName',
+        userName: '$_id.userName',
+        mobileNumber: '$_id.mobileNumber',
+        productCount: '$productCount',
+        userID: '$_id.userID',
+      },
+    },
+  ]);
 
   return savedProduct;
 };
@@ -1417,8 +1409,7 @@ const exhibitor_myprofile = async (req) => {
   let myprofile = await Demoseller.findById(token.userID);
 
   return myprofile;
-
-}
+};
 const visitor_myprofile = async (req) => {
   const token = await DemostreamToken.findById(req.query.id);
   if (!token) {
@@ -1426,25 +1417,19 @@ const visitor_myprofile = async (req) => {
   }
   let myprofile = await Demobuyer.findById(token.userID);
   return myprofile;
-
-}
+};
 
 const send_sms_now = async (req) => {
-
-  return await sms_send_seller(req);;
-
-}
+  return await sms_send_seller(req);
+};
 
 const verify_otp = async (req) => {
-
   let { otp, stream } = req.body;
 
-
-  let verify = await Demootpverify.findOne({ streamID: stream, OTP: otp, verify: false, expired: false })
+  let verify = await Demootpverify.findOne({ streamID: stream, OTP: otp, verify: false, expired: false });
   if (!verify) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Invalid OTP');
-  }
-  else {
+  } else {
     verify.verify = true;
     verify.expired = true;
     verify.save();
@@ -1454,7 +1439,7 @@ const verify_otp = async (req) => {
   }
 
   return verify;
-}
+};
 
 module.exports = {
   send_livestream_link,
@@ -1486,5 +1471,5 @@ module.exports = {
   exhibitor_myprofile,
   visitor_myprofile,
   send_sms_now,
-  verify_otp
+  verify_otp,
 };
