@@ -8,6 +8,7 @@ const ecommulter = require('../../middlewares/ecomstrean');
 const shopverify = require('../../controllers/shoptokenverify.controller');
 const subhostVerify = require('../../controllers/subhostVefify.controller');
 const uploadimage = require('../../middlewares/upload');
+const PlanImage = require('../../middlewares/plan')
 const { SetPass, SellerAuth } = require('../../controllers/sellerAuth.controller');
 
 const storage = multer.memoryStorage({
@@ -170,5 +171,5 @@ router.route('/get/video/link').get(changeVideo, Ecomcontroller.get_video_link);
 // Loading manager
 
 router.route('/loading-manager/get-order-details/:id').get(Ecomcontroller.get_order_details_by_stream);
-
+router.route('/UploadProof/plan/:id').put(PlanImage.single('image'), Ecomcontroller.UploadProof);
 module.exports = router;

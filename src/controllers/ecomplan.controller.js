@@ -4,6 +4,7 @@ const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const Ecomserive = require('../services/ecomplan.service');
 const { EventContext } = require('twilio/lib/rest/monitor/v1/event');
+const { Console } = require('winston/lib/winston/transports');
 
 const create_Plans = catchAsync(async (req, res) => {
   const value = await Ecomserive.create_Plans(req);
@@ -573,8 +574,19 @@ const getStreamRequestById = catchAsync(async(req,res)=>{
   res.send(data);
 })
 
+const UploadProof = catchAsync(async(req,res)=>{
+  const data = await Ecomserive.UploadProof(req.params.id,req.body);
+    if(req.file){
+    console.log(req.file)
+    data.image = 'images/plane/'+req.file.filename
+  }
+  data.save()
+  res.send(data);
+})
+
 module.exports = {
   create_Plans,
+  UploadProof,
   create_Plans_addon,
   get_all_Plans,
   get_all_Plans_addon,

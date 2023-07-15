@@ -11703,7 +11703,8 @@ const get_notification_getall = async (req) => {
 const fs = require('fs');
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
-const { parse } = require('path');
+// const { parse } = require('path');
+// const { default: plans } = require('razorpay/dist/types/plans');
 ffmpeg.setFfmpegPath(ffmpegPath);
 const get_stream_post_after_live_stream = async (req) => {
   let streamId = req.query.id;
@@ -12172,6 +12173,15 @@ const getStreamRequestById = async (id) => {
   return streamRequest;
 };
 
+const UploadProof = async (id, body) => {
+  let val = await Streamplan.findById(id);
+  if (!val) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
+  }
+  val = await Streamplan.findByIdAndUpdate({ _id: id }, body, { new: true });
+  return val;
+};
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -12292,4 +12302,5 @@ module.exports = {
   deletePlanById,
   disable_Enable_Plan,
   getStreamRequestById,
+  UploadProof,
 };
