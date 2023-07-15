@@ -1449,7 +1449,7 @@ const send_multible_sms_send = async (req) => {
   let { number, stream } = req.body;
   let reva
   if (number != undefined) {
-    if (number.length < 5) {
+    if (number.length <= 5) {
       let mobile = number.toString()
       // http://panel.smsmessenger.in/api/mt/SendSMS?user=demo&password=demo123&senderid=WEBSMS&channel=Promo&DCS=0&flashsms=0&number=91989xxxxxxx,91999xxxxxxx&text=test message&route=##&peid=##&DLTTemplateId=231315454xxxxxxx
       let message = `Dear participant.You may test the demo using the link https://ag23.site/b/${stream} - AgriExpoLive2023(An Ookam company event)`;
