@@ -1446,7 +1446,7 @@ const verify_otp = async (req) => {
 };
 const send_multible_sms_send = async (req) => {
 
-  let { number, stream } = res.body;
+  let { number, stream } = req.body;
   let reva
   if (number != undefined) {
     if (number.length < 5) {
