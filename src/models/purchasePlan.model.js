@@ -190,6 +190,9 @@ const purchasePlanSchema = mongoose.Schema({
   salesCommission: {
     type: String,
   },
+  PostCount:{
+    type:String,
+  }
 });
 
 purchasePlan = mongoose.model('purchasedPlans', purchasePlanSchema);
