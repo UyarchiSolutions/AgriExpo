@@ -461,6 +461,21 @@ const getPlanyById = async (id) => {
   return plan;
 };
 
+const Approve_Reject = async (id,body) => {
+  let values = await purchasePlan.findById(id);
+  if(!values){
+    throw new ApiError(httpStatus.BAD_REQUEST,"Plan Not Available")
+  }
+  if(body.status == 'Approved'){
+    values = await purchasePlan.findByIdAndUpdate({ _id: id }, { status: body.status }, { new: true });
+  }else if(body.status == 'Rejected'){
+    values = await purchasePlan.findByIdAndUpdate({ _id: id},{status:body.status},{new: true });
+  }else{
+    throw new ApiError(httpStatus.BAD_REQUEST,"Error Occured")
+  }
+  return values;
+}
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -477,4 +492,5 @@ module.exports = {
   ChangePurchasedPlan,
   UploadProof,
   getPlanyById,
+  Approve_Reject,
 };

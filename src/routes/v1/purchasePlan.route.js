@@ -27,5 +27,5 @@ router.route('/update/:id').put(purchasePlan.updatePurchasedPlanById);
 router.route('/get/All/Planes/:page').get(purchasePlan.get_All_Planes);
 router.route('/Change/Purchased/Plan/:id').put(purchasePlan.ChangePurchasedPlan);
 router.route('/UploadProof/plan/:id').put(upload, purchasePlan.UploadProof);
-
+router.route('/Approve/Reject/:id').put(purchasePlan.Approve_Reject)
 module.exports = router;
