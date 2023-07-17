@@ -430,6 +430,10 @@ const UploadProof = async (id, body) => {
   return val;
 };
 
+const getPlanyById = async (id)=>{
+  const plan = await purchasePlan.findById(id);
+  return plan;
+}
 
 module.exports = {
   create_purchase_plan,
@@ -446,4 +450,5 @@ module.exports = {
   get_All_Planes,
   ChangePurchasedPlan,
   UploadProof,
+  getPlanyById,
 };

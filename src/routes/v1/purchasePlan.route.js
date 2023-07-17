@@ -14,7 +14,7 @@ router.route('/mypurchase/plans/gellall').get(SellerAuth, purchasePlan.get_all_p
 router.route('/purchase/suceess/private').post(purchasePlan.create_purchase_plan_private);
 router.route('/purchase/PurchasePlan/EXpo').post(SellerAuth, purchasePlan.create_PurchasePlan_EXpo);
 router.route('/fetch/getPurchasedPlan').get(SellerAuth, purchasePlan.getPurchasedPlan);
-router.route('/:id').put(SellerAuth, purchasePlan.updatePurchasedPlan);
+router.route('/:id').put(SellerAuth, purchasePlan.updatePurchasedPlan).get(purchasePlan.getPlanyById);
 router.route('/update/:id').put(purchasePlan.updatePurchasedPlanById);
 router.route('/get/All/Planes/:page').get(purchasePlan.get_All_Planes);
 router.route('/Change/Purchased/Plan/:id').put(purchasePlan.ChangePurchasedPlan);

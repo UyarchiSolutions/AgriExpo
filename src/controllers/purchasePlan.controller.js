@@ -104,6 +104,11 @@ const UploadProof = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getPlanyById = catchAsync(async(req,res) => {
+  const data = await purchasePlan.getPlanyById(req.params.id);
+  res.send(data);
+})
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -119,4 +124,5 @@ module.exports = {
   get_All_Planes,
   ChangePurchasedPlan,
   UploadProof,
+  getPlanyById,
 };
