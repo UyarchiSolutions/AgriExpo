@@ -395,6 +395,12 @@ const get_All_Planes = async (page) => {
             Price:1,
             slotInfo:1,
             PayementMode:1,
+            ChequeDDdate:1,
+            ChequeDDNo:1,
+            AccountNo:1,
+            FromBank:1,
+            image:1,
+            TransactionId:1,            
         }
     },
     { $skip: 10 * page },
