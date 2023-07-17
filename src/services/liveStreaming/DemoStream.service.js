@@ -28,6 +28,7 @@ const {
   DemoInstested,
   Demosavedproduct,
   Demootpverify,
+  Democloudrecord
 } = require('../../models/liveStreaming/DemoStream.model');
 const jwt = require('jsonwebtoken');
 const agoraToken = require('./AgoraAppId.service');
@@ -43,6 +44,7 @@ const sms_send_seller = async (link, mobile) => {
 };
 const geenerate_rtc_token = async (chennel, uid, role, expirationTimestamp, agoraID) => {
   let agoraToken = await AgoraAppId.findById(agoraID);
+  console.log(chennel, uid, role, expirationTimestamp, agoraID,agoraToken)
   return Agora.RtcTokenBuilder.buildTokenWithUid(
     agoraToken.appID.replace(/\s/g, ''),
     agoraToken.appCertificate.replace(/\s/g, ''),
@@ -430,6 +432,110 @@ const get_stream_details_check = async (req) => {
   const allowed_count = await DemostreamToken.find({ golive: true, status: 'resgistered', streamID: token._id }).count();
   return { token, streampost, agora, agoraID, allowed_count };
 };
+
+const get_stream_details_check_golive = async (req) => {
+  const token = await Demostream.findById(req.query.id);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  try {
+    const payload = jwt.verify(token.streamValitity, 'demoStream');
+  } catch (err) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+  }
+  const streampost = await Demopost.aggregate([
+    { $match: { $and: [{ streamID: req.query.id }] } },
+    {
+      $lookup: {
+        from: 'democartproducts',
+        localField: '_id',
+        foreignField: 'streamrequestpostId',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'democarts',
+              localField: 'streamingCart',
+              foreignField: '_id',
+              pipeline: [
+                { $match: { $and: [{ status: { $ne: 'ordered' } }] } },
+                {
+                  $project: {
+                    _id: 1,
+                  },
+                },
+              ],
+              as: 'streamingcarts',
+            },
+          },
+          { $unwind: '$streamingcarts' },
+          { $match: { $and: [{ cardStatus: { $eq: true } }, { add_to_cart: { $eq: true } }] } },
+          { $group: { _id: null, count: { $sum: '$cartQTY' } } },
+        ],
+        as: 'stream_cart',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$stream_cart',
+      },
+    },
+    {
+      $lookup: {
+        from: 'demoorderproducts',
+        localField: '_id',
+        foreignField: 'postId',
+        pipeline: [{ $group: { _id: null, count: { $sum: '$purchase_quantity' } } }],
+        as: 'stream_checkout',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$stream_checkout',
+      },
+    },
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'productID',
+        foreignField: '_id',
+        as: 'products',
+      },
+    },
+
+    { $unwind: '$products' },
+    {
+      $project: {
+        _id: 1,
+        productTitle: '$products.productTitle',
+        image: '$products.image',
+        productId: 1,
+        categoryId: 1,
+        quantity: 1,
+        marketPlace: 1,
+        offerPrice: 1,
+        postLiveStreamingPirce: 1,
+        validity: 1,
+        minLots: 1,
+        incrementalLots: 1,
+        suppierId: 1,
+        DateIso: 1,
+        created: 1,
+        streamStart: 1,
+        streamEnd: 1,
+        stream_cart: { $ifNull: ['$stream_cart.count', 0] },
+        stream_checkout: { $ifNull: ['$stream_checkout.count', 0] },
+      },
+    },
+  ]);
+  const agora = await DemostreamToken.findOne({ streamID: req.query.id, type: 'HOST' });
+  const agoraID = await AgoraAppId.findById(token.agoraID);
+  const allowed_count = await DemostreamToken.find({ golive: true, status: 'resgistered', streamID: token._id }).count();
+  await cloude_recording_stream(token._id, token.agoraID, token.endTime);
+  return { token, streampost, agora, agoraID, allowed_count };
+};
+
 
 const go_live_stream = async (req) => {
   const token = await Demostream.findById(req.query.id);
@@ -950,6 +1056,10 @@ const go_live = async (req) => {
     demostream.save();
     req.io.emit(demostream._id + 'stream_on_going', demostream);
   }
+
+  console.log(demostream.agoraID)
+
+  await cloude_recording_stream(demostream._id, demostream.agoraID, demostream.endTime);
   return demotoken;
 };
 
@@ -1464,10 +1574,214 @@ const send_multible_sms_send = async (req) => {
   return reva.data;
 };
 
+const cloude_recording_stream = async (stream, app, endTime) => {
+  const stremRequiest = await Demostream.findById(stream);
+  let agoraToken = await AgoraAppId.findById(app);
+  let record = await Democloudrecord.findOne({ streamId: stream, recoredStart: { $eq: "acquire" } });
+  if (!record) {
+    console.log("true record")
+
+    record = await Democloudrecord.findOne({ streamId: stream, recoredStart: { $in: ["query", 'start'] } });
+    if (record) {
+      console.log("true record query")
+      let token = record;
+      const resource = token.resourceId;
+      const sid = token.sid;
+      const mode = 'mix';
+      const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
+        'base64'
+      )}`;
+      // //console.log(`https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`);
+      await axios.get(
+        `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
+        { headers: { Authorization } }
+      ).then((res) => {
+
+      }).catch(async (error) => {
+        console.log("error")
+        await Democloudrecord.findByIdAndUpdate({ _id: record._id }, { recoredStart: "stop" }, { new: true });
+        const uid = await generateUid();
+        const role = Agora.RtcRole.SUBSCRIBER;
+        const expirationTimestamp = endTime / 1000;
+        console.log(stremRequiest)
+        const token = await geenerate_rtc_token(stremRequiest._id, uid, role, expirationTimestamp, stremRequiest.agoraID);
+        record = await Democloudrecord.create({
+          date: moment().format('YYYY-MM-DD'),
+          time: moment().format('HHMMSS'),
+          created: moment(),
+          Uid: uid,
+          chennel: stremRequiest._id,
+          created_num: new Date(new Date(moment().format('YYYY-MM-DD') + ' ' + moment().format('HH:mm:ss'))).getTime(),
+          expDate: expirationTimestamp * 1000,
+          type: 'CloudRecording',
+          token: token,
+          store: record._id.replace(/[^a-zA-Z0-9]/g, ''),
+          streamId: stream
+        });
+        record.save();
+        await agora_acquire(record._id, agoraToken);
+      });
+    }
+    else {
+      console.log("no ")
+      await Democloudrecord.updateMany({ streamId: stream }, { recoredStart: "stop" }, { new: true });
+      const uid = await generateUid();
+      const role = Agora.RtcRole.SUBSCRIBER;
+      const expirationTimestamp = endTime / 1000;
+      // console.log(agoraToken)
+      // console.log(stremRequiest)
+      // console.log(stremRequiest._id)
+      // console.log(role)
+      // console.log(expirationTimestamp)
+      // console.log(agoraToken._id)
+      const token = await geenerate_rtc_token(stremRequiest._id, uid, role, expirationTimestamp, agoraToken._id);
+      record = await Democloudrecord.create({
+        date: moment().format('YYYY-MM-DD'),
+        time: moment().format('HHMMSS'),
+        created: moment(),
+        Uid: uid,
+        chennel: stremRequiest._id,
+        created_num: new Date(new Date(moment().format('YYYY-MM-DD') + ' ' + moment().format('HH:mm:ss'))).getTime(),
+        expDate: expirationTimestamp * 1000,
+        type: 'CloudRecording',
+        token: token,
+        streamId: stream
+      });
+      // record.store = record._id.replace(/[^a-zA-Z0-9]/g, ''),
+      record.save();
+      await agora_acquire(record._id, agoraToken);
+      await Democloudrecord.findByIdAndUpdate({ _id: record._id }, { store: record._id.replace(/[^a-zA-Z0-9]/g, '') }, { new: true })
+    }
+  }
+  else {
+    return { start: "Already acquired" }
+  }
+}
+
+const agora_acquire = async (id, agroaID) => {
+  let temtoken = id;
+  let agoraToken = agroaID;
+  console.log(agoraToken, 8888)
+  // let temtoken=req.body.id;
+  let token = await Democloudrecord.findById(temtoken);
+  const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
+    'base64'
+  )}`;
+  const acquire = await axios.post(
+    `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/acquire`,
+    {
+      cname: token.chennel,
+      uid: token.Uid.toString(),
+      clientRequest: {
+        resourceExpiredHour: 24,
+        scene: 0,
+      },
+    },
+    { headers: { Authorization } }
+  );
+  token.resourceId = acquire.data.resourceId;
+  token.recoredStart = 'acquire';
+  token.save();
+};
+
+const recording_start = async (id) => {
+  console.log(id, "bharathi")
+  // let temtoken = id;
+  let token = await Democloudrecord.findOne({ chennel: id, recoredStart: { $eq: "acquire" } });
+
+  // let temtoken=req.body.id;
+  // let token = await tempTokenModel.findById(temtoken);
+  if (token) {
+    let str = await Demostream.findById(token.streamId);
+    let agoraToken = await AgoraAppId.findById(str.agoraID);
+    const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
+      'base64'
+    )}`;
+    if (token.recoredStart == 'acquire') {
+      const resource = token.resourceId;
+      //console.log(resource)
+      //console.log(token)
+      const mode = 'mix';
+      const start = await axios.post(
+        `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/mode/${mode}/start`,
+        {
+          cname: token.chennel,
+          uid: token.Uid.toString(),
+          clientRequest: {
+            token: token.token,
+            recordingConfig: {
+              maxIdleTime: 30,
+              streamTypes: 2,
+              channelType: 1,
+              videoStreamType: 0,
+              transcodingConfig: {
+                height: 640,
+                width: 1080,
+                bitrate: 1000,
+                fps: 15,
+                mixedVideoLayout: 1,
+                backgroundColor: '#FFFFFF',
+              },
+            },
+            recordingFileConfig: {
+              avFileType: ['hls'],
+            },
+            storageConfig: {
+              vendor: 1,
+              region: 14,
+              bucket: 'streamingupload',
+              accessKey: 'AKIA3323XNN7Y2RU77UG',
+              secretKey: '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',
+              fileNamePrefix: [token.store, token.Uid.toString()],
+            },
+          },
+        },
+        { headers: { Authorization } }
+      );
+      token.resourceId = start.data.resourceId;
+      token.sid = start.data.sid;
+      token.recoredStart = 'start';
+      token.save();
+      setTimeout(async () => {
+        await recording_query(token._id, agoraToken);
+      }, 3000);
+      return start.data;
+    }
+    else {
+      return { message: 'Already Started' };
+    }
+  }
+  else {
+    return { message: 'Already Started' };
+  }
+};
+const recording_query = async (id, agoraToken) => {
+  const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
+    'base64'
+  )}`;
+  let temtoken = id;
+  // let temtoken=req.body.id;
+  // //console.log(req.body);
+  let token = await Democloudrecord.findById(temtoken);
+  const resource = token.resourceId;
+  const sid = token.sid;
+  const mode = 'mix';
+  // //console.log(`https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`);
+  const query = await axios.get(
+    `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
+    { headers: { Authorization } }
+  );
+  token.videoLink = query.data.serverResponse.fileList;
+  token.recoredStart = 'query';
+  token.save();
+  console.log(4, 5);
+  return query.data;
+};
 module.exports = {
   send_livestream_link,
   verifyToken,
   get_stream_details_check,
+  get_stream_details_check_golive,
   go_live_stream,
   join_stream_buyer,
   get_stream_verify_buyer,
@@ -1495,5 +1809,6 @@ module.exports = {
   visitor_myprofile,
   send_sms_now,
   verify_otp,
-  send_multible_sms_send
+  send_multible_sms_send,
+  recording_start
 };
