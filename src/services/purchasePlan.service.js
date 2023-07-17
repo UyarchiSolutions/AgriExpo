@@ -5,6 +5,7 @@ const moment = require('moment');
 const { purchasePlan } = require('../models/purchasePlan.model');
 const paymentgatway = require('./paymentgatway.service');
 const Dates = require('./Date.serive');
+const AWS = require('aws-sdk');
 
 const {
   Streamplan,
@@ -346,62 +347,62 @@ const get_All_Planes = async (page) => {
     { $lookup: { from: 'sellers', localField: 'suppierId', foreignField: '_id', as: 'suppliers' } },
     { $unwind: { preserveNullAndEmptyArrays: true, path: '$suppliers' } },
     {
-        $project:{
-            _id:1,
-            active:1,
-            archived:1,
-            planType:1,
-            numberOfStreamused:1,
-            streamvalidity:1,
-            planId:1,
-            suppierId:1,
-            paidAmount:1,
-            paymentStatus:1,
-            order_id:1,
-            noOfParticipants:1,
-            chat:1,
-            max_post_per_stream:1,
-            Duration:1,
-            planName:1,
-            DurationType:1,
-            numberOfParticipants:1,
-            numberofStream:1,
-            validityofplan:1,
-            noOfParticipantsCost:1,
-            chatNeed:1,
-            commision:1,
-            commition_value:1,
-            regularPrice:1,
-            salesPrice:1,
-            description:1,
-            planmode:1,
-            expireDate:1,
-            no_of_host:1,
-            razorpay_payment_id:1,
-            razorpay_order_id:1,
-            razorpay_signature:1,
-            DateIso:1,
-            created:1,
-            suppliers:1,
-            status:{$ifNull:['$status','Pending']},
-            Teaser:1,
-            StreamVideos:1,
-            completedStream:1,
-            Pdf:1,
-            Paidimage:1,
-            RaiseHands:1,
-            Advertisement_Display:1,
-            Special_Notification:1,
-            Price:1,
-            slotInfo:1,
-            PayementMode:1,
-            ChequeDDdate:1,
-            ChequeDDNo:1,
-            AccountNo:1,
-            FromBank:1,
-            image:1,
-            TransactionId:1,            
-        }
+      $project: {
+        _id: 1,
+        active: 1,
+        archived: 1,
+        planType: 1,
+        numberOfStreamused: 1,
+        streamvalidity: 1,
+        planId: 1,
+        suppierId: 1,
+        paidAmount: 1,
+        paymentStatus: 1,
+        order_id: 1,
+        noOfParticipants: 1,
+        chat: 1,
+        max_post_per_stream: 1,
+        Duration: 1,
+        planName: 1,
+        DurationType: 1,
+        numberOfParticipants: 1,
+        numberofStream: 1,
+        validityofplan: 1,
+        noOfParticipantsCost: 1,
+        chatNeed: 1,
+        commision: 1,
+        commition_value: 1,
+        regularPrice: 1,
+        salesPrice: 1,
+        description: 1,
+        planmode: 1,
+        expireDate: 1,
+        no_of_host: 1,
+        razorpay_payment_id: 1,
+        razorpay_order_id: 1,
+        razorpay_signature: 1,
+        DateIso: 1,
+        created: 1,
+        suppliers: 1,
+        status: { $ifNull: ['$status', 'Pending'] },
+        Teaser: 1,
+        StreamVideos: 1,
+        completedStream: 1,
+        Pdf: 1,
+        Paidimage: 1,
+        RaiseHands: 1,
+        Advertisement_Display: 1,
+        Special_Notification: 1,
+        Price: 1,
+        slotInfo: 1,
+        PayementMode: 1,
+        ChequeDDdate: 1,
+        ChequeDDNo: 1,
+        AccountNo: 1,
+        FromBank: 1,
+        image: 1,
+        TransactionId: 1,
+      },
     },
     { $skip: 10 * page },
     { $limit: 10 },
@@ -422,18 +423,40 @@ const ChangePurchasedPlan = async (id, body) => {
 };
 
 const UploadProof = async (id, body) => {
-  let val = await purchasePlan.findById(id);
-  if (!val) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
-  }
-  val = await purchasePlan.findByIdAndUpdate({ _id: id }, body, { new: true });
-  return val;
+  // let val = await purchasePlan.findById(id);
+  // if (!val) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
+  // }
+  // val = await purchasePlan.findByIdAndUpdate({ _id: id }, body, { new: true });
+  // return val;
+  const s3 = new AWS.S3({
+    accessKeyId: 'AKIAZEVZUULIPMENZZH7',
+    secretAccessKey: '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',
+    region: 'ap-south-1',
+  });
+
+  let params = {
+    Bucket: 'agriexpoupload',
+    Key: body.file.originalname,
+    Body: body.file.buffer,
+  };
+  let stream;
+  return new Promise((resolve) => {
+    s3.upload(params, async (err, data) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log(data);
+      stream = await purchasePlan.findByIdAndUpdate({ _id: id }, { Paidimage: data.Location }, { new: true });
+      resolve({ video: 'success', stream: stream });
+    });
+  });
 };
 
-const getPlanyById = async (id)=>{
+const getPlanyById = async (id) => {
   const plan = await purchasePlan.findById(id);
   return plan;
-}
+};
 
 module.exports = {
   create_purchase_plan,

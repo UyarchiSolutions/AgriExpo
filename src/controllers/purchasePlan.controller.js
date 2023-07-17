@@ -95,12 +95,7 @@ const ChangePurchasedPlan = catchAsync(async (req, res) => {
 });
 
 const UploadProof = catchAsync(async (req, res) => {
-  const data = await purchasePlan.UploadProof(req.params.id, req.body);
-  if (req.file) {
-    console.log(req.file);
-    data.image = 'images/plane/' + req.file.filename;
-  }
-  data.save();
+  const data = await purchasePlan.UploadProof(req.params.id, req);
   res.send(data);
 });
 

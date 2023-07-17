@@ -4,6 +4,14 @@ const supplierAuth = require('../../controllers/supplier.authorizations');
 const { SetPass, SellerAuth } = require('../../controllers/sellerAuth.controller');
 const PlanImage = require('../../middlewares/plan')
 const router = express.Router();
+const multer = require('multer');
+
+const storage = multer.memoryStorage({
+    destination: function (req, res, callback) {
+      callback(null, '');
+    },
+  });
+  const upload = multer({ storage }).single('Paidimage');
 
 router.route('/purchase/suceess').post(SellerAuth, purchasePlan.create_purchase_plan);
 router.route('/purchase/addon/suceess').post(SellerAuth, purchasePlan.create_purchase_plan_addon);
@@ -18,6 +26,6 @@ router.route('/:id').put(SellerAuth, purchasePlan.updatePurchasedPlan).get(purch
 router.route('/update/:id').put(purchasePlan.updatePurchasedPlanById);
 router.route('/get/All/Planes/:page').get(purchasePlan.get_All_Planes);
 router.route('/Change/Purchased/Plan/:id').put(purchasePlan.ChangePurchasedPlan);
-router.route('/UploadProof/plan/:id').put(PlanImage.single('Paidimage'), purchasePlan.UploadProof);
+router.route('/UploadProof/plan/:id').put(upload, purchasePlan.UploadProof);
 
 module.exports = router;
