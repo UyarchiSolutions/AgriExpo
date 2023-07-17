@@ -260,7 +260,7 @@ const send_livestream_link = async (req) => {
     demopoat.push(streampost8);
     demopoat.push(streampost9);
     if (demopoat.length == 10) {
-      await sms_send_seller(demostream._id, phoneNumber);
+      // await sms_send_seller(demostream._id, phoneNumber);
       resolve({ demopoat, demostream });
     }
   });
