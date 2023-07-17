@@ -102,9 +102,9 @@ const send_livestream_link = async (req) => {
   demostream.save();
   let product = await Product.find().limit(10);
   let demopoat = [];
-  if(transaction=='Without Transaction'){
-    product = await Product.find({category:"fde82b92-5caf-4539-af90-1fd15cfd389f"}).limit(10);
-    
+  if (transaction == 'Without Transaction') {
+    product = await Product.find({ category: "fde82b92-5caf-4539-af90-1fd15cfd389f" }).limit(10);
+
   }
   return new Promise(async (resolve) => {
     let element = product;
@@ -1444,6 +1444,25 @@ const verify_otp = async (req) => {
 
   return verify;
 };
+const send_multible_sms_send = async (req) => {
+
+  let { number, stream } = req.body;
+  let reva
+  if (number != undefined) {
+    if (number.length <= 5) {
+      let mobile = number.toString()
+      // http://panel.smsmessenger.in/api/mt/SendSMS?user=demo&password=demo123&senderid=WEBSMS&channel=Promo&DCS=0&flashsms=0&number=91989xxxxxxx,91999xxxxxxx&text=test message&route=##&peid=##&DLTTemplateId=231315454xxxxxxx
+      let message = `Dear participant.You may test the demo using the link https://ag23.site/b/${stream} - AgriExpoLive2023(An Ookam company event)`;
+      reva = await axios.get(
+        `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168924208038848`
+      );
+    }
+    else {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Only Five Numbers Only');
+    }
+  }
+  return reva.data;
+};
 
 module.exports = {
   send_livestream_link,
@@ -1476,4 +1495,5 @@ module.exports = {
   visitor_myprofile,
   send_sms_now,
   verify_otp,
+  send_multible_sms_send
 };

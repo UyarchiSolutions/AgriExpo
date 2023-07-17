@@ -149,6 +149,11 @@ const verify_otp= catchAsync(async (req, res) => {
   const data = await demostream.verify_otp(req);
   res.send(data);
 })
+
+const send_multible_sms_send= catchAsync(async (req, res) => {
+  const data = await demostream.send_multible_sms_send(req);
+  res.send(data);
+})
 module.exports = {
   send_livestream_link,
   get_stream_details,
@@ -179,5 +184,6 @@ module.exports = {
   exhibitor_myprofile,
   visitor_myprofile,
   send_sms_now,
-  verify_otp
+  verify_otp,
+  send_multible_sms_send
 };
