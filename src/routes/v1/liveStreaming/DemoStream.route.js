@@ -33,7 +33,7 @@ router.route('/visitor/interested').post(demostream.visitor_interested).get(demo
 router.route('/visitor/saved').post(demostream.visitor_saved).get(demostream.visitor_saved_get);
 router.route('/manage/Demo/Stream/:page').get(demostream.manageDemoStream)
 
- 
+
 router.route('/exhibitor/interested').get(demostream.exhibitor_interested_get);
 router.route('/exhibitor/myprofile').get(demostream.exhibitor_myprofile);
 router.route('/visitor/myprofile').get(demostream.visitor_myprofile);
@@ -46,6 +46,14 @@ router.route('/multible/sms/send').post(demostream.send_multible_sms_send);
 router.route('/start/cloud/record').get(demostream.start_cloud_record);
 router.route('/verification/sms/send').get(demostream.verification_sms_send);
 
+
+
+router.route('/Feedback').post(demostream.createFeedBack);
+router.route('/Feedback/:id').get(demostream.getFeedbackById).put(demostream.updateFeedback);
+router.route('/Feedback/pagination/:page').get(demostream.getFeedbackWithPagination);
+router.route('/TechIssue').post(demostream.createTecIssues);
+router.route('/TechIssue/:id').put(demostream.update_TechIssue);
+router.route('/TechIssue/pagination/:page').get(demostream.get_TechIssue);
 
 // router.route('').get(demostream.send_sms_now);
 

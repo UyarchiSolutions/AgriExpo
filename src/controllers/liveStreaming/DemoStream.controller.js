@@ -169,6 +169,44 @@ const verification_sms_send= catchAsync(async (req, res) => {
   const data = await demostream.verification_sms_send(req);
   res.send(data);
 })
+
+
+// feed Back
+const createFeedBack = catchAsync(async (req, res) => {
+  const demoIssue = await demostream.createFeedback(req);
+  res.status(httpStatus.CREATED).send(demoIssue);
+});
+
+const getFeedbackById = catchAsync(async (req, res) => {
+  const demoIssue = await demostream.getFeedback(req.params.id);
+  res.status(httpStatus.OK).send(demoIssue);
+});
+
+const getFeedbackWithPagination = catchAsync(async (req, res) => {
+  const feedback = await demostream.getFeedbackWithPagination(req.params.page);
+  res.status(httpStatus.OK).send(feedback);
+});
+
+const updateFeedback = catchAsync(async (req, res) => {
+  const feedback = await demostream.updateFeedback(req.params.id, req.body);
+  res.status(httpStatus.OK).send(feedback);
+});
+
+const createTecIssues = catchAsync(async (req, res) => {
+  const TechIssue = await demostream.createTecIssues(req.body);
+  res.status(httpStatus.CREATED).send(TechIssue);
+});
+
+const get_TechIssue = catchAsync(async (req, res) => {
+  const TechIssue = await demostream.get_TechIssue_Pagination(req.params.page);
+  res.status(httpStatus.OK).send(TechIssue);
+});
+
+const update_TechIssue = catchAsync(async (req, res) => {
+  const TechIssue = await demostream.update_TechIssue(req, params.id, req.body);
+  res.status(httpStatus.OK).send(TechIssue);
+});
+
 module.exports = {
   send_livestream_link,
   get_stream_details,
@@ -203,5 +241,12 @@ module.exports = {
   send_multible_sms_send,
   start_cloud_record,
   get_stream_details_check_golive,
-  verification_sms_send
+  verification_sms_send,
+  createFeedBack,
+  getFeedbackById,
+  updateFeedback,
+  getFeedbackWithPagination,
+  createTecIssues,
+  get_TechIssue,
+  update_TechIssue,
 };

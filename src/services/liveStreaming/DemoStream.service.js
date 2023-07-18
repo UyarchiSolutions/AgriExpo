@@ -28,7 +28,9 @@ const {
   DemoInstested,
   Demosavedproduct,
   Demootpverify,
-  Democloudrecord
+  Democloudrecord,
+  Feedback,
+  TechIssue
 } = require('../../models/liveStreaming/DemoStream.model');
 const jwt = require('jsonwebtoken');
 const agoraToken = require('./AgoraAppId.service');
@@ -90,7 +92,7 @@ const send_livestream_link = async (req) => {
     createdBy: userID,
     _id: id,
     transaction: transaction,
-    tokenExp:moment().add(30, 'minutes')
+    tokenExp: moment().add(30, 'minutes')
   });
   // endTime: moment().add(15, 'minutes'),
   const payload = {
@@ -1809,6 +1811,97 @@ const send_otp = async (stream) => {
   return otpsend;
 };
 
+
+
+
+/**
+ *feedback
+ **/
+
+const createFeedback = async (req) => {
+  let stream = req.query.id;
+  const token = await Demostream.findById(req.query.id);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  const feedback = await Feedback.create({ ...req.body, ...{ streamID: stream, userID: token.userID } });
+  return feedback;
+};
+
+const getFeedback = async (id) => {
+  const feedback = await Feedback.findById(id);
+  return feedback;
+};
+
+const updateFeedback = async (id, body) => {
+  const feedback = await Feedback.findByIdAndUpdate({ _id: id }, body, { new: true });
+  return feedback;
+};
+
+const getFeedbackWithPagination = async (page) => {
+  let feedback = await Feedback.aggregate([
+    {
+      $skip: page * 10,
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+
+  return feedback;
+};
+
+/**
+ *Tech Issues
+ **/
+
+const createTecIssues = async (body) => {
+  let center = '';
+  let id = 'ISS';
+  const issue = await TechIssue.find().count();
+  if (issue < 9) {
+    center = '0000';
+  }
+  if (issue < 99 && issue >= 9) {
+    center = '000';
+  }
+  if (issue < 999 && issue >= 99) {
+    center = '00';
+  }
+  if (issue < 9999 && issue >= 999) {
+    center = '0';
+  }
+  let total = issue + 1;
+  let issueId = id + center + total;
+
+  const techIssue = await TechIssue.create({ ...body, ...{ issueId: issueId } });
+  return techIssue;
+};
+
+const get_TechIssue = async (id) => {
+  const techIssue = await TechIssue.findById(id);
+  return techIssue;
+};
+
+const update_TechIssue = async (id, body) => {
+  const techIssue = await TechIssue.findByIdAndUpdate({ _id: id }, body, { new: true });
+  return techIssue;
+};
+
+const get_TechIssue_Pagination = async (page) => {
+  let techIssue = await TechIssue.aggregate([
+    {
+      $skip: page * 10,
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+
+  return techIssue;
+};
+
+
 module.exports = {
   send_livestream_link,
   verifyToken,
@@ -1843,5 +1936,13 @@ module.exports = {
   verify_otp,
   send_multible_sms_send,
   recording_start,
-  verification_sms_send
+  verification_sms_send,
+  createFeedback,
+  getFeedback,
+  updateFeedback,
+  getFeedbackWithPagination,
+  createTecIssues,
+  get_TechIssue,
+  update_TechIssue,
+  get_TechIssue_Pagination,
 };
