@@ -426,12 +426,6 @@ const ChangePurchasedPlan = async (id, body) => {
 };
 
 const UploadProof = async (id, body) => {
-  // let val = await purchasePlan.findById(id);
-  // if (!val) {
-  //   throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
-  // }
-  // val = await purchasePlan.findByIdAndUpdate({ _id: id }, body, { new: true });
-  // return val;
   const s3 = new AWS.S3({
     accessKeyId: 'AKIAZEVZUULIPMENZZH7',
     secretAccessKey: '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',
@@ -447,9 +441,7 @@ const UploadProof = async (id, body) => {
   return new Promise((resolve) => {
     s3.upload(params, async (err, data) => {
       if (err) {
-        console.log(err);
       }
-      console.log(data);
       stream = await purchasePlan.findByIdAndUpdate({ _id: id }, { Paidimage: data.Location }, { new: true });
       resolve({ video: 'success', stream: stream });
     });
