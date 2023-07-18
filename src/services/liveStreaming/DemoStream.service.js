@@ -90,7 +90,7 @@ const send_livestream_link = async (req) => {
     createdBy: userID,
     _id: id,
     transaction: transaction,
-    // endTime: moment().add(15, 'minutes'),
+    tokenExp:moment().add(30, 'minutes')
   });
   // endTime: moment().add(15, 'minutes'),
   const payload = {
@@ -1022,6 +1022,7 @@ const go_live = async (req) => {
       dateISO: moment(),
       userID: demostream.userID,
     });
+    demostream.startTime = moment();
     demostream.endTime = expirationTimestamp * 1000;
     demostream.status = 'On-Going';
     demostream.save();
