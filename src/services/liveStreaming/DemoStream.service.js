@@ -282,7 +282,6 @@ const verifyToken = async (req) => {
   }
   let user = await Demoseller.findById(token.userID);
   let mobileNumber = user.phoneNumber;
-
   return { token, mobileNumber };
 };
 const get_stream_verify_buyer = async (req) => {
@@ -1511,8 +1510,8 @@ const send_sms_now = async (req) => {
 
 const verify_otp = async (req) => {
   let { otp, stream } = req.body;
-
-  let verify = await Demootpverify.findOne({ streamID: stream, OTP: otp, verify: false, expired: false });
+  let Datenow = new Date().getTime();
+  let verify = await Demootpverify.findOne({ streamID: stream, OTP: otp, verify: false, expired: false, otpExpiedTime: { $gt: Datenow } });
   if (!verify) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Invalid OTP');
   } else {
@@ -1753,15 +1752,14 @@ const recording_query = async (id, agoraToken) => {
 const verification_sms_send = async (req) => {
   const token = await Demostream.findById(req.query.id);
   let res = await send_otp(token);
-  return { message: "SMS Send Successfully" }
+  return res;
 }
-
-
 
 const send_otp = async (stream) => {
   let OTPCODE = Math.floor(100000 + Math.random() * 900000);
   let Datenow = new Date().getTime();
   let otpsend = await Demootpverify.findOne({ streamID: stream._id, otpExpiedTime: { $gte: Datenow } })
+  console.log(otpsend)
   if (!otpsend) {
     const token = await Demoseller.findById(stream.userID);
     await Demootpverify.updateMany(
@@ -1785,7 +1783,7 @@ const send_otp = async (stream) => {
       `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${token.phoneNumber}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168958877302526`
     );
     // return reva.data;
-    otpsend = { otpsend: exp }
+    otpsend = { otpsend: otp.otpExpiedTime }
   }
   else {
     otpsend = { otpExpiedTime: otpsend.otpExpiedTime }
