@@ -9,7 +9,6 @@ const createSlotBooking = async (body, userId) => {
   let slotDateISO = moment.utc(slotDate).toDate();
   const startTimeISO = `${slotDate}T${fromTime}:00.000Z`;
   const endTimeISO = `${slotDate}T${endTime}:00.000Z`;
-
   let data = {
     slotDate: slotDateISO,
     fromTime: startTimeISO,
