@@ -41,7 +41,7 @@ const getFeedbackWithPagination = async (page) => {
 const createTecIssues = async (body) => {
   let center = '';
   let id = 'ISS';
-  const issue = await TechIssue.find({ active: true }).count();
+  const issue = await TechIssue.find().count();
   if (issue < 9) {
     center = '0000';
   }
