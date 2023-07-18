@@ -36,15 +36,16 @@ const agoraToken = require('./AgoraAppId.service');
 const secret = 'demoStream';
 const Agora = require('agora-access-token');
 const sms_send_seller = async (link, mobile) => {
+  mobile = 91 + "" + mobile;
   let message = `Dear Client, Thanks for your interest in our services. You can test our service by using this link https://ag23.site/s/${link} - AgriExpoLive2023(An Ookam company event)`;
   let reva = await axios.get(
-    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168924202023787`
+    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168958870053466`
   );
   return reva.data;
 };
 const geenerate_rtc_token = async (chennel, uid, role, expirationTimestamp, agoraID) => {
   let agoraToken = await AgoraAppId.findById(agoraID);
-  console.log(chennel, uid, role, expirationTimestamp, agoraID,agoraToken)
+  console.log(chennel, uid, role, expirationTimestamp, agoraID, agoraToken)
   return Agora.RtcTokenBuilder.buildTokenWithUid(
     agoraToken.appID.replace(/\s/g, ''),
     agoraToken.appCertificate.replace(/\s/g, ''),
@@ -108,164 +109,164 @@ const send_livestream_link = async (req) => {
     product = await Product.find({ category: "fde82b92-5caf-4539-af90-1fd15cfd389f" }).limit(10);
 
   }
-  return new Promise(async (resolve) => {
-    let element = product;
-    let streampost0 = await Demopost.create({
-      productTitle: element[0].productTitle,
-      streamID: demostream._id,
-      productID: element[0]._id,
-      image: element[0].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 1200,
-      pendingQTY: 1200,
-      marketPlace: 50,
-      offerPrice: 30,
-      minLots: 10,
-      incrementalLots: 5,
-    });
-    let streampost1 = await Demopost.create({
-      productTitle: element[1].productTitle,
-      streamID: demostream._id,
-      productID: element[1]._id,
-      image: element[1].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 1500,
-      pendingQTY: 1500,
-      marketPlace: 100,
-      offerPrice: 80,
-      minLots: 6,
-      incrementalLots: 5,
-    });
-    let streampost2 = await Demopost.create({
-      productTitle: element[2].productTitle,
-      streamID: demostream._id,
-      productID: element[2]._id,
-      image: element[2].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 2000,
-      pendingQTY: 2000,
-      marketPlace: 50,
-      offerPrice: 30,
-      minLots: 11,
-      incrementalLots: 5,
-    });
-    let streampost3 = await Demopost.create({
-      productTitle: element[3].productTitle,
-      streamID: demostream._id,
-      productID: element[3]._id,
-      image: element[3].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 1000,
-      pendingQTY: 1000,
-      marketPlace: 60,
-      offerPrice: 50,
-      minLots: 20,
-      incrementalLots: 5,
-    });
-    let streampost4 = await Demopost.create({
-      productTitle: element[4].productTitle,
-      streamID: demostream._id,
-      productID: element[4]._id,
-      image: element[4].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 1200,
-      pendingQTY: 1200,
-      marketPlace: 50,
-      offerPrice: 30,
-      minLots: 25,
-      incrementalLots: 5,
-    });
-    let streampost5 = await Demopost.create({
-      productTitle: element[5].productTitle,
-      streamID: demostream._id,
-      productID: element[5]._id,
-      image: element[5].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 500,
-      pendingQTY: 500,
-      marketPlace: 90,
-      offerPrice: 75,
-      minLots: 10,
-      incrementalLots: 5,
-    });
-    let streampost6 = await Demopost.create({
-      productTitle: element[6].productTitle,
-      streamID: demostream._id,
-      productID: element[6]._id,
-      image: element[6].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 2500,
-      pendingQTY: 2500,
-      marketPlace: 60,
-      offerPrice: 40,
-      minLots: 20,
-      incrementalLots: 5,
-    });
-
-    let streampost7 = await Demopost.create({
-      productTitle: element[7].productTitle,
-      streamID: demostream._id,
-      productID: element[7]._id,
-      image: element[7].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 2800,
-      pendingQTY: 2800,
-      marketPlace: 50,
-      offerPrice: 30,
-      minLots: 5,
-      incrementalLots: 5,
-    });
-    let streampost8 = await Demopost.create({
-      productTitle: element[8].productTitle,
-      streamID: demostream._id,
-      productID: element[8]._id,
-      image: element[8].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 600,
-      pendingQTY: 600,
-      marketPlace: 40,
-      offerPrice: 25,
-      minLots: 8,
-      incrementalLots: 5,
-    });
-    let streampost9 = await Demopost.create({
-      productTitle: element[9].productTitle,
-      streamID: demostream._id,
-      productID: element[9]._id,
-      image: element[9].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 700,
-      pendingQTY: 700,
-      marketPlace: 30,
-      offerPrice: 19,
-      minLots: 3,
-      incrementalLots: 5,
-    });
-    demopoat.push(streampost0);
-    demopoat.push(streampost1);
-    demopoat.push(streampost2);
-    demopoat.push(streampost3);
-    demopoat.push(streampost4);
-    demopoat.push(streampost5);
-    demopoat.push(streampost6);
-    demopoat.push(streampost7);
-    demopoat.push(streampost8);
-    demopoat.push(streampost9);
-    if (demopoat.length == 10) {
-      await sms_send_seller(demostream._id, phoneNumber);
-      resolve({ demopoat, demostream });
-    }
+  // return new Promise(async (resolve) => {
+  let element = product;
+  let streampost0 = await Demopost.create({
+    productTitle: element[0].productTitle,
+    streamID: demostream._id,
+    productID: element[0]._id,
+    image: element[0].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 1200,
+    pendingQTY: 1200,
+    marketPlace: 50,
+    offerPrice: 30,
+    minLots: 10,
+    incrementalLots: 5,
   });
+  let streampost1 = await Demopost.create({
+    productTitle: element[1].productTitle,
+    streamID: demostream._id,
+    productID: element[1]._id,
+    image: element[1].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 1500,
+    pendingQTY: 1500,
+    marketPlace: 100,
+    offerPrice: 80,
+    minLots: 6,
+    incrementalLots: 5,
+  });
+  let streampost2 = await Demopost.create({
+    productTitle: element[2].productTitle,
+    streamID: demostream._id,
+    productID: element[2]._id,
+    image: element[2].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 2000,
+    pendingQTY: 2000,
+    marketPlace: 50,
+    offerPrice: 30,
+    minLots: 11,
+    incrementalLots: 5,
+  });
+  let streampost3 = await Demopost.create({
+    productTitle: element[3].productTitle,
+    streamID: demostream._id,
+    productID: element[3]._id,
+    image: element[3].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 1000,
+    pendingQTY: 1000,
+    marketPlace: 60,
+    offerPrice: 50,
+    minLots: 20,
+    incrementalLots: 5,
+  });
+  let streampost4 = await Demopost.create({
+    productTitle: element[4].productTitle,
+    streamID: demostream._id,
+    productID: element[4]._id,
+    image: element[4].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 1200,
+    pendingQTY: 1200,
+    marketPlace: 50,
+    offerPrice: 30,
+    minLots: 25,
+    incrementalLots: 5,
+  });
+  let streampost5 = await Demopost.create({
+    productTitle: element[5].productTitle,
+    streamID: demostream._id,
+    productID: element[5]._id,
+    image: element[5].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 500,
+    pendingQTY: 500,
+    marketPlace: 90,
+    offerPrice: 75,
+    minLots: 10,
+    incrementalLots: 5,
+  });
+  let streampost6 = await Demopost.create({
+    productTitle: element[6].productTitle,
+    streamID: demostream._id,
+    productID: element[6]._id,
+    image: element[6].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 2500,
+    pendingQTY: 2500,
+    marketPlace: 60,
+    offerPrice: 40,
+    minLots: 20,
+    incrementalLots: 5,
+  });
+
+  let streampost7 = await Demopost.create({
+    productTitle: element[7].productTitle,
+    streamID: demostream._id,
+    productID: element[7]._id,
+    image: element[7].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 2800,
+    pendingQTY: 2800,
+    marketPlace: 50,
+    offerPrice: 30,
+    minLots: 5,
+    incrementalLots: 5,
+  });
+  let streampost8 = await Demopost.create({
+    productTitle: element[8].productTitle,
+    streamID: demostream._id,
+    productID: element[8]._id,
+    image: element[8].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 600,
+    pendingQTY: 600,
+    marketPlace: 40,
+    offerPrice: 25,
+    minLots: 8,
+    incrementalLots: 5,
+  });
+  let streampost9 = await Demopost.create({
+    productTitle: element[9].productTitle,
+    streamID: demostream._id,
+    productID: element[9]._id,
+    image: element[9].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 700,
+    pendingQTY: 700,
+    marketPlace: 30,
+    offerPrice: 19,
+    minLots: 3,
+    incrementalLots: 5,
+  });
+  demopoat.push(streampost0);
+  demopoat.push(streampost1);
+  demopoat.push(streampost2);
+  demopoat.push(streampost3);
+  demopoat.push(streampost4);
+  demopoat.push(streampost5);
+  demopoat.push(streampost6);
+  demopoat.push(streampost7);
+  demopoat.push(streampost8);
+  demopoat.push(streampost9);
+  // if (demopoat.length == 10) {
+  console.log(await sms_send_seller(demostream._id, phoneNumber));
+  return { demopoat, demostream };
+  // }
+  // });
 };
 
 const verifyToken = async (req) => {
@@ -306,7 +307,7 @@ const send_otp = async (stream) => {
 
   let message = `Dear ${token.name},thank you for the registration to the event AgriExpoLive2023 .Your OTP for logging into the account is ${OTPCODE}- AgriExpoLive2023(An Ookam company event)`;
   let reva = await axios.get(
-    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${token.phoneNumber}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168908130209371`
+    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${token.phoneNumber}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168958877302526`
   );
   // return reva.data;
 
@@ -1564,7 +1565,7 @@ const send_multible_sms_send = async (req) => {
       // http://panel.smsmessenger.in/api/mt/SendSMS?user=demo&password=demo123&senderid=WEBSMS&channel=Promo&DCS=0&flashsms=0&number=91989xxxxxxx,91999xxxxxxx&text=test message&route=##&peid=##&DLTTemplateId=231315454xxxxxxx
       let message = `Dear participant.You may test the demo using the link https://ag23.site/b/${stream} - AgriExpoLive2023(An Ookam company event)`;
       reva = await axios.get(
-        `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168924208038848`
+        `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168958872798585`
       );
     }
     else {
