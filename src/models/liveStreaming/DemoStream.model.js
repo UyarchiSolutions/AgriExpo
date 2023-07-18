@@ -706,4 +706,130 @@ const demootp = mongoose.Schema({
 const Demootpverify = mongoose.model('demootp', demootp);
 
 
-module.exports = { Demoseller, Demostream, Demopost, Demobuyer, Demoorder, Demoorderproduct, DemostreamToken, Democart, Democartproduct, Demopaymnt, DemoInstested, Demosavedproduct, Demootpverify };
+
+const democloud_record = mongoose.Schema({
+  _id: {
+    type: String,
+    default: v4,
+  },
+  token: {
+    type: String,
+  },
+  date: {
+    type: String,
+  },
+  created: {
+    type: Date,
+  },
+  time: {
+    type: Number,
+  },
+  expDate: {
+    type: Number,
+  },
+  created_num: {
+    type: Number,
+  },
+  participents: {
+    type: Number,
+  },
+  chennel: {
+    type: String,
+  },
+  Uid: {
+    type: Number,
+  },
+  type: {
+    type: String,
+  },
+  hostId: {
+    type: String,
+  },
+  active: {
+    type: Boolean,
+    default: true,
+  },
+  archived: {
+    type: Boolean,
+    default: false,
+  },
+  cloud_recording: {
+    type: String,
+  },
+  uid_cloud: {
+    type: Number,
+  },
+  cloud_id: {
+    type: String,
+  },
+  store: {
+    type: String,
+  },
+  supplierId: {
+    type: String,
+  },
+  streamId: {
+    type: String,
+  },
+  shopId: {
+    type: String,
+  },
+  Duration: {
+    type: Number,
+  },
+  joinedUser: {
+    type: String,
+  },
+  resourceId: {
+    type: String,
+  },
+  sid: {
+    type: String,
+  },
+  isUsed: {
+    type: Boolean,
+    default: false,
+  },
+  videoLink: {
+    type: String,
+  },
+  recoredStart: {
+    type: String,
+    default: 'Pending',
+  },
+  video: {
+    type: Boolean,
+    default: true,
+  },
+  audio: {
+    type: Boolean,
+    default: true,
+  },
+  video: {
+    type: Boolean,
+    default: true,
+  },
+  allMedia: {
+    type: Boolean,
+    default: true,
+  },
+  mainhostLeave: {
+    type: Boolean,
+    default: false
+  },
+  bigSize: {
+    type: Boolean,
+    default: false
+  },
+  convertedVideo: {
+    type: String,
+    default: 'Pending',
+  },
+  convertStatus: {
+    type: String,
+    default: 'Pending',
+  }
+
+});
+const Democloudrecord = mongoose.model('democloundrecord', democloud_record);
+module.exports = { Demoseller, Demostream, Demopost, Demobuyer, Demoorder, Demoorderproduct, DemostreamToken, Democart, Democartproduct, Demopaymnt, DemoInstested, Demosavedproduct, Demootpverify ,Democloudrecord};

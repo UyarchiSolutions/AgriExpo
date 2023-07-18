@@ -26,6 +26,12 @@ const get_stream_details_check = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(data);
 });
 
+const get_stream_details_check_golive = catchAsync(async (req, res) => {
+  const data = await demostream.get_stream_details_check_golive(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
+
 const go_live_stream = catchAsync(async (req, res) => {
   const data = await demostream.go_live_stream(req);
   res.status(httpStatus.CREATED).send(data);
@@ -145,15 +151,21 @@ const send_sms_now = catchAsync(async (req, res) => {
   res.send(data);
 })
 
-const verify_otp= catchAsync(async (req, res) => {
+const verify_otp = catchAsync(async (req, res) => {
   const data = await demostream.verify_otp(req);
   res.send(data);
 })
 
-const send_multible_sms_send= catchAsync(async (req, res) => {
+const send_multible_sms_send = catchAsync(async (req, res) => {
   const data = await demostream.send_multible_sms_send(req);
   res.send(data);
 })
+
+const start_cloud_record = catchAsync(async (req, res) => {
+  const data = await demostream.recording_start(req.query.id);
+  res.send(data);
+})
+
 module.exports = {
   send_livestream_link,
   get_stream_details,
@@ -185,5 +197,7 @@ module.exports = {
   visitor_myprofile,
   send_sms_now,
   verify_otp,
-  send_multible_sms_send
+  send_multible_sms_send,
+  start_cloud_record,
+  get_stream_details_check_golive
 };

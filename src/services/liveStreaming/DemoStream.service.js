@@ -28,6 +28,7 @@ const {
   DemoInstested,
   Demosavedproduct,
   Demootpverify,
+  Democloudrecord
 } = require('../../models/liveStreaming/DemoStream.model');
 const jwt = require('jsonwebtoken');
 const agoraToken = require('./AgoraAppId.service');
@@ -35,14 +36,16 @@ const agoraToken = require('./AgoraAppId.service');
 const secret = 'demoStream';
 const Agora = require('agora-access-token');
 const sms_send_seller = async (link, mobile) => {
+  mobile = 91 + "" + mobile;
   let message = `Dear Client, Thanks for your interest in our services. You can test our service by using this link https://ag23.site/s/${link} - AgriExpoLive2023(An Ookam company event)`;
   let reva = await axios.get(
-    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168924202023787`
+    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168958870053466`
   );
   return reva.data;
 };
 const geenerate_rtc_token = async (chennel, uid, role, expirationTimestamp, agoraID) => {
   let agoraToken = await AgoraAppId.findById(agoraID);
+  console.log(chennel, uid, role, expirationTimestamp, agoraID, agoraToken)
   return Agora.RtcTokenBuilder.buildTokenWithUid(
     agoraToken.appID.replace(/\s/g, ''),
     agoraToken.appCertificate.replace(/\s/g, ''),
@@ -106,164 +109,164 @@ const send_livestream_link = async (req) => {
     product = await Product.find({ category: "fde82b92-5caf-4539-af90-1fd15cfd389f" }).limit(10);
 
   }
-  return new Promise(async (resolve) => {
-    let element = product;
-    let streampost0 = await Demopost.create({
-      productTitle: element[0].productTitle,
-      streamID: demostream._id,
-      productID: element[0]._id,
-      image: element[0].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 1200,
-      pendingQTY: 1200,
-      marketPlace: 50,
-      offerPrice: 30,
-      minLots: 10,
-      incrementalLots: 5,
-    });
-    let streampost1 = await Demopost.create({
-      productTitle: element[1].productTitle,
-      streamID: demostream._id,
-      productID: element[1]._id,
-      image: element[1].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 1500,
-      pendingQTY: 1500,
-      marketPlace: 100,
-      offerPrice: 80,
-      minLots: 6,
-      incrementalLots: 5,
-    });
-    let streampost2 = await Demopost.create({
-      productTitle: element[2].productTitle,
-      streamID: demostream._id,
-      productID: element[2]._id,
-      image: element[2].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 2000,
-      pendingQTY: 2000,
-      marketPlace: 50,
-      offerPrice: 30,
-      minLots: 11,
-      incrementalLots: 5,
-    });
-    let streampost3 = await Demopost.create({
-      productTitle: element[3].productTitle,
-      streamID: demostream._id,
-      productID: element[3]._id,
-      image: element[3].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 1000,
-      pendingQTY: 1000,
-      marketPlace: 60,
-      offerPrice: 50,
-      minLots: 20,
-      incrementalLots: 5,
-    });
-    let streampost4 = await Demopost.create({
-      productTitle: element[4].productTitle,
-      streamID: demostream._id,
-      productID: element[4]._id,
-      image: element[4].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 1200,
-      pendingQTY: 1200,
-      marketPlace: 50,
-      offerPrice: 30,
-      minLots: 25,
-      incrementalLots: 5,
-    });
-    let streampost5 = await Demopost.create({
-      productTitle: element[5].productTitle,
-      streamID: demostream._id,
-      productID: element[5]._id,
-      image: element[5].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 500,
-      pendingQTY: 500,
-      marketPlace: 90,
-      offerPrice: 75,
-      minLots: 10,
-      incrementalLots: 5,
-    });
-    let streampost6 = await Demopost.create({
-      productTitle: element[6].productTitle,
-      streamID: demostream._id,
-      productID: element[6]._id,
-      image: element[6].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 2500,
-      pendingQTY: 2500,
-      marketPlace: 60,
-      offerPrice: 40,
-      minLots: 20,
-      incrementalLots: 5,
-    });
-
-    let streampost7 = await Demopost.create({
-      productTitle: element[7].productTitle,
-      streamID: demostream._id,
-      productID: element[7]._id,
-      image: element[7].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 2800,
-      pendingQTY: 2800,
-      marketPlace: 50,
-      offerPrice: 30,
-      minLots: 5,
-      incrementalLots: 5,
-    });
-    let streampost8 = await Demopost.create({
-      productTitle: element[8].productTitle,
-      streamID: demostream._id,
-      productID: element[8]._id,
-      image: element[8].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 600,
-      pendingQTY: 600,
-      marketPlace: 40,
-      offerPrice: 25,
-      minLots: 8,
-      incrementalLots: 5,
-    });
-    let streampost9 = await Demopost.create({
-      productTitle: element[9].productTitle,
-      streamID: demostream._id,
-      productID: element[9]._id,
-      image: element[9].image,
-      userID: user._id,
-      dateISO: moment(),
-      quantity: 700,
-      pendingQTY: 700,
-      marketPlace: 30,
-      offerPrice: 19,
-      minLots: 3,
-      incrementalLots: 5,
-    });
-    demopoat.push(streampost0);
-    demopoat.push(streampost1);
-    demopoat.push(streampost2);
-    demopoat.push(streampost3);
-    demopoat.push(streampost4);
-    demopoat.push(streampost5);
-    demopoat.push(streampost6);
-    demopoat.push(streampost7);
-    demopoat.push(streampost8);
-    demopoat.push(streampost9);
-    if (demopoat.length == 10) {
-      // await sms_send_seller(demostream._id, phoneNumber);
-      resolve({ demopoat, demostream });
-    }
+  // return new Promise(async (resolve) => {
+  let element = product;
+  let streampost0 = await Demopost.create({
+    productTitle: element[0].productTitle,
+    streamID: demostream._id,
+    productID: element[0]._id,
+    image: element[0].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 1200,
+    pendingQTY: 1200,
+    marketPlace: 50,
+    offerPrice: 30,
+    minLots: 10,
+    incrementalLots: 5,
   });
+  let streampost1 = await Demopost.create({
+    productTitle: element[1].productTitle,
+    streamID: demostream._id,
+    productID: element[1]._id,
+    image: element[1].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 1500,
+    pendingQTY: 1500,
+    marketPlace: 100,
+    offerPrice: 80,
+    minLots: 6,
+    incrementalLots: 5,
+  });
+  let streampost2 = await Demopost.create({
+    productTitle: element[2].productTitle,
+    streamID: demostream._id,
+    productID: element[2]._id,
+    image: element[2].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 2000,
+    pendingQTY: 2000,
+    marketPlace: 50,
+    offerPrice: 30,
+    minLots: 11,
+    incrementalLots: 5,
+  });
+  let streampost3 = await Demopost.create({
+    productTitle: element[3].productTitle,
+    streamID: demostream._id,
+    productID: element[3]._id,
+    image: element[3].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 1000,
+    pendingQTY: 1000,
+    marketPlace: 60,
+    offerPrice: 50,
+    minLots: 20,
+    incrementalLots: 5,
+  });
+  let streampost4 = await Demopost.create({
+    productTitle: element[4].productTitle,
+    streamID: demostream._id,
+    productID: element[4]._id,
+    image: element[4].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 1200,
+    pendingQTY: 1200,
+    marketPlace: 50,
+    offerPrice: 30,
+    minLots: 25,
+    incrementalLots: 5,
+  });
+  let streampost5 = await Demopost.create({
+    productTitle: element[5].productTitle,
+    streamID: demostream._id,
+    productID: element[5]._id,
+    image: element[5].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 500,
+    pendingQTY: 500,
+    marketPlace: 90,
+    offerPrice: 75,
+    minLots: 10,
+    incrementalLots: 5,
+  });
+  let streampost6 = await Demopost.create({
+    productTitle: element[6].productTitle,
+    streamID: demostream._id,
+    productID: element[6]._id,
+    image: element[6].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 2500,
+    pendingQTY: 2500,
+    marketPlace: 60,
+    offerPrice: 40,
+    minLots: 20,
+    incrementalLots: 5,
+  });
+
+  let streampost7 = await Demopost.create({
+    productTitle: element[7].productTitle,
+    streamID: demostream._id,
+    productID: element[7]._id,
+    image: element[7].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 2800,
+    pendingQTY: 2800,
+    marketPlace: 50,
+    offerPrice: 30,
+    minLots: 5,
+    incrementalLots: 5,
+  });
+  let streampost8 = await Demopost.create({
+    productTitle: element[8].productTitle,
+    streamID: demostream._id,
+    productID: element[8]._id,
+    image: element[8].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 600,
+    pendingQTY: 600,
+    marketPlace: 40,
+    offerPrice: 25,
+    minLots: 8,
+    incrementalLots: 5,
+  });
+  let streampost9 = await Demopost.create({
+    productTitle: element[9].productTitle,
+    streamID: demostream._id,
+    productID: element[9]._id,
+    image: element[9].image,
+    userID: user._id,
+    dateISO: moment(),
+    quantity: 700,
+    pendingQTY: 700,
+    marketPlace: 30,
+    offerPrice: 19,
+    minLots: 3,
+    incrementalLots: 5,
+  });
+  demopoat.push(streampost0);
+  demopoat.push(streampost1);
+  demopoat.push(streampost2);
+  demopoat.push(streampost3);
+  demopoat.push(streampost4);
+  demopoat.push(streampost5);
+  demopoat.push(streampost6);
+  demopoat.push(streampost7);
+  demopoat.push(streampost8);
+  demopoat.push(streampost9);
+  // if (demopoat.length == 10) {
+  console.log(await sms_send_seller(demostream._id, phoneNumber));
+  return { demopoat, demostream };
+  // }
+  // });
 };
 
 const verifyToken = async (req) => {
@@ -304,7 +307,7 @@ const send_otp = async (stream) => {
 
   let message = `Dear ${token.name},thank you for the registration to the event AgriExpoLive2023 .Your OTP for logging into the account is ${OTPCODE}- AgriExpoLive2023(An Ookam company event)`;
   let reva = await axios.get(
-    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${token.phoneNumber}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168908130209371`
+    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${token.phoneNumber}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168958877302526`
   );
   // return reva.data;
 
@@ -430,6 +433,110 @@ const get_stream_details_check = async (req) => {
   const allowed_count = await DemostreamToken.find({ golive: true, status: 'resgistered', streamID: token._id }).count();
   return { token, streampost, agora, agoraID, allowed_count };
 };
+
+const get_stream_details_check_golive = async (req) => {
+  const token = await Demostream.findById(req.query.id);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  try {
+    const payload = jwt.verify(token.streamValitity, 'demoStream');
+  } catch (err) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+  }
+  const streampost = await Demopost.aggregate([
+    { $match: { $and: [{ streamID: req.query.id }] } },
+    {
+      $lookup: {
+        from: 'democartproducts',
+        localField: '_id',
+        foreignField: 'streamrequestpostId',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'democarts',
+              localField: 'streamingCart',
+              foreignField: '_id',
+              pipeline: [
+                { $match: { $and: [{ status: { $ne: 'ordered' } }] } },
+                {
+                  $project: {
+                    _id: 1,
+                  },
+                },
+              ],
+              as: 'streamingcarts',
+            },
+          },
+          { $unwind: '$streamingcarts' },
+          { $match: { $and: [{ cardStatus: { $eq: true } }, { add_to_cart: { $eq: true } }] } },
+          { $group: { _id: null, count: { $sum: '$cartQTY' } } },
+        ],
+        as: 'stream_cart',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$stream_cart',
+      },
+    },
+    {
+      $lookup: {
+        from: 'demoorderproducts',
+        localField: '_id',
+        foreignField: 'postId',
+        pipeline: [{ $group: { _id: null, count: { $sum: '$purchase_quantity' } } }],
+        as: 'stream_checkout',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$stream_checkout',
+      },
+    },
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'productID',
+        foreignField: '_id',
+        as: 'products',
+      },
+    },
+
+    { $unwind: '$products' },
+    {
+      $project: {
+        _id: 1,
+        productTitle: '$products.productTitle',
+        image: '$products.image',
+        productId: 1,
+        categoryId: 1,
+        quantity: 1,
+        marketPlace: 1,
+        offerPrice: 1,
+        postLiveStreamingPirce: 1,
+        validity: 1,
+        minLots: 1,
+        incrementalLots: 1,
+        suppierId: 1,
+        DateIso: 1,
+        created: 1,
+        streamStart: 1,
+        streamEnd: 1,
+        stream_cart: { $ifNull: ['$stream_cart.count', 0] },
+        stream_checkout: { $ifNull: ['$stream_checkout.count', 0] },
+      },
+    },
+  ]);
+  const agora = await DemostreamToken.findOne({ streamID: req.query.id, type: 'HOST' });
+  const agoraID = await AgoraAppId.findById(token.agoraID);
+  const allowed_count = await DemostreamToken.find({ golive: true, status: 'resgistered', streamID: token._id }).count();
+  await cloude_recording_stream(token._id, token.agoraID, token.endTime);
+  return { token, streampost, agora, agoraID, allowed_count };
+};
+
 
 const go_live_stream = async (req) => {
   const token = await Demostream.findById(req.query.id);
@@ -950,6 +1057,10 @@ const go_live = async (req) => {
     demostream.save();
     req.io.emit(demostream._id + 'stream_on_going', demostream);
   }
+
+  console.log(demostream.agoraID)
+
+  await cloude_recording_stream(demostream._id, demostream.agoraID, demostream.endTime);
   return demotoken;
 };
 
@@ -1454,7 +1565,7 @@ const send_multible_sms_send = async (req) => {
       // http://panel.smsmessenger.in/api/mt/SendSMS?user=demo&password=demo123&senderid=WEBSMS&channel=Promo&DCS=0&flashsms=0&number=91989xxxxxxx,91999xxxxxxx&text=test message&route=##&peid=##&DLTTemplateId=231315454xxxxxxx
       let message = `Dear participant.You may test the demo using the link https://ag23.site/b/${stream} - AgriExpoLive2023(An Ookam company event)`;
       reva = await axios.get(
-        `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168924208038848`
+        `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168958872798585`
       );
     }
     else {
@@ -1464,10 +1575,214 @@ const send_multible_sms_send = async (req) => {
   return reva.data;
 };
 
+const cloude_recording_stream = async (stream, app, endTime) => {
+  const stremRequiest = await Demostream.findById(stream);
+  let agoraToken = await AgoraAppId.findById(app);
+  let record = await Democloudrecord.findOne({ streamId: stream, recoredStart: { $eq: "acquire" } });
+  if (!record) {
+    console.log("true record")
+
+    record = await Democloudrecord.findOne({ streamId: stream, recoredStart: { $in: ["query", 'start'] } });
+    if (record) {
+      console.log("true record query")
+      let token = record;
+      const resource = token.resourceId;
+      const sid = token.sid;
+      const mode = 'mix';
+      const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
+        'base64'
+      )}`;
+      // //console.log(`https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`);
+      await axios.get(
+        `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
+        { headers: { Authorization } }
+      ).then((res) => {
+
+      }).catch(async (error) => {
+        console.log("error")
+        await Democloudrecord.findByIdAndUpdate({ _id: record._id }, { recoredStart: "stop" }, { new: true });
+        const uid = await generateUid();
+        const role = Agora.RtcRole.SUBSCRIBER;
+        const expirationTimestamp = endTime / 1000;
+        console.log(stremRequiest)
+        const token = await geenerate_rtc_token(stremRequiest._id, uid, role, expirationTimestamp, stremRequiest.agoraID);
+        record = await Democloudrecord.create({
+          date: moment().format('YYYY-MM-DD'),
+          time: moment().format('HHMMSS'),
+          created: moment(),
+          Uid: uid,
+          chennel: stremRequiest._id,
+          created_num: new Date(new Date(moment().format('YYYY-MM-DD') + ' ' + moment().format('HH:mm:ss'))).getTime(),
+          expDate: expirationTimestamp * 1000,
+          type: 'CloudRecording',
+          token: token,
+          store: record._id.replace(/[^a-zA-Z0-9]/g, ''),
+          streamId: stream
+        });
+        record.save();
+        await agora_acquire(record._id, agoraToken);
+      });
+    }
+    else {
+      console.log("no ")
+      await Democloudrecord.updateMany({ streamId: stream }, { recoredStart: "stop" }, { new: true });
+      const uid = await generateUid();
+      const role = Agora.RtcRole.SUBSCRIBER;
+      const expirationTimestamp = endTime / 1000;
+      // console.log(agoraToken)
+      // console.log(stremRequiest)
+      // console.log(stremRequiest._id)
+      // console.log(role)
+      // console.log(expirationTimestamp)
+      // console.log(agoraToken._id)
+      const token = await geenerate_rtc_token(stremRequiest._id, uid, role, expirationTimestamp, agoraToken._id);
+      record = await Democloudrecord.create({
+        date: moment().format('YYYY-MM-DD'),
+        time: moment().format('HHMMSS'),
+        created: moment(),
+        Uid: uid,
+        chennel: stremRequiest._id,
+        created_num: new Date(new Date(moment().format('YYYY-MM-DD') + ' ' + moment().format('HH:mm:ss'))).getTime(),
+        expDate: expirationTimestamp * 1000,
+        type: 'CloudRecording',
+        token: token,
+        streamId: stream
+      });
+      // record.store = record._id.replace(/[^a-zA-Z0-9]/g, ''),
+      record.save();
+      await agora_acquire(record._id, agoraToken);
+      await Democloudrecord.findByIdAndUpdate({ _id: record._id }, { store: record._id.replace(/[^a-zA-Z0-9]/g, '') }, { new: true })
+    }
+  }
+  else {
+    return { start: "Already acquired" }
+  }
+}
+
+const agora_acquire = async (id, agroaID) => {
+  let temtoken = id;
+  let agoraToken = agroaID;
+  console.log(agoraToken, 8888)
+  // let temtoken=req.body.id;
+  let token = await Democloudrecord.findById(temtoken);
+  const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
+    'base64'
+  )}`;
+  const acquire = await axios.post(
+    `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/acquire`,
+    {
+      cname: token.chennel,
+      uid: token.Uid.toString(),
+      clientRequest: {
+        resourceExpiredHour: 24,
+        scene: 0,
+      },
+    },
+    { headers: { Authorization } }
+  );
+  token.resourceId = acquire.data.resourceId;
+  token.recoredStart = 'acquire';
+  token.save();
+};
+
+const recording_start = async (id) => {
+  console.log(id, "bharathi")
+  // let temtoken = id;
+  let token = await Democloudrecord.findOne({ chennel: id, recoredStart: { $eq: "acquire" } });
+
+  // let temtoken=req.body.id;
+  // let token = await tempTokenModel.findById(temtoken);
+  if (token) {
+    let str = await Demostream.findById(token.streamId);
+    let agoraToken = await AgoraAppId.findById(str.agoraID);
+    const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
+      'base64'
+    )}`;
+    if (token.recoredStart == 'acquire') {
+      const resource = token.resourceId;
+      //console.log(resource)
+      //console.log(token)
+      const mode = 'mix';
+      const start = await axios.post(
+        `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/mode/${mode}/start`,
+        {
+          cname: token.chennel,
+          uid: token.Uid.toString(),
+          clientRequest: {
+            token: token.token,
+            recordingConfig: {
+              maxIdleTime: 30,
+              streamTypes: 2,
+              channelType: 1,
+              videoStreamType: 0,
+              transcodingConfig: {
+                height: 640,
+                width: 1080,
+                bitrate: 1000,
+                fps: 15,
+                mixedVideoLayout: 1,
+                backgroundColor: '#FFFFFF',
+              },
+            },
+            recordingFileConfig: {
+              avFileType: ['hls'],
+            },
+            storageConfig: {
+              vendor: 1,
+              region: 14,
+              bucket: 'streamingupload',
+              accessKey: 'AKIA3323XNN7Y2RU77UG',
+              secretKey: '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',
+              fileNamePrefix: [token.store, token.Uid.toString()],
+            },
+          },
+        },
+        { headers: { Authorization } }
+      );
+      token.resourceId = start.data.resourceId;
+      token.sid = start.data.sid;
+      token.recoredStart = 'start';
+      token.save();
+      setTimeout(async () => {
+        await recording_query(token._id, agoraToken);
+      }, 3000);
+      return start.data;
+    }
+    else {
+      return { message: 'Already Started' };
+    }
+  }
+  else {
+    return { message: 'Already Started' };
+  }
+};
+const recording_query = async (id, agoraToken) => {
+  const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
+    'base64'
+  )}`;
+  let temtoken = id;
+  // let temtoken=req.body.id;
+  // //console.log(req.body);
+  let token = await Democloudrecord.findById(temtoken);
+  const resource = token.resourceId;
+  const sid = token.sid;
+  const mode = 'mix';
+  // //console.log(`https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`);
+  const query = await axios.get(
+    `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
+    { headers: { Authorization } }
+  );
+  token.videoLink = query.data.serverResponse.fileList;
+  token.recoredStart = 'query';
+  token.save();
+  console.log(4, 5);
+  return query.data;
+};
 module.exports = {
   send_livestream_link,
   verifyToken,
   get_stream_details_check,
+  get_stream_details_check_golive,
   go_live_stream,
   join_stream_buyer,
   get_stream_verify_buyer,
@@ -1495,5 +1810,6 @@ module.exports = {
   visitor_myprofile,
   send_sms_now,
   verify_otp,
-  send_multible_sms_send
+  send_multible_sms_send,
+  recording_start
 };
