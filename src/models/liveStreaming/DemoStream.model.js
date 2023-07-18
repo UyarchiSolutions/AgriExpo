@@ -701,6 +701,10 @@ const demootp = mongoose.Schema({
   expired: {
     type: Boolean,
     default: true
+  },
+  otpExpiedTime:{
+    type: Number,
+    
   }
 });
 const Demootpverify = mongoose.model('demootp', demootp);

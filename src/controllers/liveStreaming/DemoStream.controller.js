@@ -165,7 +165,10 @@ const start_cloud_record = catchAsync(async (req, res) => {
   const data = await demostream.recording_start(req.query.id);
   res.send(data);
 })
-
+const verification_sms_send= catchAsync(async (req, res) => {
+  const data = await demostream.verification_sms_send(req);
+  res.send(data);
+})
 module.exports = {
   send_livestream_link,
   get_stream_details,
@@ -199,5 +202,6 @@ module.exports = {
   verify_otp,
   send_multible_sms_send,
   start_cloud_record,
-  get_stream_details_check_golive
+  get_stream_details_check_golive,
+  verification_sms_send
 };
