@@ -90,7 +90,7 @@ const send_livestream_link = async (req) => {
     createdBy: userID,
     _id: id,
     transaction: transaction,
-    // endTime: moment().add(15, 'minutes'),
+    tokenExp:moment().add(30, 'minutes')
   });
   // endTime: moment().add(15, 'minutes'),
   const payload = {
@@ -282,38 +282,8 @@ const verifyToken = async (req) => {
   }
   let user = await Demoseller.findById(token.userID);
   let mobileNumber = user.phoneNumber;
-  let res = await send_otp(token);
-
-  return { token, res, mobileNumber };
+  return { token, mobileNumber };
 };
-
-const send_otp = async (stream) => {
-  let OTPCODE = Math.floor(100000 + Math.random() * 900000);
-  const token = await Demoseller.findById(stream.userID);
-  await Demootpverify.updateMany(
-    { streamID: stream._id, verify: false },
-    { $set: { verify: true, expired: true } },
-    { new: true }
-  );
-  let otp = await Demootpverify.create({
-    OTP: OTPCODE,
-    verify: false,
-    mobile: token.phoneNumber,
-    streamID: stream._id,
-    DateIso: moment(),
-    userID: stream.userID,
-    expired: false,
-  });
-
-  let message = `Dear ${token.name},thank you for the registration to the event AgriExpoLive2023 .Your OTP for logging into the account is ${OTPCODE}- AgriExpoLive2023(An Ookam company event)`;
-  let reva = await axios.get(
-    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${token.phoneNumber}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168958877302526`
-  );
-  // return reva.data;
-
-  return { otp, opt_Res: reva.data };
-};
-
 const get_stream_verify_buyer = async (req) => {
   console.log(req.query.id);
   const token = await Demostream.findById(req.query.id);
@@ -1052,6 +1022,7 @@ const go_live = async (req) => {
       dateISO: moment(),
       userID: demostream.userID,
     });
+    demostream.startTime = moment();
     demostream.endTime = expirationTimestamp * 1000;
     demostream.status = 'On-Going';
     demostream.save();
@@ -1540,8 +1511,17 @@ const send_sms_now = async (req) => {
 
 const verify_otp = async (req) => {
   let { otp, stream } = req.body;
-
-  let verify = await Demootpverify.findOne({ streamID: stream, OTP: otp, verify: false, expired: false });
+  const token = await Demostream.findById(stream);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  try {
+    const payload = jwt.verify(token.streamValitity, 'demoStream');
+  } catch (err) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+  }
+  let Datenow = new Date().getTime();
+  let verify = await Demootpverify.findOne({ streamID: stream, OTP: otp, verify: false, expired: false, otpExpiedTime: { $gt: Datenow } });
   if (!verify) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Invalid OTP');
   } else {
@@ -1778,6 +1758,57 @@ const recording_query = async (id, agoraToken) => {
   console.log(4, 5);
   return query.data;
 };
+
+const verification_sms_send = async (req) => {
+  const token = await Demostream.findById(req.query.id);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  try {
+    const payload = jwt.verify(token.streamValitity, 'demoStream');
+  } catch (err) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+  }
+  let res = await send_otp(token);
+  return res;
+}
+
+const send_otp = async (stream) => {
+  let OTPCODE = Math.floor(100000 + Math.random() * 900000);
+  let Datenow = new Date().getTime();
+  let otpsend = await Demootpverify.findOne({ streamID: stream._id, otpExpiedTime: { $gte: Datenow }, verify: false, expired: false, })
+  console.log(otpsend)
+  if (!otpsend) {
+    const token = await Demoseller.findById(stream.userID);
+    await Demootpverify.updateMany(
+      { streamID: stream._id, verify: false },
+      { $set: { verify: true, expired: true } },
+      { new: true }
+    );
+    let exp = moment().add(3, 'minutes');
+    let otp = await Demootpverify.create({
+      OTP: OTPCODE,
+      verify: false,
+      mobile: token.phoneNumber,
+      streamID: stream._id,
+      DateIso: moment(),
+      userID: stream.userID,
+      expired: false,
+      otpExpiedTime: exp
+    });
+    let message = `Dear ${token.name},thank you for the registration to the event AgriExpoLive2023 .Your OTP for logging into the account is ${OTPCODE}- AgriExpoLive2023(An Ookam company event)`;
+    let reva = await axios.get(
+      `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${token.phoneNumber}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168958877302526`
+    );
+    // return reva.data;
+    otpsend = { otpExpiedTime: otp.otpExpiedTime }
+  }
+  else {
+    otpsend = { otpExpiedTime: otpsend.otpExpiedTime }
+  }
+  return otpsend;
+};
+
 module.exports = {
   send_livestream_link,
   verifyToken,
@@ -1811,5 +1842,6 @@ module.exports = {
   send_sms_now,
   verify_otp,
   send_multible_sms_send,
-  recording_start
+  recording_start,
+  verification_sms_send
 };

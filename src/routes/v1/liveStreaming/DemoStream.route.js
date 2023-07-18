@@ -44,6 +44,7 @@ router.route('/verify/sms/now').post(demostream.verify_otp);
 
 router.route('/multible/sms/send').post(demostream.send_multible_sms_send);
 router.route('/start/cloud/record').get(demostream.start_cloud_record);
+router.route('/verification/sms/send').get(demostream.verification_sms_send);
 
 
 // router.route('').get(demostream.send_sms_now);

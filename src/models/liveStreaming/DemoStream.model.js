@@ -99,6 +99,12 @@ const demostreamchema = mongoose.Schema({
   otp_verifiyed_status: {
     type: String,
     default: "Pending"
+  },
+  startTime:{
+    type: Number,
+  },
+  tokenExp:{
+    type: Number,
   }
 });
 
@@ -701,6 +707,10 @@ const demootp = mongoose.Schema({
   expired: {
     type: Boolean,
     default: true
+  },
+  otpExpiedTime:{
+    type: Number,
+
   }
 });
 const Demootpverify = mongoose.model('demootp', demootp);
