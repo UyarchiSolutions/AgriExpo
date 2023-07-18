@@ -35,7 +35,7 @@ const getFeedbackWithPagination = async (page) => {
 };
 
 /**
- *feedback
+ *Tech Issues
  **/
 
 const createTecIssues = async (body) => {
