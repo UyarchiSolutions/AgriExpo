@@ -1510,6 +1510,15 @@ const send_sms_now = async (req) => {
 
 const verify_otp = async (req) => {
   let { otp, stream } = req.body;
+  const token = await Demostream.findById(stream);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  try {
+    const payload = jwt.verify(token.streamValitity, 'demoStream');
+  } catch (err) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+  }
   let Datenow = new Date().getTime();
   let verify = await Demootpverify.findOne({ streamID: stream, OTP: otp, verify: false, expired: false, otpExpiedTime: { $gt: Datenow } });
   if (!verify) {
@@ -1751,6 +1760,14 @@ const recording_query = async (id, agoraToken) => {
 
 const verification_sms_send = async (req) => {
   const token = await Demostream.findById(req.query.id);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  try {
+    const payload = jwt.verify(token.streamValitity, 'demoStream');
+  } catch (err) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+  }
   let res = await send_otp(token);
   return res;
 }
@@ -1758,7 +1775,7 @@ const verification_sms_send = async (req) => {
 const send_otp = async (stream) => {
   let OTPCODE = Math.floor(100000 + Math.random() * 900000);
   let Datenow = new Date().getTime();
-  let otpsend = await Demootpverify.findOne({ streamID: stream._id, otpExpiedTime: { $gte: Datenow } })
+  let otpsend = await Demootpverify.findOne({ streamID: stream._id, otpExpiedTime: { $gte: Datenow }, verify: false, expired: false, })
   console.log(otpsend)
   if (!otpsend) {
     const token = await Demoseller.findById(stream.userID);
@@ -1783,7 +1800,7 @@ const send_otp = async (stream) => {
       `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${token.phoneNumber}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168958877302526`
     );
     // return reva.data;
-    otpsend = { otpsend: otp.otpExpiedTime }
+    otpsend = { otpExpiedTime: otp.otpExpiedTime }
   }
   else {
     otpsend = { otpExpiedTime: otpsend.otpExpiedTime }
