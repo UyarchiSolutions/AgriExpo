@@ -33,7 +33,7 @@ const createSlotBooking = async (body, userId) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Slot not Available');
   }
 
-  findSlot = await purchasePlan.updateOne(
+  await purchasePlan.updateOne(
     {
       _id: body.PlanId,
       slotInfo: {
