@@ -198,7 +198,7 @@ const createTecIssues = catchAsync(async (req, res) => {
 });
 
 const get_TechIssue = catchAsync(async (req, res) => {
-  const TechIssue = await demostream.get_TechIssue_Pagination(req.params.page);
+  const TechIssue = await demostream.get_TechIssue_Pagination(req);
   res.status(httpStatus.OK).send(TechIssue);
 });
 
