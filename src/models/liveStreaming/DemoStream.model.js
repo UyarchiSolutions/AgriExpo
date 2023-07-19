@@ -75,7 +75,7 @@ const demostreamchema = mongoose.Schema({
   },
   userList: {
     type: Array,
-    default: []
+    default: [],
   },
   end_Status: {
     type: String,
@@ -85,7 +85,7 @@ const demostreamchema = mongoose.Schema({
   },
   status: {
     type: String,
-    default: "Pending"
+    default: 'Pending',
   },
   createdBy: {
     type: String,
@@ -98,14 +98,14 @@ const demostreamchema = mongoose.Schema({
   },
   otp_verifiyed_status: {
     type: String,
-    default: "Pending"
+    default: 'Pending',
   },
   startTime: {
     type: Number,
   },
   tokenExp: {
     type: Number,
-  }
+  },
 });
 
 const Demostream = mongoose.model('demostream', demostreamchema);
@@ -187,8 +187,7 @@ const Demobuyerschema = mongoose.Schema({
   },
   name: {
     type: String,
-  }
-
+  },
 });
 
 const Demobuyer = mongoose.model('demobuyer', Demobuyerschema);
@@ -260,7 +259,7 @@ const Demoorderschema = mongoose.Schema({
   },
   userId: {
     type: String,
-  }
+  },
 });
 
 const Demoorder = mongoose.model('demoorder', Demoorderschema);
@@ -309,7 +308,7 @@ const Demoorderproductschema = mongoose.Schema({
   },
   streamPostId: {
     type: String,
-  }
+  },
 });
 
 const Demoorderproduct = mongoose.model('demoorderproduct', Demoorderproductschema);
@@ -359,11 +358,10 @@ const Demostreamchema = mongoose.Schema({
   golive: {
     type: Boolean,
     default: false,
-  }
+  },
 });
 
 const DemostreamToken = mongoose.model('demostreamtoken', Demostreamchema);
-
 
 const Democartchame = mongoose.Schema({
   _id: {
@@ -406,14 +404,10 @@ const Democartchame = mongoose.Schema({
   },
   userId: {
     type: String,
-  }
+  },
 });
 
-
-
-
 const Democart = mongoose.model('democart', Democartchame);
-
 
 const Democartproductschema = mongoose.Schema({
   _id: {
@@ -473,7 +467,7 @@ const Democartproductschema = mongoose.Schema({
   },
   cardStatus: {
     type: Boolean,
-    default: true
+    default: true,
   },
   add_to_cart: {
     type: Boolean,
@@ -492,7 +486,7 @@ const Democartproductschema = mongoose.Schema({
   },
   userId: {
     type: String,
-  }
+  },
 });
 
 const Democartproduct = mongoose.model('democartproduct', Democartproductschema);
@@ -596,9 +590,6 @@ const streamingPaymant = mongoose.Schema({
 });
 const Demopaymnt = mongoose.model('demopayment', streamingPaymant);
 
-
-
-
 const demointrestedschema = mongoose.Schema({
   _id: {
     type: String,
@@ -630,11 +621,9 @@ const demointrestedschema = mongoose.Schema({
   },
   intrested: {
     type: Boolean,
-  }
+  },
 });
 const DemoInstested = mongoose.model('demointrested', demointrestedschema);
-
-
 
 const demosavedproductschema = mongoose.Schema({
   _id: {
@@ -667,12 +656,9 @@ const demosavedproductschema = mongoose.Schema({
   },
   saved: {
     type: Boolean,
-  }
+  },
 });
 const Demosavedproduct = mongoose.model('demosavedproduct', demosavedproductschema);
-
-
-
 
 const demootp = mongoose.Schema({
   _id: {
@@ -702,20 +688,17 @@ const demootp = mongoose.Schema({
   },
   verify: {
     type: Boolean,
-    default: true
+    default: true,
   },
   expired: {
     type: Boolean,
-    default: true
+    default: true,
   },
   otpExpiedTime: {
     type: Number,
-
-  }
+  },
 });
 const Demootpverify = mongoose.model('demootp', demootp);
-
-
 
 const democloud_record = mongoose.Schema({
   _id: {
@@ -825,11 +808,11 @@ const democloud_record = mongoose.Schema({
   },
   mainhostLeave: {
     type: Boolean,
-    default: false
+    default: false,
   },
   bigSize: {
     type: Boolean,
-    default: false
+    default: false,
   },
   convertedVideo: {
     type: String,
@@ -838,11 +821,8 @@ const democloud_record = mongoose.Schema({
   convertStatus: {
     type: String,
     default: 'Pending',
-  }
-
+  },
 });
-
-
 
 const FeedBackSchema = new mongoose.Schema(
   {
@@ -891,7 +871,7 @@ const FeedBackSchema = new mongoose.Schema(
     },
     userID: {
       type: String,
-    }
+    },
   },
   { timestamps: true }
 );
@@ -927,13 +907,35 @@ const TechIssueSchema = mongoose.Schema(
     issueId: {
       type: String,
     },
+    userId: {
+      type: String,
+    },
+    status: {
+      type: String,
+      default: 'Pending',
+    },
   },
   { timestamps: true }
 );
 
 const TechIssue = mongoose.model('demotechissue', TechIssueSchema);
 
-
-
 const Democloudrecord = mongoose.model('democloundrecord', democloud_record);
-module.exports = { Demoseller, Demostream, Demopost, Demobuyer, Demoorder, Demoorderproduct, DemostreamToken, Democart, Democartproduct, Demopaymnt, DemoInstested, Demosavedproduct, Demootpverify, Democloudrecord, Feedback, TechIssue };
+module.exports = {
+  Demoseller,
+  Demostream,
+  Demopost,
+  Demobuyer,
+  Demoorder,
+  Demoorderproduct,
+  DemostreamToken,
+  Democart,
+  Democartproduct,
+  Demopaymnt,
+  DemoInstested,
+  Demosavedproduct,
+  Demootpverify,
+  Democloudrecord,
+  Feedback,
+  TechIssue,
+};

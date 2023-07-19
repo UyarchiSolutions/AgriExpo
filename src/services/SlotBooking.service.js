@@ -9,7 +9,6 @@ const createSlotBooking = async (body, userId) => {
   let slotDateISO = moment.utc(slotDate).toDate();
   const startTimeISO = `${slotDate}T${fromTime}:00.000Z`;
   const endTimeISO = `${slotDate}T${endTime}:00.000Z`;
-
   let data = {
     slotDate: slotDateISO,
     fromTime: startTimeISO,
@@ -34,7 +33,7 @@ const createSlotBooking = async (body, userId) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Slot not Available');
   }
 
-  findSlot = await purchasePlan.updateOne(
+  await purchasePlan.updateOne(
     {
       _id: body.PlanId,
       slotInfo: {
@@ -56,6 +55,13 @@ const createSlotBooking = async (body, userId) => {
   return creation;
 };
 
+const getBooked_Slot = async (userId, page) => {
+  let val = await SlotBooking.aggregate([{ $elemMatch: { userId: userId } }, { $kip: page * 10 }, { $limit: 10 }]);
+  let total = SlotBooking.aggregate([{ $elemMatch: { userId: userId } }, { $kip: 10 * (page + 1) }, { $limit: 10 }]);
+  return { val, next: total.length != 0 };
+};
+
 module.exports = {
   createSlotBooking,
+  getBooked_Slot,
 };

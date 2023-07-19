@@ -9,6 +9,13 @@ const createSlotBooking = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(slotBooking);
 });
 
+const getBooked_Slot = catchAsync(async (req, res) => {
+  let userId = req.userId;
+  const slotBooking = await SlotBookingService.getBooked_Slot(userId, req.params.page);
+  res.status(httpStatus.OK).send(slotBooking);
+});
+
 module.exports = {
   createSlotBooking,
+  getBooked_Slot,
 };
