@@ -1955,6 +1955,7 @@ const get_TechIssue_Pagination = async (page) => {
         createdAt: 1,
         userName: '$user.name',
         userNumber: '$user.phoneNumber',
+        Issue_type: 1,
       },
     },
     {
