@@ -910,6 +910,10 @@ const TechIssueSchema = mongoose.Schema(
     userId: {
       type: String,
     },
+    status: {
+      type: String,
+      default: 'Pending',
+    },
   },
   { timestamps: true }
 );

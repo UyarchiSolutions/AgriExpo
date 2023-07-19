@@ -1899,6 +1899,31 @@ const update_TechIssue = async (id, body) => {
 const get_TechIssue_Pagination = async (page) => {
   let techIssue = await TechIssue.aggregate([
     {
+      $lookup: {
+        from: 'demosellers',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$user',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        status: { $ifNull: ['$status', 'Pending'] },
+        Issue_description: 1,
+        issueId: 1,
+        createdAt: 1,
+        userName: '$user.name',
+        userNumber: '$user.phoneNumber',
+      },
+    },
+    {
       $skip: page * 10,
     },
     {
@@ -1906,7 +1931,16 @@ const get_TechIssue_Pagination = async (page) => {
     },
   ]);
 
-  return techIssue;
+  let total = await TechIssue.aggregate([
+    {
+      $skip: 10 * (page + 1),
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+
+  return { value: techIssue, next: total.length != 0 };
 };
 
 module.exports = {
