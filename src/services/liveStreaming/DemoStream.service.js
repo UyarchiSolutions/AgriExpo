@@ -101,7 +101,7 @@ const send_livestream_link = async (req) => {
     type: 'demostream',
   };
   let valitity = jwt.sign(payload, secret, {
-    expiresIn: '30m', // Set token expiration to 30 minutes
+    expiresIn: '300m', // Set token expiration to 30 minutes
   });
   demostream.streamValitity = valitity;
   demostream.save();
