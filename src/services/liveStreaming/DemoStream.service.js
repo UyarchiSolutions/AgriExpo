@@ -2005,11 +2005,11 @@ const get_TechIssue_Pagination = async (page) => {
 
 const get_completed_stream = async (req) => {
   const stream = await Demostream.findById(req.query.id);
-  if (!token) {
+  if (!stream) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
   }
   try {
-    const payload = jwt.verify(token.streamValitity, 'demoStream');
+    const payload = jwt.verify(stream.streamValitity, 'demoStream');
   } catch (err) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
   }
