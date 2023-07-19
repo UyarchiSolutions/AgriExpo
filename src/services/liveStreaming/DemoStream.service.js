@@ -1583,7 +1583,7 @@ const cloude_recording_stream = async (stream, app, endTime) => {
           )}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
           { headers: { Authorization } }
         )
-        .then((res) => {})
+        .then((res) => { })
         .catch(async (error) => {
           console.log('error');
           await Democloudrecord.findByIdAndUpdate({ _id: record._id }, { recoredStart: 'stop' }, { new: true });
@@ -2003,6 +2003,21 @@ const get_TechIssue_Pagination = async (page) => {
   return { value: techIssue, next: next.length != 0, total: total.length };
 };
 
+const get_completed_stream = async (req) => {
+  const stream = await Demostream.findById(req.query.id);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  try {
+    const payload = jwt.verify(token.streamValitity, 'demoStream');
+  } catch (err) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+  }
+  const cloud = await Democloudrecord.find({ streamId: req.query.id, videoLink: { $ne: null } });
+
+  return { stream, cloud }
+}
+
 module.exports = {
   send_livestream_link,
   verifyToken,
@@ -2046,4 +2061,5 @@ module.exports = {
   get_TechIssue,
   update_TechIssue,
   get_TechIssue_Pagination,
+  get_completed_stream
 };
