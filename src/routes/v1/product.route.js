@@ -5,6 +5,7 @@ const stockImage = require('../../middlewares/stock');
 const bill = require('../../middlewares/bills');
 const router = express.Router();
 const productservice = require('../../services/product.service');
+const { SellerAuth } = require('../../controllers/sellerAuth.controller');
 router
   .route('/create')
   .post(
@@ -103,4 +104,5 @@ router.route('/setprice/details/:page').get(productController.get_Set_price_prod
 router.route('/getproduct/stock/:type').get(productController.get_random_product);
 router.route('/get/product/by/category/:id').get(productController.getProductbycategory);
 router.route('/getDataby/Categories/:value').get(productController.getDatabyCategories);
+router.route('/createCustomer/Request/Product').post(SellerAuth, productController.createCustomerRequestProduct);
 module.exports = router;
