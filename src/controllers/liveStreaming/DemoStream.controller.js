@@ -208,7 +208,7 @@ const update_TechIssue = catchAsync(async (req, res) => {
 });
 
 const get_completed_stream= catchAsync(async (req, res) => {
-  const TechIssue = await demostream.get_completed_stream(req, params.id, req.body);
+  const TechIssue = await demostream.get_completed_stream(req);
   res.status(httpStatus.OK).send(TechIssue);
 });
 
