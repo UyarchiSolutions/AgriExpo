@@ -1896,8 +1896,9 @@ const update_TechIssue = async (id, body) => {
   return techIssue;
 };
 
-const get_TechIssue_Pagination = async (page) => {
+const get_TechIssue_Pagination = async (req) => {
   let stream = req.query.id;
+  let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : req.query.page;
   const token = await Demostream.findById(req.query.id);
   if (!token) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
