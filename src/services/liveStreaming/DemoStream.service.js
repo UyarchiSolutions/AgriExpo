@@ -1897,7 +1897,18 @@ const update_TechIssue = async (id, body) => {
 };
 
 const get_TechIssue_Pagination = async (page) => {
+  let stream = req.query.id;
+  const token = await Demostream.findById(req.query.id);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  try {
+    const payload = jwt.verify(token.streamValitity, 'demoStream');
+  } catch (err) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+  }
   let techIssue = await TechIssue.aggregate([
+    { $match: { $and: [{ userId: { $eq: token.userID } }] } },
     {
       $lookup: {
         from: 'demosellers',
@@ -1933,6 +1944,7 @@ const get_TechIssue_Pagination = async (page) => {
   ]);
 
   let next = await TechIssue.aggregate([
+    { $match: { $and: [{ userId: { $eq: token.userID } }] } },
     {
       $lookup: {
         from: 'demosellers',
@@ -1967,6 +1979,7 @@ const get_TechIssue_Pagination = async (page) => {
     },
   ]);
   let total = await TechIssue.aggregate([
+    { $match: { $and: [{ userId: { $eq: token.userID } }] } },
     {
       $lookup: {
         from: 'demosellers',
