@@ -105,4 +105,5 @@ router.route('/getproduct/stock/:type').get(productController.get_random_product
 router.route('/get/product/by/category/:id').get(productController.getProductbycategory);
 router.route('/getDataby/Categories/:value').get(productController.getDatabyCategories);
 router.route('/createCustomer/Request/Product').post(SellerAuth, productController.createCustomerRequestProduct);
+router.route('/getCustomer/all/Request/Product').get(productController.getAllCustomerRequestProduct);
 module.exports = router;

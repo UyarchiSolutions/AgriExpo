@@ -496,6 +496,11 @@ const createCustomerRequestProduct = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getAllCustomerRequestProduct = catchAsync(async (req, res) => {
+  const data = await productService.getAllCustomerRequestProduct();
+  res.send(data);
+});
+
 module.exports = {
   createProduct,
   getAllienceBySupplierId,
@@ -568,4 +573,5 @@ module.exports = {
   getProductbycategory,
   getDatabyCategories,
   createCustomerRequestProduct,
+  getAllCustomerRequestProduct,
 };

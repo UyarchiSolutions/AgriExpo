@@ -2090,6 +2090,26 @@ const createCustomerRequestProduct = async (body, userId) => {
   return await CustomerRequestProduct.create({ ...body, ...{ userId: userId } });
 };
 
+const getAllCustomerRequestProduct = async () => {
+  const data = await CustomerRequestProduct.aggregate([
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'users',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$users',
+      },
+    },
+  ]);
+  return data;
+};
+
 module.exports = {
   createProduct,
   getTrendsData,
@@ -2165,4 +2185,5 @@ module.exports = {
   getProductbycategory,
   getDatabyCategories,
   createCustomerRequestProduct,
+  getAllCustomerRequestProduct,
 };
