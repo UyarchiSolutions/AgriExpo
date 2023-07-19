@@ -910,6 +910,9 @@ const TechIssueSchema = mongoose.Schema(
     userId: {
       type: String,
     },
+    streamID: {
+      type: String,
+    },
     status: {
       type: String,
       default: 'Pending',

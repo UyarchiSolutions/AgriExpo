@@ -198,12 +198,17 @@ const createTecIssues = catchAsync(async (req, res) => {
 });
 
 const get_TechIssue = catchAsync(async (req, res) => {
-  const TechIssue = await demostream.get_TechIssue_Pagination(req.params.page);
+  const TechIssue = await demostream.get_TechIssue_Pagination(req);
   res.status(httpStatus.OK).send(TechIssue);
 });
 
 const update_TechIssue = catchAsync(async (req, res) => {
   const TechIssue = await demostream.update_TechIssue(req, params.id, req.body);
+  res.status(httpStatus.OK).send(TechIssue);
+});
+
+const get_completed_stream= catchAsync(async (req, res) => {
+  const TechIssue = await demostream.get_completed_stream(req);
   res.status(httpStatus.OK).send(TechIssue);
 });
 
@@ -249,4 +254,5 @@ module.exports = {
   createTecIssues,
   get_TechIssue,
   update_TechIssue,
+  get_completed_stream
 };

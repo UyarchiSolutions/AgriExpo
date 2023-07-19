@@ -101,7 +101,7 @@ const send_livestream_link = async (req) => {
     type: 'demostream',
   };
   let valitity = jwt.sign(payload, secret, {
-    expiresIn: '30m', // Set token expiration to 30 minutes
+    expiresIn: '60m', // Set token expiration to 30 minutes
   });
   demostream.streamValitity = valitity;
   demostream.save();
@@ -1583,7 +1583,7 @@ const cloude_recording_stream = async (stream, app, endTime) => {
           )}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
           { headers: { Authorization } }
         )
-        .then((res) => {})
+        .then((res) => { })
         .catch(async (error) => {
           console.log('error');
           await Democloudrecord.findByIdAndUpdate({ _id: record._id }, { recoredStart: 'stop' }, { new: true });
@@ -1896,8 +1896,19 @@ const update_TechIssue = async (id, body) => {
   return techIssue;
 };
 
-const get_TechIssue_Pagination = async (page) => {
+const get_TechIssue_Pagination = async (req) => {
+  let page = req.params.page == '' || req.params.page == null || req.params.page == null ? 0 : req.params.page;
+  const token = await Demostream.findById(req.query.id);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  try {
+    const payload = jwt.verify(token.streamValitity, 'demoStream');
+  } catch (err) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+  }
   let techIssue = await TechIssue.aggregate([
+    { $match: { $and: [{ userId: { $eq: token.userID } }] } },
     {
       $lookup: {
         from: 'demosellers',
@@ -1933,6 +1944,7 @@ const get_TechIssue_Pagination = async (page) => {
   ]);
 
   let next = await TechIssue.aggregate([
+    { $match: { $and: [{ userId: { $eq: token.userID } }] } },
     {
       $lookup: {
         from: 'demosellers',
@@ -1967,6 +1979,7 @@ const get_TechIssue_Pagination = async (page) => {
     },
   ]);
   let total = await TechIssue.aggregate([
+    { $match: { $and: [{ userId: { $eq: token.userID } }] } },
     {
       $lookup: {
         from: 'demosellers',
@@ -2002,6 +2015,21 @@ const get_TechIssue_Pagination = async (page) => {
   ]);
   return { value: techIssue, next: next.length != 0, total: total.length };
 };
+
+const get_completed_stream = async (req) => {
+  const stream = await Demostream.findById(req.query.id);
+  if (!stream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
+  }
+  try {
+    const payload = jwt.verify(stream.streamValitity, 'demoStream');
+  } catch (err) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+  }
+  const cloud = await Democloudrecord.find({ streamId: req.query.id, videoLink: { $ne: null } });
+
+  return { stream, cloud }
+}
 
 module.exports = {
   send_livestream_link,
@@ -2046,4 +2074,5 @@ module.exports = {
   get_TechIssue,
   update_TechIssue,
   get_TechIssue_Pagination,
+  get_completed_stream
 };
