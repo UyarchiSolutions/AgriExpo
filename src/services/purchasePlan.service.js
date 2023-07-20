@@ -461,8 +461,6 @@ const Approve_Reject = async (id, body) => {
   }
   if (body.status == 'Approved') {
     values = await purchasePlan.findByIdAndUpdate({ _id: id }, { status: body.status }, { new: true });
-    // slotInfo
-    // Slotseperation
     values.slotInfo.forEach(async (e) => {
       // suppierId
       await Slotseperation.create({

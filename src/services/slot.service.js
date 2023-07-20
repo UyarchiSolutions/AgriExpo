@@ -85,6 +85,8 @@ const getSlots_Minutse_Wise = async () => {
         _id: {
           Type: '$Type',
           Duration: '$Duration',
+          startFormat: '$startFormat',
+          endFormat: '$endFormat',
         },
         count: { $sum: 1 },
       },
@@ -95,11 +97,40 @@ const getSlots_Minutse_Wise = async () => {
         Type: '$_id.Type',
         Duration: '$_id.Duration',
         count: '$count',
+        startFormat: '$_id.StartFormat',
+        endFormat: '$_id.EndFormat',
       },
     },
   ]);
 
   return value;
+};
+
+const getDetailsForSlotChoosing = async () => {
+  let val = await Slot.aggregate([
+    {
+      $group: {
+        _id: {
+          date: '$date',
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        date: '$_id.date',
+      },
+    },
+  ]);
+  let datas = await Slot.aggregate([
+    {
+      $group: {
+        _id: '$Type',
+        documents: { $push: '$$ROOT' },
+      },
+    },
+  ]);
+  return { dates: val, datas: datas };
 };
 
 module.exports = {
@@ -108,4 +139,5 @@ module.exports = {
   UpdateSlotById,
   DeleteSlotById,
   getSlots_Minutse_Wise,
+  getDetailsForSlotChoosing,
 };
