@@ -479,6 +479,71 @@ const Approve_Reject = async (id, body) => {
   return values;
 };
 
+const getPlanDetailsByUser = async (userId) => {
+  let val = await purchasePlan.aggregate([
+    {
+      $match: { status: 'Approved', suppierId: userId },
+    },
+    {
+      $lookup: {
+        from: 'slotseperations',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [
+          {
+            $match: {
+              SlotType: 'Normal',
+            },
+          },
+        ],
+        as: 'NormalSlot',
+      },
+    },
+    {
+      $lookup: {
+        from: 'slotseperations',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [
+          {
+            $match: {
+              SlotType: 'Peak',
+            },
+          },
+        ],
+        as: 'PeakSlot',
+      },
+    },
+    {
+      $lookup: {
+        from: 'slotseperations',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [
+          {
+            $match: {
+              SlotType: 'Exclusive',
+            },
+          },
+        ],
+        as: 'ExclusiveSlot',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        active: 1,
+        status: 1,
+        planName: 1,
+        Normal: { $size: '$NormalSlot' },
+        Peak: { $size: '$PeakSlot' },
+        Exclusive: { $size: '$ExclusiveSlot' },
+      },
+    },
+  ]);
+  return val;
+};
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -496,4 +561,5 @@ module.exports = {
   UploadProof,
   getPlanyById,
   Approve_Reject,
+  getPlanDetailsByUser,
 };

@@ -2,16 +2,16 @@ const express = require('express');
 const purchasePlan = require('../../controllers/purchasePlan.controller');
 const supplierAuth = require('../../controllers/supplier.authorizations');
 const { SetPass, SellerAuth } = require('../../controllers/sellerAuth.controller');
-const PlanImage = require('../../middlewares/plan')
+const PlanImage = require('../../middlewares/plan');
 const router = express.Router();
 const multer = require('multer');
 
 const storage = multer.memoryStorage({
-    destination: function (req, res, callback) {
-      callback(null, '');
-    },
-  });
-  const upload = multer({ storage }).single('Paidimage');
+  destination: function (req, res, callback) {
+    callback(null, '');
+  },
+});
+const upload = multer({ storage }).single('Paidimage');
 
 router.route('/purchase/suceess').post(SellerAuth, purchasePlan.create_purchase_plan);
 router.route('/purchase/addon/suceess').post(SellerAuth, purchasePlan.create_purchase_plan_addon);
@@ -27,5 +27,6 @@ router.route('/update/:id').put(purchasePlan.updatePurchasedPlanById);
 router.route('/get/All/Planes/:page').get(purchasePlan.get_All_Planes);
 router.route('/Change/Purchased/Plan/:id').put(purchasePlan.ChangePurchasedPlan);
 router.route('/UploadProof/plan/:id').put(upload, purchasePlan.UploadProof);
-router.route('/Approve/Reject/:id').put(purchasePlan.Approve_Reject)
+router.route('/Approve/Reject/:id').put(purchasePlan.Approve_Reject);
+router.route('/get/PlanDetails/ByUser').get(SellerAuth, purchasePlan.getPlanDetailsByUser);
 module.exports = router;
