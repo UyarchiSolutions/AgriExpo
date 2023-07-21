@@ -2,55 +2,37 @@ const httpStatus = require('http-status');
 const { SlotBooking } = require('../models/SlotBooking.model');
 const ApiError = require('../utils/ApiError');
 const { purchasePlan } = require('../models/purchasePlan.model');
+const { Slotseperation } = require('../models/slot.model');
 const moment = require('moment');
 
 const createSlotBooking = async (body, userId) => {
-  const { slotDate, fromTime, endTime } = body;
-  let slotDateISO = moment.utc(slotDate).toDate();
-  const startTimeISO = `${slotDate}T${fromTime}:00.000Z`;
-  const endTimeISO = `${slotDate}T${endTime}:00.000Z`;
-  let data = {
-    slotDate: slotDateISO,
-    fromTime: startTimeISO,
-    endTime: endTimeISO,
-    Durations: body.Durations,
-    slotType: body.slotType,
-    PlanId: body.PlanId,
-    userId: userId,
-    SlotDuration: body.SlotDuration,
-  };
-  let findSlot = await purchasePlan.findOne({
-    _id: body.PlanId,
-    slotInfo: {
-      $elemMatch: {
-        No_Of_Slot: { $gt: 0 },
-        Duration: body.SlotDuration,
-        slotType: body.slotType,
-      },
-    },
-  });
-  if (!findSlot) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Slot not Available');
-  }
+  const { Date, planId, slotId, Type, duration } = body;
+  console.log(body);
 
-  await purchasePlan.updateOne(
-    {
-      _id: body.PlanId,
-      slotInfo: {
-        $elemMatch: {
-          No_Of_Slot: { $gt: 0 },
-          Duration: body.SlotDuration,
-          slotType: body.slotType,
-        },
-      },
-    },
-    {
-      $inc: {
-        'slotInfo.$.No_Of_Slot': -1,
-      },
-    },
+  let findAvailableSlot = await Slotseperation.findOne({
+    PlanId: planId,
+    userId: userId,
+    SlotType: Type,
+    Duration: duration,
+  });
+  if (findAvailableSlot.Slots == 0) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Max Slot Finished');
+  }
+  let usedSlots = findAvailableSlot.usedSlots + 1;
+  let availableSlot = findAvailableSlot.Slots - 1;
+  findAvailableSlot = await Slotseperation.findByIdAndUpdate(
+    { _id: findAvailableSlot._id },
+    { Slots: availableSlot, usedSlots: usedSlots },
     { new: true }
   );
+  let data = {
+    slotId: slotId,
+    Durations: duration,
+    slotType: Type,
+    PlanId: planId,
+    userId: userId,
+    slotDate: Date,
+  };
   let creation = await SlotBooking.create(data);
   return creation;
 };
