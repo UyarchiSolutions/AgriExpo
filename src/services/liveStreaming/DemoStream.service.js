@@ -1882,7 +1882,7 @@ const createTecIssues = async (body) => {
   if (!findstream) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid Stream Id');
   }
-  const techIssue = await TechIssue.create({ ...body, ...{ issueId: issueId, userId: findstream.userID } });
+  const techIssue = await TechIssue.create({ ...body, ...{ streamID: body.streamId, issueId: issueId, userId: findstream.userID } });
   return techIssue;
 };
 
