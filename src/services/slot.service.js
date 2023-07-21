@@ -139,8 +139,8 @@ const getSlotsWitdSort = async (data) => {
   let val = await Slotseperation.aggregate([
     {
       $match: {
-        SlotType: type,
-        Duration: parseInt(Duration),
+        SlotType: { $in: type },
+        Duration: { $in: Duration },
         PlanId: PlanId,
       },
     },
