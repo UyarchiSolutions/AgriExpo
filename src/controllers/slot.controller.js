@@ -28,10 +28,16 @@ const getSlots_Minutse_Wise = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getDetailsForSlotChoosing = catchAsync(async (req, res) => {
+  const data = await SlotService.getDetailsForSlotChoosing();
+  res.send(data);
+});
+
 module.exports = {
   SlotCreation,
   Fetch_Slot,
   UpdateSlotById,
   DeleteSlotById,
   getSlots_Minutse_Wise,
+  getDetailsForSlotChoosing,
 };

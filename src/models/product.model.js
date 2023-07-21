@@ -406,6 +406,38 @@ const shopListSchema = new mongoose.Schema({
 });
 
 const ShopList = mongoose.model('shopList', shopListSchema);
+
+const CustomerRequestProductSchema = new mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+    category: {
+      type: String,
+    },
+    subcategory: {
+      type: String,
+    },
+    productName: {
+      type: String,
+    },
+    brandName: {
+      type: String,
+    },
+    userId: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
+
+const CustomerRequestProduct = mongoose.model('CustomerRequestProduct', CustomerRequestProductSchema);
+
 module.exports = {
   Stock,
   Product,
@@ -414,4 +446,5 @@ module.exports = {
   BillRaise,
   ManageBill,
   ShopList,
+  CustomerRequestProduct,
 };

@@ -99,15 +99,21 @@ const UploadProof = catchAsync(async (req, res) => {
   res.send(data);
 });
 
-const getPlanyById = catchAsync(async(req,res) => {
+const getPlanyById = catchAsync(async (req, res) => {
   const data = await purchasePlan.getPlanyById(req.params.id);
   res.send(data);
-})
+});
 
-const Approve_Reject = catchAsync(async(req,res) => {
+const Approve_Reject = catchAsync(async (req, res) => {
   const data = await purchasePlan.Approve_Reject(req.params.id, req.body);
   res.send(data);
-})
+});
+
+const getPlanDetailsByUser = catchAsync(async (req, res) => {
+  let userId = req.userId;
+  const data = await purchasePlan.getPlanDetailsByUser(userId);
+  res.send(data);
+});
 
 module.exports = {
   create_purchase_plan,
@@ -126,4 +132,5 @@ module.exports = {
   UploadProof,
   getPlanyById,
   Approve_Reject,
+  getPlanDetailsByUser,
 };

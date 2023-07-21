@@ -34,4 +34,39 @@ const SlotSchema = new mongoose.Schema(
 
 const Slot = mongoose.model('slot', SlotSchema);
 
-module.exports = { Slot };
+const SlotseperationSchema = mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    SlotType: {
+      type: String,
+    },
+    Duration: Number,
+    PlanId: {
+      type: String,
+    },
+    Slots: Number,
+    usedSlots: {
+      type: Number,
+      default: 0,
+    },
+    status: {
+      type: String,
+      default: 'Pending',
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+    userId: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
+
+const Slotseperation = mongoose.model('Slotseperation', SlotseperationSchema);
+
+module.exports = { Slot, Slotseperation };

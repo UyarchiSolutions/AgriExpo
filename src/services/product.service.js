@@ -1,5 +1,14 @@
 const httpStatus = require('http-status');
-const { Product, Stock, ConfirmStock, LoadingExecute, BillRaise, ManageBill, ShopList } = require('../models/product.model');
+const {
+  Product,
+  Stock,
+  ConfirmStock,
+  LoadingExecute,
+  BillRaise,
+  ManageBill,
+  ShopList,
+  CustomerRequestProduct,
+} = require('../models/product.model');
 const ApiError = require('../utils/ApiError');
 const Supplier = require('../models/supplier.model');
 const ReceivedOrder = require('../models/receivedOrders.model');
@@ -2073,6 +2082,34 @@ const getDatabyCategories = async (value) => {
   return data;
 };
 
+// customer product Requests
+
+// CustomerRequestProduct --> Model Name
+
+const createCustomerRequestProduct = async (body, userId) => {
+  return await CustomerRequestProduct.create({ ...body, ...{ userId: userId } });
+};
+
+const getAllCustomerRequestProduct = async () => {
+  const data = await CustomerRequestProduct.aggregate([
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'users',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$users',
+      },
+    },
+  ]);
+  return data;
+};
+
 module.exports = {
   createProduct,
   getTrendsData,
@@ -2147,4 +2184,6 @@ module.exports = {
   getstock_opening_product,
   getProductbycategory,
   getDatabyCategories,
+  createCustomerRequestProduct,
+  getAllCustomerRequestProduct,
 };
