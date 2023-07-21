@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const { Slot, Slotseperation } = require('../models/slot.model');
 const ApiError = require('../utils/ApiError');
 const moment = require('moment');
+const { purchasePlan } = require('../models/purchasePlan.model');
 
 const createSlot = async (body) => {
   const { chooseTime, Duration, date, Type } = body;
@@ -134,17 +135,46 @@ const getDetailsForSlotChoosing = async () => {
 };
 
 const getSlotsWitdSort = async (data) => {
-  const { arr, PlanId } = data;
+  const { PlanId } = data;
+  let value = await purchasePlan.findById(PlanId);
+  if (!value) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Availbale');
+  }
+  let matchdata = [];
+  value.slotInfo.forEach((e) => {
+    let val = { Type: e.slotType, Duration: e.Duration };
+    matchdata.push(val);
+  });
 
-  let val = await Slotseperation.aggregate([
+  let val = await Slot.aggregate([
     {
       $match: {
-        $or: arr,
-        PlanId: PlanId,
+        $or: matchdata,
+      },
+    },
+    {
+      $group: {
+        _id: '$Type',
+        documents: { $push: '$$ROOT' },
       },
     },
   ]);
-  return val;
+  let val2 = await Slot.aggregate([
+    {
+      $group: {
+        _id: {
+          date: '$date',
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        date: '$_id.date',
+      },
+    },
+  ]);
+  return { val: val, dates: val2 };
 };
 
 module.exports = {
