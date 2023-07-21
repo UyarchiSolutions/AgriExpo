@@ -134,13 +134,12 @@ const getDetailsForSlotChoosing = async () => {
 };
 
 const getSlotsWitdSort = async (data) => {
-  const { type, Duration, PlanId } = data;
+  const { arr, PlanId } = data;
 
   let val = await Slotseperation.aggregate([
     {
       $match: {
-        SlotType: { $in: type },
-        Duration: { $in: Duration },
+        $or: arr,
         PlanId: PlanId,
       },
     },
