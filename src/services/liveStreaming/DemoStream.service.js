@@ -1882,7 +1882,7 @@ const createTecIssues = async (body) => {
   if (!findstream) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid Stream Id');
   }
-  const techIssue = await TechIssue.create({ ...body, ...{ issueId: issueId, userId: findstream.userID } });
+  const techIssue = await TechIssue.create({ ...body, ...{ streamID: body.streamId, issueId: issueId, userId: findstream.userID } });
   return techIssue;
 };
 
@@ -1908,7 +1908,7 @@ const get_TechIssue_Pagination = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
   }
   let techIssue = await TechIssue.aggregate([
-    { $match: { $and: [{ userId: { $eq: token.userID } }] } },
+    { $match: { $and: [{ streamID: { $eq: token._id } }] } },
     {
       $lookup: {
         from: 'demosellers',
