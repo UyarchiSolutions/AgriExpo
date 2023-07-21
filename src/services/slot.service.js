@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Slot } = require('../models/slot.model');
+const { Slot, Slotseperation } = require('../models/slot.model');
 const ApiError = require('../utils/ApiError');
 const moment = require('moment');
 
@@ -133,6 +133,21 @@ const getDetailsForSlotChoosing = async () => {
   return { dates: val, datas: datas };
 };
 
+const getSlotsWitdSort = async (data) => {
+  const { type, Duration, PlanId } = data;
+
+  let val = await Slotseperation.aggregate([
+    {
+      $match: {
+        SlotType: type,
+        Duration: parseInt(Duration),
+        PlanId: PlanId,
+      },
+    },
+  ]);
+  return val;
+};
+
 module.exports = {
   createSlot,
   Fetch_Slot,
@@ -140,4 +155,5 @@ module.exports = {
   DeleteSlotById,
   getSlots_Minutse_Wise,
   getDetailsForSlotChoosing,
+  getSlotsWitdSort,
 };
