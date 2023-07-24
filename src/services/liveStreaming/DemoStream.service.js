@@ -2084,6 +2084,82 @@ const get_completed_stream = async (req) => {
   return { stream, cloud };
 };
 
+const getIssuesWithPagination = async (page) => {
+  let val = await TechIssue.aggregate([
+    {
+      $lookup: {
+        from: 'demosellers',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$user',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        Logi_name: 1,
+        Mobile_number: 1,
+        Issue_type: 1,
+        Issue_description: 1,
+        Others: 1,
+        status: 1,
+        issueId: 1,
+        userId: 1,
+        createdAt: 1,
+        userName: '$user.name',
+        userPhoneNumber: '$user.phoneNumber',
+      },
+    },
+    {
+      $skip: 10 * page,
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+
+  let total = await TechIssue.aggregate([
+    {
+      $lookup: {
+        from: 'demosellers',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$user',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        Logi_name: 1,
+        Mobile_number: 1,
+        Issue_type: 1,
+        Issue_description: 1,
+        Others: 1,
+        status: 1,
+        issueId: 1,
+        userId: 1,
+        createdAt: 1,
+        userName: '$user.name',
+        userPhoneNumber: '$user.phoneNumber',
+      },
+    },
+  ]);
+
+  return { val: val, total: total.length };
+};
+
 module.exports = {
   send_livestream_link,
   verifyToken,
@@ -2128,4 +2204,5 @@ module.exports = {
   update_TechIssue,
   get_TechIssue_Pagination,
   get_completed_stream,
+  getIssuesWithPagination,
 };

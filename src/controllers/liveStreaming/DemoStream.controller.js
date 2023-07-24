@@ -31,7 +31,6 @@ const get_stream_details_check_golive = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(data);
 });
 
-
 const go_live_stream = catchAsync(async (req, res) => {
   const data = await demostream.go_live_stream(req);
   res.status(httpStatus.CREATED).send(data);
@@ -99,77 +98,75 @@ const get_DemoStream_By_Admin = catchAsync(async (req, res) => {
 const manageDemoStream = catchAsync(async (req, res) => {
   const data = await demostream.manageDemoStream(req.params.page);
 
-
   res.send(data);
-})
+});
 
 const my_orders_buyer = catchAsync(async (req, res) => {
   const data = await demostream.my_orders_buyer(req);
   res.send(data);
-})
+});
 const view_order_details = catchAsync(async (req, res) => {
   const data = await demostream.view_order_details(req);
   res.send(data);
-})
+});
 
 const get_exhibitor_order = catchAsync(async (req, res) => {
   const data = await demostream.get_exhibitor_order(req);
   res.send(data);
-})
+});
 const visitor_interested = catchAsync(async (req, res) => {
   const data = await demostream.visitor_interested(req);
   res.send(data);
-})
+});
 const visitor_saved = catchAsync(async (req, res) => {
   const data = await demostream.visitor_saved(req);
   res.send(data);
-})
+});
 
 const visitor_interested_get = catchAsync(async (req, res) => {
   const data = await demostream.visitor_interested_get(req);
   res.send(data);
-})
+});
 const visitor_saved_get = catchAsync(async (req, res) => {
   const data = await demostream.visitor_saved_get(req);
   res.send(data);
-})
+});
 
 const exhibitor_interested_get = catchAsync(async (req, res) => {
   const data = await demostream.exhibitor_interested_get(req);
   res.send(data);
-})
+});
 const exhibitor_myprofile = catchAsync(async (req, res) => {
   const data = await demostream.exhibitor_myprofile(req);
   res.send(data);
-})
+});
 const visitor_myprofile = catchAsync(async (req, res) => {
   const data = await demostream.visitor_myprofile(req);
   res.send(data);
-})
+});
 const send_sms_now = catchAsync(async (req, res) => {
   const data = await demostream.send_sms_now(req);
   res.send(data);
-})
+});
 
 const verify_otp = catchAsync(async (req, res) => {
   const data = await demostream.verify_otp(req);
   res.send(data);
-})
+});
 
 const send_multible_sms_send = catchAsync(async (req, res) => {
   const data = await demostream.send_multible_sms_send(req);
   res.send(data);
-})
+});
 
 const start_cloud_record = catchAsync(async (req, res) => {
   const data = await demostream.recording_start(req.query.id);
   res.send(data);
-})
-const verification_sms_send= catchAsync(async (req, res) => {
+});
+const verification_sms_send = catchAsync(async (req, res) => {
   const data = await demostream.verification_sms_send(req);
   res.send(data);
-})
-
+});
 
 // feed Back
 const createFeedBack = catchAsync(async (req, res) => {
@@ -207,8 +204,13 @@ const update_TechIssue = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(TechIssue);
 });
 
-const get_completed_stream= catchAsync(async (req, res) => {
+const get_completed_stream = catchAsync(async (req, res) => {
   const TechIssue = await demostream.get_completed_stream(req);
+  res.status(httpStatus.OK).send(TechIssue);
+});
+
+const getIssuesWithPagination = catchAsync(async (req, res) => {
+  const TechIssue = await demostream.getIssuesWithPagination(req.params.page);
   res.status(httpStatus.OK).send(TechIssue);
 });
 
@@ -254,5 +256,6 @@ module.exports = {
   createTecIssues,
   get_TechIssue,
   update_TechIssue,
-  get_completed_stream
+  get_completed_stream,
+  getIssuesWithPagination,
 };
