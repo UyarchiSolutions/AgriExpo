@@ -2160,6 +2160,15 @@ const getIssuesWithPagination = async (page) => {
   return { val: val, total: total.length };
 };
 
+const issueResolve = async (id, body) => {
+  let issue = await TechIssue.findById(id);
+  if (!issue) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Issue Not Available');
+  }
+  issue = await TechIssue.findByIdAndUpdate({ _id: id }, body, { new: true });
+  return issue;
+};
+
 module.exports = {
   send_livestream_link,
   verifyToken,
@@ -2205,4 +2214,5 @@ module.exports = {
   get_TechIssue_Pagination,
   get_completed_stream,
   getIssuesWithPagination,
+  issueResolve,
 };

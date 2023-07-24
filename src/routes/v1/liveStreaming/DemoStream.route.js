@@ -51,6 +51,7 @@ router.route('/TechIssue').post(demostream.createTecIssues);
 router.route('/TechIssue/:id').put(demostream.update_TechIssue);
 router.route('/TechIssue/pagination/:page').get(demostream.get_TechIssue);
 router.route('/get/IssuesWith/Pagination/:page').get(demostream.getIssuesWithPagination);
+router.route('/issueResolve/:id').put(demostream.issueResolve);
 
 router.route('/get/completed/stream').get(demostream.get_completed_stream);
 

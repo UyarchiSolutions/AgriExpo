@@ -214,6 +214,11 @@ const getIssuesWithPagination = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(TechIssue);
 });
 
+const issueResolve = catchAsync(async (req, res) => {
+  const TechIssue = await demostream.issueResolve(req.params.id, req.body);
+  res.status(httpStatus.OK).send(TechIssue);
+});
+
 module.exports = {
   send_livestream_link,
   get_stream_details,
@@ -258,4 +263,5 @@ module.exports = {
   update_TechIssue,
   get_completed_stream,
   getIssuesWithPagination,
+  issueResolve,
 };
