@@ -1846,6 +1846,20 @@ const updateFeedback = async (id, body) => {
 const getFeedbackWithPagination = async (page) => {
   let feedback = await Feedback.aggregate([
     {
+      $lookup: {
+        from: 'demosellers',
+        localField: 'userID',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$user',
+      },
+    },
+    {
       $skip: page * 10,
     },
     {
