@@ -1583,7 +1583,7 @@ const cloude_recording_stream = async (stream, app, endTime) => {
           )}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
           { headers: { Authorization } }
         )
-        .then((res) => { })
+        .then((res) => {})
         .catch(async (error) => {
           console.log('error');
           await Democloudrecord.findByIdAndUpdate({ _id: record._id }, { recoredStart: 'stop' }, { new: true });
@@ -1852,8 +1852,14 @@ const getFeedbackWithPagination = async (page) => {
       $limit: 10,
     },
   ]);
-
-  return feedback;
+  let total = await Feedback.aggregate([
+    {
+      $match: {
+        _id: { $ne: null },
+      },
+    },
+  ]);
+  return { val: feedback, total: total.length };
 };
 
 /**
@@ -1882,7 +1888,10 @@ const createTecIssues = async (body) => {
   if (!findstream) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid Stream Id');
   }
-  const techIssue = await TechIssue.create({ ...body, ...{ streamID: body.streamId, issueId: issueId, userId: findstream.userID } });
+  const techIssue = await TechIssue.create({
+    ...body,
+    ...{ streamID: body.streamId, issueId: issueId, userId: findstream.userID },
+  });
   return techIssue;
 };
 
@@ -2028,8 +2037,8 @@ const get_completed_stream = async (req) => {
   }
   const cloud = await Democloudrecord.find({ streamId: req.query.id, videoLink: { $ne: null } });
 
-  return { stream, cloud }
-}
+  return { stream, cloud };
+};
 
 module.exports = {
   send_livestream_link,
@@ -2074,5 +2083,5 @@ module.exports = {
   get_TechIssue,
   update_TechIssue,
   get_TechIssue_Pagination,
-  get_completed_stream
+  get_completed_stream,
 };
