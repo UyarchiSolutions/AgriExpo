@@ -1860,6 +1860,36 @@ const getFeedbackWithPagination = async (page) => {
       },
     },
     {
+      $lookup: {
+        from: 'demostreams',
+        localField: 'streamID',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'b2busers',
+              localField: 'createdBy',
+              foreignField: '_id',
+              as: 'b2busers',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$b2busers',
+            },
+          },
+        ],
+        as: 'createdBy',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$createdBy',
+      },
+    },
+    {
       $skip: page * 10,
     },
     {
