@@ -16,7 +16,7 @@ const createSlotBooking = async (body, userId) => {
       SlotType: slot.Type,
       Duration: slot.duration,
     });
-    if (findAvailableSlot.Slots <= 0 || !findAvailableSlot) {
+    if (!findAvailableSlot || findAvailableSlot.Slots <= 0) {
       err = true;
       break;
     }
