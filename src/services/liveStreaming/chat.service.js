@@ -82,23 +82,25 @@ const livejoined_now = async (req, io, type) => {
   if (temp) {
     let stream = await Demostream.findById(temp.streamID);
     if (stream) {
-      let joined = stream.userList != null ? stream.userList : [];
-      if (type == "join") {
-        let index = joined.indexOf(req.user);
-        if (index == -1) {
-          joined.push(req.user)
+      if (stream.status !='Completed') {
+        let joined = stream.userList != null ? stream.userList : [];
+        if (type == "join") {
+          let index = joined.indexOf(req.user);
+          if (index == -1) {
+            joined.push(req.user)
+          }
         }
-      }
-      else {
-        let index = joined.indexOf(req.user);
-        if (index != -1) {
-          joined.splice(index, 1)
+        else {
+          let index = joined.indexOf(req.user);
+          if (index != -1) {
+            joined.splice(index, 1)
+          }
         }
+        stream.userList = joined;
+        stream.current_watching_stream = joined.length
+        stream.save();
+        io.sockets.emit(stream._id + "_stream_joins", stream);
       }
-      stream.userList = joined;
-      stream.current_watching_stream = joined.length
-      stream.save();
-      io.sockets.emit(stream._id + "_stream_joins", stream);
     }
   }
 }
