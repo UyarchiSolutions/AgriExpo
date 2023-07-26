@@ -987,7 +987,7 @@ const add_odrerPayment_cod = async (shopId, body, orders) => {
 const end_stream = async (req) => {
   let value = await Demostream.findByIdAndUpdate(
     { _id: req.query.id },
-    { status: 'Completed', streamEnd_Time: moment(), end_Status: 'HostLeave' },
+    { status: 'Completed', streamEnd_Time: moment(), userList: [], end_Status: 'HostLeave' },
     { new: true }
   );
   req.io.emit(req.query.id + '_stream_end', { value: true });
