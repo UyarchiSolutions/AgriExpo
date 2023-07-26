@@ -39,46 +39,6 @@ const createSlotBooking = async (body, userId) => {
   if (err) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Max Slot Finished');
   }
-  // console.log(body);
-  // Date, planId, slotId, Type, duration
-  // arr.forEach(async (e) => {
-  //   let findAvailableSlot = await Slotseperation.findOne({
-  //     PlanId: e.planId,
-  //     userId: userId,
-  //     SlotType: e.Type,
-  //     Duration: e.duration,
-  //   });
-  // if (findAvailableSlot.Slots == 0 || !findAvailableSlot) {
-  //   // throw new ApiError(httpStatus.BAD_REQUEST, 'Max Slot Finished');
-  //   return false;
-  // }
-  // let usedSlots = findAvailableSlot.usedSlots + 1;
-  // let availableSlot = findAvailableSlot.Slots - 1;
-  // await Slotseperation.findByIdAndUpdate(
-  //   { _id: findAvailableSlot._id },
-  //   { Slots: availableSlot, usedSlots: usedSlots },
-  //   { new: true }
-  // );
-  //   let val = findAvailableSlot.Slots - 1;
-  //   console.log(val);
-  // });
-
-  // let usedSlots = findAvailableSlot.usedSlots + 1;
-  // let availableSlot = findAvailableSlot.Slots - 1;
-  // findAvailableSlot = await Slotseperation.findByIdAndUpdate(
-  //   { _id: findAvailableSlot._id },
-  //   { Slots: availableSlot, usedSlots: usedSlots },
-  //   { new: true }
-  // );
-  // let data = {
-  //   slotId: slotId,
-  //   Durations: duration,
-  //   slotType: Type,
-  //   PlanId: planId,
-  //   userId: userId,
-  //   slotDate: Date,
-  // };
-  // let creation = await SlotBooking.create(data);
   return body;
 };
 
