@@ -115,6 +115,12 @@ const getPlanDetailsByUser = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getuserAvailablePlanes = catchAsync(async (req, res) => {
+  let userId = req.userId;
+  const data = await purchasePlan.getuserAvailablePlanes(req.params.id, userId);
+  res.send(data);
+});
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -133,4 +139,5 @@ module.exports = {
   getPlanyById,
   Approve_Reject,
   getPlanDetailsByUser,
+  getuserAvailablePlanes,
 };

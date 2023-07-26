@@ -29,4 +29,5 @@ router.route('/Change/Purchased/Plan/:id').put(purchasePlan.ChangePurchasedPlan)
 router.route('/UploadProof/plan/:id').put(upload, purchasePlan.UploadProof);
 router.route('/Approve/Reject/:id').put(purchasePlan.Approve_Reject);
 router.route('/get/PlanDetails/ByUser').get(SellerAuth, purchasePlan.getPlanDetailsByUser);
+router.route('/user/Available/Planes/:id').get(SellerAuth, purchasePlan.getuserAvailablePlanes);
 module.exports = router;
