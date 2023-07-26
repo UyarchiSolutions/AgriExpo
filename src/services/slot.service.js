@@ -134,15 +134,46 @@ const getDetailsForSlotChoosing = async () => {
   return { dates: val, datas: datas };
 };
 
-const getSlotsWitdSort = async (data) => {
+const getSlotsWitdSort = async (data,userId) => {
   const { PlanId } = data;
   let value = await purchasePlan.findById(PlanId);
   if (!value) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Availbale');
   }
+
+  let values = await purchasePlan.aggregate([
+    {
+      $match: {
+        _id: PlanId,
+      },
+    },
+    {
+      $lookup: {
+        from: 'slotseperations',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $match: { userId: userId, Slots: { $gt: 0 } } }],
+        as: 'available',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        planType: 1,
+        status: 1,
+        planName: 1,
+        slotInfo: '$available',
+      },
+    },
+  ]);
+  let datas;
+  if (values.length > 0) {
+    datas = values[0];
+  }
+
   let matchdata = [];
-  value.slotInfo.forEach((e) => {
-    let val = { Type: e.slotType, Duration: e.Duration };
+  datas.slotInfo.forEach((e) => {
+    let val = { Type: e.SlotType, Duration: e.Duration };
     matchdata.push(val);
   });
 
@@ -175,6 +206,7 @@ const getSlotsWitdSort = async (data) => {
     },
   ]);
   return { val: val, dates: val2 };
+  // return values
 };
 
 module.exports = {

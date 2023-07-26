@@ -34,7 +34,8 @@ const getDetailsForSlotChoosing = catchAsync(async (req, res) => {
 });
 
 const getSlotsWitdSort = catchAsync(async (req, res) => {
-  const data = await SlotService.getSlotsWitdSort(req.body);
+  let userId = req.userId;
+  const data = await SlotService.getSlotsWitdSort(req.body, userId);
   res.send(data);
 });
 
