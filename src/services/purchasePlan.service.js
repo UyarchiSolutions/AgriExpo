@@ -544,6 +544,39 @@ const getPlanDetailsByUser = async (userId) => {
   return val;
 };
 
+const getuserAvailablePlanes = async (id, userId) => {
+  let val = await purchasePlan.aggregate([
+    {
+      $match: {
+        _id: id,
+      },
+    },
+    {
+      $lookup: {
+        from: 'slotseperations',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $match: { userId: userId, Slots: { $gt: 0 } } }],
+        as: 'available',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        planType: 1,
+        status: 1,
+        planName: 1,
+        slotInfo: '$available',
+      },
+    },
+  ]);
+  let data = {};
+  if (val.length > 0) {
+    data = val[0];
+  }
+  return data;
+};
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -562,4 +595,5 @@ module.exports = {
   getPlanyById,
   Approve_Reject,
   getPlanDetailsByUser,
+  getuserAvailablePlanes,
 };

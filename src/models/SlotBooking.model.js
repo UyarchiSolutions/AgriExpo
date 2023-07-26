@@ -9,7 +9,7 @@ const SlotBookingSchema = new mongoose.Schema(
       default: v4,
     },
     slotDate: {
-      type: Date,
+      type: String,
     },
     fromTime: {
       type: String,
@@ -35,6 +35,9 @@ const SlotBookingSchema = new mongoose.Schema(
     },
     SlotDuration: {
       type: Number,
+    },
+    slotId: {
+      type: String,
     },
   },
   { timestamps: true }

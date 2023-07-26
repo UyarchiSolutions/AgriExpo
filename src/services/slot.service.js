@@ -1,7 +1,8 @@
 const httpStatus = require('http-status');
-const { Slot } = require('../models/slot.model');
+const { Slot, Slotseperation } = require('../models/slot.model');
 const ApiError = require('../utils/ApiError');
 const moment = require('moment');
+const { purchasePlan } = require('../models/purchasePlan.model');
 
 const createSlot = async (body) => {
   const { chooseTime, Duration, date, Type } = body;
@@ -133,6 +134,81 @@ const getDetailsForSlotChoosing = async () => {
   return { dates: val, datas: datas };
 };
 
+const getSlotsWitdSort = async (data,userId) => {
+  const { PlanId } = data;
+  let value = await purchasePlan.findById(PlanId);
+  if (!value) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Availbale');
+  }
+
+  let values = await purchasePlan.aggregate([
+    {
+      $match: {
+        _id: PlanId,
+      },
+    },
+    {
+      $lookup: {
+        from: 'slotseperations',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $match: { userId: userId, Slots: { $gt: 0 } } }],
+        as: 'available',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        planType: 1,
+        status: 1,
+        planName: 1,
+        slotInfo: '$available',
+      },
+    },
+  ]);
+  let datas;
+  if (values.length > 0) {
+    datas = values[0];
+  }
+
+  let matchdata = [];
+  datas.slotInfo.forEach((e) => {
+    let val = { Type: e.SlotType, Duration: e.Duration };
+    matchdata.push(val);
+  });
+
+  let val = await Slot.aggregate([
+    {
+      $match: {
+        $or: matchdata,
+      },
+    },
+    {
+      $group: {
+        _id: '$Type',
+        documents: { $push: '$$ROOT' },
+      },
+    },
+  ]);
+  let val2 = await Slot.aggregate([
+    {
+      $group: {
+        _id: {
+          date: '$date',
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        date: '$_id.date',
+      },
+    },
+  ]);
+  return { val: val, dates: val2 };
+  // return values
+};
+
 module.exports = {
   createSlot,
   Fetch_Slot,
@@ -140,4 +216,5 @@ module.exports = {
   DeleteSlotById,
   getSlots_Minutse_Wise,
   getDetailsForSlotChoosing,
+  getSlotsWitdSort,
 };

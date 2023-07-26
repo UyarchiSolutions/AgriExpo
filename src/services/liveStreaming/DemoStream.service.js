@@ -1583,7 +1583,7 @@ const cloude_recording_stream = async (stream, app, endTime) => {
           )}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
           { headers: { Authorization } }
         )
-        .then((res) => { })
+        .then((res) => {})
         .catch(async (error) => {
           console.log('error');
           await Democloudrecord.findByIdAndUpdate({ _id: record._id }, { recoredStart: 'stop' }, { new: true });
@@ -1846,14 +1846,64 @@ const updateFeedback = async (id, body) => {
 const getFeedbackWithPagination = async (page) => {
   let feedback = await Feedback.aggregate([
     {
+      $lookup: {
+        from: 'demosellers',
+        localField: 'userID',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$user',
+      },
+    },
+    {
+      $lookup: {
+        from: 'demostreams',
+        localField: 'streamID',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'b2busers',
+              localField: 'createdBy',
+              foreignField: '_id',
+              as: 'b2busers',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$b2busers',
+            },
+          },
+        ],
+        as: 'createdBy',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$createdBy',
+      },
+    },
+    {
       $skip: page * 10,
     },
     {
       $limit: 10,
     },
   ]);
-
-  return feedback;
+  let total = await Feedback.aggregate([
+    {
+      $match: {
+        _id: { $ne: null },
+      },
+    },
+  ]);
+  return { val: feedback, total: total.length };
 };
 
 /**
@@ -1882,7 +1932,10 @@ const createTecIssues = async (body) => {
   if (!findstream) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid Stream Id');
   }
-  const techIssue = await TechIssue.create({ ...body, ...{ streamID: body.streamId, issueId: issueId, userId: findstream.userID } });
+  const techIssue = await TechIssue.create({
+    ...body,
+    ...{ streamID: body.streamId, issueId: issueId, userId: findstream.userID },
+  });
   return techIssue;
 };
 
@@ -2028,8 +2081,93 @@ const get_completed_stream = async (req) => {
   }
   const cloud = await Democloudrecord.find({ streamId: req.query.id, videoLink: { $ne: null } });
 
-  return { stream, cloud }
-}
+  return { stream, cloud };
+};
+
+const getIssuesWithPagination = async (page) => {
+  let val = await TechIssue.aggregate([
+    {
+      $lookup: {
+        from: 'demosellers',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$user',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        Logi_name: 1,
+        Mobile_number: 1,
+        Issue_type: 1,
+        Issue_description: 1,
+        Others: 1,
+        status: 1,
+        issueId: 1,
+        userId: 1,
+        createdAt: 1,
+        userName: '$user.name',
+        userPhoneNumber: '$user.phoneNumber',
+      },
+    },
+    {
+      $skip: 10 * page,
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+
+  let total = await TechIssue.aggregate([
+    {
+      $lookup: {
+        from: 'demosellers',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$user',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        Logi_name: 1,
+        Mobile_number: 1,
+        Issue_type: 1,
+        Issue_description: 1,
+        Others: 1,
+        status: 1,
+        issueId: 1,
+        userId: 1,
+        createdAt: 1,
+        userName: '$user.name',
+        userPhoneNumber: '$user.phoneNumber',
+      },
+    },
+  ]);
+
+  return { val: val, total: total.length };
+};
+
+const issueResolve = async (id, body) => {
+  let issue = await TechIssue.findById(id);
+  if (!issue) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Issue Not Available');
+  }
+  issue = await TechIssue.findByIdAndUpdate({ _id: id }, body, { new: true });
+  return issue;
+};
 
 module.exports = {
   send_livestream_link,
@@ -2074,5 +2212,7 @@ module.exports = {
   get_TechIssue,
   update_TechIssue,
   get_TechIssue_Pagination,
-  get_completed_stream
+  get_completed_stream,
+  getIssuesWithPagination,
+  issueResolve,
 };

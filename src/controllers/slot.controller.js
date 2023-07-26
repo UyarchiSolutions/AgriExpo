@@ -33,6 +33,12 @@ const getDetailsForSlotChoosing = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getSlotsWitdSort = catchAsync(async (req, res) => {
+  let userId = req.userId;
+  const data = await SlotService.getSlotsWitdSort(req.body, userId);
+  res.send(data);
+});
+
 module.exports = {
   SlotCreation,
   Fetch_Slot,
@@ -40,4 +46,5 @@ module.exports = {
   DeleteSlotById,
   getSlots_Minutse_Wise,
   getDetailsForSlotChoosing,
+  getSlotsWitdSort,
 };
