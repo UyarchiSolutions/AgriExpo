@@ -3,6 +3,7 @@ const videoUploadService = require('../models/videoUpload.model');
 const moment = require('moment');
 const ApiError = require('../utils/ApiError');
 const AWS = require('aws-sdk');
+const fs = require('fs')
 
 const videoupload = async (file, path, format) => {
     const s3 = new AWS.S3({
@@ -10,10 +11,12 @@ const videoupload = async (file, path, format) => {
         secretAccessKey: 'NW7jfKJoom+Cu/Ys4ISrBvCU4n4bg9NsvzAbY07c',
         region: 'ap-south-1',
     });
+    const fileStream = fs.createReadStream(file.path);
+
     let params = {
         Bucket: 'streamingupload',
         Key: path + file.originalname,
-        Body: file.buffer,
+        Body: fileStream,
     };
     return new Promise((resolve, reject) => {
         const s3Upload = s3.upload(params, (err, data) => {
@@ -25,8 +28,6 @@ const videoupload = async (file, path, format) => {
         });
         s3Upload.on('httpUploadProgress', function (progress) {
             console.log('Progress:', progress.loaded, '/', progress.total); 
-
-            
         });
     });
 }
