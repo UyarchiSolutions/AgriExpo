@@ -1049,15 +1049,15 @@ const get_DemoStream_By_Admin = async (page, id) => {
       $addFields: {
         status: {
           $cond: {
-            if:{$eq:['$endTime',null]},
-            then:'$status',
-            else:{
-              $cond:{
-              if: { $lt: ['$endTime', currentDate] },
-              then: 'Completed',
-              else: '$status',
-            }
-          }
+            if: { $eq: ['$endTime', null] },
+            then: '$status',
+            else: {
+              $cond: {
+                if: { $gt: ['$endTime', currentDate] },
+                then: 'Completed',
+                else: '$status',
+              },
+            },
           },
         },
       },
