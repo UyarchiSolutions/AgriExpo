@@ -566,6 +566,9 @@ const join_stream_buyer = async (req) => {
   let register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
   if (register < 5) {
     demotoken.golive = true;
+    if (stream.status == 'Pending') {
+      stream.status = "Ready";
+    }
   } else {
     demotoken.golive = false;
   }
@@ -577,6 +580,8 @@ const join_stream_buyer = async (req) => {
     req.io.emit(demotoken.streamID + '_buyer_registor', { register });
   }, 300);
   return demotoken;
+
+
 };
 
 const buyer_go_live_stream = async (req) => {
