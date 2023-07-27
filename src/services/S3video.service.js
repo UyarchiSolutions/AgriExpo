@@ -25,8 +25,6 @@ const videoupload = async (file, path, format) => {
         });
         s3Upload.on('httpUploadProgress', function (progress) {
             console.log('Progress:', progress.loaded, '/', progress.total); 
-
-            
         });
     });
 }
