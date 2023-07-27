@@ -530,6 +530,33 @@ const getPlanDetailsByUser = async (userId) => {
       },
     },
     {
+      $lookup: {
+        from: 'slotbookings',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $match: { slotType: 'Normal' } }],
+        as: 'BookedSlotsNormal',
+      },
+    },
+    {
+      $lookup: {
+        from: 'slotbookings',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $match: { slotType: 'Peak' } }],
+        as: 'BookedSlotsPeak',
+      },
+    },
+    {
+      $lookup: {
+        from: 'slotbookings',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $match: { slotType: 'Exclusive' } }],
+        as: 'BookedSlotsExclusive',
+      },
+    },
+    {
       $project: {
         _id: 1,
         active: 1,
@@ -538,6 +565,9 @@ const getPlanDetailsByUser = async (userId) => {
         Normal: { $size: '$NormalSlot' },
         Peak: { $size: '$PeakSlot' },
         Exclusive: { $size: '$ExclusiveSlot' },
+        NormalSlots: { $size: '$BookedSlotsNormal' },
+        PeakSlots: { $size: '$BookedSlotsPeak' },
+        Exclusive: { $size: '$BookedSlotsExclusive' },
       },
     },
   ]);
