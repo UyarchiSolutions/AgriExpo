@@ -42,10 +42,25 @@ const createSlotBooking = async (body, userId) => {
   return body;
 };
 
-const getBooked_Slot = async (userId, page) => {
-  let val = await SlotBooking.aggregate([{ $elemMatch: { userId: userId } }, { $kip: page * 10 }, { $limit: 10 }]);
-  let total = SlotBooking.aggregate([{ $elemMatch: { userId: userId } }, { $kip: 10 * (page + 1) }, { $limit: 10 }]);
-  return { val, next: total.length != 0 };
+const getBooked_Slot = async (userId) => {
+  let val = await SlotBooking.aggregate([
+    { $match: { userId: userId } },
+    {
+      $lookup: {
+        from: 'slots',
+        localField: 'slotId',
+        foreignField: '_id',
+        as: 'slots',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$slots',
+      },
+    },
+  ]);
+  return val;
 };
 
 module.exports = {
