@@ -257,7 +257,7 @@ const send_livestream_link = async (req) => {
 
   // if (demopoat.length == 10) {
   await sms_send_seller(demostream._id, phoneNumber);
-  console.log(await emailservice.sendDemolink('mps.bharathiraja@gmail.com', demostream._id));
+  console.log(await emailservice.sendDemolink(['bharathiraja996574@gmail.com', 'bharathi@uyarchi.com', 'mps.bharathiraja@gmail.com'], demostream._id));
   return { demopoat, demostream };
   // }
   // });
