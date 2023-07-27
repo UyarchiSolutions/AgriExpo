@@ -4,7 +4,6 @@ const moment = require('moment');
 const { AgoraAppId } = require('../../models/liveStreaming/AgoraAppId.model');
 const Dates = require('../Date.serive');
 const paymentgatway = require('../paymentgatway.service');
-const emailservice = require("../email.service")
 const axios = require('axios');
 const {
   Product,
@@ -35,6 +34,7 @@ const {
 } = require('../../models/liveStreaming/DemoStream.model');
 const jwt = require('jsonwebtoken');
 const agoraToken = require('./AgoraAppId.service');
+const emailservice = require('../email.service');
 
 const secret = 'demoStream';
 const Agora = require('agora-access-token');
@@ -254,10 +254,19 @@ const send_livestream_link = async (req) => {
     minLots: 3,
     incrementalLots: 5,
   });
-
+  demopoat.push(streampost0);
+  demopoat.push(streampost1);
+  demopoat.push(streampost2);
+  demopoat.push(streampost3);
+  demopoat.push(streampost4);
+  demopoat.push(streampost5);
+  demopoat.push(streampost6);
+  demopoat.push(streampost7);
+  demopoat.push(streampost8);
+  demopoat.push(streampost9);
   // if (demopoat.length == 10) {
   await sms_send_seller(demostream._id, phoneNumber);
-  console.log(await emailservice.sendDemolink(['bharathiraja996574@gmail.com', 'bharathi@uyarchi.com', 'mps.bharathiraja@gmail.com'], demostream._id));
+  console.log(emailservice.sendDemolink(['bharathiraja996574@gmail.com', 'bharathi@uyarchi.com', 'mps.bharathiraja@gmail.com'], demostream._id));
   return { demopoat, demostream };
   // }
   // });
