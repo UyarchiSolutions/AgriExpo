@@ -11856,14 +11856,22 @@ const update_start_end_time = async (req) => {
 
   return;
 };
+const fileupload = require('fs')
 
 const video_upload_post = async (req) => {
   console.log(req.file)
-
-  return { message: "asda" };
+  let up = await S3video.videoupload(req.file, 'upload/video', 'mp4');
+  fileupload.unlink(req.file.path, (err) => {
+    if (err) {
+      console.error(err)
+      return
+    }
+    //file removed
+  })
+  
+  // return { message: "asda" };
   // return { asd: "asda" }
 
-  // let up = await S3video.videoupload(req.file, 'upload/video', 'mp4');
   // console.log(up)
   // let streamPostId = req.query.id;
   // let streamPost = await StreamPost.findById(streamPostId);
@@ -11901,7 +11909,7 @@ const video_upload_post = async (req) => {
   //   // });
   // });
 
-  // return up;
+  return up;
 };
 
 const get_video_link = async (req) => {
