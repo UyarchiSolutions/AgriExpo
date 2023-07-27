@@ -11859,7 +11859,6 @@ const update_start_end_time = async (req) => {
 
 const video_upload_post = async (req) => {
   console.log(req.file)
-  console.log(req.file)
 
   return { message: "asda" };
   // return { asd: "asda" }
