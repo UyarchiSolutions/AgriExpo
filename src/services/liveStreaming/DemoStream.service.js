@@ -1043,7 +1043,35 @@ const go_live = async (req) => {
 };
 
 const get_DemoStream_By_Admin = async (id) => {
-  const data = await Demostream.aggregate([{ $match: { createdBy: id } }]);
+  let currentDate = new Date().getTime();
+  const data = await Demostream.aggregate([
+    { $sort: { dateISO: -1 } },
+    // { $match: { createdBy: id } },
+    {
+      $addFields: {
+        status: {
+          $cond: {
+            if: { $lt: ['$endTime', currentDate] },
+            then: "Completed",
+            else: "$status",
+          }
+        },
+      },
+    },
+
+    {
+      $addFields: {
+        otp_verifiyed_status: {
+          $cond: {
+            if: { $lt: ["$tokenExp", currentDate] },
+            then: "Expired",
+            else: "$otp_verifiyed_status",
+          }
+        },
+      },
+    },
+    { $limit: 10 }
+  ]);
   return data;
 };
 
