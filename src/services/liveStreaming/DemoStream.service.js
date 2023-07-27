@@ -568,10 +568,12 @@ const join_stream_buyer = async (req) => {
     demotoken.golive = true;
     if (stream.status == 'Pending') {
       stream.status = 'Ready';
+      stream.save();
     }
   } else {
     demotoken.golive = false;
   }
+ 
   demotoken.status = 'resgistered';
   demotoken.save();
 
@@ -1047,13 +1049,18 @@ const get_DemoStream_By_Admin = async (page, id) => {
     { $match: { createdBy: id } },
     {
       $addFields: {
+        endtrue:{ $ifNull: ['$endTime', false] },
+      },
+    },
+    {
+      $addFields: {
         status: {
           $cond: {
-            if: { $eq: ['$endTime', null] },
+            if: { $eq: ['$endtrue', false] },
             then: '$status',
             else: {
               $cond: {
-                if: { $gt: ['$endTime', currentDate] },
+                if: { $lt: ['$endTime', currentDate] },
                 then: 'Completed',
                 else: '$status',
               },
