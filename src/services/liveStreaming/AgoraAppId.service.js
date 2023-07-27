@@ -51,7 +51,7 @@ const { Country, State, City } = require('country-state-city');
 const get_country_list = async (req) => {
   // const csc = require('country-state-city').Country;
   const countries = Country.getAllCountries();
-  console.log(countries);
+  // console.log(countries);
   return countries;
 
 }
@@ -60,7 +60,7 @@ const get_state_list = async (req) => {
 
   // const csc = require('country-state-city').Country;
   const state = State.getStatesOfCountry(req.query.county);
-  console.log(state);
+  // console.log(state);
   return state;
 
 
