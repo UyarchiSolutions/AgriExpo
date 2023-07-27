@@ -11860,10 +11860,12 @@ const update_start_end_time = async (req) => {
 const video_upload_post = async (req) => {
   console.log(req.file)
   console.log(req.file.buffer)
+
+  return { message: "asda" };
   // return { asd: "asda" }
 
-  let up = await S3video.videoupload(req.file, 'upload/video', 'mp4');
-  console.log(up)
+  // let up = await S3video.videoupload(req.file, 'upload/video', 'mp4');
+  // console.log(up)
   // let streamPostId = req.query.id;
   // let streamPost = await StreamPost.findById(streamPostId);
   // if (!streamPost) {
@@ -11900,7 +11902,7 @@ const video_upload_post = async (req) => {
   //   // });
   // });
 
-  return up;
+  // return up;
 };
 
 const get_video_link = async (req) => {
