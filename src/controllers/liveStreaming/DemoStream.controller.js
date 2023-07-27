@@ -91,7 +91,7 @@ const go_live = catchAsync(async (req, res) => {
 });
 
 const get_DemoStream_By_Admin = catchAsync(async (req, res) => {
-  const data = await demostream.get_DemoStream_By_Admin(req.userId);
+  const data = await demostream.get_DemoStream_By_Admin(req.params.page, req.userId);
   res.send(data);
 });
 

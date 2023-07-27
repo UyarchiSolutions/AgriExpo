@@ -567,7 +567,7 @@ const join_stream_buyer = async (req) => {
   if (register < 5) {
     demotoken.golive = true;
     if (stream.status == 'Pending') {
-      stream.status = "Ready";
+      stream.status = 'Ready';
     }
   } else {
     demotoken.golive = false;
@@ -580,8 +580,6 @@ const join_stream_buyer = async (req) => {
     req.io.emit(demotoken.streamID + '_buyer_registor', { register });
   }, 300);
   return demotoken;
-
-
 };
 
 const buyer_go_live_stream = async (req) => {
@@ -1042,7 +1040,7 @@ const go_live = async (req) => {
   return demotoken;
 };
 
-const get_DemoStream_By_Admin = async (id) => {
+const get_DemoStream_By_Admin = async (page, id) => {
   let currentDate = new Date().getTime();
   const data = await Demostream.aggregate([
     { $sort: { dateISO: -1 } },
@@ -1052,27 +1050,57 @@ const get_DemoStream_By_Admin = async (id) => {
         status: {
           $cond: {
             if: { $lt: ['$endTime', currentDate] },
-            then: "Completed",
-            else: "$status",
-          }
+            then: 'Completed',
+            else: '$status',
+          },
         },
       },
     },
-
     {
       $addFields: {
         otp_verifiyed_status: {
           $cond: {
-            if: { $lt: ["$tokenExp", currentDate] },
-            then: "Expired",
-            else: "$otp_verifiyed_status",
-          }
+            if: { $lt: ['$tokenExp', currentDate] },
+            then: 'Expired',
+            else: '$otp_verifiyed_status',
+          },
         },
       },
     },
-    { $limit: 10 }
+    {
+      $skip: 10 * page,
+    },
+    { $limit: 10 },
   ]);
-  return data;
+
+  const total = await Demostream.aggregate([
+    { $sort: { dateISO: -1 } },
+    { $match: { createdBy: id } },
+    {
+      $addFields: {
+        status: {
+          $cond: {
+            if: { $lt: ['$endTime', currentDate] },
+            then: 'Completed',
+            else: '$status',
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        otp_verifiyed_status: {
+          $cond: {
+            if: { $lt: ['$tokenExp', currentDate] },
+            then: 'Expired',
+            else: '$otp_verifiyed_status',
+          },
+        },
+      },
+    },
+  ]);
+
+  return { data: data, total: total.length };
 };
 
 const manageDemoStream = async (page) => {
@@ -1571,7 +1599,7 @@ const verify_otp = async (req) => {
     verify.save();
     const stream = await Demostream.findById(verify.streamID);
     stream.otp_verifiyed = verify._id;
-    stream.otp_verifiyed_status = "Verified";
+    stream.otp_verifiyed_status = 'Verified';
     stream.save();
   }
 
@@ -1619,7 +1647,7 @@ const cloude_recording_stream = async (stream, app, endTime) => {
           )}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
           { headers: { Authorization } }
         )
-        .then((res) => { })
+        .then((res) => {})
         .catch(async (error) => {
           console.log('error');
           await Democloudrecord.findByIdAndUpdate({ _id: record._id }, { recoredStart: 'stop' }, { new: true });
