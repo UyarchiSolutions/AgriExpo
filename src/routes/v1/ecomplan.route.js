@@ -10,7 +10,7 @@ const subhostVerify = require('../../controllers/subhostVefify.controller');
 const uploadimage = require('../../middlewares/upload');
 const PlanImage = require('../../middlewares/plan')
 const { SetPass, SellerAuth } = require('../../controllers/sellerAuth.controller');
-
+const upload_now = multer({ dest: 'uploads/' });
 const storage = multer.memoryStorage({
   destination: function (req, res, callback) {
     callback(null, '');
