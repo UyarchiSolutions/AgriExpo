@@ -495,10 +495,19 @@ const getPlanDetailsByUser = async (userId) => {
               SlotType: 'Normal',
             },
           },
+          {
+            $addFields: {
+              sumval: { $add: ['$usedSlots', '$Slots'] },
+            },
+          },
+          {
+            $group: { _id: null, total: { $sum: '$sumval' } },
+          },
         ],
         as: 'NormalSlot',
       },
     },
+    { $unwind: { preserveNullAndEmptyArrays: true, path: '$NormalSlot' } },
     {
       $lookup: {
         from: 'slotseperations',
@@ -510,8 +519,22 @@ const getPlanDetailsByUser = async (userId) => {
               SlotType: 'Peak',
             },
           },
+          {
+            $addFields: {
+              sumval: { $add: ['$usedSlots', '$Slots'] },
+            },
+          },
+          {
+            $group: { _id: null, total: { $sum: '$sumval' } },
+          },
         ],
         as: 'PeakSlot',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$PeakSlot',
       },
     },
     {
@@ -525,8 +548,45 @@ const getPlanDetailsByUser = async (userId) => {
               SlotType: 'Exclusive',
             },
           },
+          {
+            $addFields: {
+              sumval: { $add: ['$usedSlots', '$Slots'] },
+            },
+          },
+          {
+            $group: { _id: null, total: { $sum: '$sumval' } },
+          },
         ],
+
         as: 'ExclusiveSlot',
+      },
+    },
+    { $unwind: { preserveNullAndEmptyArrays: true, path: '$ExclusiveSlot' } },
+    {
+      $lookup: {
+        from: 'slotbookings',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $match: { slotType: 'Normal' } }],
+        as: 'BookedSlotsNormal',
+      },
+    },
+    {
+      $lookup: {
+        from: 'slotbookings',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $match: { slotType: 'Peak' } }],
+        as: 'BookedSlotsPeak',
+      },
+    },
+    {
+      $lookup: {
+        from: 'slotbookings',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $match: { slotType: 'Exclusive' } }],
+        as: 'BookedSlotsExclusive',
       },
     },
     {
@@ -535,9 +595,12 @@ const getPlanDetailsByUser = async (userId) => {
         active: 1,
         status: 1,
         planName: 1,
-        Normal: { $size: '$NormalSlot' },
-        Peak: { $size: '$PeakSlot' },
-        Exclusive: { $size: '$ExclusiveSlot' },
+        Normal: { $ifNull: ['$NormalSlot.total', 0] },
+        Peak: { $ifNull: ['$PeakSlot.total', 0] },
+        Exclusive: { $ifNull: ['$ExclusiveSlot.total', 0] },
+        NormalSlots: { $ifNull: [{ $size: '$BookedSlotsNormal' }, 0] },
+        PeakSlots: { $ifNull: [{ $size: '$BookedSlotsPeak' }, 0] },
+        ExclusiveSlots: { $ifNull: [{ $size: '$BookedSlotsExclusive' }, 0] },
       },
     },
   ]);

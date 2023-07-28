@@ -86,8 +86,6 @@ const getSlots_Minutse_Wise = async () => {
         _id: {
           Type: '$Type',
           Duration: '$Duration',
-          startFormat: '$startFormat',
-          endFormat: '$endFormat',
         },
         count: { $sum: 1 },
       },
@@ -134,7 +132,7 @@ const getDetailsForSlotChoosing = async () => {
   return { dates: val, datas: datas };
 };
 
-const getSlotsWitdSort = async (data,userId) => {
+const getSlotsWitdSort = async (data, userId) => {
   const { PlanId } = data;
   let value = await purchasePlan.findById(PlanId);
   if (!value) {
