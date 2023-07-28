@@ -310,7 +310,7 @@ const send_request_link = async (req) => {
   demopoat.push(streampost8);
   demopoat.push(streampost9);
   // if (demopoat.length == 10) {
-  await sms_send_seller(demostream._id, phoneNumber);
+  await sms_send_seller(demostream._id, user.phoneNumber);
   // console.log(emailservice.sendDemolink(['bharathiraja996574@gmail.com', 'bharathi@uyarchi.com', 'mps.bharathiraja@gmail.com'], demostream._id));
   return { demopoat, demostream };
 }
