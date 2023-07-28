@@ -924,6 +924,42 @@ const TechIssueSchema = mongoose.Schema(
 const TechIssue = mongoose.model('demotechissue', TechIssueSchema);
 
 const Democloudrecord = mongoose.model('democloundrecord', democloud_record);
+
+
+
+const Demorequstshema = new mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    streamID: {
+      type: String,
+    },
+    userID: {
+      type: String,
+    },
+    name: {
+      type: String,
+    },
+    mobileNumber: {
+      type: String,
+    },
+    location: {
+      type: String,
+    },
+    userID: {
+      type: String,
+    },
+    dateISO: {
+      type: Number,
+    }
+  },
+  { timestamps: true }
+);
+
+const Demorequest = mongoose.model('demorequest', Demorequstshema);
+
 module.exports = {
   Demoseller,
   Demostream,
@@ -941,4 +977,5 @@ module.exports = {
   Democloudrecord,
   Feedback,
   TechIssue,
+  Demorequest
 };
