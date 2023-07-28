@@ -135,25 +135,24 @@ const streamplanschema = mongoose.Schema({
   Transtraction: {
     type: String,
   },
-  BankName:{
+  BankName: {
     type: String,
   },
-  PaymentMethod:{
+  PaymentMethod: {
     type: String,
   },
-  AccNo:{
-    type:String,
+  AccNo: {
+    type: String,
   },
-  TransactionId:{
-    type:String,
+  TransactionId: {
+    type: String,
   },
-  ChequeDDNo:{
-    type:String,
+  ChequeDDNo: {
+    type: String,
   },
-  ChequeDDdate:{
-    type:String,
+  ChequeDDdate: {
+    type: String,
   },
-  
 });
 
 const Streamplan = mongoose.model('streamplan', streamplanschema);
@@ -369,6 +368,9 @@ const streamRequestschema = mongoose.Schema({
   goLive: {
     type: Boolean,
     default: false,
+  },
+  brouchers: {
+    type: String,
   },
   // afterStreaming: {
   //   type: String,
