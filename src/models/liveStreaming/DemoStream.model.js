@@ -942,7 +942,7 @@ const Demorequstshema = new mongoose.Schema(
     name: {
       type: String,
     },
-    mobileNumber: {
+    phoneNumber: {
       type: String,
     },
     location: {
