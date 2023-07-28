@@ -106,6 +106,10 @@ const demostreamchema = mongoose.Schema({
   tokenExp: {
     type: Number,
   },
+  demoType: {
+    type: String,
+    default: "By Admin"
+  }
 });
 
 const Demostream = mongoose.model('demostream', demostreamchema);
@@ -953,6 +957,9 @@ const Demorequstshema = new mongoose.Schema(
     },
     dateISO: {
       type: Number,
+    },
+    streamID: {
+      type: String,
     }
   },
   { timestamps: true }

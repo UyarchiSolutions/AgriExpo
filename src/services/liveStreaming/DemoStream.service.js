@@ -93,21 +93,108 @@ const demorequest = async (req) => {
 
 
 const get_demo_request = async (req) => {
-  let page = req.params.page == '' || req.params.page == null || req.params.page == null ? 0 : req.params.page;
+  let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : req.query.page;
+  let currentDate = new Date().getTime();
 
   let demostream = await Demorequest.aggregate([
+    { $sort: { dateISO: -1 } },
+    {
+      $lookup: {
+        from: 'demostreams',
+        localField: 'streamID',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $addFields: {
+              endtrue: { $ifNull: ['$endTime', false] },
+            },
+          },
+          {
+            $addFields: {
+              status: {
+                $cond: {
+                  if: { $eq: ['$endtrue', false] },
+                  then: '$status',
+                  else: {
+                    $cond: {
+                      if: { $lt: ['$endTime', currentDate] },
+                      then: 'Completed',
+                      else: '$status',
+                    },
+                  },
+                },
+              },
+            },
+          },
+          {
+            $addFields: {
+              otp_verifiyed_status: {
+                $cond: {
+                  if: { $lt: ['$tokenExp', currentDate] },
+                  then: 'Expired',
+                  else: '$otp_verifiyed_status',
+                },
+              },
+            },
+          },
+          { $limit: 1 }
+        ],
+        as: 'demostreams',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$demostreams',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        phoneNumber: 1,
+        streamID: 1,
+        dateISO: 1,
+        streamName: {
+          $ifNull: ["$demostreams.streamName", 'nill']
+        },
+        status: {
+          $ifNull: ["$demostreams.status", 'nill']
+        },
+        otp_verifiyed_status: {
+          $ifNull: ["$demostreams.otp_verifiyed_status", 'nill']
+        },
+        location: 1,
+        name: 1,
+        userID: 1,
+
+      }
+    },
     {
       $skip: 10 * page,
     },
     { $limit: 10 },
   ])
-  return demostream;
+  let next = await Demorequest.aggregate([
+    { $sort: { dateISO: -1 } },
+    {
+      $skip: 10 * (page + 1),
+    },
+    { $limit: 10 },
+  ])
+  return { demostream, next: next.length != 0 };
 }
 
 const send_request_link = async (req) => {
   let transaction = req.query.transaction;
   let userID = req.userId;
-  let user = await Demoseller.findById(req.query.id);
+  let demorequest = await Demorequest.findById(req.query.id);
+  if (!demorequest) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Demo Request Not Found');
+  }
+  let user = await Demoseller.findById(demorequest.userID);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User Not Found');
+  }
   const id = generateUniqueID();
   let streamCount = await Demostream.find().count();
   console.log(moment().add(15, 'minutes').format('hh:mm a'));
@@ -121,6 +208,7 @@ const send_request_link = async (req) => {
     _id: id,
     transaction: transaction,
     tokenExp: moment().add(30, 'minutes'),
+    demoType: "seller"
   });
   // endTime: moment().add(15, 'minutes'),
   const payload = {
@@ -133,6 +221,8 @@ const send_request_link = async (req) => {
   });
   demostream.streamValitity = valitity;
   demostream.save();
+  demorequest.streamID = demostream._id;
+  demorequest.save();
   let product = await Product.find().limit(10);
   let demopoat = [];
   if (transaction == 'Without Transaction') {
@@ -292,7 +382,7 @@ const send_request_link = async (req) => {
   demopoat.push(streampost8);
   demopoat.push(streampost9);
   // if (demopoat.length == 10) {
-  await sms_send_seller(demostream._id, phoneNumber);
+  await sms_send_seller(demostream._id, user.phoneNumber);
   // console.log(emailservice.sendDemolink(['bharathiraja996574@gmail.com', 'bharathi@uyarchi.com', 'mps.bharathiraja@gmail.com'], demostream._id));
   return { demopoat, demostream };
 }
@@ -1274,7 +1364,7 @@ const get_DemoStream_By_Admin = async (page, id) => {
   let currentDate = new Date().getTime();
   const data = await Demostream.aggregate([
     { $sort: { dateISO: -1 } },
-    { $match: { createdBy: id } },
+    { $match: { createdBy: id, demoType: { $ne: "seller" } } },
     {
       $addFields: {
         endtrue: { $ifNull: ['$endTime', false] },
