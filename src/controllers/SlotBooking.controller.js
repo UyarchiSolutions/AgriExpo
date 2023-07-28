@@ -17,7 +17,7 @@ const getBooked_Slot = catchAsync(async (req, res) => {
 
 const getBooked_Slot_By_Exhibitor = catchAsync(async (req, res) => {
   let userId = req.userId;
-  const slotBooking = await SlotBookingService.getBooked_Slot_By_Exhibitor(userId);
+  const slotBooking = await SlotBookingService.getBooked_Slot_By_Exhibitor(userId, req.params.id);
   res.send(slotBooking);
 });
 

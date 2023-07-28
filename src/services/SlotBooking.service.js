@@ -63,9 +63,9 @@ const getBooked_Slot = async (userId, id) => {
   return val;
 };
 
-const getBooked_Slot_By_Exhibitor = async (userId) => {
+const getBooked_Slot_By_Exhibitor = async (userId, planId) => {
   let val = await SlotBooking.aggregate([
-    { $match: { userId: userId } },
+    { $match: { userId: userId, PlanId: planId } },
     {
       $lookup: {
         from: 'slots',
