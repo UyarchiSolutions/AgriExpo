@@ -7,10 +7,28 @@ const send_livestream_link = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(data);
 });
 
+const demorequest = catchAsync(async (req, res) => {
+  const data = await demostream.demorequest(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
+
+const get_demo_request = catchAsync(async (req, res) => {
+  const data = await demostream.get_demo_request(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
+
+const send_request_link = catchAsync(async (req, res) => {
+  const data = await demostream.send_request_link(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
 const get_stream_details = catchAsync(async (req, res) => {
   const data = await demostream.send_livestream_link(req);
   res.status(httpStatus.CREATED).send(data);
 });
+
 const get_stream_verify = catchAsync(async (req, res) => {
   const data = await demostream.verifyToken(req);
   res.status(httpStatus.CREATED).send(data);
@@ -91,7 +109,7 @@ const go_live = catchAsync(async (req, res) => {
 });
 
 const get_DemoStream_By_Admin = catchAsync(async (req, res) => {
-  const data = await demostream.get_DemoStream_By_Admin(req.params.page, req.userId);
+  const data = await demostream.get_DemoStream_By_Admin(req.userId);
   res.send(data);
 });
 
@@ -264,4 +282,7 @@ module.exports = {
   get_completed_stream,
   getIssuesWithPagination,
   issueResolve,
+  demorequest,
+  get_demo_request,
+  send_request_link
 };
