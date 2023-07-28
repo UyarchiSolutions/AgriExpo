@@ -565,9 +565,9 @@ const getPlanDetailsByUser = async (userId) => {
         Normal: { $size: '$NormalSlot' },
         Peak: { $size: '$PeakSlot' },
         Exclusive: { $size: '$ExclusiveSlot' },
-        NormalSlots: { $size: '$BookedSlotsNormal' },
-        PeakSlots: { $size: '$BookedSlotsPeak' },
-        Exclusive: { $size: '$BookedSlotsExclusive' },
+        NormalSlots: { $ifNull: [{ $size: '$BookedSlotsNormal' }, 0] },
+        PeakSlots: { $ifNull: [{ $size: '$BookedSlotsPeak' }, 0] },
+        Exclusive: { $ifNull: [{ $size: '$BookedSlotsExclusive' }, 0] },
       },
     },
   ]);
