@@ -74,9 +74,9 @@ function generateUniqueID() {
 
 const demorequest = async (req) => {
   const { mobileNumber, name, location } = req.body;
-  let user = await Demoseller.findOne({ phoneNumber: phoneNumber });
+  let user = await Demoseller.findOne({ phoneNumber: mobileNumber });
   if (!user) {
-    user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
+    user = await Demoseller.create({ phoneNumber: mobileNumber, dateISO: moment(), name: name });
   } else {
     user.name = name;
     user.save();
