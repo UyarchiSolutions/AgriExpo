@@ -115,7 +115,14 @@ const get_demo_request = async (req) => {
 const send_request_link = async (req) => {
   let transaction = req.query.transaction;
   let userID = req.userId;
-  let user = await Demoseller.findById(req.query.id);
+  let demorequest = await Demorequest.findById(req.query.id);
+  if (!demorequest) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Demo Request Not Found');
+  }
+  let user = await Demoseller.findById(demorequest.userID);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User Not Found');
+  }
   const id = generateUniqueID();
   let streamCount = await Demostream.find().count();
   console.log(moment().add(15, 'minutes').format('hh:mm a'));
@@ -129,6 +136,7 @@ const send_request_link = async (req) => {
     _id: id,
     transaction: transaction,
     tokenExp: moment().add(30, 'minutes'),
+    demoType: "seller"
   });
   // endTime: moment().add(15, 'minutes'),
   const payload = {
@@ -141,6 +149,8 @@ const send_request_link = async (req) => {
   });
   demostream.streamValitity = valitity;
   demostream.save();
+  demorequest.streamID = demostream._id;
+  demorequest.save();
   let product = await Product.find().limit(10);
   let demopoat = [];
   if (transaction == 'Without Transaction') {
