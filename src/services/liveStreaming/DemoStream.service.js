@@ -96,12 +96,20 @@ const get_demo_request = async (req) => {
   let page = req.params.page == '' || req.params.page == null || req.params.page == null ? 0 : req.params.page;
 
   let demostream = await Demorequest.aggregate([
+    { $sort: { dateISO: -1 } },
     {
       $skip: 10 * page,
     },
     { $limit: 10 },
   ])
-  return demostream;
+  let next = await Demorequest.aggregate([
+    { $sort: { dateISO: -1 } },
+    {
+      $skip: 10 * (page + 1),
+    },
+    { $limit: 10 },
+  ])
+  return { demostream, next: next.length != 0 };
 }
 
 const send_request_link = async (req) => {
