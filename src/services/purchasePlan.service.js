@@ -495,10 +495,19 @@ const getPlanDetailsByUser = async (userId) => {
               SlotType: 'Normal',
             },
           },
+          {
+            $addFields: {
+              sumval: { $add: ['$usedSlots', '$Slots'] },
+            },
+          },
+          {
+            $group: { _id: null, total: { $sum: '$sumval' } },
+          },
         ],
         as: 'NormalSlot',
       },
     },
+    { $unwind: { preserveNullAndEmptyArrays: true, path: '$NormalSlot' } },
     {
       $lookup: {
         from: 'slotseperations',
@@ -510,8 +519,22 @@ const getPlanDetailsByUser = async (userId) => {
               SlotType: 'Peak',
             },
           },
+          {
+            $addFields: {
+              sumval: { $add: ['$usedSlots', '$Slots'] },
+            },
+          },
+          {
+            $group: { _id: null, total: { $sum: '$sumval' } },
+          },
         ],
         as: 'PeakSlot',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$PeakSlot',
       },
     },
     {
@@ -525,10 +548,20 @@ const getPlanDetailsByUser = async (userId) => {
               SlotType: 'Exclusive',
             },
           },
+          {
+            $addFields: {
+              sumval: { $add: ['$usedSlots', '$Slots'] },
+            },
+          },
+          {
+            $group: { _id: null, total: { $sum: '$sumval' } },
+          },
         ],
+
         as: 'ExclusiveSlot',
       },
     },
+    { $unwind: { preserveNullAndEmptyArrays: true, path: '$ExclusiveSlot' } },
     {
       $lookup: {
         from: 'slotbookings',
@@ -562,9 +595,9 @@ const getPlanDetailsByUser = async (userId) => {
         active: 1,
         status: 1,
         planName: 1,
-        Normal: { $ifNull: [{ $size: '$NormalSlot' }, 0] },
-        Peak: { $ifNull: [{ $size: '$PeakSlot' }, 0] },
-        Exclusive: { $ifNull: [{ $size: '$ExclusiveSlot' }, 0] },
+        Normal: { $ifNull: ['$NormalSlot.total', 0] },
+        Peak: { $ifNull: ['$PeakSlot.total', 0] },
+        Exclusive: { $ifNull: ['$ExclusiveSlot.total', 0] },
         NormalSlots: { $ifNull: [{ $size: '$BookedSlotsNormal' }, 0] },
         PeakSlots: { $ifNull: [{ $size: '$BookedSlotsPeak' }, 0] },
         ExclusiveSlots: { $ifNull: [{ $size: '$BookedSlotsExclusive' }, 0] },
