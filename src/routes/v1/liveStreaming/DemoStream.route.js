@@ -56,9 +56,9 @@ router.route('/issueResolve/:id').put(demostream.issueResolve);
 router.route('/get/completed/stream').get(demostream.get_completed_stream);
 
 
-router.route('/get/completed/stream').post(demostream.demorequest);
-router.route('/get/completed/stream').get(authorization, demostream.get_demo_request);
-router.route('/get/completed/stream').post(authorization, demostream.send_request_link);
+router.route('/post/request/demo').post(demostream.demorequest);
+router.route('/get/request/demo').get(authorization, demostream.get_demo_request);
+router.route('/send/request/demo').post(authorization, demostream.send_request_link);
 
 
 // router.route('').get(demostream.send_sms_now);
