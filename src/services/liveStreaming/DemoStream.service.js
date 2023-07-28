@@ -93,7 +93,7 @@ const demorequest = async (req) => {
 
 
 const get_demo_request = async (req) => {
-  let page = req.params.page == '' || req.params.page == null || req.params.page == null ? 0 : req.params.page;
+  let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : req.query.page;
   let currentDate = new Date().getTime();
 
   let demostream = await Demorequest.aggregate([
