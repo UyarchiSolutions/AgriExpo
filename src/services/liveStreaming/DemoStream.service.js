@@ -94,9 +94,81 @@ const demorequest = async (req) => {
 
 const get_demo_request = async (req) => {
   let page = req.params.page == '' || req.params.page == null || req.params.page == null ? 0 : req.params.page;
+  let currentDate = new Date().getTime();
 
   let demostream = await Demorequest.aggregate([
     { $sort: { dateISO: -1 } },
+    {
+      $lookup: {
+        from: 'demostreams',
+        localField: 'streamID',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $addFields: {
+              endtrue: { $ifNull: ['$endTime', false] },
+            },
+          },
+          {
+            $addFields: {
+              status: {
+                $cond: {
+                  if: { $eq: ['$endtrue', false] },
+                  then: '$status',
+                  else: {
+                    $cond: {
+                      if: { $lt: ['$endTime', currentDate] },
+                      then: 'Completed',
+                      else: '$status',
+                    },
+                  },
+                },
+              },
+            },
+          },
+          {
+            $addFields: {
+              otp_verifiyed_status: {
+                $cond: {
+                  if: { $lt: ['$tokenExp', currentDate] },
+                  then: 'Expired',
+                  else: '$otp_verifiyed_status',
+                },
+              },
+            },
+          },
+          { $limit: 1 }
+        ],
+        as: 'demostreams',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$demostreams',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        phoneNumber: 1,
+        streamID: 1,
+        dateISO: 1,
+        streamName: {
+          $ifNull: ["$demostreams.streamName", 'nill']
+        },
+        status: {
+          $ifNull: ["$demostreams.status", 'nill']
+        },
+        otp_verifiyed_status: {
+          $ifNull: ["$demostreams.otp_verifiyed_status", 'nill']
+        },
+        location: 1,
+        name: 1,
+        userID: 1,
+
+      }
+    },
     {
       $skip: 10 * page,
     },
@@ -1292,7 +1364,7 @@ const get_DemoStream_By_Admin = async (page, id) => {
   let currentDate = new Date().getTime();
   const data = await Demostream.aggregate([
     { $sort: { dateISO: -1 } },
-    { $match: { createdBy: id } },
+    { $match: { createdBy: id, demoType: { $ne: "seller" } } },
     {
       $addFields: {
         endtrue: { $ifNull: ['$endTime', false] },
