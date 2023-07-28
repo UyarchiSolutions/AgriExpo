@@ -8,7 +8,7 @@ const ecommulter = require('../../middlewares/ecomstrean');
 const shopverify = require('../../controllers/shoptokenverify.controller');
 const subhostVerify = require('../../controllers/subhostVefify.controller');
 const uploadimage = require('../../middlewares/upload');
-const PlanImage = require('../../middlewares/plan')
+const PlanImage = require('../../middlewares/plan');
 const { SetPass, SellerAuth } = require('../../controllers/sellerAuth.controller');
 
 const storage = multer.memoryStorage({
@@ -17,14 +17,15 @@ const storage = multer.memoryStorage({
   },
 });
 const upload = multer({ storage }).single('teaser');
+const uploadBroucher = multer({ storage }).single('brouchers');
 const storage_s3 = multer.diskStorage({
   destination(req, file, cb) {
-    cb(null, 'uploads')
+    cb(null, 'uploads');
   },
   filename(req, file, cb) {
-    cb(null, `${file.fieldname}-${Date.now()}`)
-  }
-})
+    cb(null, `${file.fieldname}-${Date.now()}`);
+  },
+});
 
 const upload_s3 = multer({ storage: storage_s3 });
 
@@ -63,6 +64,7 @@ router.route('/create/stream/one').post(SellerAuth, Ecomcontroller.create_stream
 router.route('/create/stream/one').put(SellerAuth, Ecomcontroller.find_and_update_one);
 router.route('/create/stream/one/image').post(ecommulter.single('image'), Ecomcontroller.create_stream_one_image);
 router.route('/create/stream/one/video').post(upload, Ecomcontroller.create_stream_one_video);
+router.route('/create/stream/one/Broucher').post(uploadBroucher, Ecomcontroller.create_stream_one_Broucher);
 router.route('/create/stream/two').post(SellerAuth, Ecomcontroller.create_stream_two);
 router.route('/get/all/stream').get(SellerAuth, Ecomcontroller.get_all_stream);
 router.route('/get/one/stream').get(SellerAuth, Ecomcontroller.get_one_stream);
@@ -98,7 +100,7 @@ router.route('/getAll/shop/live/stream/watch/admin').get(Ecomcontroller.get_watc
 router.route('/watchlive/go/live').get(Ecomcontroller.get_watch_live_token);
 router.route('/homepage/streamdatails/all').get(shopverify, Ecomcontroller.getall_homeage_streams);
 router.route('/on/going/stream').get(shopverify, Ecomcontroller.on_going_stream);
-router.route('/getStreamRequestById/:id').get(Ecomcontroller.getStreamRequestById)
+router.route('/getStreamRequestById/:id').get(Ecomcontroller.getStreamRequestById);
 
 //live Stream pre register
 

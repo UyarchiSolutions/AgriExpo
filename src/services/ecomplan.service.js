@@ -24,7 +24,7 @@ const { findById } = require('../models/token.model');
 
 const agoraToken = require('./liveStreaming/AgoraAppId.service');
 
-const S3video = require("./S3video.service")
+const S3video = require('./S3video.service');
 
 const create_Plans = async (req) => {
   const { slotInfo } = req.body;
@@ -1461,6 +1461,34 @@ const create_stream_one_video = async (req) => {
         //console.log(data);
         stream = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, { teaser: data.Location });
         resolve({ teaser: 'success', stream });
+      });
+    });
+  } else {
+    return { message: 'Invalid' };
+  }
+};
+const create_stream_one_Broucher = async (req) => {
+  // //console.log(req.file, "asdasda")
+  if (req.file != null) {
+    const s3 = new AWS.S3({
+      accessKeyId: 'AKIA3323XNN7Y2RU77UG',
+      secretAccessKey: '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',
+      region: 'ap-south-1',
+    });
+    let params = {
+      Bucket: 'realestatevideoupload',
+      Key: req.file.originalname,
+      Body: req.file.buffer,
+    };
+    let stream;
+    return new Promise((resolve) => {
+      s3.upload(params, async (err, data) => {
+        if (err) {
+          //console.log(err);
+        }
+        //console.log(data);
+        stream = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, { brouchers: data.Location });
+        resolve({ brouchers: 'success', stream });
       });
     });
   } else {
@@ -7356,8 +7384,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+        ? 'RAC'
+        : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -7366,8 +7394,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-            ? 'RAC'
-            : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -11799,7 +11827,7 @@ const get_stream_post_after_live_stream = async (req) => {
       ffmpeg(inputFilePath)
         .outputOptions('-c', 'copy')
         .output(outputFilePath)
-        .on('end', (e) => { })
+        .on('end', (e) => {})
         .on('error', (err) => {
           console.error('Error while converting:', err);
         })
@@ -11856,17 +11884,17 @@ const update_start_end_time = async (req) => {
 
   return;
 };
-const fileupload = require('fs')
+const fileupload = require('fs');
 
 const video_upload_post = async (req) => {
-  console.log(req.file)
+  console.log(req.file);
   let up = await S3video.videoupload(req.file, 'upload/video', 'mp4');
   fileupload.unlink(req.file.path, (err) => {
     if (err) {
-      console.error(err)
-      return
+      console.error(err);
+      return;
     }
-  })
+  });
   return up;
 };
 
@@ -12280,4 +12308,5 @@ module.exports = {
   disable_Enable_Plan,
   getStreamRequestById,
   UploadProof,
+  create_stream_one_Broucher,
 };
