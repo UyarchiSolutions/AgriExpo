@@ -8,7 +8,7 @@ const tokenService = require('../services/token.service');
 const config = require('../config/config');
 const { Seller } = require('../models/seller.models');
 const SellerAuth = async (req, res, next) => {
-  const token = req.headers.sellerauth
+  const token = req.headers.sellerauth;
   // //console.log(token)
   if (!token) {
     return res.send(httpStatus.UNAUTHORIZED, 'Invalid Access set');
@@ -26,8 +26,7 @@ const SellerAuth = async (req, res, next) => {
     req.seller = payload.userRole;
     if (userss.mainSeller == 'admin') {
       req.accessBy = userss._id;
-    }
-    else {
+    } else {
       req.accessBy = userss.mainSeller;
     }
     return next();

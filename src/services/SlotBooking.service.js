@@ -63,7 +63,29 @@ const getBooked_Slot = async (userId, id) => {
   return val;
 };
 
+const getBooked_Slot_By_Exhibitor = async (userId) => {
+  let val = await SlotBooking.aggregate([
+    { $match: { userId: userId } },
+    {
+      $lookup: {
+        from: 'slots',
+        localField: 'slotId',
+        foreignField: '_id',
+        as: 'slots',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$slots',
+      },
+    },
+  ]);
+  return val;
+};
+
 module.exports = {
   createSlotBooking,
   getBooked_Slot,
+  getBooked_Slot_By_Exhibitor,
 };
