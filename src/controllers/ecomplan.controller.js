@@ -147,11 +147,6 @@ const create_stream_one_video = catchAsync(async (req, res) => {
   res.send(value);
 });
 
-const create_stream_one_Broucher = catchAsync(async (req, res) => {
-  const value = await Ecomserive.create_stream_one_Broucher(req);
-  res.send(value);
-});
-
 const create_stream_two = catchAsync(async (req, res) => {
   const value = await Ecomserive.create_stream_two(req);
   res.send(value);
@@ -574,20 +569,20 @@ const disable_Enable_Plan = catchAsync(async (req, res) => {
   res.send(data);
 });
 
-const getStreamRequestById = catchAsync(async (req, res) => {
+const getStreamRequestById = catchAsync(async(req,res)=>{
   const data = await Ecomserive.getStreamRequestById(req.params.id);
   res.send(data);
-});
+})
 
-const UploadProof = catchAsync(async (req, res) => {
-  const data = await Ecomserive.UploadProof(req.params.id, req.body);
-  if (req.file) {
-    console.log(req.file);
-    data.image = 'images/plane/' + req.file.filename;
+const UploadProof = catchAsync(async(req,res)=>{
+  const data = await Ecomserive.UploadProof(req.params.id,req.body);
+    if(req.file){
+    console.log(req.file)
+    data.image = 'images/plane/'+req.file.filename
   }
-  data.save();
+  data.save()
   res.send(data);
-});
+})
 
 module.exports = {
   create_Plans,
@@ -702,5 +697,4 @@ module.exports = {
   deletePlanById,
   disable_Enable_Plan,
   getStreamRequestById,
-  create_stream_one_Broucher,
 };
