@@ -1383,7 +1383,7 @@ const create_stream_one = async (req) => {
       max_post_per_stream: parseInt(plan.PostCount),
       sepTwo: 'Completed',
       planId: req.body.planId,
-      Duration: plan.Duration,
+      Duration: slot.Duration,
       endTime: datess,
       streamEnd_Time: datess,
       slotId:slot._id
