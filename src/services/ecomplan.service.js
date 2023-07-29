@@ -1349,9 +1349,10 @@ const create_stream_one = async (req) => {
   //console.log(req.body);
   let slot = await Slot.findById(req.body.slot);
   let data = slot.date;
-  let time = slot.start;
+  let time = slot.startFormat;
   slot = await Slot.findByIdAndUpdate({ _id: slot._id }, { Status: 'Booked' }, { new: true });
   let startTime = new Date(new Date(data + ' ' + time)).getTime();
+  console.log(time, startTime);
 
   const value = await Streamrequest.create({
     ...req.body,
@@ -1364,22 +1365,22 @@ const create_stream_one = async (req) => {
   });
   await Dates.create_date(value);
   //step two
-  let myplan = await purchasePlan.findById(req.body.planId);
-  let plan = await Streamplan.findById(myplan.planId);
-  if (myplan.numberOfStreamused + 1 == plan.numberofStream) {
-    myplan.active = false;
-  }
-  myplan.numberOfStreamused = myplan.numberOfStreamused + 1;
-  myplan.save();
+  let plan = await purchasePlan.findById(req.body.planId);
+  // let plan = await Streamplan.findById(myplan.planId);
+  // if (myplan.numberOfStreamused + 1 == plan.numberofStream) {
+  //   myplan.active = false;
+  // }
+  // myplan.numberOfStreamused = myplan.numberOfStreamused + 1;
+  // myplan.save();
   let streamss = await Streamrequest.findById(value._id);
-  let datess = new Date().setTime(new Date(streamss.startTime).getTime() + plan.Duration * 60 * 1000);
+  let datess = new Date().setTime(new Date(streamss.startTime).getTime() + slot.Duration * 60 * 1000);
   await Streamrequest.findByIdAndUpdate(
     { _id: value._id },
     {
-      Duration: myplan.Duration,
-      noOfParticipants: myplan.noOfParticipants,
-      chat: myplan.chat,
-      max_post_per_stream: myplan.max_post_per_stream,
+      Duration: slot.Duration,
+      noOfParticipants: plan.numberOfParticipants,
+      chat: plan.chat_Option,
+      max_post_per_stream: parseInt(plan.PostCount),
       sepTwo: 'Completed',
       planId: req.body.planId,
       Duration: plan.Duration,
@@ -1388,9 +1389,9 @@ const create_stream_one = async (req) => {
     },
     { new: true }
   );
-  let Duration = myplan.Duration;
-  let numberOfParticipants = myplan.numberOfParticipants * Duration;
-  let no_of_host = myplan.no_of_host * Duration;
+  let Duration = slot.Duration;
+  let numberOfParticipants = plan.numberOfParticipants * Duration;
+  let no_of_host = plan.no_of_host * Duration;
 
   let totalMinutes = numberOfParticipants + no_of_host + Duration;
   let agoraID = await agoraToken.token_assign(totalMinutes, value._id, 'agri');
