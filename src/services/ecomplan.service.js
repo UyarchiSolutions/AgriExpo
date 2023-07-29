@@ -1350,7 +1350,7 @@ const create_stream_one = async (req) => {
   let slot = await Slot.findById(req.body.slot);
   let data = slot.date;
   let time = slot.start;
-  slot = await Slot.findByIdAndUpdate({ _id: slot._id }, { status: 'Booked' }, { new: true });
+  slot = await Slot.findByIdAndUpdate({ _id: slot._id }, { Status: 'Booked' }, { new: true });
   let startTime = new Date(new Date(data + ' ' + time)).getTime();
 
   const value = await Streamrequest.create({
