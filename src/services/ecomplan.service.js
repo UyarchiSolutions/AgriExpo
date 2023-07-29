@@ -10,6 +10,7 @@ const {
   shopNotification,
   PlanSlot,
 } = require('../models/ecomplan.model');
+const { Slot } = require('../models/slot.model');
 const axios = require('axios'); //
 const { streamingOrder, streamingorderProduct, streamingorderPayments } = require('../models/liveStreaming/checkout.model');
 const { Joinusers } = require('../models/liveStreaming/generateToken.model');
@@ -1346,8 +1347,9 @@ const remove_one_post = async (req) => {
 
 const create_stream_one = async (req) => {
   //console.log(req.body);
-  let data = req.body.streamingDate;
-  let time = req.body.streamingTime;
+  let slot = await Slot.findById(req.body.slot);
+  let data = slot.date;
+  let time = slot.start;
   let startTime = new Date(new Date(data + ' ' + time)).getTime();
 
   const value = await Streamrequest.create({
