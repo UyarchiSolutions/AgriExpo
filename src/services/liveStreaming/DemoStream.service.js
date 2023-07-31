@@ -31,7 +31,7 @@ const {
   Democloudrecord,
   Feedback,
   TechIssue,
-  Demorequest,
+  Demorequest
 } = require('../../models/liveStreaming/DemoStream.model');
 const jwt = require('jsonwebtoken');
 const agoraToken = require('./AgoraAppId.service');
@@ -89,7 +89,8 @@ const demorequest = async (req) => {
     location: location,
   });
   return demostream;
-};
+}
+
 
 const get_demo_request = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : req.query.page;
@@ -136,7 +137,7 @@ const get_demo_request = async (req) => {
               },
             },
           },
-          { $limit: 1 },
+          { $limit: 1 }
         ],
         as: 'demostreams',
       },
@@ -154,33 +155,34 @@ const get_demo_request = async (req) => {
         streamID: 1,
         dateISO: 1,
         streamName: {
-          $ifNull: ['$demostreams.streamName', 'nill'],
+          $ifNull: ["$demostreams.streamName", 'nill']
         },
         status: {
-          $ifNull: ['$demostreams.status', 'nill'],
+          $ifNull: ["$demostreams.status", 'nill']
         },
         otp_verifiyed_status: {
-          $ifNull: ['$demostreams.otp_verifiyed_status', 'nill'],
+          $ifNull: ["$demostreams.otp_verifiyed_status", 'nill']
         },
         location: 1,
         name: 1,
         userID: 1,
-      },
+
+      }
     },
     {
       $skip: 10 * page,
     },
     { $limit: 10 },
-  ]);
+  ])
   let next = await Demorequest.aggregate([
     { $sort: { dateISO: -1 } },
     {
       $skip: 10 * (page + 1),
     },
     { $limit: 10 },
-  ]);
+  ])
   return { demostream, next: next.length != 0 };
-};
+}
 
 const send_request_link = async (req) => {
   let transaction = req.query.transaction;
@@ -206,7 +208,7 @@ const send_request_link = async (req) => {
     _id: id,
     transaction: transaction,
     tokenExp: moment().add(30, 'minutes'),
-    demoType: 'seller',
+    demoType: "seller"
   });
   // endTime: moment().add(15, 'minutes'),
   const payload = {
@@ -383,7 +385,9 @@ const send_request_link = async (req) => {
   await sms_send_seller(demostream._id, user.phoneNumber);
   // console.log(emailservice.sendDemolink(['bharathiraja996574@gmail.com', 'bharathi@uyarchi.com', 'mps.bharathiraja@gmail.com'], demostream._id));
   return { demopoat, demostream };
-};
+}
+
+
 
 const send_livestream_link = async (req) => {
   let userID = req.userId;
@@ -1360,7 +1364,7 @@ const get_DemoStream_By_Admin = async (page, id) => {
   let currentDate = new Date().getTime();
   const data = await Demostream.aggregate([
     { $sort: { dateISO: -1 } },
-    { $match: { createdBy: id, demoType: { $ne: 'seller' } } },
+    { $match: { createdBy: id, demoType: { $ne: "seller" } } },
     {
       $addFields: {
         endtrue: { $ifNull: ['$endTime', false] },
@@ -1430,44 +1434,11 @@ const get_DemoStream_By_Admin = async (page, id) => {
   return { data: data, total: total.length };
 };
 
+
 const manageDemoStream = async (page) => {
-  let currentDate = new Date().getTime();
   const data = await Demostream.aggregate([
     { $sort: { dateISO: -1 } },
     { $match: { _id: { $ne: null } } },
-    {
-      $addFields: {
-        endtrue: { $ifNull: ['$endTime', false] },
-      },
-    },
-    {
-      $addFields: {
-        status: {
-          $cond: {
-            if: { $eq: ['$endtrue', false] },
-            then: '$status',
-            else: {
-              $cond: {
-                if: { $lt: ['$endTime', currentDate] },
-                then: 'Completed',
-                else: '$status',
-              },
-            },
-          },
-        },
-      },
-    },
-    {
-      $addFields: {
-        otp_verifiyed_status: {
-          $cond: {
-            if: { $lt: ['$tokenExp', currentDate] },
-            then: 'Expired',
-            else: '$otp_verifiyed_status',
-          },
-        },
-      },
-    },
     { $lookup: { from: 'b2busers', localField: 'createdBy', foreignField: '_id', as: 'users' } },
     { $unwind: { preserveNullAndEmptyArrays: true, path: '$users' } },
     {
@@ -1485,7 +1456,6 @@ const manageDemoStream = async (page) => {
         streamValitity: 1,
         agoraID: 1,
         endTime: 1,
-        otp_verifiyed_status: 1,
         createdBy: { $ifNull: ['$users.name', 'Nill'] },
       },
     },
@@ -1494,41 +1464,7 @@ const manageDemoStream = async (page) => {
   ]);
 
   const total = await Demostream.aggregate([
-    { $sort: { dateISO: -1 } },
     { $match: { _id: { $ne: null } } },
-    {
-      $addFields: {
-        endtrue: { $ifNull: ['$endTime', false] },
-      },
-    },
-    {
-      $addFields: {
-        status: {
-          $cond: {
-            if: { $eq: ['$endtrue', false] },
-            then: '$status',
-            else: {
-              $cond: {
-                if: { $lt: ['$endTime', currentDate] },
-                then: 'Completed',
-                else: '$status',
-              },
-            },
-          },
-        },
-      },
-    },
-    {
-      $addFields: {
-        otp_verifiyed_status: {
-          $cond: {
-            if: { $lt: ['$tokenExp', currentDate] },
-            then: 'Expired',
-            else: '$otp_verifiyed_status',
-          },
-        },
-      },
-    },
     { $lookup: { from: 'b2busers', localField: 'createdBy', foreignField: '_id', as: 'users' } },
     { $unwind: { preserveNullAndEmptyArrays: true, path: '$users' } },
     {
@@ -1546,7 +1482,6 @@ const manageDemoStream = async (page) => {
         streamValitity: 1,
         agoraID: 1,
         endTime: 1,
-        otp_verifiyed_status: 1,
         createdBy: { $ifNull: ['$users.name', 'Nill'] },
       },
     },
@@ -2044,7 +1979,7 @@ const cloude_recording_stream = async (stream, app, endTime) => {
           )}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
           { headers: { Authorization } }
         )
-        .then((res) => {})
+        .then((res) => { })
         .catch(async (error) => {
           console.log('error');
           await Democloudrecord.findByIdAndUpdate({ _id: record._id }, { recoredStart: 'stop' }, { new: true });
@@ -2173,7 +2108,7 @@ const recording_start = async (id) => {
               },
             },
             recordingFileConfig: {
-              avFileType: ['mp4'],
+              avFileType: ['hls','mp4'],
             },
             storageConfig: {
               vendor: 1,
@@ -2678,5 +2613,5 @@ module.exports = {
   issueResolve,
   demorequest,
   get_demo_request,
-  send_request_link,
+  send_request_link
 };
