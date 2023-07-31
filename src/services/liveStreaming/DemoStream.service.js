@@ -1431,6 +1431,7 @@ const get_DemoStream_By_Admin = async (page, id) => {
 };
 
 const manageDemoStream = async (page) => {
+  let currentDate = new Date().getTime();
   const data = await Demostream.aggregate([
     { $sort: { dateISO: -1 } },
     { $match: { _id: { $ne: null } } },
