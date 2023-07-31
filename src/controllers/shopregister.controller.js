@@ -17,6 +17,11 @@ const forget_password = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(shop);
 });
 
+const sendOTP_continue_Reg = catchAsync(async (req, res) => {
+  const shop = await registerShop.sendOTP_continue_Reg(req.body);
+  res.send(shop);
+});
+
 const verify_otp = catchAsync(async (req, res) => {
   const otp = await registerShop.verify_otp(req.body);
   res.status(httpStatus.CREATED).send(otp);
@@ -213,4 +218,5 @@ module.exports = {
   get_my_orders_all,
   get_my_orders_single,
   NewRegister_Shop,
+  sendOTP_continue_Reg,
 };
