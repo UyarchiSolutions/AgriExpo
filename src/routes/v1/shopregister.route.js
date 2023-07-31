@@ -9,6 +9,7 @@ router.route('/getmyorders/vieworder').get(shopverify, shopregister.getmyorder_b
 router.route('/regiter').post(shopregister.register_shop);
 router.route('/new/register').post(shopregister.NewRegister_Shop);
 router.route('/forget').post(shopregister.forget_password);
+router.route('/sendOTP/continue/Reg').post(shopregister.sendOTP_continue_Reg);
 router.route('/verify').post(shopregister.verify_otp);
 router.route('/setpassword').post(shopregister.set_password);
 router.route('/changepassword').post(shopverify, shopregister.change_password);
