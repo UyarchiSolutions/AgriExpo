@@ -422,6 +422,9 @@ const streamRequestschema = mongoose.Schema({
   totalMinues: {
     type: Number,
   },
+  slotId: {
+    type: String,
+  },
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);

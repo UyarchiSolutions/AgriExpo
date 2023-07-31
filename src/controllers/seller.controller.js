@@ -25,6 +25,11 @@ const forgotPass = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const sendOTP_continue = catchAsync(async (req, res) => {
+  const data = await SellerService.sendOTP_continue(req);
+  res.send(data);
+});
+
 const loginseller = catchAsync(async (req, res) => {
   const data = await SellerService.loginseller(req);
   const tokens = await tokenService.generateAuthTokens_sellerApp(data);
@@ -152,4 +157,5 @@ module.exports = {
   update_my_profile,
   getSellers_With_Paginations,
   DisableSeller,
+  sendOTP_continue,
 };

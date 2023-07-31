@@ -7,6 +7,7 @@ router.route('/register/seller').post(SellerController.createSeller);
 router.route('/verifyotp/seller').post(SellerController.verifyOTP);
 router.route('/setpassword/seller').post(SetPass, SellerController.setPassword);
 router.route('/forgot/seller').post(SellerController.forgotPass);
+router.route('/sendOTP/continue').post(SellerController.sendOTP_continue);
 router.route('/login/seller').post(SellerController.loginseller);
 router.route('/alreadyuser/seller').post(SellerController.alreadyUser);
 

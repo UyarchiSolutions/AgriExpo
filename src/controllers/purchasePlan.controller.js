@@ -121,6 +121,12 @@ const getuserAvailablePlanes = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getPlanes_Request_Streams = catchAsync(async (req, res) => {
+  let userId = req.userId;
+  const data = await purchasePlan.getPlanes_Request_Streams(userId);
+  res.send(data);
+});
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -140,4 +146,5 @@ module.exports = {
   Approve_Reject,
   getPlanDetailsByUser,
   getuserAvailablePlanes,
+  getPlanes_Request_Streams,
 };
