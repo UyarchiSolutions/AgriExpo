@@ -2128,7 +2128,7 @@ const recording_start = async (id) => {
       token.save();
       setTimeout(async () => {
         await recording_query(token._id, agoraToken);
-      }, 3000);
+      }, 10000);
       return start.data;
     } else {
       return { message: 'Already Started' };
@@ -2156,7 +2156,7 @@ const recording_query = async (id, agoraToken) => {
   );
   console.log(query.data)
   console.log(query.data.serverResponse.fileList)
-  token.videoLink = query.data.serverResponse.fileList;
+  // token.videoLink = query.data.serverResponse.fileList;
   token.recoredStart = 'query';
   token.save();
   console.log(4, 5);
