@@ -2155,7 +2155,7 @@ const recording_query = async (id, agoraToken) => {
     { headers: { Authorization } }
   );
   console.log(query.data)
-  console.log(query.data.fileList:)
+  console.log(query.data.fileList)
   // token.videoLink = query.data.serverResponse.fileList;
   token.recoredStart = 'query';
   token.save();
