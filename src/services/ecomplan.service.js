@@ -1386,7 +1386,8 @@ const create_stream_one = async (req) => {
       Duration: slot.Duration,
       endTime: datess,
       streamEnd_Time: datess,
-      slotId:slot._id
+      slotId: slot._id,
+      streamingDate: slot.date,
     },
     { new: true }
   );
