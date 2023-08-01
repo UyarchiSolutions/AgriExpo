@@ -173,6 +173,9 @@ const streamPostschema = mongoose.Schema({
   created: {
     type: Date,
   },
+  unit: {
+    type: String,
+  },
   DateIso: {
     type: Number,
   },
