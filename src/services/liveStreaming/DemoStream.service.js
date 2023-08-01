@@ -2128,7 +2128,7 @@ const recording_start = async (id) => {
       token.save();
       setTimeout(async () => {
         await recording_query(token._id, agoraToken);
-      }, 10000);
+      }, 3000);
       return start.data;
     } else {
       return { message: 'Already Started' };
