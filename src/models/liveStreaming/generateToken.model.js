@@ -92,6 +92,12 @@ const tempToken = mongoose.Schema({
   videoLink: {
     type: String,
   },
+  videoLink_array: {
+    type: Array,
+  },
+  videoLink_mp4: {
+    type: String,
+  },
   recoredStart: {
     type: String,
     default: 'Pending',

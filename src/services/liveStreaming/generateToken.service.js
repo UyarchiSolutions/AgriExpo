@@ -152,7 +152,7 @@ const generateToken_sub = async (req) => {
         joinedUser: user._id,
       },
     });
-    const token = await geenerate_rtc_token(channel, uid, role, str.endTime / 1000,str.agoraID);
+    const token = await geenerate_rtc_token(channel, uid, role, str.endTime / 1000, str.agoraID);
     value.token = token;
     value.save();
     stream = value;
@@ -285,13 +285,13 @@ const participents_limit = async (req) => {
   return { participents: value >= participents.participents ? false : true };
 };
 
-const agora_acquire = async (req, id,agroaID) => {
+const agora_acquire = async (req, id, agroaID) => {
   let temtoken = id;
-    let agoraToken = await AgoraAppId.findById(agroaID);
-    console.log(agoraToken,8888)
+  let agoraToken = await AgoraAppId.findById(agroaID);
+  console.log(agoraToken, 8888)
   // let temtoken=req.body.id;
   let token = await tempTokenModel.findById(temtoken);
-   const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
+  const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
     'base64'
   )}`;
   const acquire = await axios.post(
@@ -304,7 +304,7 @@ const agora_acquire = async (req, id,agroaID) => {
         scene: 0,
       },
     },
-    { headers: { Authorization} }
+    { headers: { Authorization } }
   );
   token.resourceId = acquire.data.resourceId;
   token.recoredStart = 'acquire';
@@ -350,7 +350,7 @@ const recording_start = async (req, id) => {
               },
             },
             recordingFileConfig: {
-              avFileType: ['hls'],
+              avFileType: ['hls', 'mp4'],
             },
             storageConfig: {
               vendor: 1,
@@ -369,7 +369,7 @@ const recording_start = async (req, id) => {
       token.recoredStart = 'start';
       token.save();
       setTimeout(async () => {
-        await recording_query(req, token._id,agoraToken);
+        await recording_query(req, token._id, agoraToken);
       }, 3000);
       return start.data;
     }
@@ -381,7 +381,7 @@ const recording_start = async (req, id) => {
     return { message: 'Already Started' };
   }
 };
-const recording_query = async (req, id,agoraToken) => {
+const recording_query = async (req, id, agoraToken) => {
   const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
     'base64'
   )}`;
@@ -397,7 +397,11 @@ const recording_query = async (req, id,agoraToken) => {
     `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
     { headers: { Authorization } }
   );
-  token.videoLink = query.data.serverResponse.fileList;
+  // token.videoLink =
+  //   videoLink_mp4
+  console.log(query.data.serverResponse.fileList)
+  videoLink_array = query.data.serverResponse.fileList;
+  // token.videoLink = query.data.serverResponse.fileList;
   token.recoredStart = 'query';
   token.save();
   console.log(4, 5);
@@ -694,7 +698,7 @@ const get_sub_golive = async (req, io) => {
         as: 'temptokens_sub',
       },
     },
-    
+
     {
       $project: {
         _id: 1,
@@ -721,7 +725,7 @@ const get_sub_golive = async (req, io) => {
         chat_need: '$streamrequests.chat_need',
         temptokens_sub: '$temptokens_sub',
         joindedUserBan: 1,
-        appID:"$streamrequests.agoraappids.appID"
+        appID: "$streamrequests.agoraappids.appID"
       },
     },
   ]);
@@ -1012,7 +1016,7 @@ const create_subhost_token = async (req) => {
         type: 'subhost',
       },
     });
-    const token = await geenerate_rtc_token(streamId, uid, Agora.RtcRole.PUBLISHER, expirationTimestamp,stream.agoraID);
+    const token = await geenerate_rtc_token(streamId, uid, Agora.RtcRole.PUBLISHER, expirationTimestamp, stream.agoraID);
     value.token = token;
     value.chennel = streamId;
     value.save();
@@ -1021,7 +1025,7 @@ const create_subhost_token = async (req) => {
     stream.save();
   }
   req.io.emit(streamId + '_golive', { streamId: streamId });
-  await production_supplier_token_cloudrecording(req, streamId,stream.agoraID);
+  await production_supplier_token_cloudrecording(req, streamId, stream.agoraID);
   return value;
 };
 
@@ -1099,11 +1103,11 @@ const production_supplier_token = async (req) => {
 
   req.io.emit(streamId + '_golive', { streamId: streamId });
   console.log(streamId);
-  await production_supplier_token_cloudrecording(req, streamId,stream.agoraID);
+  await production_supplier_token_cloudrecording(req, streamId, stream.agoraID);
   return value;
 };
 
-const production_supplier_token_cloudrecording = async (req, id,agroaID) => {
+const production_supplier_token_cloudrecording = async (req, id, agroaID) => {
   let streamId = id;
   // let streamId = req.body.streamId;
   let agoraToken = await AgoraAppId.findById(agroaID)
@@ -1130,12 +1134,12 @@ const production_supplier_token_cloudrecording = async (req, id,agroaID) => {
         type: 'CloudRecording',
       },
     });
-    const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp,agroaID);
+    const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp, agroaID);
     value.token = token;
     value.store = value._id.replace(/[^a-zA-Z0-9]/g, '');
     value.save();
     if (value.videoLink == '' || value.videoLink == null) {
-      await agora_acquire(req, value._id,agroaID);
+      await agora_acquire(req, value._id, agroaID);
     }
   } else {
     // try {
@@ -1171,11 +1175,11 @@ const production_supplier_token_cloudrecording = async (req, id,agroaID) => {
           type: 'CloudRecording',
         },
       });
-      const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp,agroaID);
+      const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp, agroaID);
       value.token = token;
       value.store = value._id.replace(/[^a-zA-Z0-9]/g, '');
       value.save();
-      await agora_acquire(req, value._id,agroaID);
+      await agora_acquire(req, value._id, agroaID);
     });
   }
   return value;
