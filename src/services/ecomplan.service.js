@@ -362,7 +362,7 @@ const get_all_Post_with_page_live = async (req) => {
         streamEnd_Time: '$streamrequestposts.streamEnd_Time',
         postCount: '$streamrequestposts.postCount',
         tokenGeneration: '$streamrequestposts.tokenGeneration',
-        unit:1,
+        unit: 1,
       },
     },
     { $skip: 10 * page },
@@ -529,7 +529,7 @@ const get_all_Post_with_page_completed = async (req) => {
         allot_host_1: '$streamrequestposts.allot_host_1',
         allot_host_2: '$streamrequestposts.allot_host_2',
         allot_host_3: '$streamrequestposts.allot_host_3',
-        unit:1,
+        unit: 1,
       },
     },
     { $skip: 10 * page },
@@ -667,7 +667,7 @@ const get_all_Post_with_page_exhausted = async (req) => {
         discription: 1,
         bookingAmount: 1,
         afterStreaming: 1,
-        unit:1,
+        unit: 1,
       },
     },
     { $sort: { DateIso: -1 } },
@@ -803,7 +803,7 @@ const get_all_Post_with_page_removed = async (req) => {
         streamEnd_Time: '$streamrequestposts.streamEnd_Time',
         postCount: '$streamrequestposts.postCount',
         tokenGeneration: '$streamrequestposts.tokenGeneration',
-        unit:1,
+        unit: 1,
       },
     },
     { $sort: { DateIso: -1 } },
@@ -984,7 +984,7 @@ const get_all_Post_with_page_all = async (req, status) => {
         streamEnd_Time: '$streamrequestposts.streamEnd_Time',
         postCount: '$streamrequestposts.postCount',
         tokenGeneration: '$streamrequestposts.tokenGeneration',
-        unit:1,
+        unit: 1,
       },
     },
     { $sort: { DateIso: -1 } },
@@ -1134,7 +1134,7 @@ const get_all_Post_with_page = async (req, status) => {
         streamEnd_Time: '$streamrequestposts.streamEnd_Time',
         postCount: '$streamrequestposts.postCount',
         tokenGeneration: '$streamrequestposts.tokenGeneration',
-        unit:1,
+        unit: 1,
       },
     },
     { $sort: { DateIso: -1 } },
@@ -1268,7 +1268,7 @@ const get_all_Post_with_page_assigned = async (req) => {
         streamEnd_Time: '$streamrequestposts.streamEnd_Time',
         postCount: '$streamrequestposts.postCount',
         tokenGeneration: '$streamrequestposts.tokenGeneration',
-        unit:1,
+        unit: 1,
       },
     },
     { $sort: { DateIso: -1 } },
@@ -1417,21 +1417,16 @@ const create_stream_one = async (req) => {
 };
 
 const find_and_update_one = async (req) => {
-  let data = req.body.streamingDate;
-  let time = req.body.streamingTime;
-  let startTime = new Date(new Date(data + ' ' + time)).getTime();
   let streamss = await Streamrequest.findById(req.query.id);
-  let myplan = await purchasePlan.findById(streamss.planId);
-  let plan = await Streamplan.findById(myplan.planId);
-  let datess = new Date().setTime(new Date(streamss.startTime).getTime() + plan.Duration * 60 * 1000);
-
+  if (!streamss) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Not Found stream');
+  }
   let value = await Streamrequest.findByIdAndUpdate(
     { _id: req.query.id },
-    { ...req.body, ...{ startTime: startTime, endTime: datess, streamEnd_Time: datess } },
+    req.body,
     { new: true }
   );
   let posts = value.post;
-  //console.log(posts, req.body.addpost);
   req.body.addpost.forEach(async (a) => {
     posts.push(a);
     await StreamPost.findByIdAndUpdate({ _id: a }, { isUsed: true, status: 'Assigned' }, { new: true });
@@ -7397,8 +7392,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-        ? 'RAC'
-        : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -7407,8 +7402,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+            ? 'RAC'
+            : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -11840,7 +11835,7 @@ const get_stream_post_after_live_stream = async (req) => {
       ffmpeg(inputFilePath)
         .outputOptions('-c', 'copy')
         .output(outputFilePath)
-        .on('end', (e) => {})
+        .on('end', (e) => { })
         .on('error', (err) => {
           console.error('Error while converting:', err);
         })
