@@ -428,6 +428,9 @@ const streamRequestschema = mongoose.Schema({
   slotId: {
     type: String,
   },
+  Location:{
+    type: String,
+  }
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);
