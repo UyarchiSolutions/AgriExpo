@@ -9,6 +9,12 @@ const create_Advertisment = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const get_Advertisment = catchAsync(async (req, res) => {
+  const data = await AdvertismentService.get_Advertisment(req.params.page);
+  res.send(data);
+});
+
 module.exports = {
   create_Advertisment,
+  get_Advertisment,
 };
