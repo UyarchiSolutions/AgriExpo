@@ -2207,6 +2207,7 @@ const get_all_streams = async (req) => {
 
     {
       $project: {
+        purchasedplans:"$purchasedplans",
         _id: 1,
         supplierName: '$suppliers.contactName',
         active: 1,
