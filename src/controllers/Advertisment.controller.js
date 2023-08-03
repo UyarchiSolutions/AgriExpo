@@ -4,7 +4,8 @@ const catchAsync = require('../utils/catchAsync');
 const AdvertismentService = require('../services/Advertisment.service');
 
 const create_Advertisment = catchAsync(async (req, res) => {
-  const data = await AdvertismentService.create_Advertisment(req.body);
+  let userId = req.userId;
+  const data = await AdvertismentService.create_Advertisment(req.body, userId);
   res.send(data);
 });
 

@@ -30,6 +30,9 @@ const AdvertismentSchema = new mongoose.Schema(
     Display_mode: {
       type: String,
     },
+    userId: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
