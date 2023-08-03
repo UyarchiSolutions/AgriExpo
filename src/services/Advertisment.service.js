@@ -8,7 +8,6 @@ const create_Advertisment = async (body, userId) => {
 };
 
 const get_Advertisment = async (page) => {
-    console.log(page)
   let values = await Advertisment.aggregate([{ $skip: page * 10 }, { $limit: 10 }]);
   let total = await Advertisment.find().count();
   return { values: values, total: total };
