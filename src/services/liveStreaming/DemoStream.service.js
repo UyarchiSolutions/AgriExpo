@@ -41,10 +41,13 @@ const secret = 'demoStream';
 const Agora = require('agora-access-token');
 const sms_send_seller = async (link, mobile) => {
   mobile = 91 + '' + mobile;
+  console.log(mobile)
+  console.log(link)
   let message = `Dear Client, Thanks for your interest in our services. You can test our service by using this link https://ag23.site/s/${link} - AgriExpoLive2023(An Ookam company event)`;
   let reva = await axios.get(
     `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168958870053466`
   );
+  console.log(reva.data);
   return reva.data;
 };
 const geenerate_rtc_token = async (chennel, uid, role, expirationTimestamp, agoraID) => {
@@ -382,7 +385,7 @@ const send_request_link = async (req) => {
   demopoat.push(streampost8);
   demopoat.push(streampost9);
   // if (demopoat.length == 10) {
-  await sms_send_seller(demostream._id, user.phoneNumber);
+  console.log(await sms_send_seller(demostream._id, user.phoneNumber));
   // console.log(emailservice.sendDemolink(['bharathiraja996574@gmail.com', 'bharathi@uyarchi.com', 'mps.bharathiraja@gmail.com'], demostream._id));
   return { demopoat, demostream };
 }
@@ -2079,7 +2082,7 @@ const recording_start = async (id) => {
     let agoraToken = await AgoraAppId.findById(str.agoraID);
     const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString('base64')}`;
     if (token.recoredStart == 'acquire') {
-      console.log("start",agoraToken,token)
+      console.log("start", agoraToken, token)
       const resource = token.resourceId;
       //console.log(resource)
       //console.log(token)
@@ -2146,7 +2149,7 @@ const recording_query = async (id, agoraToken) => {
   const mode = 'mix';
   // //console.log(`https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`);
   const query = await axios.get(
-    `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g,'')}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
+    `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
     { headers: { Authorization } }
   );
   console.log(query.data)
