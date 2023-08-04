@@ -599,7 +599,7 @@ const verifyToken = async (req) => {
   try {
     const payload = jwt.verify(token.streamValitity, 'demoStream');
   } catch (err) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link has Expired');
   }
   let user = await Demoseller.findById(token.userID);
   let mobileNumber = user.phoneNumber;
@@ -614,7 +614,7 @@ const get_stream_verify_buyer = async (req) => {
   try {
     const payload = jwt.verify(token.streamValitity, 'demoStream');
   } catch (err) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link has Expired');
   }
   const joined = await DemostreamToken.findById(req.query.join);
   if (joined) {
@@ -631,7 +631,7 @@ const get_stream_details_check = async (req) => {
   try {
     const payload = jwt.verify(token.streamValitity, 'demoStream');
   } catch (err) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link has Expired');
   }
   const streampost = await Demopost.aggregate([
     { $match: { $and: [{ streamID: req.query.id }] } },
@@ -733,7 +733,7 @@ const get_stream_details_check_golive = async (req) => {
   try {
     const payload = jwt.verify(token.streamValitity, 'demoStream');
   } catch (err) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link has Expired');
   }
   const streampost = await Demopost.aggregate([
     { $match: { $and: [{ streamID: req.query.id }] } },
@@ -836,7 +836,7 @@ const go_live_stream = async (req) => {
   try {
     const payload = jwt.verify(token.streamValitity, 'demoStream');
   } catch (err) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link has Expired');
   }
   const streampost = await Demopost.find({ streamID: req.query.id });
 
@@ -1913,7 +1913,7 @@ const verify_otp = async (req) => {
   try {
     const payload = jwt.verify(token.streamValitity, 'demoStream');
   } catch (err) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link has Expired');
   }
   let Datenow = new Date().getTime();
   let verify = await Demootpverify.findOne({
@@ -2079,15 +2079,13 @@ const recording_start = async (id) => {
     let agoraToken = await AgoraAppId.findById(str.agoraID);
     const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString('base64')}`;
     if (token.recoredStart == 'acquire') {
+      console.log("start",agoraToken,token)
       const resource = token.resourceId;
       //console.log(resource)
       //console.log(token)
       const mode = 'mix';
       const start = await axios.post(
-        `https://api.agora.io/v1/apps/${agoraToken.appID.replace(
-          /\s/g,
-          ''
-        )}/cloud_recording/resourceid/${resource}/mode/${mode}/start`,
+        `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/mode/${mode}/start`,
         {
           cname: token.chennel,
           uid: token.Uid.toString(),
@@ -2148,14 +2146,11 @@ const recording_query = async (id, agoraToken) => {
   const mode = 'mix';
   // //console.log(`https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`);
   const query = await axios.get(
-    `https://api.agora.io/v1/apps/${agoraToken.appID.replace(
-      /\s/g,
-      ''
-    )}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
+    `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g,'')}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
     { headers: { Authorization } }
   );
   console.log(query.data)
-  // console.log(query.data.serverResponse.fileList)
+  console.log(query.data.serverResponse.fileList)
   if (query.data.serverResponse.fileList.length > 0) {
     token.videoLink = query.data.serverResponse.fileList[0].fileName;
     token.videoLvideoLink_objink = query.data.serverResponse.fileList;
@@ -2174,7 +2169,7 @@ const verification_sms_send = async (req) => {
   try {
     const payload = jwt.verify(token.streamValitity, 'demoStream');
   } catch (err) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link has Expired');
   }
   let res = await send_otp(token);
   return res;
@@ -2359,7 +2354,7 @@ const get_TechIssue_Pagination = async (req) => {
   try {
     const payload = jwt.verify(token.streamValitity, 'demoStream');
   } catch (err) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link has Expired');
   }
   let techIssue = await TechIssue.aggregate([
     { $match: { $and: [{ streamID: { $eq: token._id } }] } },
@@ -2478,7 +2473,7 @@ const get_completed_stream = async (req) => {
   try {
     const payload = jwt.verify(stream.streamValitity, 'demoStream');
   } catch (err) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Link Expired');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Link has Expired');
   }
   const cloud = await Democloudrecord.find({ streamId: req.query.id, videoLink: { $ne: null } });
 
