@@ -400,6 +400,7 @@ const recording_query = async (req, id, agoraToken) => {
   // token.videoLink =
   //   videoLink_mp4
   console.log(query.data.serverResponse.fileList)
+  console.log(query.data.serverResponse.fileList)
   videoLink_array = query.data.serverResponse.fileList;
   // token.videoLink = query.data.serverResponse.fileList;
   token.recoredStart = 'query';
