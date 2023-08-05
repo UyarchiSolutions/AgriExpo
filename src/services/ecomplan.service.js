@@ -1421,11 +1421,7 @@ const find_and_update_one = async (req) => {
   if (!streamss) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Not Found stream');
   }
-  let value = await Streamrequest.findByIdAndUpdate(
-    { _id: req.query.id },
-    req.body,
-    { new: true }
-  );
+  let value = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, req.body, { new: true });
   let posts = value.post;
   req.body.addpost.forEach(async (a) => {
     posts.push(a);
@@ -2207,7 +2203,7 @@ const get_all_streams = async (req) => {
 
     {
       $project: {
-        purchasedplans:"$purchasedplans",
+        purchasedplans: '$purchasedplans',
         _id: 1,
         supplierName: '$suppliers.contactName',
         active: 1,
@@ -7393,8 +7389,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+        ? 'RAC'
+        : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -7403,8 +7399,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-            ? 'RAC'
-            : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -11836,7 +11832,7 @@ const get_stream_post_after_live_stream = async (req) => {
       ffmpeg(inputFilePath)
         .outputOptions('-c', 'copy')
         .output(outputFilePath)
-        .on('end', (e) => { })
+        .on('end', (e) => {})
         .on('error', (err) => {
           console.error('Error while converting:', err);
         })
