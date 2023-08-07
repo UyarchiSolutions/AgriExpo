@@ -53,7 +53,7 @@ const chat_room_create_host = async (req, io) => {
   let user = await Seller.findById(token.suppierId);
   console.log(token)
   console.log(user)
-  let data = await Groupchat.create({ ...req, ...{ created: moment(), dateISO: dateIso, userName: user.contactName, userType: "supplier", supplierId: user._id, joinuser: req.id, user } })
+  let data = await Groupchat.create({ ...req, ...{ created: moment(), dateISO: dateIso, userName: user.tradeName, userType: "supplier", supplierId: user._id, joinuser: req.id, user } })
   // //console.log(req)
   io.sockets.emit(req.channel, data);
 }
