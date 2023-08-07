@@ -12241,7 +12241,7 @@ const update_pump_views = async (body) => {
   const { arr } = body;
   arr.forEach(async (e) => {
     let finding = await Streamrequest.findById(e._id);
-    let existval = finding.PumpupView ? find.PumpupView : 0;
+    let existval = finding.PumpupView ? finding.PumpupView : 0;
     let total = existval + e.Pumpupview
     await Streamrequest.findByIdAndUpdate({ _id: e._id }, { PumpupView: total }, { new: true });
   });
