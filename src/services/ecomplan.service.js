@@ -12239,12 +12239,13 @@ const get_Live_Streams = async () => {
 
 const update_pump_views = async (body) => {
   const { arr } = body;
-  arr.forEach(async (e) => {
+  for (let i = 0; i < arr.length; i++) {
+    let e = arr[i];
     let finding = await Streamrequest.findById(e._id);
     let existval = finding.PumpupView ? finding.PumpupView : 0;
-    let total = existval + e.Pumpupview
+    let total = existval + e.Pumpupview;
     await Streamrequest.findByIdAndUpdate({ _id: e._id }, { PumpupView: total }, { new: true });
-  });
+  }
   return { message: 'Views Updated' };
 };
 
