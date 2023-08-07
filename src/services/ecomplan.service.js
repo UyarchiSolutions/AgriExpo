@@ -12203,6 +12203,36 @@ const get_Live_Streams = async () => {
         goLive: true,
       },
     },
+    {
+      $lookup: {
+        from: 'joinedusers',
+        localField: '_id',
+        foreignField: 'streamId',
+        as: 'joinedUsers',
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'suppliers',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$suppliers',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        SupplierName: '$suppliers.tradeName',
+        streamName: 1,
+        TotalViews: { $size: '$joinedUsers' },
+      },
+    },
   ]);
   return val;
 };
