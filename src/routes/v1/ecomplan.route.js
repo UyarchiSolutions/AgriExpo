@@ -184,5 +184,5 @@ router.route('/get/video/link').get(upload_s3.single('video'), Ecomcontroller.ge
 
 router.route('/loading-manager/get-order-details/:id').get(Ecomcontroller.get_order_details_by_stream);
 router.route('/UploadProof/plan/:id').put(PlanImage.single('image'), Ecomcontroller.UploadProof);
-router.route('/get/Live/Streams').get(Ecomcontroller.get_Live_Streams);
+router.route('/get/Live/Stream').get(Ecomcontroller.get_Live_Streams);
 module.exports = router;
