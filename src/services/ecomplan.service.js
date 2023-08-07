@@ -12192,6 +12192,21 @@ const UploadProof = async (id, body) => {
   return val;
 };
 
+const get_Live_Streams = async () => {
+  const currentUnixTimestamp = moment().valueOf();
+  console.log(currentUnixTimestamp);
+  let val = await Streamrequest.aggregate([
+    {
+      $match: {
+        startTime: { $lt: currentUnixTimestamp },
+        streamEnd_Time: { $gte: currentUnixTimestamp },
+        goLive: true,
+      },
+    },
+  ]);
+  return val;
+};
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -12314,4 +12329,5 @@ module.exports = {
   getStreamRequestById,
   UploadProof,
   create_stream_one_Broucher,
+  get_Live_Streams,
 };

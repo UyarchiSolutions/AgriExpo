@@ -589,6 +589,11 @@ const UploadProof = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const get_Live_Streams = catchAsync(async (req, res) => {
+  const data = await Ecomserive.get_Live_Streams();
+  res.send(data);
+});
+
 module.exports = {
   create_Plans,
   UploadProof,
@@ -703,4 +708,5 @@ module.exports = {
   disable_Enable_Plan,
   getStreamRequestById,
   create_stream_one_Broucher,
+  get_Live_Streams,
 };
