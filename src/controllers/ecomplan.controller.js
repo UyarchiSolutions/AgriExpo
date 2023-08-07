@@ -594,6 +594,11 @@ const get_Live_Streams = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const update_pump_views = catchAsync(async (req, res) => {
+  const data = await Ecomserive.update_pump_views(req.body);
+  res.send(data);
+});
+
 module.exports = {
   create_Plans,
   UploadProof,
@@ -709,4 +714,5 @@ module.exports = {
   getStreamRequestById,
   create_stream_one_Broucher,
   get_Live_Streams,
+  update_pump_views,
 };

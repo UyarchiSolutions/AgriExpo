@@ -12237,6 +12237,14 @@ const get_Live_Streams = async () => {
   return val;
 };
 
+const update_pump_views = async (body) => {
+  const { arr } = body;
+  arr.forEach(async (e) => {
+    await Streamrequest.findByIdAndUpdate({ _id: e._id }, { PumpupView: e.PumpupView }, { new: true });
+  });
+  return { message: 'Views Updated' };
+};
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -12360,4 +12368,5 @@ module.exports = {
   UploadProof,
   create_stream_one_Broucher,
   get_Live_Streams,
+  update_pump_views
 };
