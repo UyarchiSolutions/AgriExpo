@@ -50,7 +50,9 @@ const chat_room_create_host = async (req, io) => {
   // //console.log(req)
   let dateIso = new Date(new Date(moment().format('YYYY-MM-DD') + ' ' + moment().format('HH:mm:ss'))).getTime();
   let token = await Streamrequest.findById(req.id)
-  let user = await Seller.findById(token.suppierId)
+  let user = await Seller.findById(token.suppierId);
+  console.log(token)
+  console.log(user)
   let data = await Groupchat.create({ ...req, ...{ created: moment(), dateISO: dateIso, userName: user.contactName, userType: "supplier", supplierId: user._id, joinuser: req.id, user } })
   // //console.log(req)
   io.sockets.emit(req.channel, data);
@@ -82,7 +84,7 @@ const livejoined_now = async (req, io, type) => {
   if (temp) {
     let stream = await Demostream.findById(temp.streamID);
     if (stream) {
-      if (stream.status !='Completed') {
+      if (stream.status != 'Completed') {
         let joined = stream.userList != null ? stream.userList : [];
         if (type == "join") {
           let index = joined.indexOf(req.user);
