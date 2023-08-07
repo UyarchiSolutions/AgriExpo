@@ -12194,7 +12194,6 @@ const UploadProof = async (id, body) => {
 
 const get_Live_Streams = async () => {
   const currentUnixTimestamp = moment().valueOf();
-  console.log(currentUnixTimestamp);
   let val = await Streamrequest.aggregate([
     {
       $match: {
@@ -12231,6 +12230,7 @@ const get_Live_Streams = async () => {
         SupplierName: '$suppliers.tradeName',
         streamName: 1,
         TotalViews: { $size: '$joinedUsers' },
+        PumpupView: 1,
       },
     },
   ]);
@@ -12240,7 +12240,10 @@ const get_Live_Streams = async () => {
 const update_pump_views = async (body) => {
   const { arr } = body;
   arr.forEach(async (e) => {
-    await Streamrequest.findByIdAndUpdate({ _id: e._id }, { PumpupView: e.PumpupView }, { new: true });
+    let finding = await Streamrequest.findById(e._id);
+    let existval = finding.PumpupView ? find.PumpupView : 0;
+    let total = existval + e.PumpupView
+    await Streamrequest.findByIdAndUpdate({ _id: e._id }, { PumpupView: total }, { new: true });
   });
   return { message: 'Views Updated' };
 };
@@ -12368,5 +12371,5 @@ module.exports = {
   UploadProof,
   create_stream_one_Broucher,
   get_Live_Streams,
-  update_pump_views
+  update_pump_views,
 };
