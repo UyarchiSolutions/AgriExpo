@@ -80,6 +80,10 @@ const forgotPass = async (req) => {
 const sendOTP_continue = async (req) => {
   let body = req.body;
   let value = await Seller.findOne({ mobileNumber: body.mobileNumber, registered: false });
+  let Registered = await Seller.findOne({ mobileNumber: body.mobileNumber, registered: true });
+  if (Registered) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Your are already registered');
+  }
   if (!value) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Mobile Number Not Exist');
   }
