@@ -5,6 +5,7 @@ const { OTP, sellerOTP } = require('../models/saveOtp.model');
 const sentOTP = require('../config/seller.config');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
+
 const { Streamplan, StreamPost, Streamrequest, StreamrequestPost, StreamPreRegister } = require('../models/ecomplan.model');
 const createSeller = async (req) => {
   let body = req.body;
@@ -80,10 +81,13 @@ const forgotPass = async (req) => {
 const sendOTP_continue = async (req) => {
   let body = req.body;
   let value = await Seller.findOne({ mobileNumber: body.mobileNumber, registered: false });
-  if (!value) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Already Registered');
+  let Registered = await Seller.findOne({ mobileNumber: body.mobileNumber, registered: true });
+  if (Registered) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Your are already registered');
   }
-
+  if (!value) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Mobile Number Not Exist');
+  }
   await sellerOTP.updateMany({ mobileNumber: body.mobileNumber }, { $set: { active: false } });
   const otp = await sentOTP(value.mobileNumber, value);
   return value;

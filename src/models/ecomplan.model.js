@@ -431,6 +431,9 @@ const streamRequestschema = mongoose.Schema({
   Location: {
     type: String,
   },
+  PumpupView: {
+    type: Number,
+  },
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);

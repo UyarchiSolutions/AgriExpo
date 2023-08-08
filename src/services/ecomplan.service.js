@@ -12192,6 +12192,63 @@ const UploadProof = async (id, body) => {
   return val;
 };
 
+const get_Live_Streams = async () => {
+  const currentUnixTimestamp = moment().valueOf();
+  let val = await Streamrequest.aggregate([
+    {
+      $match: {
+        startTime: { $lt: currentUnixTimestamp },
+        streamEnd_Time: { $gte: currentUnixTimestamp },
+        goLive: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'joinedusers',
+        localField: '_id',
+        foreignField: 'streamId',
+        as: 'joinedUsers',
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'suppliers',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$suppliers',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        SupplierName: '$suppliers.tradeName',
+        streamName: 1,
+        TotalViews: { $size: '$joinedUsers' },
+        PumpupView: 1,
+      },
+    },
+  ]);
+  return val;
+};
+
+const update_pump_views = async (body) => {
+  const { arr } = body;
+  for (let i = 0; i < arr.length; i++) {
+    let e = arr[i];
+    let finding = await Streamrequest.findById(e._id);
+    let existval = finding.PumpupView ? finding.PumpupView : 0;
+    let total = existval + e.Pumpupview;
+    await Streamrequest.findByIdAndUpdate({ _id: e._id }, { PumpupView: total }, { new: true });
+  }
+  return { message: 'Views Updated' };
+};
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -12314,4 +12371,6 @@ module.exports = {
   getStreamRequestById,
   UploadProof,
   create_stream_one_Broucher,
+  get_Live_Streams,
+  update_pump_views,
 };
