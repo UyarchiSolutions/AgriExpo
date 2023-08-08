@@ -67,7 +67,7 @@ const generateToken = async (req) => {
   const token = await geenerate_rtc_token(streamId, uid, role, expirationTimestamp);
   value.token = token;
   value.chennel = streamId;
-  value.store = value._id.replace(/[^a-zA-Z0-9]/g, '');
+  value.store = stream._id.replace(/[^a-zA-Z0-9]/g, '');
   let cloud_recording = await generateToken_sub_record(streamId, false, req, value, expirationTimestamp);
   value.cloud_recording = cloud_recording.value.token;
   value.uid_cloud = cloud_recording.value.Uid;
@@ -386,26 +386,25 @@ const recording_query = async (req, id, agoraToken) => {
     'base64'
   )}`;
   let temtoken = id;
-  // let temtoken=req.body.id;
-  // //console.log(req.body);
   let token = await tempTokenModel.findById(temtoken);
   const resource = token.resourceId;
   const sid = token.sid;
   const mode = 'mix';
-  // //console.log(`https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`);
   const query = await axios.get(
     `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
     { headers: { Authorization } }
   );
-  // token.videoLink =
-  //   videoLink_mp4
-  console.log(query.data.serverResponse.fileList)
-  console.log(query.data.serverResponse.fileList)
-  videoLink_array = query.data.serverResponse.fileList;
-  // token.videoLink = query.data.serverResponse.fileList;
-  token.recoredStart = 'query';
-  token.save();
-  console.log(4, 5);
+  if (query.data.serverResponse.fileList.length > 0) {
+    token.videoLink = query.data.serverResponse.fileList[0].fileName;
+    token.videoLink_array = query.data.serverResponse.fileList;
+    let m3u8 = query.data.serverResponse.fileList[0].fileName;
+    if (m3u8 != null) {
+      let mp4 = m3u8.replace('.m3u8', '_0.mp4')
+      token.videoLink_mp4 = mp4;
+    }
+    token.recoredStart = 'query';
+    token.save();
+  }
   return query.data;
 };
 
@@ -1058,7 +1057,7 @@ const create_raice_token = async (req) => {
     const token = await geenerate_rtc_token(streamId, uid, Agora.RtcRole.PUBLISHER, expirationTimestamp);
     value.token = token;
     value.chennel = streamId;
-    value.store = value._id.replace(/[^a-zA-Z0-9]/g, '');
+    value.store = stream._id.replace(/[^a-zA-Z0-9]/g, '');
     value.save();
   }
 
@@ -1137,7 +1136,7 @@ const production_supplier_token_cloudrecording = async (req, id, agroaID) => {
     });
     const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp, agroaID);
     value.token = token;
-    value.store = value._id.replace(/[^a-zA-Z0-9]/g, '');
+    value.store = stream._id.replace(/[^a-zA-Z0-9]/g, '');
     value.save();
     if (value.videoLink == '' || value.videoLink == null) {
       await agora_acquire(req, value._id, agroaID);
@@ -1178,7 +1177,7 @@ const production_supplier_token_cloudrecording = async (req, id, agroaID) => {
       });
       const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp, agroaID);
       value.token = token;
-      value.store = value._id.replace(/[^a-zA-Z0-9]/g, '');
+      value.store = stream._id.replace(/[^a-zA-Z0-9]/g, '');
       value.save();
       await agora_acquire(req, value._id, agroaID);
     });

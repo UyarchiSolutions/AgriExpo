@@ -53,7 +53,7 @@ const agora_acquire = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(tokens);
 });
 const recording_start = catchAsync(async (req, res) => {
-  const tokens = await generateTokenService.recording_start(req,req.query.id);
+  const tokens = await generateTokenService.recording_start(req, req.query.id);
   res.status(httpStatus.CREATED).send(tokens);
 });
 const recording_query = catchAsync(async (req, res) => {
@@ -79,7 +79,7 @@ const get_sub_token = catchAsync(async (req, res) => {
 });
 
 const get_sub_golive = catchAsync(async (req, res) => {
-  const tokens = await generateTokenService.get_sub_golive(req,req.io);
+  const tokens = await generateTokenService.get_sub_golive(req, req.io);
   res.status(httpStatus.CREATED).send(tokens);
 });
 
@@ -95,7 +95,7 @@ const get_participents_limit = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(tokens);
 });
 
-const get_current_live_stream= catchAsync(async (req, res) => {
+const get_current_live_stream = catchAsync(async (req, res) => {
   let tokens = await generateTokenService.get_current_live_stream(req);
   res.status(httpStatus.CREATED).send(tokens);
 });
@@ -142,12 +142,12 @@ const get_stream_complete_videos = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(tokens);
 });
 
-const videoConverter= catchAsync(async (req, res) => {
+const videoConverter = catchAsync(async (req, res) => {
   let tokens = await generateTokenService.videoConverter(req);
   res.status(httpStatus.CREATED).send(tokens);
 });
 
-const cloud_recording_start= catchAsync(async (req, res) => {
+const cloud_recording_start = catchAsync(async (req, res) => {
   let tokens = await generateTokenService.cloud_recording_start(req);
   res.status(httpStatus.CREATED).send(tokens);
 });
