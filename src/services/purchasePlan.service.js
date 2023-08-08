@@ -7,7 +7,7 @@ const paymentgatway = require('./paymentgatway.service');
 const Dates = require('./Date.serive');
 const AWS = require('aws-sdk');
 const { Slotseperation } = require('../models/slot.model');
-
+const axios = require('axios');
 const {
   Streamplan,
   StreamPost,
@@ -16,6 +16,8 @@ const {
   StreamPreRegister,
   streamPlanlink,
 } = require('../models/ecomplan.model');
+
+const { Seller } = require('../models/seller.models');
 
 const create_purchase_plan = async (req) => {
   let orders;
@@ -311,9 +313,53 @@ const get_all_purchasePlans = async (req) => {
 
 // AGRI EXPO
 
+const Purchased_Message = async (Name, plan, mobile) => {
+  mobile = 91 + '' + mobile;
+  console.log(mobile);
+  // let message = `Dear Client, Thanks for your interest in our services. You can test our service by using this link https://ag23.site/s/${link} - AgriExpoLive2023(An Ookam company event)`;
+  let message = `Dear ${Name}, Thank you for subscribing to the ${plan} plan for the event AgriExpoLive2023.Once the payment is approved,you may start using the app for streaming your products/services - AgriExpoLive2023(An Ookam company event)`;
+  let reva = await axios.get(
+    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707169038127561646`
+  );
+  console.log(reva.data);
+  return reva.data;
+};
+
 const create_PurchasePlan_EXpo = async (body, userId) => {
-  const data = { ...body, DateIso: moment(), suppierId: userId };
+  let findUser = await Seller.findById(userId);
+  if (!findUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  let findPlan = await Streamplan.findById(body.planId).select(['-_id', '-active', '-__v']);
+  if (!findPlan) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Plan not found');
+  }
+  let data = {
+    streamvalidity: findPlan.streamvalidity,
+    slotInfo: findPlan.slotInfo,
+    planName: findPlan.planName,
+    numberOfParticipants: findPlan.numberOfParticipants,
+    Teaser: findPlan.Teaser,
+    StreamVideos: findPlan.StreamVideos,
+    completedStream: findPlan.completedStream,
+    Pdf: findPlan.Pdf,
+    image: findPlan.image,
+    description: findPlan.description,
+    RaiseHands: findPlan.RaiseHands,
+    Advertisement_Display: findPlan.Advertisement_Display,
+    Special_Notification: findPlan.Special_Notification,
+    chat_Option: findPlan.chat_Option,
+    salesCommission: findPlan.salesCommission,
+    Price: findPlan.Price,
+    PostCount: findPlan.PostCount,
+    no_of_host: findPlan.no_of_host,
+    planType: findPlan.planType,
+    DateIso: moment(),
+    planId:body.planId,
+    suppierId:userId
+  };
   const creations = await purchasePlan.create(data);
+  await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
   return creations;
 };
 
