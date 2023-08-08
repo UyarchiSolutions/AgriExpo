@@ -57,7 +57,7 @@ const sendOTP_continue_Reg = async (body) => {
   const mobileNumber = body.mobile;
   let shop = await Shop.findOne({ mobile: mobileNumber });
   if (!shop) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Shop-Not-found');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Mobile Not Found');
   }
   shop = await Shop.findOne({ mobile: mobileNumber, registered: { $eq: false } });
   if (!shop) {
