@@ -81,9 +81,8 @@ const sendOTP_continue = async (req) => {
   let body = req.body;
   let value = await Seller.findOne({ mobileNumber: body.mobileNumber, registered: false });
   if (!value) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Already Registered');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Mobile Number Not Exist');
   }
-
   await sellerOTP.updateMany({ mobileNumber: body.mobileNumber }, { $set: { active: false } });
   const otp = await sentOTP(value.mobileNumber, value);
   return value;
