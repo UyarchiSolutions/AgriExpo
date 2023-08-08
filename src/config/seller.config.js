@@ -22,7 +22,7 @@ const Otp = async (mobile, user) => {
   // var options = 'https://api.textlocal.in/' + data;
   let message = `${OTPCODE} is the Onetime password(OTP) to reset the password. This is usable once and valid for 5 mins from the request. PLS DO NOT SHARE WITH ANYONE - AgriExpoLive2023(An Ookam company event)`;
   let reva = await axios.get(
-    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${contact}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707169038127561646`
+    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${contact}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707169089051541000`
   );
   console.log(reva.data,"Forgot password")
   await saveOtp(contact, OTPCODE, user);
