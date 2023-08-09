@@ -275,7 +275,7 @@ const get_all_purchasePlans = async (req) => {
   const myorders = await purchasePlan.aggregate([
     {
       $match: {
-        $and: [{ suppierId: { $eq: req.userId } }, { active: { $eq: true } }, { expireDate: { $gt: date_now } }],
+        $and: [{ suppierId: { $eq: req.userId } }, { active: { $eq: true } }],
       },
     },
     {
