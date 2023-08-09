@@ -16,7 +16,6 @@ const {
   StreamPreRegister,
   streamPlanlink,
 } = require('../models/ecomplan.model');
-
 const { Seller } = require('../models/seller.models');
 
 const create_purchase_plan = async (req) => {
@@ -355,8 +354,8 @@ const create_PurchasePlan_EXpo = async (body, userId) => {
     no_of_host: findPlan.no_of_host,
     planType: findPlan.planType,
     DateIso: moment(),
-    planId:body.planId,
-    suppierId:userId
+    planId: body.planId,
+    suppierId: userId,
   };
   const creations = await purchasePlan.create(data);
   await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
@@ -840,6 +839,60 @@ const getuserAvailablePlanes = async (id, userId) => {
   return data;
 };
 
+const get_All_Purchased_Plan = async (page) => {
+  let values = await Streamplan.aggregate([
+    {
+      $lookup: {
+        from: 'purchasedplans',
+        localField: '_id',
+        foreignField: 'planId',
+        pipeline: [{ $match: { status: 'Approved' } }],
+        as: 'planes',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        planName: 1,
+        purchasedCount: { $size: '$planes' },
+      },
+    },
+    {
+      $match: { purchasedCount: { $gt: 0 } },
+    },
+    {
+      $skip: page * 10,
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+
+  let Total = await Streamplan.aggregate([
+    {
+      $lookup: {
+        from: 'purchasedplans',
+        localField: '_id',
+        foreignField: 'planId',
+        pipeline: [{ $match: { status: 'Approved' } }],
+        as: 'planes',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        planName: 1,
+        purchasedCount: { $size: '$planes' },
+      },
+    },
+    {
+      $match: { purchasedCount: { $gt: 0 } },
+    },
+  ]);
+
+  return { values: values, total: Total.length };
+};
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -860,4 +913,5 @@ module.exports = {
   getPlanDetailsByUser,
   getuserAvailablePlanes,
   getPlanes_Request_Streams,
+  get_All_Purchased_Plan,
 };
