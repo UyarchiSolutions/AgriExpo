@@ -8987,7 +8987,7 @@ const get_completed_stream_completed = async (req) => {
     // //console.log(date, dateMatch)
   }
   const value = await Streamrequest.aggregate([
-    { $match: { $and: [dateMatch, { endTime: { $lte: date_now } }, { status: { $ne: 'Cancelled' } }] } },
+    { $match: { $and: [dateMatch, { streamEnd_Time: { $lte: date_now } }, { status: { $ne: 'Cancelled' } }] } },
     { $sort: { DateIso: 1 } },
     {
       $lookup: {
@@ -9053,13 +9053,13 @@ const get_completed_stream_completed = async (req) => {
     },
     {
       $lookup: {
-        from: 'suppliers',
+        from: 'sellers',
         localField: 'suppierId',
         foreignField: '_id',
-        as: 'suppliers',
+        as: 'sellers',
       },
     },
-    { $unwind: '$suppliers' },
+    { $unwind: '$sellers' },
     {
       $lookup: {
         from: 'streampreregisters',
@@ -9204,7 +9204,7 @@ const get_completed_stream_completed = async (req) => {
     {
       $project: {
         _id: 1,
-        supplierName: '$suppliers.contactName',
+        supplierName: '$sellers.contactName',
         active: 1,
         archive: 1,
         post: 1,
