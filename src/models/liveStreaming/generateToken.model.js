@@ -133,6 +133,9 @@ const tempToken = mongoose.Schema({
   convertStatus: {
     type: String,
     default: 'Pending',
+  },
+  appID:{
+    type: String,
   }
 });
 

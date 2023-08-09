@@ -7389,8 +7389,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-        ? 'RAC'
-        : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -7399,8 +7399,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+            ? 'RAC'
+            : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -8688,7 +8688,6 @@ const get_completed_stream_live = async (req) => {
     if (date.length == 2) {
       dateMatch = { $and: [{ streamingDate: { $gte: date[0] } }, { streamingDate: { $lte: date[1] } }] };
     }
-    // //console.log(date, dateMatch)
   }
   const value = await Streamrequest.aggregate([
     { $sort: { DateIso: 1 } },
@@ -8697,7 +8696,7 @@ const get_completed_stream_live = async (req) => {
         $and: [
           dateMatch,
           { startTime: { $lt: date_now } },
-          { endTime: { $gt: date_now } },
+          { streamEnd_Time: { $gt: date_now } },
           { status: { $ne: 'Cancelled' } },
         ],
       },
@@ -8766,13 +8765,13 @@ const get_completed_stream_live = async (req) => {
     },
     {
       $lookup: {
-        from: 'suppliers',
+        from: 'sellers',
         localField: 'suppierId',
         foreignField: '_id',
-        as: 'suppliers',
+        as: 'sellers',
       },
     },
-    { $unwind: '$suppliers' },
+    { $unwind: '$sellers' },
     {
       $lookup: {
         from: 'streampreregisters',
@@ -8917,7 +8916,7 @@ const get_completed_stream_live = async (req) => {
     {
       $project: {
         _id: 1,
-        supplierName: '$suppliers.contactName',
+        supplierName: '$sellers.contactName',
         active: 1,
         archive: 1,
         post: 1,
@@ -11832,7 +11831,7 @@ const get_stream_post_after_live_stream = async (req) => {
       ffmpeg(inputFilePath)
         .outputOptions('-c', 'copy')
         .output(outputFilePath)
-        .on('end', (e) => {})
+        .on('end', (e) => { })
         .on('error', (err) => {
           console.error('Error while converting:', err);
         })
