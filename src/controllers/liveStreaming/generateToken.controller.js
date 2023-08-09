@@ -153,6 +153,11 @@ const cloud_recording_start = catchAsync(async (req, res) => {
 });
 
 
+const get_cloude_recording = catchAsync(async (req, res) => {
+  let tokens = await generateTokenService.get_cloude_recording(req);
+  res.status(httpStatus.CREATED).send(tokens);
+});
+
 module.exports = {
   generateToken,
   getHostTokens,
@@ -181,5 +186,6 @@ module.exports = {
   get_stream_complete_videos,
   videoConverter,
   get_current_live_stream,
-  cloud_recording_start
+  cloud_recording_start,
+  get_cloude_recording
 };

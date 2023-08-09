@@ -10,6 +10,7 @@ const subhostVerify = require('../../controllers/subhostVefify.controller');
 const uploadimage = require('../../middlewares/upload');
 const PlanImage = require('../../middlewares/plan');
 const { SetPass, SellerAuth } = require('../../controllers/sellerAuth.controller');
+const authorization = require('../../controllers/tokenVerify.controller');
 
 const storage = multer.memoryStorage({
   destination: function (req, res, callback) {
@@ -186,4 +187,8 @@ router.route('/loading-manager/get-order-details/:id').get(Ecomcontroller.get_or
 router.route('/UploadProof/plan/:id').put(PlanImage.single('image'), Ecomcontroller.UploadProof);
 router.route('/get/Live/Stream').get(Ecomcontroller.get_Live_Streams);
 router.route('/update/pump/views').post(Ecomcontroller.update_pump_views);
+
+
+router.route('/upload/stream/video').post(authorization, upload_s3.single("video"), Ecomcontroller.upload_s3_stream_video);
+
 module.exports = router;

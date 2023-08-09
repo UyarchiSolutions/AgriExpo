@@ -12248,6 +12248,39 @@ const update_pump_views = async (body) => {
   return { message: 'Views Updated' };
 };
 
+
+const upload_s3_stream_video = async (req) => {
+  console.log(req.file)
+  let streamId = req.query.id;
+  let stream = await Streamrequest.findById(streamId);
+
+  if (!stream) {
+    fileupload.unlink(req.file.path, (err) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+    })
+    throw new ApiError(httpStatus.NOT_FOUND, 'Not Found stream');
+  }
+  let up = await S3video.videoupload(req.file, 'upload/admin/upload', 'mp4');
+  console.log(up)
+  if (up) {
+    stream.uploadLink = up.Location;
+    stream.uploadDate = moment();
+    stream.uploadStatus = "upload";
+    stream.save();
+  }
+  fileupload.unlink(req.file.path, (err) => {
+    if (err) {
+      console.error(err)
+      return
+    }
+  })
+  return stream;
+};
+
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -12372,4 +12405,5 @@ module.exports = {
   create_stream_one_Broucher,
   get_Live_Streams,
   update_pump_views,
+  upload_s3_stream_video
 };

@@ -434,6 +434,17 @@ const streamRequestschema = mongoose.Schema({
   PumpupView: {
     type: Number,
   },
+  uploadDate: {
+    type: Number,
+  },
+  uploadLink: {
+    type: String,
+  },
+  uploadStatus: {
+    type: String,
+    default: "Pending"
+  }
+  
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);

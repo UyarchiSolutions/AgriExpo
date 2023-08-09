@@ -985,6 +985,14 @@ const find_userLimt = async (channel) => {
 };
 
 const remove_host_live = async (req) => {
+  let stream = await Streamrequest.findById(req.query.id);
+  if (stream) {
+    stream = await Streamrequest.findByIdAndUpdate(
+      { _id: req.query.id },
+      { status: 'Completed', streamEnd_Time: moment(), end_Status: 'Terminated' },
+      { new: true }
+    );
+  }
   req.io.emit(req.query.id + 'admin_action', { remove: true });
   return { removed: 'success' };
 };
@@ -1102,7 +1110,7 @@ const production_supplier_token = async (req) => {
   }
 
   req.io.emit(streamId + '_golive', { streamId: streamId });
-  console.log(streamId);
+  // console.log(streamId);
   await production_supplier_token_cloudrecording(req, streamId, stream.agoraID);
   return value;
 };
@@ -1115,7 +1123,7 @@ const production_supplier_token_cloudrecording = async (req, id, agroaID) => {
   if (!stream) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
   }
-  console.log(stream);
+  // console.log(stream);
   value = await tempTokenModel.findOne({ chennel: streamId, type: 'CloudRecording', recoredStart: { $in: ["query", 'start'] } });
   if (!value) {
     const uid = await generateUid();
@@ -1146,7 +1154,7 @@ const production_supplier_token_cloudrecording = async (req, id, agroaID) => {
     let token = value;
     const resource = token.resourceId;
     const sid = token.sid;
-    console.log(1234567890123456, resource)
+    // console.log(1234567890123456, resource)
     const mode = 'mix';
     const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
       'base64'
@@ -1192,7 +1200,7 @@ const production_supplier_token_watchamin = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
   }
   value = await tempTokenModel.findOne({ chennel: streamId, type: 'adminwatch' });
-  console.log(stream)
+  // console.log(stream)
   if (!value) {
     const uid = await generateUid();
     const role = Agora.RtcRole.SUBSCRIBER;
@@ -1527,7 +1535,7 @@ const videoConverter = async () => {
       //console.log('Conversion completed successfully', e);
     })
     .on('error', (err) => {
-      console.error('Error while converting:', err);
+      // console.error('Error while converting:', err);
     })
     .run();
   //console.log(outputFilePath)
@@ -1549,7 +1557,7 @@ const videoConverter = async () => {
   };
   s3.upload(params, (err, data) => {
     if (err) {
-      console.error(err);
+      // console.error(err);
     } else {
       //console.log(`File uploaded successfully. Location: ${data.Location}`);
     }
@@ -1561,7 +1569,7 @@ const cloud_recording_start = async (req) => {
   // let recording=await tempTokenModel.findById(req.query.id);
 
   let token = await tempTokenModel.findById(req.query.id);
-  console.log(token)
+  // console.log(token)
   const resource = token.resourceId;
   const sid = token.sid;
   const mode = 'mix';
@@ -1575,6 +1583,13 @@ const cloud_recording_start = async (req) => {
   // return recording;
 
 };
+
+const get_cloude_recording = async (req) => {
+  let streamid = req.query.id;
+  let stream = await tempTokenModel.find({ streamId: streamid, type: 'CloudRecording', recoredStart: { $ne: "Pending" } });
+  return stream;
+
+}
 
 module.exports = {
   generateToken,
@@ -1604,5 +1619,6 @@ module.exports = {
   get_stream_complete_videos,
   videoConverter,
   get_current_live_stream,
-  cloud_recording_start
+  cloud_recording_start,
+  get_cloude_recording
 };
