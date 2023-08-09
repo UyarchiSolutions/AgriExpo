@@ -198,7 +198,7 @@ const purchasePlanSchema = mongoose.Schema(
       type: Number,
     },
   },
-  { timestamp: true }
+  { timestamps: true }
 );
 
 purchasePlan = mongoose.model('purchasedPlans', purchasePlanSchema);
