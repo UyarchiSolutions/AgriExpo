@@ -506,6 +506,7 @@ const Approve_Reject = async (id, body) => {
   }
   if (body.status == 'Approved') {
     values = await purchasePlan.findByIdAndUpdate({ _id: id }, { status: body.status }, { new: true });
+    await purchasePlan.findByIdAndUpdate({ _id: id }, { approvalDate: moment() }, { new: true });
     values.slotInfo.forEach(async (e) => {
       // suppierId
       await Slotseperation.create({
@@ -518,6 +519,7 @@ const Approve_Reject = async (id, body) => {
     });
   } else if (body.status == 'Rejected') {
     values = await purchasePlan.findByIdAndUpdate({ _id: id }, { status: body.status }, { new: true });
+    await purchasePlan.findByIdAndUpdate({ _id: id }, { approvalDate: moment() }, { new: true });
   } else {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Error Occured');
   }
@@ -855,6 +857,7 @@ const get_All_Purchased_Plan = async (page) => {
         _id: 1,
         planName: 1,
         purchasedCount: { $size: '$planes' },
+        slotInfo: 1,
       },
     },
     {
@@ -883,6 +886,7 @@ const get_All_Purchased_Plan = async (page) => {
         _id: 1,
         planName: 1,
         purchasedCount: { $size: '$planes' },
+        slotInfo: 1,
       },
     },
     {
@@ -891,6 +895,45 @@ const get_All_Purchased_Plan = async (page) => {
   ]);
 
   return { values: values, total: Total.length };
+};
+
+const streamPlanById = async (id) => {
+  let val = await Streamplan.findById(id);
+  if (!val) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'StreamPlan Not Found');
+  }
+  return val;
+};
+
+const getPurchased_ByPlanId = async (id) => {
+  let values = await purchasePlan.aggregate([
+    {
+      $match: {
+        planId: id,
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'supplier',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$supplier',
+      },
+    },
+    // {
+    //   $project: {
+    //     _id: 1,
+    //     approvalDate: { $ifNull: ['$approvalDate', 'nill'] },
+    //   },
+    // },
+  ]);
+  return values;
 };
 
 module.exports = {
@@ -914,4 +957,6 @@ module.exports = {
   getuserAvailablePlanes,
   getPlanes_Request_Streams,
   get_All_Purchased_Plan,
+  streamPlanById,
+  getPurchased_ByPlanId,
 };
