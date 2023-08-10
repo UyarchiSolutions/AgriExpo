@@ -1990,7 +1990,7 @@ const only_chat_get = async (req) => {
     {
       $lookup: {
         from: 'streamrequests',
-        localField: 'planId',
+        localField: 'streamId',
         foreignField: '_id',
         as: 'streamrequests',
       },
@@ -2011,10 +2011,11 @@ const only_chat_get = async (req) => {
     },
     { $unwind: '$suppliers' },
   ])
-  if (tmp.length == 0) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
-  }
-  return tmp[0];
+  // if (tmp.length == 0) {
+  //   throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
+  // }
+  // return tmp[0];
+  return tmp;
 
 }
 
