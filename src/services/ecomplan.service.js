@@ -1955,6 +1955,11 @@ const end_stream = async (req) => {
   return { value: true };
 };
 
+const generateUid = async (req) => {
+  const length = 5;
+  const randomNo = Math.floor(Math.pow(10, length - 1) + Math.random() * 9 * Math.pow(10, length - 1));
+  return randomNo;
+};
 
 const only_chat_join = async (req) => {
   let streamId = req.query.id;
