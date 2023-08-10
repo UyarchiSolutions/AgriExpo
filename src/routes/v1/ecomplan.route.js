@@ -79,6 +79,8 @@ router.route('/getall/admin/streams').get(Ecomcontroller.get_all_admin);
 router.route('/update/approved').put(Ecomcontroller.update_approved);
 router.route('/update/reject').put(Ecomcontroller.update_reject);
 router.route('/my/approved/streams').get(SellerAuth, Ecomcontroller.get_all_streams);
+router.route('/only/chat/join').get(SellerAuth, Ecomcontroller.only_chat_join);
+router.route('/get/chat/join').get(SellerAuth, Ecomcontroller.only_chat_get);
 router.route('/subhost/assign/streams').get(SellerAuth, Ecomcontroller.get_subhost_streams);
 router.route('/allot/stream/subhost').put(SellerAuth, Ecomcontroller.allot_stream_subhost);
 router.route('/cancel/stream').put(SellerAuth, Ecomcontroller.cancel_stream);

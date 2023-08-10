@@ -212,6 +212,17 @@ const get_all_streams = catchAsync(async (req, res) => {
   const value = await Ecomserive.get_all_streams(req);
   res.send(value);
 });
+const only_chat_join = catchAsync(async (req, res) => {
+  //console.log('sdas');
+  const value = await Ecomserive.only_chat_join(req);
+  res.send(value);
+});
+
+const only_chat_get= catchAsync(async (req, res) => {
+  //console.log('sdas');
+  const value = await Ecomserive.only_chat_get(req);
+  res.send(value);
+});
 const get_subhost_streams = catchAsync(async (req, res) => {
   //console.log('sdas');
   const value = await Ecomserive.get_subhost_streams(req);
@@ -718,5 +729,7 @@ module.exports = {
   create_stream_one_Broucher,
   get_Live_Streams,
   update_pump_views,
-  upload_s3_stream_video
+  upload_s3_stream_video,
+  only_chat_join,
+  only_chat_get
 };

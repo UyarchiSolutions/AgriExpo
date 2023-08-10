@@ -1955,6 +1955,64 @@ const end_stream = async (req) => {
   return { value: true };
 };
 
+
+const only_chat_join = async (req) => {
+  let streamId = req.query.id;
+  let userId = req.userId;
+  let tmp = await tempTokenModel.findOne({ streamId: streamId, supplierId: userId, type: "chat" })
+  if (!tmp) {
+    const uid = await generateUid();
+
+    tmp = await tempTokenModel.create({
+      date: moment().format('YYYY-MM-DD'),
+      time: moment().format('HHMMSS'),
+      supplierId: userId,
+      streamId: streamId,
+      created: moment(),
+      Uid: uid,
+      type: "chat"
+    });
+  }
+  return tmp;
+
+}
+
+const only_chat_get = async (req) => {
+  let streamId = req.query.id;
+  let userId = req.userId;
+  let tmp = await tempTokenModel.aggregate([
+    { $match: { $and: [{ streamId: { $eq: streamId } }, { supplierId: { $eq: userId } }, { type: { $eq: "chat" } }] } },
+    {
+      $lookup: {
+        from: 'streamrequests',
+        localField: 'planId',
+        foreignField: '_id',
+        as: 'streamrequests',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$streamrequests',
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'suppliers',
+      },
+    },
+    { $unwind: '$suppliers' },
+  ])
+  if (tmp.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
+  }
+  return tmp[0];
+
+}
+
 const get_all_streams = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
   //console.log(req.userId);
@@ -2214,7 +2272,7 @@ const get_all_streams = async (req) => {
         archive: 1,
         post: 1,
         communicationMode: 1,
-        chat_permissions:1,
+        chat_permissions: 1,
         sepTwo: 1,
         bookingAmount: 1,
         streamingDate: 1,
@@ -12410,5 +12468,7 @@ module.exports = {
   create_stream_one_Broucher,
   get_Live_Streams,
   update_pump_views,
-  upload_s3_stream_video
+  upload_s3_stream_video,
+  only_chat_join,
+  only_chat_get
 };
