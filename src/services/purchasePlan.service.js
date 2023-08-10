@@ -16,7 +16,6 @@ const {
   StreamPreRegister,
   streamPlanlink,
 } = require('../models/ecomplan.model');
-
 const { Seller } = require('../models/seller.models');
 
 const create_purchase_plan = async (req) => {
@@ -275,7 +274,7 @@ const get_all_purchasePlans = async (req) => {
   const myorders = await purchasePlan.aggregate([
     {
       $match: {
-        $and: [{ suppierId: { $eq: req.userId } }, { active: { $eq: true } }, { expireDate: { $gt: date_now } }],
+        $and: [{ suppierId: { $eq: req.userId } }, { active: { $eq: true } }],
       },
     },
     {
@@ -355,8 +354,8 @@ const create_PurchasePlan_EXpo = async (body, userId) => {
     no_of_host: findPlan.no_of_host,
     planType: findPlan.planType,
     DateIso: moment(),
-    planId:body.planId,
-    suppierId:userId
+    planId: body.planId,
+    suppierId: userId,
   };
   const creations = await purchasePlan.create(data);
   await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
@@ -507,6 +506,7 @@ const Approve_Reject = async (id, body) => {
   }
   if (body.status == 'Approved') {
     values = await purchasePlan.findByIdAndUpdate({ _id: id }, { status: body.status }, { new: true });
+    await purchasePlan.findByIdAndUpdate({ _id: id }, { approvalDate: moment() }, { new: true });
     values.slotInfo.forEach(async (e) => {
       // suppierId
       await Slotseperation.create({
@@ -519,6 +519,7 @@ const Approve_Reject = async (id, body) => {
     });
   } else if (body.status == 'Rejected') {
     values = await purchasePlan.findByIdAndUpdate({ _id: id }, { status: body.status }, { new: true });
+    await purchasePlan.findByIdAndUpdate({ _id: id }, { approvalDate: moment() }, { new: true });
   } else {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Error Occured');
   }
@@ -840,6 +841,101 @@ const getuserAvailablePlanes = async (id, userId) => {
   return data;
 };
 
+const get_All_Purchased_Plan = async (page) => {
+  let values = await Streamplan.aggregate([
+    {
+      $lookup: {
+        from: 'purchasedplans',
+        localField: '_id',
+        foreignField: 'planId',
+        pipeline: [{ $match: { status: 'Approved' } }],
+        as: 'planes',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        planName: 1,
+        purchasedCount: { $size: '$planes' },
+        slotInfo: 1,
+      },
+    },
+    {
+      $match: { purchasedCount: { $gt: 0 } },
+    },
+    {
+      $skip: page * 10,
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+
+  let Total = await Streamplan.aggregate([
+    {
+      $lookup: {
+        from: 'purchasedplans',
+        localField: '_id',
+        foreignField: 'planId',
+        pipeline: [{ $match: { status: 'Approved' } }],
+        as: 'planes',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        planName: 1,
+        purchasedCount: { $size: '$planes' },
+        slotInfo: 1,
+      },
+    },
+    {
+      $match: { purchasedCount: { $gt: 0 } },
+    },
+  ]);
+
+  return { values: values, total: Total.length };
+};
+
+const streamPlanById = async (id) => {
+  let val = await Streamplan.findById(id);
+  if (!val) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'StreamPlan Not Found');
+  }
+  return val;
+};
+
+const getPurchased_ByPlanId = async (id) => {
+  let values = await purchasePlan.aggregate([
+    {
+      $match: {
+        planId: id,
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'supplier',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$supplier',
+      },
+    },
+    // {
+    //   $project: {
+    //     _id: 1,
+    //     approvalDate: { $ifNull: ['$approvalDate', 'nill'] },
+    //   },
+    // },
+  ]);
+  return values;
+};
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -860,4 +956,7 @@ module.exports = {
   getPlanDetailsByUser,
   getuserAvailablePlanes,
   getPlanes_Request_Streams,
+  get_All_Purchased_Plan,
+  streamPlanById,
+  getPurchased_ByPlanId,
 };

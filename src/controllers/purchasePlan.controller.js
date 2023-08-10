@@ -127,6 +127,21 @@ const getPlanes_Request_Streams = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const get_All_Purchased_Plan = catchAsync(async (req, res) => {
+  const data = await purchasePlan.get_All_Purchased_Plan(req.params.page);
+  res.send(data);
+});
+
+const streamPlanById = catchAsync(async (req, res) => {
+  const data = await purchasePlan.streamPlanById(req.params.id);
+  res.send(data);
+});
+
+const getPurchased_ByPlanId = catchAsync(async (req, res) => {
+  const data = await purchasePlan.getPurchased_ByPlanId(req.params.id);
+  res.send(data);
+});
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -147,4 +162,7 @@ module.exports = {
   getPlanDetailsByUser,
   getuserAvailablePlanes,
   getPlanes_Request_Streams,
+  get_All_Purchased_Plan,
+  streamPlanById,
+  getPurchased_ByPlanId,
 };
