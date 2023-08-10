@@ -2014,11 +2014,10 @@ const only_chat_get = async (req) => {
     },
     { $unwind: '$suppliers' },
   ])
-  // if (tmp.length == 0) {
-  //   throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
-  // }
-  // return tmp[0];
-  return tmp;
+  if (tmp.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
+  }
+  return tmp[0];
 
 }
 
