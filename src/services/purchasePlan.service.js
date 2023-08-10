@@ -456,7 +456,11 @@ const get_All_Planes = async (page) => {
     { $skip: 10 * page },
     { $limit: 10 },
   ]);
-  let total = await purchasePlan.aggregate([{ $match: { active: true } }]);
+  let total = await purchasePlan.aggregate([
+    { $match: { active: true } },
+    { $lookup: { from: 'sellers', localField: 'suppierId', foreignField: '_id', as: 'suppliers' } },
+    { $unwind: "$suppliers" },
+  ]);
   return { values, total: total.length };
 };
 
