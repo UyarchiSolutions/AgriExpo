@@ -2200,7 +2200,11 @@ const get_all_streams = async (req) => {
         allot_host_3_name: { $ifNull: ['$allot_host_3_lookup.contactName', '$allot_host_3'] },
       },
     },
-
+    {
+      $addFields: {
+        chat_permissions: { $eq: ['$allot_chat', 'my self'] },
+      },
+    },
     {
       $project: {
         purchasedplans: '$purchasedplans',
@@ -2210,6 +2214,7 @@ const get_all_streams = async (req) => {
         archive: 1,
         post: 1,
         communicationMode: 1,
+        chat_permissions:1,
         sepTwo: 1,
         bookingAmount: 1,
         streamingDate: 1,
