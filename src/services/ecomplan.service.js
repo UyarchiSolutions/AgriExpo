@@ -1985,6 +1985,8 @@ const only_chat_join = async (req) => {
 const only_chat_get = async (req) => {
   let streamId = req.query.id;
   let userId = req.userId;
+  console.log(streamId)
+  console.log(userId)
 
   let tmp = await tempTokenModel.aggregate([
     { $match: { $and: [{ _id: { $eq: streamId } }, { supplierId: { $eq: userId } }, { type: { $eq: "chat" } }] } },
