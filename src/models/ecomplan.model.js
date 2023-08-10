@@ -443,8 +443,11 @@ const streamRequestschema = mongoose.Schema({
   uploadStatus: {
     type: String,
     default: "Pending"
+  },
+  transaction: {
+    type: String,
   }
-  
+
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);

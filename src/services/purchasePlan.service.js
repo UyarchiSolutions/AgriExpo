@@ -391,7 +391,7 @@ const get_All_Planes = async (page) => {
   let values = await purchasePlan.aggregate([
     { $match: { active: true } },
     { $lookup: { from: 'sellers', localField: 'suppierId', foreignField: '_id', as: 'suppliers' } },
-    { $unwind: { preserveNullAndEmptyArrays: true, path: '$suppliers' } },
+    { $unwind: "$suppliers" },
     {
       $project: {
         _id: 1,
