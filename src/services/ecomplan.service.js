@@ -2618,7 +2618,7 @@ const get_subhost_streams = async (req) => {
     },
     {
       $addFields: {
-        chat_permissions: { $eq: ['$allot_chat', userId] },
+        chat_permissions: { $eq: ['$allot_chat', req.userId] },
       },
     },
     {
@@ -2627,9 +2627,9 @@ const get_subhost_streams = async (req) => {
         supplierName: '$suppliers.contactName',
         hostingPermissions: {
           $or: [
-            { $eq: ['$allot_host_1', userId] },
-            { $eq: ['$allot_host_2', userId] },
-            { $eq: ['$allot_host_3', userId] },
+            { $eq: ['$allot_host_1', req.userId] },
+            { $eq: ['$allot_host_2', req.userId] },
+            { $eq: ['$allot_host_3', req.userId] },
           ],
         },
         chat_permissions: 1,
@@ -2659,13 +2659,6 @@ const get_subhost_streams = async (req) => {
         noOfParticipants: 1,
         max_post_per_stream: 1,
         status: 1,
-        hostingPermissions: {
-          $or: [
-            { $eq: ['$allot_host_1', 'my self'] },
-            { $eq: ['$allot_host_2', 'my self'] },
-            { $eq: ['$allot_host_3', 'my self'] },
-          ],
-        },
         no_of_host: '$purchasedplans.no_of_host',
         chat_need: 1,
         allot_chat: 1,
