@@ -2007,7 +2007,7 @@ const only_chat_get = async (req) => {
     {
       $lookup: {
         from: 'sellers',
-        localField: 'suppierId',
+        localField: 'supplierId',
         foreignField: '_id',
         as: 'suppliers',
       },
