@@ -2420,6 +2420,7 @@ const get_subhost_streams = async (req) => {
           statusFilter,
           {
             $or: [
+              { allot_chat: { $eq: req.userId } },
               { allot_host_1: { $eq: req.userId } },
               { allot_host_2: { $eq: req.userId } },
               { allot_host_3: { $eq: req.userId } },
@@ -2616,9 +2617,22 @@ const get_subhost_streams = async (req) => {
       },
     },
     {
+      $addFields: {
+        chat_permissions: { $eq: ['$allot_chat', userId] },
+      },
+    },
+    {
       $project: {
         _id: 1,
         supplierName: '$suppliers.contactName',
+        hostingPermissions: {
+          $or: [
+            { $eq: ['$allot_host_1', userId] },
+            { $eq: ['$allot_host_2', userId] },
+            { $eq: ['$allot_host_3', userId] },
+          ],
+        },
+        chat_permissions: 1,
         active: 1,
         archive: 1,
         post: 1,
