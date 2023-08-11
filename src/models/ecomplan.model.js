@@ -446,6 +446,16 @@ const streamRequestschema = mongoose.Schema({
   },
   transaction: {
     type: String,
+  },
+  selectvideo: {
+    type: String,
+  },
+  showLink: {
+    type: String,
+  },
+  show_completd: {
+    type: Boolean,
+    default: false
   }
 
 });
