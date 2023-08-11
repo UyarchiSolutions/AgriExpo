@@ -12201,7 +12201,7 @@ const completed_show_vidio = async (req) => {
   }
 
 
-  return stream;
+  return { message: "success" };
 
 };
 
