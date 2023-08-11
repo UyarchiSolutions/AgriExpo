@@ -12184,10 +12184,10 @@ const completed_show_vidio = async (req) => {
   }
 
   if (show == 'upload') {
-    stream.showLink = streamss.uploadLink;
-    stream.selectvideo = show;
-    stream.show_completd = true;
-    stream.save();
+    streamss.showLink = streamss.uploadLink;
+    streamss.selectvideo = show;
+    streamss.show_completd = true;
+    streamss.save();
   }
   else {
     let temp = await tempTokenModel.findById(show);
@@ -12195,13 +12195,13 @@ const completed_show_vidio = async (req) => {
       throw new ApiError(httpStatus.BAD_REQUEST, 'recored Not Found');
     }
     streamss.showLink = 'https://streamingupload.s3.ap-south-1.amazonaws.com/' + temp.videoLink_mp4;
-    stream.selectvideo = show;
-    stream.show_completd = true;
-    stream.save();
+    streamss.selectvideo = show;
+    streamss.show_completd = true;
+    streamss.save();
   }
 
 
-  return streamss;
+  return stream;
 
 };
 
