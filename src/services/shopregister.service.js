@@ -1892,13 +1892,21 @@ const get_my_orders_all = async (req) => {
               purchase_price: 1,
               status: 1,
               productTitle: '$products.productTitle',
+              productImg: '$products.image',
               OrderAmount: { $multiply: ['$purchase_quantity', '$purchase_price'] },
             },
           },
           {
             $group: {
               _id: null,
-              productTitle: { $push: '$productTitle' },
+              products: {
+                $push: {
+                  ProductTitle: '$productTitle',
+                  Price: '$purchase_price',
+                  QTY: '$purchase_quantity',
+                  Img: '$productImg',
+                },
+              },
               orderAmount: { $sum: '$OrderAmount' },
             },
           },
@@ -1970,7 +1978,7 @@ const get_my_orders_all = async (req) => {
         Amount: 1,
         DateIso: 1,
         created: 1,
-        productTitle: '$streamingorderproducts.productTitle',
+        productTitle: '$streamingorderproducts',
         // productTitle: "$streamingorderproducts",
         orderAmount: '$streamingorderproducts.orderAmount',
         totalPaidAmound: '$streamingorderpayments.totalPaidAmound',
@@ -1990,6 +1998,258 @@ const get_my_orders_all = async (req) => {
     { $limit: 10 },
   ]);
   return { value, next: total != 0 };
+};
+
+const get_Streaming_orders = async (id) => {
+  let value = await streamingOrder.aggregate([
+    { $match: { _id: id } },
+    {
+      $lookup: {
+        from: 'streamingorderproducts',
+        localField: '_id',
+        foreignField: 'orderId',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'products',
+              localField: 'productId',
+              foreignField: '_id',
+              as: 'products',
+            },
+          },
+          { $unwind: '$products' },
+          {
+            $project: {
+              _id: 1,
+              purchase_quantity: 1,
+              purchase_price: 1,
+              status: 1,
+              productTitle: '$products.productTitle',
+              productImg: '$products.image',
+              OrderAmount: { $multiply: ['$purchase_quantity', '$purchase_price'] },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              products: {
+                $push: {
+                  ProductTitle: '$productTitle',
+                  Price: '$purchase_price',
+                  QTY: '$purchase_quantity',
+                  Img: '$productImg',
+                },
+              },
+              orderAmount: { $sum: '$OrderAmount' },
+            },
+          },
+        ],
+        as: 'streamingorderproducts',
+      },
+    },
+    { $unwind: '$streamingorderproducts' },
+
+    {
+      $lookup: {
+        from: 'streamingorderpayments',
+        localField: '_id',
+        foreignField: 'orderId',
+        pipeline: [
+          {
+            $group: {
+              _id: null,
+              totalPaidAmound: { $sum: '$paidAmt' },
+            },
+          },
+        ],
+        as: 'streamingorderpayments',
+      },
+    },
+    { $unwind: '$streamingorderpayments' },
+    {
+      $lookup: {
+        from: 'streamrequests',
+        localField: 'streamId',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'sellers',
+              localField: 'suppierId',
+              foreignField: '_id',
+              as: 'sellers',
+            },
+          },
+          { $unwind: '$sellers' },
+          {
+            $project: {
+              _id: 1,
+              contactName: '$sellers.contactName',
+              mobileNumber: '$sellers.mobileNumber',
+              tradeName: '$sellers.tradeName',
+              streamName: 1,
+              created: 1,
+            },
+          },
+        ],
+        as: 'streamrequests',
+      },
+    },
+    { $unwind: '$streamrequests' },
+    {
+      $project: {
+        _id: 1,
+        status: 1,
+        orderStatus: 1,
+        approvalStatus: 1,
+        orderId: 1,
+        name: 1,
+        state: 1,
+        city: 1,
+        pincode: 1,
+        address: 1,
+        Amount: 1,
+        DateIso: 1,
+        created: 1,
+        productTitle: '$streamingorderproducts',
+        // productTitle: "$streamingorderproducts",
+        orderAmount: '$streamingorderproducts.orderAmount',
+        totalPaidAmound: '$streamingorderpayments.totalPaidAmound',
+        contactName: '$streamrequests.contactName',
+        mobileNumber: '$streamrequests.mobileNumber',
+        streamName: '$streamrequests.streamName',
+        streamDate: '$streamrequests.created',
+        tradeName: '$streamrequests.tradeName',
+      },
+    },
+  ]);
+  return value[0];
+};
+
+const get_Streaming_ordersByStream = async (id) => {
+  let value = await streamingOrder.aggregate([
+    { $match: { streamId: id } },
+    {
+      $lookup: {
+        from: 'streamingorderproducts',
+        localField: '_id',
+        foreignField: 'orderId',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'products',
+              localField: 'productId',
+              foreignField: '_id',
+              as: 'products',
+            },
+          },
+          { $unwind: '$products' },
+          {
+            $project: {
+              _id: 1,
+              purchase_quantity: 1,
+              purchase_price: 1,
+              status: 1,
+              productTitle: '$products.productTitle',
+              productImg: '$products.image',
+              OrderAmount: { $multiply: ['$purchase_quantity', '$purchase_price'] },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              products: {
+                $push: {
+                  ProductTitle: '$productTitle',
+                  Price: '$purchase_price',
+                  QTY: '$purchase_quantity',
+                  Img: '$productImg',
+                },
+              },
+              orderAmount: { $sum: '$OrderAmount' },
+            },
+          },
+        ],
+        as: 'streamingorderproducts',
+      },
+    },
+    { $unwind: '$streamingorderproducts' },
+
+    {
+      $lookup: {
+        from: 'streamingorderpayments',
+        localField: '_id',
+        foreignField: 'orderId',
+        pipeline: [
+          {
+            $group: {
+              _id: null,
+              totalPaidAmound: { $sum: '$paidAmt' },
+            },
+          },
+        ],
+        as: 'streamingorderpayments',
+      },
+    },
+    { $unwind: '$streamingorderpayments' },
+    {
+      $lookup: {
+        from: 'streamrequests',
+        localField: 'streamId',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'sellers',
+              localField: 'suppierId',
+              foreignField: '_id',
+              as: 'sellers',
+            },
+          },
+          { $unwind: '$sellers' },
+          {
+            $project: {
+              _id: 1,
+              contactName: '$sellers.contactName',
+              mobileNumber: '$sellers.mobileNumber',
+              tradeName: '$sellers.tradeName',
+              streamName: 1,
+              created: 1,
+            },
+          },
+        ],
+        as: 'streamrequests',
+      },
+    },
+    { $unwind: '$streamrequests' },
+    {
+      $project: {
+        _id: 1,
+        status: 1,
+        orderStatus: 1,
+        approvalStatus: 1,
+        orderId: 1,
+        name: 1,
+        state: 1,
+        city: 1,
+        pincode: 1,
+        address: 1,
+        Amount: 1,
+        DateIso: 1,
+        created: 1,
+        productTitle: '$streamingorderproducts',
+        // productTitle: "$streamingorderproducts",
+        orderAmount: '$streamingorderproducts.orderAmount',
+        totalPaidAmound: '$streamingorderpayments.totalPaidAmound',
+        contactName: '$streamrequests.contactName',
+        mobileNumber: '$streamrequests.mobileNumber',
+        streamName: '$streamrequests.streamName',
+        streamDate: '$streamrequests.created',
+        tradeName: '$streamrequests.tradeName',
+      },
+    },
+  ]);
+  return value;
 };
 
 const get_my_orders_single = async (req) => {
@@ -2178,4 +2438,6 @@ module.exports = {
   get_my_orders_single,
   NewRegister_Shop,
   sendOTP_continue_Reg,
+  get_Streaming_orders,
+  get_Streaming_ordersByStream,
 };

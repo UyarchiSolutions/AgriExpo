@@ -138,7 +138,7 @@ const streamPlanById = catchAsync(async (req, res) => {
 });
 
 const getPurchased_ByPlanId = catchAsync(async (req, res) => {
-  const data = await purchasePlan.getPurchased_ByPlanId(req.params.id);
+  const data = await purchasePlan.getPurchased_ByPlanId(req.params.id, req.params.page);
   res.send(data);
 });
 

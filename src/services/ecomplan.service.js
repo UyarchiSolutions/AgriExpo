@@ -1964,7 +1964,7 @@ const generateUid = async (req) => {
 const only_chat_join = async (req) => {
   let streamId = req.query.id;
   let userId = req.userId;
-  let tmp = await tempTokenModel.findOne({ streamId: streamId, supplierId: userId, type: "chat" })
+  let tmp = await tempTokenModel.findOne({ streamId: streamId, supplierId: userId, type: 'chat' });
   if (!tmp) {
     const uid = await generateUid();
 
@@ -1975,21 +1975,20 @@ const only_chat_join = async (req) => {
       streamId: streamId,
       created: moment(),
       Uid: uid,
-      type: "chat"
+      type: 'chat',
     });
   }
   return tmp;
-
-}
+};
 
 const only_chat_get = async (req) => {
   let streamId = req.query.id;
   let userId = req.userId;
-  console.log(streamId)
-  console.log(userId)
+  console.log(streamId);
+  console.log(userId);
 
   let tmp = await tempTokenModel.aggregate([
-    { $match: { $and: [{ _id: { $eq: streamId } }, { supplierId: { $eq: userId } }, { type: { $eq: "chat" } }] } },
+    { $match: { $and: [{ _id: { $eq: streamId } }, { supplierId: { $eq: userId } }, { type: { $eq: 'chat' } }] } },
     {
       $lookup: {
         from: 'streamrequests',
@@ -2013,13 +2012,12 @@ const only_chat_get = async (req) => {
       },
     },
     { $unwind: '$suppliers' },
-  ])
+  ]);
   if (tmp.length == 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
   }
   return tmp[0];
-
-}
+};
 
 const get_all_streams = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
@@ -12112,38 +12110,65 @@ const update_pump_views = async (body) => {
   return { message: 'Views Updated' };
 };
 
-
 const upload_s3_stream_video = async (req) => {
-  console.log(req.file)
+  console.log(req.file);
   let streamId = req.query.id;
   let stream = await Streamrequest.findById(streamId);
 
   if (!stream) {
     fileupload.unlink(req.file.path, (err) => {
       if (err) {
-        console.error(err)
-        return
+        console.error(err);
+        return;
       }
-    })
+    });
     throw new ApiError(httpStatus.NOT_FOUND, 'Not Found stream');
   }
   let up = await S3video.videoupload(req.file, 'upload/admin/upload', 'mp4');
-  console.log(up)
+  console.log(up);
   if (up) {
     stream.uploadLink = up.Location;
     stream.uploadDate = moment();
-    stream.uploadStatus = "upload";
+    stream.uploadStatus = 'upload';
     stream.save();
   }
   fileupload.unlink(req.file.path, (err) => {
     if (err) {
-      console.error(err)
-      return
+      console.error(err);
+      return;
     }
-  })
+  });
   return stream;
 };
 
+const get_stream_by_user = async (req, page) => {
+  let id = req.userId;
+  let values = await Streamrequest.aggregate([
+    {
+      $match: { suppierId: id },
+    },
+    {
+      $lookup: {
+        from: 'streamingorders',
+        localField: '_id',
+        foreignField: 'streamId',
+        as: 'streamorders',
+      },
+    },
+  ]);
+  return values;
+};
+
+const getStreambyId = async (id) => {
+  let values = await Streamrequest.aggregate([
+    {
+      $match: {
+        _id: id,
+      },
+    },
+  ]);
+  return values[0]
+};
 
 module.exports = {
   create_Plans,
@@ -12271,5 +12296,7 @@ module.exports = {
   update_pump_views,
   upload_s3_stream_video,
   only_chat_join,
-  only_chat_get
+  only_chat_get,
+  get_stream_by_user,
+  getStreambyId,
 };
