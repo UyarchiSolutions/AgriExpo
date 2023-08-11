@@ -192,5 +192,6 @@ router.route('/update/pump/views').post(Ecomcontroller.update_pump_views);
 
 
 router.route('/upload/stream/video').post(authorization, upload_s3.single("video"), Ecomcontroller.upload_s3_stream_video);
+router.route('/upload/stream/video/byuser').post(SellerAuth, upload_s3.single("video"), Ecomcontroller.upload_s3_stream_video);
 
 module.exports = router;

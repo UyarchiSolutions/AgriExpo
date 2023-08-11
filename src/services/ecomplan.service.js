@@ -11812,15 +11812,8 @@ const get_notification_getall = async (req) => {
   return { notification, total: total };
 };
 
-const fs = require('fs');
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-const ffmpeg = require('fluent-ffmpeg');
-// const { parse } = require('path');
-// const { default: plans } = require('razorpay/dist/types/plans');
-ffmpeg.setFfmpegPath(ffmpegPath);
 const get_stream_post_after_live_stream = async (req) => {
   let streamId = req.query.id;
-  let streamnotification = await Streamrequest.findById(streamId);
   let notification = await Streamrequest.aggregate([
     { $match: { $and: [{ _id: { $eq: streamId } }] } },
     {
@@ -11895,61 +11888,8 @@ const get_stream_post_after_live_stream = async (req) => {
   if (notification.length == 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Not Found');
   }
-  let cloud_record = await tempTokenModel.findOne({ streamId: { $eq: streamId } });
-  console.log(cloud_record, streamnotification);
-  let value = notification[0];
-  if (cloud_record) {
-    console.log(cloud_record);
-    // value.temptokens.forEach(async (e) => {
-    if (cloud_record.convertStatus != 'Converted' && cloud_record.videoLink != null && cloud_record.videoLink != '') {
-      const inputFilePath = 'https://streamingupload.s3.ap-south-1.amazonaws.com/' + cloud_record.videoLink;
-      let store = cloud_record._id.replace(/[^a-zA-Z0-9]/g, '');
-      const outputFilePath = 'output.mp4';
 
-      ffmpeg(inputFilePath)
-        .outputOptions('-c', 'copy')
-        .output(outputFilePath)
-        .on('end', (e) => { })
-        .on('error', (err) => {
-          console.error('Error while converting:', err);
-        })
-        .run();
-      const s3 = new AWS.S3({
-        accessKeyId: 'AKIA3323XNN7Y2RU77UG',
-        secretAccessKey: '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',
-        region: 'ap-south-1',
-      });
-      const bucketName = 'streamingupload';
-
-      const fileContent = fs.readFileSync(outputFilePath);
-      if (fileContent != null) {
-        const params = {
-          Bucket: bucketName,
-          Key: store + '/mp4/' + outputFilePath,
-          Body: fileContent,
-        };
-        s3.upload(params, async (err, data) => {
-          if (err) {
-            console.error(err);
-          } else {
-            cloud_record.convertedVideo = data.Location;
-            cloud_record.convertedVideo = data.Location;
-            cloud_record.convertStatus = 'Converted';
-            cloud_record.save();
-            // streamnotification.videoconvertStatus = 'Converted';
-            // streamnotification.save();
-            fs.unlink(outputFilePath, (err) => {
-              if (err) {
-              } else {
-              }
-            });
-          }
-        });
-      }
-    }
-    // });
-  }
-  return value;
+  return notification[0];
 };
 
 const update_start_end_time = async (req) => {
@@ -11981,161 +11921,7 @@ const video_upload_post = async (req) => {
 };
 
 const get_video_link = async (req) => {
-  let streamId = req.query.id;
-  let streamnotification = await Streamrequest.findById(streamId);
-  const promises = [];
-  const arr = [1, 2, 3, 4, 5];
 
-  let notification = await Streamrequest.aggregate([
-    { $match: { $and: [{ _id: { $eq: streamId } }] } },
-    {
-      $lookup: {
-        from: 'temptokens',
-        localField: '_id',
-        foreignField: 'streamId',
-        pipeline: [{ $match: { $and: [{ type: { $eq: 'CloudRecording' } }] } }],
-        as: 'temptokens',
-      },
-    },
-  ]);
-  if (notification.length == 0) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Not Found stream');
-  }
-  let value = notification[0];
-  value.temptokens.forEach(async (e) => {
-    const promise = new Promise((resolve, reject) => {
-      if (e.convertStatus != 'Converted') {
-        const inputFilePath = 'https://streamingupload.s3.ap-south-1.amazonaws.com/' + e.videoLink;
-        let store = e._id.replace(/[^a-zA-Z0-9]/g, '');
-        const outputFilePath = 'output.mp4';
-
-        ffmpeg(inputFilePath)
-          .outputOptions('-c', 'copy')
-          .output(outputFilePath)
-          .on('end', (e) => {
-            //console.log('Conversion completed successfully', e);
-          })
-          .on('error', (err) => {
-            console.error('Error while converting:', err);
-          })
-          .run();
-        const s3 = new AWS.S3({
-          accessKeyId: 'AKIA3323XNN7Y2RU77UG',
-          secretAccessKey: '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',
-          region: 'ap-south-1',
-        });
-        const bucketName = 'streamingupload';
-
-        //console.log(outputFilePath);
-
-        const fileContent = fs.readFileSync(outputFilePath);
-        //console.log(fileContent);
-        if (fileContent != null) {
-          const params = {
-            Bucket: bucketName,
-            Key: store + '/mp4/' + outputFilePath,
-            Body: fileContent,
-          };
-          s3.upload(params, async (err, data) => {
-            if (err) {
-              console.error(err);
-            } else {
-              e.convertedVideo = data.Location;
-              let val = await tempTokenModel.findById(e._id);
-              val.convertedVideo = data.Location;
-              val.convertStatus = 'Converted';
-              val.save();
-              streamnotification.videoconvertStatus = 'Converted';
-              streamnotification.save();
-              resolve(val);
-              // fs.unlink(outputFilePath, (err) => {
-              //   if (err) {
-              //     //console.log('Error deleting file:', err);
-              //   } else {
-              //     //console.log('File deleted successfully!');
-              //   }
-              // });
-            }
-          });
-        }
-      } else {
-        resolve(e);
-      }
-    });
-    promises.push(promise);
-  });
-
-  return Promise.all(promises)
-    .then((results) => {
-      //console.log(results);
-      notification[0].temptokens = results;
-      return notification[0];
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-};
-
-const get_order_details_by_stream = async (id, query) => {
-  //console.log(query);
-  let buyerSearch = { _id: { $ne: null } };
-
-  if (query.Buyer) {
-    if (query.Buyer != '') {
-      buyerSearch = {
-        $or: [{ name: { $regex: query.buyer, $options: 'i' } }, { orderId: { $regex: query.buyer, $options: 'i' } }],
-      };
-    }
-  } else {
-  }
-
-  let values = await streamingOrder.aggregate([
-    {
-      $match: {
-        streamId: id,
-        orderStatus: { $in: ['processed', 'payment received', 'loaded'] },
-      },
-    },
-    {
-      $lookup: {
-        from: 'streamingorderproducts',
-        localField: '_id',
-        foreignField: 'orderId',
-        pipeline: [
-          {
-            $match: {
-              status: 'approved',
-            },
-          },
-        ],
-        as: 'approved',
-      },
-    },
-    {
-      $lookup: {
-        from: 'b2bshopclones',
-        localField: 'shopId',
-        foreignField: '_id',
-        as: 'shop',
-      },
-    },
-    {
-      $unwind: {
-        preserveNullAndEmptyArrays: true,
-        path: '$shop',
-      },
-    },
-    {
-      $project: {
-        _id: 1,
-        orderStatus: 1,
-        orderId: 1,
-        DispathCount: { $size: '$approved' },
-        Buyer: '$shop.SName',
-      },
-    },
-  ]);
-  return values;
 };
 
 const get_post_view = async (req) => {
