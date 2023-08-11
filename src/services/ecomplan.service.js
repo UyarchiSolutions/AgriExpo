@@ -12130,6 +12130,8 @@ const upload_s3_stream_video = async (req) => {
     stream.uploadLink = up.Location;
     stream.uploadDate = moment();
     stream.uploadStatus = 'upload';
+
+
     stream.save();
   }
   fileupload.unlink(req.file.path, (err) => {
@@ -12169,6 +12171,40 @@ const getStreambyId = async (id) => {
   ]);
   return values[0]
 };
+
+const completed_show_vidio = async (req) => {
+  let userID = req.userId;
+  let { stream, show } = req.body;
+  let streamss = await Streamrequest.findById(stream);
+  if (!streamss) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Stream Not Found');
+  }
+  if (streamss.suppierId != userID) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'illegal to Access Stream');
+  }
+
+  if (show == 'upload') {
+    stream.showLink = streamss.uploadLink;
+    stream.selectvideo = show;
+    stream.show_completd = true;
+    stream.save();
+  }
+  else {
+    let temp = await tempTokenModel.findById(show);
+    if (!temp) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'recored Not Found');
+    }
+    streamss.showLink = 'https://streamingupload.s3.ap-south-1.amazonaws.com/' + temp.videoLink_mp4;
+    stream.selectvideo = show;
+    stream.show_completd = true;
+    stream.save();
+  }
+
+
+  return streamss;
+
+};
+
 
 module.exports = {
   create_Plans,
@@ -12299,4 +12335,5 @@ module.exports = {
   only_chat_get,
   get_stream_by_user,
   getStreambyId,
+  completed_show_vidio
 };

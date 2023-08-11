@@ -624,6 +624,11 @@ const getStreambyId = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const completed_show_vidio = catchAsync(async (req, res) => {
+  const data = await Ecomserive.completed_show_vidio(req);
+  res.send(data);
+});
+
 module.exports = {
   create_Plans,
   UploadProof,
@@ -745,4 +750,5 @@ module.exports = {
   only_chat_get,
   get_stream_by_user,
   getStreambyId,
+  completed_show_vidio
 };
