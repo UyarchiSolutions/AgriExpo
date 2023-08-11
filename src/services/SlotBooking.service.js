@@ -59,6 +59,20 @@ const getBooked_Slot = async (userId, id) => {
         path: '$slots',
       },
     },
+    {
+      $lookup: {
+        from: 'streamrequests',
+        localField: 'slotId',
+        foreignField: 'slotId',
+        as: 'Stream',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$Stream',
+      },
+    },
   ]);
   return val;
 };
