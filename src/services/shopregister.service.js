@@ -1870,6 +1870,7 @@ const get_my_orders_all = async (req) => {
   let shopId = req.shopId;
   let value = await streamingOrder.aggregate([
     { $match: { $and: [{ shopId: { $eq: shopId } }] } },
+    { $sort: { created: -1 } },
     {
       $lookup: {
         from: 'streamingorderproducts',
@@ -1989,8 +1990,6 @@ const get_my_orders_all = async (req) => {
         tradeName: '$streamrequests.tradeName',
       },
     },
-    { $skip: 10 * page },
-    { $limit: 10 },
   ]);
   let total = await streamingOrder.aggregate([
     { $match: { $and: [{ shopId: { $eq: shopId } }] } },
