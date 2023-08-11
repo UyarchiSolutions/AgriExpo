@@ -905,8 +905,11 @@ const streamPlanById = async (id) => {
   return val;
 };
 
-const getPurchased_ByPlanId = async (id) => {
+const getPurchased_ByPlanId = async (id, page) => {
   let values = await purchasePlan.aggregate([
+    {
+      $sort: { createdAt: -1 },
+    },
     {
       $match: {
         planId: id,
@@ -926,15 +929,59 @@ const getPurchased_ByPlanId = async (id) => {
         path: '$supplier',
       },
     },
-    // {
-    //   $project: {
-    //     _id: 1,
-    //     approvalDate: { $ifNull: ['$approvalDate', 'nill'] },
-    //   },
-    // },
+    {
+      $project: {
+        _id: 1,
+        approvalDate: 1,
+        createdAt: 1,
+        planName: 1,
+        planId: 1,
+        SellerName: '$supplier.tradeName',
+      },
+    },
+    {
+      $skip: page * 10,
+    },
+    {
+      $limit: 10,
+    },
   ]);
-  return values;
+
+  let total = await purchasePlan.aggregate([
+    {
+      $match: {
+        planId: id,
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'supplier',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$supplier',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        approvalDate: 1,
+        createdAt: 1,
+        planName: 1,
+        planId: 1,
+        SellerName: '$supplier.tradeName',
+      },
+    },
+  ]);
+
+  return { values: values, total: total.length };
 };
+
 
 module.exports = {
   create_purchase_plan,

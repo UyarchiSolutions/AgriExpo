@@ -34,5 +34,7 @@ router.route('/update/myprofile').put(shopverify, shopregister.update_profile);
 router.route('/update/changepassword').put(shopverify, shopregister.update_changepassword);
 router.route('/getmy/orders/all').get(shopverify, shopregister.get_my_orders_all);
 router.route('/getmy/orders/single').get(shopverify, shopregister.get_my_orders_single);
+router.route('/get/Streaming/orders/:id').get(shopregister.get_Streaming_orders);
+router.route('/get/Streaming/ordersByStream/:id').get(shopregister.get_Streaming_ordersByStream);
 
 module.exports = router;
