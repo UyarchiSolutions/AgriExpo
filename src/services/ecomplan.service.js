@@ -11862,7 +11862,7 @@ const get_stream_post_after_live_stream = async (req) => {
               streampostId: '$streamposts._id',
               uploadStreamVideo: '$streamposts.uploadStreamVideo',
               newVideoUpload: '$streamposts.newVideoUpload',
-              startTime: "$streamposts.startTime",
+              streamStart: "$streamposts.streamStart",
               hours: "$streamposts.hours",
               minutes: "$streamposts.minutes",
               second: "$streamposts.second",
