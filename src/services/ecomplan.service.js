@@ -11928,6 +11928,7 @@ const update_start_end_time = async (req) => {
   streamPost.minutes = minutes;
   streamPost.second = second;
   streamPost.videoTime = true;
+  streamPost.save();
   return streamPost;
 };
 const fileupload = require('fs');
