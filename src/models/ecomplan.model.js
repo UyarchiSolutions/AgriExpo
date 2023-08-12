@@ -246,7 +246,13 @@ const streamPostschema = mongoose.Schema({
   streamStart: {
     type: Number,
   },
-  streamEnd: {
+  hours: {
+    type: Number,
+  },
+  minutes: {
+    type: Number,
+  },
+  second: {
     type: Number,
   },
   bookingAmount: {
@@ -263,6 +269,10 @@ const streamPostschema = mongoose.Schema({
     type: String,
     default: 'Pending',
   },
+  videoTime: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const StreamPost = mongoose.model('Streampost', streamPostschema);

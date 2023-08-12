@@ -11973,6 +11973,11 @@ const get_stream_post_after_live_stream = async (req) => {
               streampostId: '$streamposts._id',
               uploadStreamVideo: '$streamposts.uploadStreamVideo',
               newVideoUpload: '$streamposts.newVideoUpload',
+              streamStart: "$streamposts.streamStart",
+              hours: "$streamposts.hours",
+              minutes: "$streamposts.minutes",
+              second: "$streamposts.second",
+
             },
           },
           // {
@@ -12002,18 +12007,45 @@ const get_stream_post_after_live_stream = async (req) => {
 };
 
 const update_start_end_time = async (req) => {
+  let { hours, minutes, second } = req.body;
   let streamPostId = req.query.id;
   let streamPost = await StreamPost.findById(streamPostId);
 
   if (!streamPost) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Not Found');
   }
-  streamPost.streamStart = req.body.videoStart;
-  streamPost.streamEnd = req.body.videoEnd;
-  streamPost.newVideoUpload = 'time';
-  // streamPost.save();
+  let totalsec = 0;
+  if (req.body.hours != null) {
+    totalsec += parseInt(req.body.hours) * 3600;
+    hours = parseInt(hours);
+  }
+  else {
+    hours = 0;
+  }
+  if (req.body.minutes != null) {
+    totalsec += parseInt(req.body.minutes) * 60;
+    minutes = parseInt(minutes);
 
-  return;
+  }
+  else {
+    minutes = 0;
+  }
+  if (req.body.second != null) {
+    totalsec += parseInt(req.body.minutes)
+    second = parseInt(second);
+
+  }
+  else {
+    second = 0;
+
+  }
+  streamPost.streamStart = totalsec;
+  streamPost.hours = hours;
+  streamPost.minutes = minutes;
+  streamPost.second = second;
+  streamPost.videoTime = true;
+  streamPost.save();
+  return streamPost;
 };
 const fileupload = require('fs');
 
@@ -12292,22 +12324,25 @@ const completed_show_vidio = async (req) => {
   }
 
   if (show == 'upload') {
-    stream.showLink = streamss.uploadLink;
-    stream.selectvideo = show;
-    stream.show_completd = true;
-    stream.save();
-  } else {
+    streamss.showLink = streamss.uploadLink;
+    streamss.selectvideo = show;
+    streamss.show_completd = true;
+    streamss.save();
+  }
+  else {
     let temp = await tempTokenModel.findById(show);
     if (!temp) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'recored Not Found');
     }
     streamss.showLink = 'https://streamingupload.s3.ap-south-1.amazonaws.com/' + temp.videoLink_mp4;
-    stream.selectvideo = show;
-    stream.show_completd = true;
-    stream.save();
+    streamss.selectvideo = show;
+    streamss.show_completd = true;
+    streamss.save();
   }
 
-  return streamss;
+
+  return { message: "success" };
+
 };
 
 module.exports = {
