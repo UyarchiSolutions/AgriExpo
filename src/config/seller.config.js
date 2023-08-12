@@ -3,7 +3,7 @@ var urlencode = require('urlencode');
 const urlencodeed = require('rawurlencode');
 const moment = require('moment');
 const axios = require('axios');
-const Otp = async (mobile, user) => {
+const Otp = async (mobile, user, msg) => {
   // var sender = 'txtlcl';
   const contact = mobile;
   // numbers = '91' + contact;
@@ -20,11 +20,16 @@ const Otp = async (mobile, user) => {
   // );
   // data = 'send/?apikey=' + apiKey + '&numbers=' + numbers + '&sender=' + sender + '&message=' + message;
   // var options = 'https://api.textlocal.in/' + data;
-  let message = `${OTPCODE} is the Onetime password(OTP) to reset the password. This is usable once and valid for 5 mins from the request. PLS DO NOT SHARE WITH ANYONE - AgriExpoLive2023(An Ookam company event)`;
+  let message;
+  if (msg == 'forgot') {
+    message = `${OTPCODE} is the Onetime password(OTP) to reset the password. This is usable once and valid for 5 mins from the request. PLS DO NOT SHARE WITH ANYONE - AgriExpoLive2023(An Ookam company event)`;
+  } else {
+    message = `Dear ${user.contactName},thank you for the registration to the event AgriExpoLive2023 .Your OTP for logging into the account is ${OTPCODE}- AgriExpoLive2023(An Ookam company event)`;
+  }
   let reva = await axios.get(
     `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${contact}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707169089051541000`
   );
-  console.log(reva.data,"Forgot password")
+  console.log(reva.data, 'Forgot password');
   await saveOtp(contact, OTPCODE, user);
 
   // https.request(options, callback).end();

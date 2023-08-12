@@ -22,7 +22,7 @@ const createSeller = async (req) => {
     value = await Seller.create({ ...body, ...{ mainSeller: 'admin', sellerType: 'MainSeller', sellerRole: 'admin' } });
     value.roleNum = [1];
     value.save();
-    const otp = await sentOTP(value.mobileNumber, value);
+    const otp = await sentOTP(value.mobileNumber, value, 'reg');
   }
   return value;
 };
@@ -74,7 +74,7 @@ const forgotPass = async (req) => {
   }
 
   await sellerOTP.updateMany({ mobileNumber: body.mobileNumber }, { $set: { active: false } });
-  const otp = await sentOTP(value.mobileNumber, value);
+  const otp = await sentOTP(value.mobileNumber, value, 'forgot');
   return value;
 };
 
@@ -89,7 +89,7 @@ const sendOTP_continue = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Mobile Number Not Exist');
   }
   await sellerOTP.updateMany({ mobileNumber: body.mobileNumber }, { $set: { active: false } });
-  const otp = await sentOTP(value.mobileNumber, value);
+  const otp = await sentOTP(value.mobileNumber, value, 'cont');
   return value;
 };
 
