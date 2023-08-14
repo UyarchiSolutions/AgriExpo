@@ -639,7 +639,17 @@ const visitor_interested_product = catchAsync(async (req, res) => {
 });
 
 const getIntrested_product = catchAsync(async (req, res) => {
-  const data = await Ecomserive.get_intrested_product(req.userId);
+  const data = await Ecomserive.getIntrested_product(req.params.id);
+  res.send(data);
+});
+
+const getStreamDetails = catchAsync(async (req, res) => {
+  const data = await Ecomserive.getStreamDetails(req.userId);
+  res.send(data);
+});
+
+const getStreamProductDetailsBy_Customer = catchAsync(async (req, res) => {
+  const data = await Ecomserive.getStreamProductDetailsBy_Customer(req.params.id, req.params.StreamId);
   res.send(data);
 });
 
@@ -768,4 +778,6 @@ module.exports = {
   visitor_save_product,
   visitor_interested_product,
   getIntrested_product,
+  getStreamDetails,
+  getStreamProductDetailsBy_Customer,
 };

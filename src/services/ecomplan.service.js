@@ -24,6 +24,7 @@ const { tempTokenModel } = require('../models/liveStreaming/generateToken.model'
 const generateLink = require('./liveStreaming/generatelink.service');
 const moment = require('moment');
 const { findById } = require('../models/token.model');
+const { Shop } = require('../models/b2b.ShopClone.model');
 
 const agoraToken = require('./liveStreaming/AgoraAppId.service');
 
@@ -12385,13 +12386,147 @@ const visitor_interested_product = async (req) => {
   return interested;
 };
 
-const getIntrested_product = async (id) => {
-  let value = await Instestedproduct.aggregate([
+const getIntrested_product = async (streamId) => {
+  let value = await Shop.aggregate([
     {
-      $match: { intrested: true, userID: id },
+      $lookup: {
+        from: 'intrestedproducts',
+        localField: '_id',
+        foreignField: 'userID',
+        pipeline: [
+          {
+            $match: { streamID: streamId, intrested: true },
+          },
+          {
+            $group: {
+              _id: null,
+              productCount: { $sum: 1 },
+            },
+          },
+        ],
+        as: 'intrestedproducts',
+      },
+    },
+    { $unwind: '$intrestedproducts' },
+    {
+      $project: {
+        _id: 1,
+        mobile: 1,
+        SName: 1,
+        productCount: '$intrestedproducts.productCount',
+      },
     },
   ]);
   return value;
+};
+
+const getStreamDetails = async (id) => {
+  const currentUnixTimestamp = moment().valueOf();
+  let streams = await Streamrequest.aggregate([
+    {
+      $sort: { created: -1 },
+    },
+    {
+      $match: { suppierId: id },
+    },
+
+    {
+      $addFields: {
+        isBetweenTime: {
+          $and: [{ $lt: ['$startTime', currentUnixTimestamp] }, { $gte: ['$streamEnd_Time', currentUnixTimestamp] }],
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: 'intrestedproducts',
+        localField: '_id',
+        foreignField: 'streamID',
+        pipeline: [{ $match: { intrested: true } }],
+        as: 'Intrested',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        streamName: 1,
+        startTime: 1,
+        isBetweenTime: 1,
+        intrestedCount: { $size: '$Intrested' },
+      },
+    },
+    {
+      $match: {
+        intrestedCount: { $gt: 0 },
+      },
+    },
+  ]);
+  return streams;
+};
+
+const getStreamProductDetailsBy_Customer = async (id, streamId) => {
+  let val = await Instestedproduct.aggregate([
+    {
+      $match: {
+        streamID: streamId,
+        userID: id,
+        intrested: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'streamposts',
+        localField: 'productID',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'products',
+              localField: 'productId',
+              foreignField: '_id',
+              as: 'product',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$product',
+            },
+          },
+        ],
+        as: 'streampost',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$streampost',
+      },
+    },
+    {
+      $lookup: {
+        from: 'streamrequests',
+        localField: 'streamID',
+        foreignField: '_id',
+        as: 'Stream',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$Stream',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        Product: '$streampost.product.productTitle',
+        Stream: '$Stream.streamName',
+        date: '$created',
+      },
+    },
+  ]);
+  return val;
 };
 
 module.exports = {
@@ -12527,4 +12662,6 @@ module.exports = {
   visitor_save_product,
   visitor_interested_product,
   getIntrested_product,
+  getStreamDetails,
+  getStreamProductDetailsBy_Customer,
 };
