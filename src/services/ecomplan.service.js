@@ -1873,6 +1873,12 @@ const get_all_admin = async (req) => {
         planId: 1,
         streamrequestposts: '$streamrequestposts',
         adminApprove: 1,
+        image: 1,
+        teaser: 1,
+        primarycommunication: 1,
+        secondarycommunication: 1,
+        startTime: 1,
+        chat_need: 1,
       },
     },
 
@@ -1880,7 +1886,112 @@ const get_all_admin = async (req) => {
     { $skip: 10 * page },
     { $limit: 10 },
   ]);
-  return value;
+
+  const total = await Streamrequest.aggregate([
+    {
+      $lookup: {
+        from: 'streamrequestposts',
+        localField: '_id',
+        foreignField: 'streamRequest',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'streamposts',
+              localField: 'postId',
+              foreignField: '_id',
+              pipeline: [
+                {
+                  $lookup: {
+                    from: 'products',
+                    localField: 'productId',
+                    foreignField: '_id',
+                    as: 'products',
+                  },
+                },
+                { $unwind: '$products' },
+                {
+                  $project: {
+                    _id: 1,
+                    productTitle: '$products.productTitle',
+                    productId: 1,
+                    categoryId: 1,
+                    quantity: 1,
+                    marketPlace: 1,
+                    offerPrice: 1,
+                    postLiveStreamingPirce: 1,
+                    validity: 1,
+                    minLots: 1,
+                    incrementalLots: 1,
+                    suppierId: 1,
+                    DateIso: 1,
+                    created: 1,
+                  },
+                },
+              ],
+              as: 'streamposts',
+            },
+          },
+          { $unwind: '$streamposts' },
+          {
+            $project: {
+              _id: 1,
+              productTitle: '$streamposts.productTitle',
+              productId: '$streamposts.productId',
+              quantity: '$streamposts.quantity',
+              marketPlace: '$streamposts.marketPlace',
+              offerPrice: '$streamposts.offerPrice',
+              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
+              validity: '$streamposts.validity',
+              minLots: '$streamposts.minLots',
+              incrementalLots: '$streamposts.incrementalLots',
+            },
+          },
+        ],
+        as: 'streamrequestposts',
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'sellers',
+      },
+    },
+    { $unwind: '$sellers' },
+    {
+      $project: {
+        _id: 1,
+        supplierName: '$suppliers.contactName',
+        active: 1,
+        archive: 1,
+        post: 1,
+        communicationMode: 1,
+        sepTwo: 1,
+        bookingAmount: 1,
+        streamingDate: 1,
+        streamingTime: 1,
+        discription: 1,
+        streamName: 1,
+        suppierId: 1,
+        postCount: 1,
+        DateIso: 1,
+        created: 1,
+        planId: 1,
+        streamrequestposts: '$streamrequestposts',
+        adminApprove: 1,
+        image: 1,
+        teaser: 1,
+        primarycommunication: 1,
+        secondarycommunication: 1,
+        startTime: 1,
+        chat_need: 1,
+      },
+    },
+
+    { $sort: { DateIso: -1 } },
+  ]);
+  return { value: value, total: total.length };
 };
 
 const update_approved = async (req) => {
@@ -7467,8 +7578,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+        ? 'RAC'
+        : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -7477,8 +7588,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-            ? 'RAC'
-            : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -11952,9 +12063,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => {
-
-};
+const get_video_link = async (req) => {};
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
@@ -12165,7 +12274,6 @@ const upload_s3_stream_video = async (req) => {
     stream.uploadDate = moment();
     stream.uploadStatus = 'upload';
 
-
     stream.save();
   }
   fileupload.unlink(req.file.path, (err) => {
@@ -12203,7 +12311,7 @@ const getStreambyId = async (id) => {
       },
     },
   ]);
-  return values[0]
+  return values[0];
 };
 
 const completed_show_vidio = async (req) => {
