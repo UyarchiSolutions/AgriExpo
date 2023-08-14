@@ -9,6 +9,8 @@ const {
   Slab,
   shopNotification,
   PlanSlot,
+  Instestedproduct,
+  Savedproduct
 } = require('../models/ecomplan.model');
 const { Slot } = require('../models/slot.model');
 const axios = require('axios'); //
@@ -11866,6 +11868,7 @@ const get_stream_post_after_live_stream = async (req) => {
               hours: "$streamposts.hours",
               minutes: "$streamposts.minutes",
               second: "$streamposts.second",
+              videoTime: "$streamposts.videoTime",
 
             },
           },
@@ -11904,14 +11907,14 @@ const update_start_end_time = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Not Found');
   }
   let totalsec = 0;
-  if (req.body.hours != null) {
+  if (req.body.hours != null && req.body.hours != '') {
     totalsec += parseInt(req.body.hours) * 3600;
     hours = parseInt(hours);
   }
   else {
     hours = 0;
   }
-  if (req.body.minutes != null) {
+  if (req.body.minutes != null && req.body.minutes != '') {
     totalsec += parseInt(req.body.minutes) * 60;
     minutes = parseInt(minutes);
 
@@ -11919,10 +11922,9 @@ const update_start_end_time = async (req) => {
   else {
     minutes = 0;
   }
-  if (req.body.second != null) {
-    totalsec += parseInt(req.body.minutes)
+  if (req.body.second != null && req.body.second != '') {
+    totalsec += parseInt(req.body.second)
     second = parseInt(second);
-
   }
   else {
     second = 0;
@@ -12238,6 +12240,55 @@ const completed_show_vidio = async (req) => {
 };
 
 
+const visitor_save_product = async (req) => {
+  let userID = req.userId;
+  const { postID, streamID } = req.body;
+
+  let saveproducts = await Savedproduct.findOne({ productID: postID, streamID: streamID, userID: userID });
+
+  if (!saveproducts) {
+    saveproducts = await Savedproduct.create({
+      saved: true,
+      productID: postID,
+      streamID: streamID,
+      userID: userID,
+      DateIso: moment(),
+      created: moment(),
+      intrested: true,
+    });
+  }
+  else {
+    saveproducts.intrested = !saveproducts.intrested;
+    saveproducts.save();
+  }
+
+  return saveproducts;
+
+
+}
+const visitor_interested_product = async (req) => {
+  let userID = req.userId;
+  const { postID, streamID } = req.body;
+  let interested = await Instestedproduct.findOne({ productID: postID, streamID: streamID, userID: userID });
+  if (!interested) {
+    interested = await Instestedproduct.create({
+      interested: true,
+      productID: postID,
+      streamID: streamID,
+      userID: userID,
+      DateIso: moment(),
+      created: moment(),
+      intrested: true,
+    });
+  }
+  else {
+    interested.intrested = !interested.intrested;
+    interested.save();
+  }
+
+  return interested;
+}
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -12367,5 +12418,7 @@ module.exports = {
   only_chat_get,
   get_stream_by_user,
   getStreambyId,
-  completed_show_vidio
+  completed_show_vidio,
+  visitor_save_product,
+  visitor_interested_product
 };

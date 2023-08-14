@@ -714,6 +714,82 @@ const PlanSlotSchema = new mongoose.Schema(
 
 const PlanSlot = mongoose.model('planslot', PlanSlotSchema);
 
+
+
+
+const intrestedschema = mongoose.Schema({
+  _id: {
+    type: String,
+    default: v4,
+  },
+  DateIso: {
+    type: Number,
+  },
+  date: {
+    type: String,
+  },
+  created: {
+    type: Date,
+  },
+  time: {
+    type: Number,
+  },
+  productID: {
+    type: String,
+  },
+  streamID: {
+    type: String,
+  },
+  userID: {
+    type: String,
+  },
+  joinedUSER: {
+    type: String,
+  },
+  intrested: {
+    type: Boolean,
+  },
+});
+const Instestedproduct = mongoose.model('intrestedproduct', intrestedschema);
+
+const savedproductschema = mongoose.Schema({
+  _id: {
+    type: String,
+    default: v4,
+  },
+  DateIso: {
+    type: Number,
+  },
+  date: {
+    type: String,
+  },
+  created: {
+    type: Date,
+  },
+  time: {
+    type: Number,
+  },
+  productID: {
+    type: String,
+  },
+  streamID: {
+    type: String,
+  },
+  userID: {
+    type: String,
+  },
+  joinedUSER: {
+    type: String,
+  },
+  saved: {
+    type: Boolean,
+  },
+});
+const Savedproduct = mongoose.model('savedproduct', savedproductschema);
+
+
+
+
 module.exports = {
   Streamplan,
   StreamPost,
@@ -724,4 +800,7 @@ module.exports = {
   Slab,
   shopNotification,
   PlanSlot,
+  Instestedproduct,
+  Savedproduct
+
 };

@@ -629,6 +629,15 @@ const completed_show_vidio = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const visitor_save_product= catchAsync(async (req, res) => {
+  const data = await Ecomserive.visitor_save_product(req);
+  res.send(data);
+});
+const visitor_interested_product= catchAsync(async (req, res) => {
+  const data = await Ecomserive.visitor_interested_product(req);
+  res.send(data);
+});
+
 module.exports = {
   create_Plans,
   UploadProof,
@@ -750,5 +759,7 @@ module.exports = {
   only_chat_get,
   get_stream_by_user,
   getStreambyId,
-  completed_show_vidio
+  completed_show_vidio,
+  visitor_save_product,
+  visitor_interested_product
 };
