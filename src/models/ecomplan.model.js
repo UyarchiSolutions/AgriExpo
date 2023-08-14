@@ -743,9 +743,6 @@ const intrestedschema = mongoose.Schema({
   userID: {
     type: String,
   },
-  joinedUSER: {
-    type: String,
-  },
   intrested: {
     type: Boolean,
   },
@@ -776,9 +773,6 @@ const savedproductschema = mongoose.Schema({
     type: String,
   },
   userID: {
-    type: String,
-  },
-  joinedUSER: {
     type: String,
   },
   saved: {

@@ -611,11 +611,56 @@ const get_sub_golive = async (req, io) => {
                         },
                       },
                       { $unwind: '$products' },
+                      {
+                        $lookup: {
+                          from: 'intrestedproducts',
+                          localField: '_id',
+                          foreignField: 'productID',
+                          pipeline: [
+                            { $match: { $and: [{ userID: req.shopId }] } }
+                          ],
+                          as: 'intrestedproduct',
+                        },
+                      },
+                      {
+                        $unwind: {
+                          preserveNullAndEmptyArrays: true,
+                          path: '$intrestedproduct',
+                        },
+                      },
+                      {
+                        $addFields: {
+                          intrested: { $ifNull: ['$intrestedproduct.intrested', false] },
+                        },
+                      },
+                      {
+                        $lookup: {
+                          from: 'savedproducts',
+                          localField: '_id',
+                          foreignField: 'productID',
+                          pipeline: [
+                            { $match: { $and: [{ userID: req.shopId }] } }
+                          ],
+                          as: 'savedproduct',
+                        },
+                      },
+                      {
+                        $unwind: {
+                          preserveNullAndEmptyArrays: true,
+                          path: '$savedproduct',
+                        },
+                      },
+                      {
+                        $addFields: {
+                          saved: { $ifNull: ['$savedproduct.saved', false] },
+                        },
+                      },
                     ],
                     as: 'streamposts',
                   },
                 },
                 { $unwind: '$streamposts' },
+
                 {
                   $project: {
                     _id: 1,
@@ -638,6 +683,8 @@ const get_sub_golive = async (req, io) => {
                     suppierId: 1,
                     DateIso: 1,
                     created: '2023-01-20T11:46:58.201Z',
+                    intrested: "$streamposts.intrested",
+                    saved:  "$streamposts.saved",
                   },
                 },
               ],

@@ -7578,8 +7578,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-        ? 'RAC'
-        : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -7588,8 +7588,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+            ? 'RAC'
+            : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -12063,7 +12063,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => {};
+const get_video_link = async (req) => { };
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
@@ -12349,7 +12349,8 @@ const completed_show_vidio = async (req) => {
 
 
 const visitor_save_product = async (req) => {
-  let userID = req.userId;
+  let userID = req.shopId;
+  console.log(userID)
   const { postID, streamID } = req.body;
 
   let saveproducts = await Savedproduct.findOne({ productID: postID, streamID: streamID, userID: userID });
@@ -12362,11 +12363,11 @@ const visitor_save_product = async (req) => {
       userID: userID,
       DateIso: moment(),
       created: moment(),
-      intrested: true,
+      saved: true,
     });
   }
   else {
-    saveproducts.intrested = !saveproducts.intrested;
+    saveproducts.saved = !saveproducts.saved;
     saveproducts.save();
   }
 
@@ -12375,7 +12376,8 @@ const visitor_save_product = async (req) => {
 
 }
 const visitor_interested_product = async (req) => {
-  let userID = req.userId;
+  let userID = req.shopId;
+  console.log(userID)
   const { postID, streamID } = req.body;
   let interested = await Instestedproduct.findOne({ productID: postID, streamID: streamID, userID: userID });
   if (!interested) {

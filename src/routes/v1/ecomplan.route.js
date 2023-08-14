@@ -196,8 +196,8 @@ router.route('/get/stream/by/user').get(SellerAuth, Ecomcontroller.get_stream_by
 router.route('/getStreambyId/:id').get(Ecomcontroller.getStreambyId);
 
 router.route('/completed/show/visitor/video').put(SellerAuth, Ecomcontroller.completed_show_vidio);
-router.route('/visitor/saved').post(SellerAuth, Ecomcontroller.visitor_save_product);
-router.route('/visitor/interested').post(SellerAuth, Ecomcontroller.visitor_interested_product);
+router.route('/visitor/saved').post(shopverify, Ecomcontroller.visitor_save_product);
+router.route('/visitor/interested').post(shopverify, Ecomcontroller.visitor_interested_product);
 
 
 
