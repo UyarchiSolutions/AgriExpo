@@ -629,12 +629,17 @@ const completed_show_vidio = catchAsync(async (req, res) => {
   res.send(data);
 });
 
-const visitor_save_product= catchAsync(async (req, res) => {
+const visitor_save_product = catchAsync(async (req, res) => {
   const data = await Ecomserive.visitor_save_product(req);
   res.send(data);
 });
-const visitor_interested_product= catchAsync(async (req, res) => {
+const visitor_interested_product = catchAsync(async (req, res) => {
   const data = await Ecomserive.visitor_interested_product(req);
+  res.send(data);
+});
+
+const getIntrested_product = catchAsync(async (req, res) => {
+  const data = await Ecomserive.get_intrested_product(req.userId);
   res.send(data);
 });
 
@@ -761,5 +766,6 @@ module.exports = {
   getStreambyId,
   completed_show_vidio,
   visitor_save_product,
-  visitor_interested_product
+  visitor_interested_product,
+  getIntrested_product,
 };

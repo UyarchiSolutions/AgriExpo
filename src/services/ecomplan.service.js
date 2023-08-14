@@ -10,7 +10,7 @@ const {
   shopNotification,
   PlanSlot,
   Instestedproduct,
-  Savedproduct
+  Savedproduct,
 } = require('../models/ecomplan.model');
 const { Slot } = require('../models/slot.model');
 const axios = require('axios'); //
@@ -7578,8 +7578,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+        ? 'RAC'
+        : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -7588,8 +7588,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-            ? 'RAC'
-            : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -11975,12 +11975,11 @@ const get_stream_post_after_live_stream = async (req) => {
               streampostId: '$streamposts._id',
               uploadStreamVideo: '$streamposts.uploadStreamVideo',
               newVideoUpload: '$streamposts.newVideoUpload',
-              streamStart: "$streamposts.streamStart",
-              hours: "$streamposts.hours",
-              minutes: "$streamposts.minutes",
-              second: "$streamposts.second",
-              videoTime: "$streamposts.videoTime",
-
+              streamStart: '$streamposts.streamStart',
+              hours: '$streamposts.hours',
+              minutes: '$streamposts.minutes',
+              second: '$streamposts.second',
+              videoTime: '$streamposts.videoTime',
             },
           },
           // {
@@ -12021,25 +12020,20 @@ const update_start_end_time = async (req) => {
   if (req.body.hours != null && req.body.hours != '') {
     totalsec += parseInt(req.body.hours) * 3600;
     hours = parseInt(hours);
-  }
-  else {
+  } else {
     hours = 0;
   }
   if (req.body.minutes != null && req.body.minutes != '') {
     totalsec += parseInt(req.body.minutes) * 60;
     minutes = parseInt(minutes);
-
-  }
-  else {
+  } else {
     minutes = 0;
   }
   if (req.body.second != null && req.body.second != '') {
-    totalsec += parseInt(req.body.second)
+    totalsec += parseInt(req.body.second);
     second = parseInt(second);
-  }
-  else {
+  } else {
     second = 0;
-
   }
   streamPost.streamStart = totalsec;
   streamPost.hours = hours;
@@ -12063,7 +12057,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => { };
+const get_video_link = async (req) => {};
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
@@ -12330,8 +12324,7 @@ const completed_show_vidio = async (req) => {
     streamss.selectvideo = show;
     streamss.show_completd = true;
     streamss.save();
-  }
-  else {
+  } else {
     let temp = await tempTokenModel.findById(show);
     if (!temp) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'recored Not Found');
@@ -12342,15 +12335,12 @@ const completed_show_vidio = async (req) => {
     streamss.save();
   }
 
-
-  return { message: "success" };
-
+  return { message: 'success' };
 };
-
 
 const visitor_save_product = async (req) => {
   let userID = req.shopId;
-  console.log(userID)
+  console.log(userID);
   const { postID, streamID } = req.body;
 
   let saveproducts = await Savedproduct.findOne({ productID: postID, streamID: streamID, userID: userID });
@@ -12365,19 +12355,16 @@ const visitor_save_product = async (req) => {
       created: moment(),
       saved: true,
     });
-  }
-  else {
+  } else {
     saveproducts.saved = !saveproducts.saved;
     saveproducts.save();
   }
 
   return saveproducts;
-
-
-}
+};
 const visitor_interested_product = async (req) => {
   let userID = req.shopId;
-  console.log(userID)
+  console.log(userID);
   const { postID, streamID } = req.body;
   let interested = await Instestedproduct.findOne({ productID: postID, streamID: streamID, userID: userID });
   if (!interested) {
@@ -12390,14 +12377,22 @@ const visitor_interested_product = async (req) => {
       created: moment(),
       intrested: true,
     });
-  }
-  else {
+  } else {
     interested.intrested = !interested.intrested;
     interested.save();
   }
 
   return interested;
-}
+};
+
+const getIntrested_product = async (id) => {
+  let value = await Instestedproduct.aggregate([
+    {
+      $match: { intrested: true, userID: id },
+    },
+  ]);
+  return value;
+};
 
 module.exports = {
   create_Plans,
@@ -12530,5 +12525,6 @@ module.exports = {
   getStreambyId,
   completed_show_vidio,
   visitor_save_product,
-  visitor_interested_product
+  visitor_interested_product,
+  getIntrested_product,
 };
