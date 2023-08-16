@@ -6412,7 +6412,7 @@ const getall_homeage_streams = async (req) => {
         teaser: 1,
       },
     },
-    { $limit: 5 },
+    { $limit: 10 },
   ]);
 
   var date_now = new Date().getTime();
@@ -6645,7 +6645,7 @@ const getall_homeage_streams = async (req) => {
         productArray: '$streamrequestposts.productTitle',
       },
     },
-    { $limit: 5 },
+    { $limit: 10 },
   ]);
 
   let completednext = await Streamrequest.aggregate([
@@ -6869,7 +6869,7 @@ const getall_homeage_streams = async (req) => {
         productArray: '$streamrequestposts.productTitle',
       },
     },
-    { $skip: 5 },
+    { $skip: 10 },
     { $limit: 5 },
   ]);
 
@@ -7097,7 +7097,7 @@ const getall_homeage_streams = async (req) => {
         teaser: 1,
       },
     },
-    { $skip: 5 },
+    { $skip: 10 },
     { $limit: 5 },
   ]);
 
@@ -7324,7 +7324,7 @@ const getall_homeage_streams = async (req) => {
         teaser: 1,
       },
     },
-    { $limit: 5 },
+    { $limit: 10 },
   ]);
   let upcoming_next = await Streamrequest.aggregate([
     { $sort: { startTime: 1 } },
@@ -7548,7 +7548,7 @@ const getall_homeage_streams = async (req) => {
         teaser: 1,
       },
     },
-    { $skip: 5 },
+    { $skip: 10 },
     { $limit: 5 },
   ]);
   let currentLives = await Streamrequest.aggregate([
@@ -7779,7 +7779,7 @@ const getall_homeage_streams = async (req) => {
         teaser: 1,
       },
     },
-    { $limit: 5 },
+    { $limit: 10 },
   ]);
   let currentLives_next = await Streamrequest.aggregate([
     { $sort: { startTime: 1 } },
@@ -8009,7 +8009,7 @@ const getall_homeage_streams = async (req) => {
         teaser: 1,
       },
     },
-    { $skip: 5 },
+    { $skip: 10 },
     { $limit: 5 },
   ]);
   // var date_now = new Date().getTime();
