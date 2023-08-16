@@ -5,6 +5,7 @@ const AttendanceImage = require('../../middlewares/attendanceCloneImage');
 const authorization = require('../../controllers/tokenVerify.controller');
 const router = express.Router();
 const supplierAuth = require('../../controllers/supplierAppAuth.controller');
+const shopverify = require('../../controllers/shoptokenverify.controller');
 
 // Shop Clone
 router.get('/filter/shopName/Contact/:key', b2bShopCloneController.filterShopwithNameAndContact);

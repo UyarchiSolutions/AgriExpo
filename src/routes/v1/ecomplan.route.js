@@ -203,5 +203,6 @@ router.route('/visitor/interested').post(shopverify, Ecomcontroller.visitor_inte
 router.route('/getIntrested/product/:id').get(Ecomcontroller.getIntrested_product);
 router.route('/getStreamDetails').get(SellerAuth, Ecomcontroller.getStreamDetails);
 router.route('/getStreamProductDetailsBy/Customer/:id/:StreamId').get(Ecomcontroller.getStreamProductDetailsBy_Customer);
+router.route('/saved/product').get(shopverify, Ecomcontroller.get_savedProduct_By_Visitor);
 
 module.exports = router;

@@ -12529,6 +12529,17 @@ const getStreamProductDetailsBy_Customer = async (id, streamId) => {
   return val;
 };
 
+const get_savedProduct_By_Visitor = async (userId) => {
+  let shop = await Shop.aggregate([
+    {
+      $match: {
+        _id: userId,
+      },
+    },
+  ]);
+  return shop;
+};
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -12664,4 +12675,5 @@ module.exports = {
   getIntrested_product,
   getStreamDetails,
   getStreamProductDetailsBy_Customer,
+  get_savedProduct_By_Visitor,
 };

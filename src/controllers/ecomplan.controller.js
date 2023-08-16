@@ -653,6 +653,11 @@ const getStreamProductDetailsBy_Customer = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const get_savedProduct_By_Visitor = catchAsync(async (req, res) => {
+  const data = await Ecomserive.get_savedProduct_By_Visitor(req.userId);
+  res.send(data);
+});
+
 module.exports = {
   create_Plans,
   UploadProof,
@@ -780,4 +785,5 @@ module.exports = {
   getIntrested_product,
   getStreamDetails,
   getStreamProductDetailsBy_Customer,
+  get_savedProduct_By_Visitor,
 };
