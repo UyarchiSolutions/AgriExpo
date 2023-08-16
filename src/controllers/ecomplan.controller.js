@@ -629,12 +629,32 @@ const completed_show_vidio = catchAsync(async (req, res) => {
   res.send(data);
 });
 
-const visitor_save_product= catchAsync(async (req, res) => {
+const visitor_save_product = catchAsync(async (req, res) => {
   const data = await Ecomserive.visitor_save_product(req);
   res.send(data);
 });
-const visitor_interested_product= catchAsync(async (req, res) => {
+const visitor_interested_product = catchAsync(async (req, res) => {
   const data = await Ecomserive.visitor_interested_product(req);
+  res.send(data);
+});
+
+const getIntrested_product = catchAsync(async (req, res) => {
+  const data = await Ecomserive.getIntrested_product(req.params.id);
+  res.send(data);
+});
+
+const getStreamDetails = catchAsync(async (req, res) => {
+  const data = await Ecomserive.getStreamDetails(req.userId);
+  res.send(data);
+});
+
+const getStreamProductDetailsBy_Customer = catchAsync(async (req, res) => {
+  const data = await Ecomserive.getStreamProductDetailsBy_Customer(req.params.id, req.params.StreamId);
+  res.send(data);
+});
+
+const get_savedProduct_By_Visitor = catchAsync(async (req, res) => {
+  const data = await Ecomserive.get_savedProduct_By_Visitor(req.userId);
   res.send(data);
 });
 
@@ -761,5 +781,9 @@ module.exports = {
   getStreambyId,
   completed_show_vidio,
   visitor_save_product,
-  visitor_interested_product
+  visitor_interested_product,
+  getIntrested_product,
+  getStreamDetails,
+  getStreamProductDetailsBy_Customer,
+  get_savedProduct_By_Visitor,
 };

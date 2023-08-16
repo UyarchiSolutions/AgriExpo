@@ -191,15 +191,18 @@ router.route('/get/Live/Stream').get(Ecomcontroller.get_Live_Streams);
 router.route('/update/pump/views').post(Ecomcontroller.update_pump_views);
 
 router.route('/upload/stream/video').post(authorization, upload_s3.single('video'), Ecomcontroller.upload_s3_stream_video);
-router.route('/upload/stream/video/byuser').post(SellerAuth, upload_s3.single("video"), Ecomcontroller.upload_s3_stream_video);
+router
+  .route('/upload/stream/video/byuser')
+  .post(SellerAuth, upload_s3.single('video'), Ecomcontroller.upload_s3_stream_video);
 router.route('/get/stream/by/user').get(SellerAuth, Ecomcontroller.get_stream_by_user);
 router.route('/getStreambyId/:id').get(Ecomcontroller.getStreambyId);
 
 router.route('/completed/show/visitor/video').put(SellerAuth, Ecomcontroller.completed_show_vidio);
 router.route('/visitor/saved').post(shopverify, Ecomcontroller.visitor_save_product);
 router.route('/visitor/interested').post(shopverify, Ecomcontroller.visitor_interested_product);
-
-
-
+router.route('/getIntrested/product/:id').get(Ecomcontroller.getIntrested_product);
+router.route('/getStreamDetails').get(SellerAuth, Ecomcontroller.getStreamDetails);
+router.route('/getStreamProductDetailsBy/Customer/:id/:StreamId').get(Ecomcontroller.getStreamProductDetailsBy_Customer);
+router.route('/saved/product').get(shopverify, Ecomcontroller.get_savedProduct_By_Visitor);
 
 module.exports = router;

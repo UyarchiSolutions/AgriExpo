@@ -10,7 +10,7 @@ const {
   shopNotification,
   PlanSlot,
   Instestedproduct,
-  Savedproduct
+  Savedproduct,
 } = require('../models/ecomplan.model');
 const { Slot } = require('../models/slot.model');
 const axios = require('axios'); //
@@ -24,6 +24,7 @@ const { tempTokenModel } = require('../models/liveStreaming/generateToken.model'
 const generateLink = require('./liveStreaming/generatelink.service');
 const moment = require('moment');
 const { findById } = require('../models/token.model');
+const { Shop } = require('../models/b2b.ShopClone.model');
 
 const agoraToken = require('./liveStreaming/AgoraAppId.service');
 
@@ -8048,8 +8049,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+        ? 'RAC'
+        : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -8058,8 +8059,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-            ? 'RAC'
-            : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -12445,12 +12446,11 @@ const get_stream_post_after_live_stream = async (req) => {
               streampostId: '$streamposts._id',
               uploadStreamVideo: '$streamposts.uploadStreamVideo',
               newVideoUpload: '$streamposts.newVideoUpload',
-              streamStart: "$streamposts.streamStart",
-              hours: "$streamposts.hours",
-              minutes: "$streamposts.minutes",
-              second: "$streamposts.second",
-              videoTime: "$streamposts.videoTime",
-
+              streamStart: '$streamposts.streamStart',
+              hours: '$streamposts.hours',
+              minutes: '$streamposts.minutes',
+              second: '$streamposts.second',
+              videoTime: '$streamposts.videoTime',
             },
           },
           // {
@@ -12491,25 +12491,20 @@ const update_start_end_time = async (req) => {
   if (req.body.hours != null && req.body.hours != '') {
     totalsec += parseInt(req.body.hours) * 3600;
     hours = parseInt(hours);
-  }
-  else {
+  } else {
     hours = 0;
   }
   if (req.body.minutes != null && req.body.minutes != '') {
     totalsec += parseInt(req.body.minutes) * 60;
     minutes = parseInt(minutes);
-
-  }
-  else {
+  } else {
     minutes = 0;
   }
   if (req.body.second != null && req.body.second != '') {
-    totalsec += parseInt(req.body.second)
+    totalsec += parseInt(req.body.second);
     second = parseInt(second);
-  }
-  else {
+  } else {
     second = 0;
-
   }
   streamPost.streamStart = totalsec;
   streamPost.hours = hours;
@@ -12533,7 +12528,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => { };
+const get_video_link = async (req) => {};
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
@@ -12800,8 +12795,7 @@ const completed_show_vidio = async (req) => {
     streamss.selectvideo = show;
     streamss.show_completd = true;
     streamss.save();
-  }
-  else {
+  } else {
     let temp = await tempTokenModel.findById(show);
     if (!temp) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'recored Not Found');
@@ -12812,15 +12806,12 @@ const completed_show_vidio = async (req) => {
     streamss.save();
   }
 
-
-  return { message: "success" };
-
+  return { message: 'success' };
 };
-
 
 const visitor_save_product = async (req) => {
   let userID = req.shopId;
-  console.log(userID)
+  console.log(userID);
   const { postID, streamID } = req.body;
 
   let saveproducts = await Savedproduct.findOne({ productID: postID, streamID: streamID, userID: userID });
@@ -12835,19 +12826,16 @@ const visitor_save_product = async (req) => {
       created: moment(),
       saved: true,
     });
-  }
-  else {
+  } else {
     saveproducts.saved = !saveproducts.saved;
     saveproducts.save();
   }
 
   return saveproducts;
-
-
-}
+};
 const visitor_interested_product = async (req) => {
   let userID = req.shopId;
-  console.log(userID)
+  console.log(userID);
   const { postID, streamID } = req.body;
   let interested = await Instestedproduct.findOne({ productID: postID, streamID: streamID, userID: userID });
   if (!interested) {
@@ -12860,14 +12848,167 @@ const visitor_interested_product = async (req) => {
       created: moment(),
       intrested: true,
     });
-  }
-  else {
+  } else {
     interested.intrested = !interested.intrested;
     interested.save();
   }
 
   return interested;
-}
+};
+
+const getIntrested_product = async (streamId) => {
+  let value = await Shop.aggregate([
+    {
+      $lookup: {
+        from: 'intrestedproducts',
+        localField: '_id',
+        foreignField: 'userID',
+        pipeline: [
+          {
+            $match: { streamID: streamId, intrested: true },
+          },
+          {
+            $group: {
+              _id: null,
+              productCount: { $sum: 1 },
+            },
+          },
+        ],
+        as: 'intrestedproducts',
+      },
+    },
+    { $unwind: '$intrestedproducts' },
+    {
+      $project: {
+        _id: 1,
+        mobile: 1,
+        SName: 1,
+        productCount: '$intrestedproducts.productCount',
+      },
+    },
+  ]);
+  return value;
+};
+
+const getStreamDetails = async (id) => {
+  const currentUnixTimestamp = moment().valueOf();
+  let streams = await Streamrequest.aggregate([
+    {
+      $sort: { created: -1 },
+    },
+    {
+      $match: { suppierId: id },
+    },
+
+    {
+      $addFields: {
+        isBetweenTime: {
+          $and: [{ $lt: ['$startTime', currentUnixTimestamp] }, { $gte: ['$streamEnd_Time', currentUnixTimestamp] }],
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: 'intrestedproducts',
+        localField: '_id',
+        foreignField: 'streamID',
+        pipeline: [{ $match: { intrested: true } }],
+        as: 'Intrested',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        streamName: 1,
+        startTime: 1,
+        isBetweenTime: 1,
+        intrestedCount: { $size: '$Intrested' },
+      },
+    },
+    {
+      $match: {
+        intrestedCount: { $gt: 0 },
+      },
+    },
+  ]);
+  return streams;
+};
+
+const getStreamProductDetailsBy_Customer = async (id, streamId) => {
+  let val = await Instestedproduct.aggregate([
+    {
+      $match: {
+        streamID: streamId,
+        userID: id,
+        intrested: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'streamposts',
+        localField: 'productID',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'products',
+              localField: 'productId',
+              foreignField: '_id',
+              as: 'product',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$product',
+            },
+          },
+        ],
+        as: 'streampost',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$streampost',
+      },
+    },
+    {
+      $lookup: {
+        from: 'streamrequests',
+        localField: 'streamID',
+        foreignField: '_id',
+        as: 'Stream',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$Stream',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        Product: '$streampost.product.productTitle',
+        Stream: '$Stream.streamName',
+        date: '$created',
+      },
+    },
+  ]);
+  return val;
+};
+
+const get_savedProduct_By_Visitor = async (userId) => {
+  let shop = await Shop.aggregate([
+    {
+      $match: {
+        _id: userId,
+      },
+    },
+  ]);
+  return shop;
+};
 
 module.exports = {
   create_Plans,
@@ -13000,5 +13141,9 @@ module.exports = {
   getStreambyId,
   completed_show_vidio,
   visitor_save_product,
-  visitor_interested_product
+  visitor_interested_product,
+  getIntrested_product,
+  getStreamDetails,
+  getStreamProductDetailsBy_Customer,
+  get_savedProduct_By_Visitor,
 };
