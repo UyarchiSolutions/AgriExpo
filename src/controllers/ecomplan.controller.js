@@ -658,6 +658,18 @@ const get_savedProduct_By_Visitor = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const exhibitor_get_video_all= catchAsync(async (req, res) => {
+  const data = await Ecomserive.exhibitor_get_video_all(req);
+  res.send(data);
+});
+
+
+const get_exhibitor_details= catchAsync(async (req, res) => {
+  const data = await Ecomserive.get_exhibitor_details(req);
+  res.send(data);
+});
+
+
 module.exports = {
   create_Plans,
   UploadProof,
@@ -786,4 +798,6 @@ module.exports = {
   getStreamDetails,
   getStreamProductDetailsBy_Customer,
   get_savedProduct_By_Visitor,
+  exhibitor_get_video_all,
+  get_exhibitor_details
 };

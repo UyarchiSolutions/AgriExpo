@@ -29,6 +29,7 @@ const { Shop } = require('../models/b2b.ShopClone.model');
 const agoraToken = require('./liveStreaming/AgoraAppId.service');
 
 const S3video = require('./S3video.service');
+const { Seller } = require('../models/seller.models')
 
 const create_Plans = async (req) => {
   const { slotInfo } = req.body;
@@ -13029,6 +13030,138 @@ const get_savedProduct_By_Visitor = async (userId) => {
   return shop;
 };
 
+const exhibitor_get_video_all = async (req) => {
+  const sellerId = req.query.channel;
+  let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
+  var date_now = new Date().getTime();
+
+  let stream = await Streamrequest.aggregate([
+    { $match: { $and: [{ suppierId: { $eq: sellerId } }, { adminApprove: { $eq: 'Approved' } }, { status: { $ne: "Cancelled" } }] } },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'suppliers',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$suppliers',
+      },
+    },
+    {
+      $addFields: {
+        condition: {
+          $cond: {
+            if: { $and: [{ $lte: ['$startTime', date_now] }, { $gte: ["$streamEnd_Time", date_now] }] },
+            then: 1,
+            else: {
+              $cond: {
+                if: { $and: [{ $gte: ['$startTime', date_now] }] },
+                then: 2,
+                else: 3
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      $addFields: {
+        streamStatus: {
+          $cond: {
+            if: { $and: [{ $eq: ['$condition', 1] }] },
+            then: "Live",
+            else: {
+              $cond: {
+                if: { $and: [{ $eq: ['$condition', 2] }] },
+                then: "Upcomming",
+                else: "Completed"
+              }
+            }
+          }
+        }
+      }
+    },
+    { $sort: { condition: 1 } },
+    {
+      $project: {
+        _id: 1,
+        image: 1,
+        discription: 1,
+        streamName: 1,
+        startTime: 1,
+        DateIso: 1,
+        Duration: 1,
+        endTime: 1,
+        suppliersName: '$suppliers.contactName',
+        tradeName: '$suppliers.tradeName',
+        channel: '$suppliers._id',
+        status: 1,
+        streamrequestposts_count: 1,
+        streamEnd_Time: 1,
+        teaser: 1,
+        condition: 1,
+        streamStatus: 1
+      },
+    },
+    { $skip: 10 * page },
+    { $limit: 10 },
+  ]);
+
+  let next = await Streamrequest.aggregate([
+    { $match: { $and: [{ suppierId: { $eq: sellerId } }, { adminApprove: { $eq: 'Approved' } }, { status: { $ne: "Cancelled" } }] } },
+    {
+      $addFields: {
+        condition: {
+          $cond: {
+            if: { $and: [{ $lte: ['$startTime', date_now] }, { $gte: ["$streamEnd_Time", date_now] }] },
+            then: 1,
+            else: {
+              $cond: {
+                if: { $and: [{ $gte: ['$startTime', date_now] }] },
+                then: 2,
+                else: 3
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      $addFields: {
+        streamStatus: {
+          $cond: {
+            if: { $and: [{ $eq: ['$condition', 1] }] },
+            then: "Live",
+            else: {
+              $cond: {
+                if: { $and: [{ $eq: ['$condition', 2] }] },
+                then: "Upcomming",
+                else: "Completed"
+              }
+            }
+          }
+        }
+      }
+    },
+    { $sort: { condition: 1 } },
+    { $skip: 10 * (page + 1) },
+    { $limit: 10 },
+  ]);
+  return { stream, next: next.length != 0 };
+};
+
+const get_exhibitor_details = async (req) => {
+  const sellerId = req.query.channel;
+  let sell = await Seller.findById(sellerId);
+
+  return sell;
+};
+
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -13165,4 +13298,6 @@ module.exports = {
   getStreamDetails,
   getStreamProductDetailsBy_Customer,
   get_savedProduct_By_Visitor,
+  exhibitor_get_video_all,
+  get_exhibitor_details
 };
