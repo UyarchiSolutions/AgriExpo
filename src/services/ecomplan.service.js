@@ -6473,20 +6473,6 @@ const getall_homeage_streams = async (req) => {
     },
     {
       $lookup: {
-        from: 'suppliers',
-        localField: 'suppierId',
-        foreignField: '_id',
-        as: 'suppliers',
-      },
-    },
-    {
-      $unwind: {
-        preserveNullAndEmptyArrays: true,
-        path: '$suppliers',
-      },
-    },
-    {
-      $lookup: {
         from: 'streampreregisters',
         localField: '_id',
         foreignField: 'streamId',
@@ -6605,6 +6591,20 @@ const getall_homeage_streams = async (req) => {
     },
     { $unwind: '$streamrequestposts' },
     {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'suppliers',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$suppliers',
+      },
+    },
+    {
       $project: {
         _id: 1,
         active: 1,
@@ -6636,7 +6636,6 @@ const getall_homeage_streams = async (req) => {
         goLive: 1,
         joinedusers_user: '$joinedusers_user',
         alreadyJoined: 1,
-        suppliersName: '$suppliers.primaryContactName',
         registerStatus: 1,
         eligible: 1,
         viewstatus: 1,
@@ -6645,9 +6644,11 @@ const getall_homeage_streams = async (req) => {
         streamEnd_Time: 1,
         productArray: '$streamrequestposts.productTitle',
         image: 1,
-        teaser:1,
+        teaser: 1,
         channel: '$suppliers._id',
-
+        suppliersName: '$suppliers.contactName',
+        tradeName: '$suppliers.tradeName',
+        channel: '$suppliers._id',
 
       },
     },
@@ -8067,8 +8068,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-        ? 'RAC'
-        : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -8077,8 +8078,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+            ? 'RAC'
+            : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -12546,7 +12547,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => {};
+const get_video_link = async (req) => { };
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
