@@ -13107,8 +13107,8 @@ const exhibitor_get_video_all = async (req) => {
         streamStatus: 1
       },
     },
-    { $skip: 10 * page },
-    { $limit: 10 },
+    { $skip: 20 * page },
+    { $limit: 20 },
   ]);
 
   let next = await Streamrequest.aggregate([
@@ -13148,8 +13148,8 @@ const exhibitor_get_video_all = async (req) => {
       }
     },
     { $sort: { condition: 1 } },
-    { $skip: 10 * (page + 1) },
-    { $limit: 10 },
+    { $skip: 20 * (page + 1) },
+    { $limit: 20 },
   ]);
   return { stream, next: next.length != 0 };
 };
