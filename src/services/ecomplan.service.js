@@ -6402,6 +6402,7 @@ const getall_homeage_streams = async (req) => {
         alreadyJoined: 1,
         suppliersName: '$suppliers.contactName',
         tradeName: '$suppliers.tradeName',
+        channel: '$suppliers._id',
         registerStatus: 1,
         eligible: 1,
         viewstatus: 1,
@@ -6644,7 +6645,9 @@ const getall_homeage_streams = async (req) => {
         streamEnd_Time: 1,
         productArray: '$streamrequestposts.productTitle',
         image: 1,
-        teaser:1
+        teaser:1,
+        channel: '$suppliers._id',
+
 
       },
     },
@@ -6870,6 +6873,8 @@ const getall_homeage_streams = async (req) => {
         streamrequestposts_count: 1,
         streamEnd_Time: 1,
         productArray: '$streamrequestposts.productTitle',
+        channel: '$suppliers._id',
+
       },
     },
     { $skip: 10 },
@@ -7098,6 +7103,8 @@ const getall_homeage_streams = async (req) => {
         streamEnd_Time: 1,
         productArray: '$streamrequestposts.productTitle',
         teaser: 1,
+        channel: '$suppliers._id',
+
       },
     },
     { $skip: 10 },
@@ -7325,6 +7332,8 @@ const getall_homeage_streams = async (req) => {
         streamEnd_Time: 1,
         productArray: '$streamrequestposts.productTitle',
         teaser: 1,
+        channel: '$suppliers._id',
+
       },
     },
     { $limit: 10 },
@@ -7549,6 +7558,8 @@ const getall_homeage_streams = async (req) => {
         streamEnd_Time: 1,
         productArray: '$streamrequestposts.productTitle',
         teaser: 1,
+        channel: '$suppliers._id',
+
       },
     },
     { $skip: 10 },
@@ -7780,6 +7791,8 @@ const getall_homeage_streams = async (req) => {
         // streamrequestposts:"$streamrequestposts",
         image: 1,
         teaser: 1,
+        channel: '$suppliers._id',
+
       },
     },
     { $limit: 10 },
@@ -8010,6 +8023,8 @@ const getall_homeage_streams = async (req) => {
         // streamrequestposts:"$streamrequestposts",
         image: 1,
         teaser: 1,
+        channel: '$suppliers._id',
+
       },
     },
     { $skip: 10 },
