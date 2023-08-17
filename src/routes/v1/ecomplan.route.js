@@ -208,7 +208,7 @@ router.route('/saved/product').get(shopverify, Ecomcontroller.get_savedProduct_B
 
 
 
-router.route('/exhibitor/getvideo/all').get( Ecomcontroller.exhibitor_get_video_all);
+router.route('/exhibitor/getvideo/all').get(shopverify, Ecomcontroller.exhibitor_get_video_all);
 router.route('/exhibitor/details').get(shopverify, Ecomcontroller.get_exhibitor_details);
 
 module.exports = router;
