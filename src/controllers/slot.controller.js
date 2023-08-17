@@ -39,6 +39,21 @@ const getSlotsWitdSort = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getSlots_by_SlotInfo = catchAsync(async (req, res) => {
+  const data = await SlotService.getSlots_by_SlotInfo(req.query);
+  res.send(data);
+});
+
+const getSlots_Duraions = catchAsync(async (req, res) => {
+  const data = await SlotService.getSlots_Duraions(req.query);
+  res.send(data);
+});
+
+const getStreamBySlots = catchAsync(async (req, res) => {
+  const data = await SlotService.getStreamBySlots(req.params.id);
+  res.send(data);
+});
+
 module.exports = {
   SlotCreation,
   Fetch_Slot,
@@ -47,4 +62,7 @@ module.exports = {
   getSlots_Minutse_Wise,
   getDetailsForSlotChoosing,
   getSlotsWitdSort,
+  getSlots_by_SlotInfo,
+  getSlots_Duraions,
+  getStreamBySlots,
 };

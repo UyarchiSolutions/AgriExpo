@@ -3,6 +3,8 @@ const { Slot, Slotseperation } = require('../models/slot.model');
 const ApiError = require('../utils/ApiError');
 const moment = require('moment');
 const { purchasePlan } = require('../models/purchasePlan.model');
+const { Streamrequest } = require('../models/ecomplan.model');
+const Seller = require('../models/seller.models');
 
 const createSlot = async (body) => {
   const { chooseTime, Duration, date, Type } = body;
@@ -207,6 +209,126 @@ const getSlotsWitdSort = async (data, userId) => {
   // return values
 };
 
+const getSlots_by_SlotInfo = async (query) => {
+  let duratrionMatch = { active: true };
+  const { duration, type } = query;
+  if (duration != '') {
+    duratrionMatch = { Duration: parseInt(duration) };
+  }
+
+  console.log(query);
+
+  let values = await Slot.aggregate([
+    {
+      $match: {
+        $and: [duratrionMatch, { Type: type }],
+      },
+    },
+    {
+      $lookup: {
+        from: 'slotbookings',
+        localField: '_id',
+        foreignField: 'slotId',
+        as: 'slot',
+      },
+    },
+    {
+      $lookup: {
+        from: 'streamrequests',
+        localField: '_id',
+        foreignField: 'slotId',
+        as: 'streams',
+      },
+    },
+  ]);
+  return values;
+};
+
+const getSlots_Duraions = async () => {
+  let values = await Slot.aggregate([
+    {
+      $group: {
+        _id: {
+          Duration: '$Duration',
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        Durations: '$_id.Duration',
+      },
+    },
+  ]);
+  return values;
+};
+
+// Streamrequest
+
+const getStreamBySlots = async (id) => {
+  const currentUnixTimestamp = moment().valueOf();
+
+  let values = await Streamrequest.aggregate([
+    {
+      $match: {
+        slotId: id,
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'Suppliers',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$Suppliers',
+      },
+    },
+    {
+      $addFields: {
+        isBetweenTime: {
+          $and: [{ $gte: ['$startTime', currentUnixTimestamp] }, { $gte: ['$streamEnd_Time', currentUnixTimestamp] }],
+        },
+      },
+    },
+    {
+      $addFields: {
+        PendingStatus: { $and: [{ $gte: ['$startTime', currentUnixTimestamp] }] },
+      },
+    },
+    {
+      $addFields: {
+        StreamStatus: {
+          $cond: {
+            if: { $eq: ['$isBetweenTime', true] },
+            then: 'Onlive',
+            else: 'Completed',
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        PendingStatus: {
+          $cond: {
+            if: { $eq: ['$PendingStatus', true] },
+            then: 'Pending',
+            else: '$StreamStatus',
+          },
+        },
+      },
+    },
+  ]);
+
+  let slot = await Slot.findById(id);
+
+  return { values, slot };
+};
+
 module.exports = {
   createSlot,
   Fetch_Slot,
@@ -215,4 +337,7 @@ module.exports = {
   getSlots_Minutse_Wise,
   getDetailsForSlotChoosing,
   getSlotsWitdSort,
+  getSlots_by_SlotInfo,
+  getSlots_Duraions,
+  getStreamBySlots,
 };
