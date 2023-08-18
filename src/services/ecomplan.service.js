@@ -4689,6 +4689,8 @@ const get_watch_live_steams_interested = async (req) => {
         streamrequestposts_count: 1,
         streamEnd_Time: 1,
         productArray: '$streamrequestposts.productTitle',
+        image: 1,
+        teaser: 1
       },
     },
     { $skip: 10 * page },
