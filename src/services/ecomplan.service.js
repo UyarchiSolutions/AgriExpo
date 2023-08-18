@@ -5168,7 +5168,7 @@ const get_watch_live_steams_completed = async (req) => {
     { $skip: 10 * (page + 1) },
     { $limit: 10 },
   ]);
-  return { value, total: total.length };
+  return { value, next: total.length != 0 };
 };
 
 const get_watch_live_steams = async (req) => {
