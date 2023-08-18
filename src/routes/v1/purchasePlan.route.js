@@ -34,4 +34,5 @@ router.route('/getPlanes/Request/Streams').get(SellerAuth, purchasePlan.getPlane
 router.route('/get/All/Purchased/Plan/:page').get(purchasePlan.get_All_Purchased_Plan);
 router.route('/stream/PlanById/:id').get(purchasePlan.streamPlanById);
 router.route('/get/Purchased/ByPlanId/:id/:page').get(purchasePlan.getPurchased_ByPlanId);
+router.route('/getStreamByUserAndPlan/:user/:plan').get(purchasePlan.getStreamByUserAndPlan);
 module.exports = router;

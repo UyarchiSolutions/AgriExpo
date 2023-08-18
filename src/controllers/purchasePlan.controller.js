@@ -142,6 +142,11 @@ const getPurchased_ByPlanId = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getStreamByUserAndPlan = catchAsync(async (req, res) => {
+  const data = await purchasePlan.getStreamByUserAndPlan(req.params.user, req.params.plan);
+  res.send(data);
+});
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -165,4 +170,5 @@ module.exports = {
   get_All_Purchased_Plan,
   streamPlanById,
   getPurchased_ByPlanId,
+  getStreamByUserAndPlan,
 };

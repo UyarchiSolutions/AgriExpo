@@ -391,7 +391,7 @@ const get_All_Planes = async (page) => {
   let values = await purchasePlan.aggregate([
     { $match: { active: true } },
     { $lookup: { from: 'sellers', localField: 'suppierId', foreignField: '_id', as: 'suppliers' } },
-    { $unwind: "$suppliers" },
+    { $unwind: '$suppliers' },
     {
       $project: {
         _id: 1,
@@ -459,7 +459,7 @@ const get_All_Planes = async (page) => {
   let total = await purchasePlan.aggregate([
     { $match: { active: true } },
     { $lookup: { from: 'sellers', localField: 'suppierId', foreignField: '_id', as: 'suppliers' } },
-    { $unwind: "$suppliers" },
+    { $unwind: '$suppliers' },
   ]);
   return { values, total: total.length };
 };
@@ -499,7 +499,13 @@ const UploadProof = async (id, body) => {
 };
 
 const getPlanyById = async (id) => {
-  const plan = await purchasePlan.findById(id);
+  const plan = await purchasePlan.aggregate([
+    {
+      $match: {
+        _id: id,
+      },
+    },
+  ]);
   return plan;
 };
 
@@ -940,8 +946,12 @@ const getPurchased_ByPlanId = async (id, page) => {
         createdAt: 1,
         planName: 1,
         planId: 1,
+        userId: '$supplier._id',
         SellerName: '$supplier.tradeName',
       },
+    },
+    {
+      $match: { approvalDate: { $ne: null } },
     },
     {
       $skip: page * 10,
@@ -986,6 +996,67 @@ const getPurchased_ByPlanId = async (id, page) => {
   return { values: values, total: total.length };
 };
 
+const getStreamByUserAndPlan = async (userId, planId) => {
+  const currentUnixTimestamp = moment().valueOf();
+
+  let values = await Streamrequest.aggregate([
+    {
+      $match: {
+        planId: planId,
+        suppierId: userId,
+      },
+    },
+    {
+      $lookup: {
+        from: 'slots',
+        localField: 'slotId',
+        foreignField: '_id',
+        as: 'slots',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$slots',
+      },
+    },
+    {
+      $addFields: {
+        isBetweenTime: {
+          $and: [{ $gte: ['$startTime', currentUnixTimestamp] }, { $lt: ['$streamEnd_Time', currentUnixTimestamp] }],
+        },
+      },
+    },
+    {
+      $addFields: {
+        PendingStatus: { $and: [{ $gte: ['$startTime', currentUnixTimestamp] }] },
+      },
+    },
+    {
+      $addFields: {
+        StreamStatus: {
+          $cond: {
+            if: { $eq: ['$isBetweenTime', true] },
+            then: 'Onlive',
+            else: 'Completed',
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        PendingStatus: {
+          $cond: {
+            if: { $eq: ['$PendingStatus', true] },
+            then: 'Pending',
+            else: '$StreamStatus',
+          },
+        },
+      },
+    },
+  ]);
+  return values;
+};
 
 module.exports = {
   create_purchase_plan,
@@ -1010,4 +1081,5 @@ module.exports = {
   get_All_Purchased_Plan,
   streamPlanById,
   getPurchased_ByPlanId,
+  getStreamByUserAndPlan,
 };

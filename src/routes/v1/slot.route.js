@@ -7,4 +7,7 @@ router.route('/:id').put(SlotController.UpdateSlotById).delete(SlotController.De
 router.route('/slots/drop/doen').get(SlotController.getSlots_Minutse_Wise);
 router.route('/getDetails/For/Slot/Choosing').get(SlotController.getDetailsForSlotChoosing);
 router.route('/getDetails/slots').post(SellerAuth, SlotController.getSlotsWitdSort);
+router.route('/getSlots/by/SlotInfo').get(SlotController.getSlots_by_SlotInfo);
+router.route('/getSlots/Duraions').get(SlotController.getSlots_Duraions);
+router.route('/getStreamBySlots/:id').get(SlotController.getStreamBySlots);
 module.exports = router;

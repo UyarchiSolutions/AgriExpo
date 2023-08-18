@@ -199,6 +199,11 @@ const get_Streaming_ordersByStream = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const get_Streaming_ordersByOrder = catchAsync(async (req, res) => {
+  const data = await registerShop.get_Streaming_ordersByOrder(req.params.id);
+  res.send(data);
+});
+
 module.exports = {
   register_shop,
   verify_otp,
@@ -231,4 +236,5 @@ module.exports = {
   sendOTP_continue_Reg,
   get_Streaming_orders,
   get_Streaming_ordersByStream,
+  get_Streaming_ordersByOrder,
 };
