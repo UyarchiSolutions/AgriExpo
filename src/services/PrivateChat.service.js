@@ -12,6 +12,7 @@ const intraction_exhibitor = async (req) => {
     if (!intraction) {
         intraction = await Interaction.create({ exhibitorId: channel, visitorId: shopId });
     }
+    console.log(intraction)
     return intraction;
 };
 

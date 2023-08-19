@@ -6,7 +6,8 @@ const PrivateChat = require('../services/PrivateChat.service');
 
 const intraction_exhibitor = catchAsync(async (req, res) => {
     let value = await PrivateChat.intraction_exhibitor(req);
-    res.status(httpStatus.NO_CONTENT).send(value);
+    res.send(value);
+
 });
 
 
