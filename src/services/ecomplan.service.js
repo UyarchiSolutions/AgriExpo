@@ -13179,7 +13179,7 @@ const notify_me_toggle = async (req) => {
   const { channel } = req.body;
   let shopId = req.shopId;
   let noti = await Notify.findOne({ ExhibitorId: channel, VisitorId: shopId });
-  if (!sell) {
+  if (!noti) {
     noti = await Notify.create({ ExhibitorId: channel, VisitorId: shopId, notify: true });
   }
   else {
