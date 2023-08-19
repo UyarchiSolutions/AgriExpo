@@ -85,6 +85,10 @@ const SellerSchema = new mongoose.Schema(
     companyName: {
       type: String,
     },
+    notifyCount: {
+      type: Number,
+      default: 0
+    }
   },
   {
     timestamps: { createdAt: 'createdDate', updatedAt: 'updatedDate' },

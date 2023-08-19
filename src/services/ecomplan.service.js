@@ -13205,12 +13205,24 @@ const get_exhibitor_details = async (req) => {
 const notify_me_toggle = async (req) => {
   const { channel } = req.body;
   let shopId = req.shopId;
+  let seller = await Seller.findById(channel);
   let noti = await Notify.findOne({ ExhibitorId: channel, VisitorId: shopId });
   if (!noti) {
     noti = await Notify.create({ ExhibitorId: channel, VisitorId: shopId, notify: true });
+    seller.notifyCount = seller.notifyCount == null ? seller.notifyCount + 1 : 0;
+    seller.save();
   }
   else {
     noti = await Notify.findByIdAndUpdate({ _id: noti._id }, { notify: !noti.notify }, { new: true })
+
+    if (noti.notify) {
+      seller.notifyCount = 0;
+      seller.save();
+    }
+    else {
+      seller.notifyCount = 0;
+      seller.save();
+    }
   }
   return noti;
 };
