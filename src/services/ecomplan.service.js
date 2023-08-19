@@ -13186,7 +13186,7 @@ const notify_me_toggle = async (req) => {
     noti = !noti.notify;
     noti.save();
   }
-  return sell;
+  return noti;
 };
 
 
