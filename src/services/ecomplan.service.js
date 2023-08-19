@@ -13214,7 +13214,7 @@ const get_exhibitor_details = async (req) => {
     },
     {
       $addFields: {
-        notify: { $ifNull: ['$userinteraction.chat', false] },
+        chat: { $ifNull: ['$userinteraction._id', false] },
       },
     },
 
