@@ -13169,8 +13169,15 @@ const exhibitor_get_video_all = async (req) => {
 
 const get_exhibitor_details = async (req) => {
   const sellerId = req.query.channel;
+  let shopId = req.shopId;
   let sell = await Seller.findById(sellerId);
-
+  let noti = await Notify.findOne({ ExhibitorId: sellerId, VisitorId: shopId });
+  if (!noti) {
+    sell.notify = false;
+  }
+  else {
+    sell.notify = noti.notify;
+  }
   return sell;
 };
 
@@ -13183,8 +13190,7 @@ const notify_me_toggle = async (req) => {
     noti = await Notify.create({ ExhibitorId: channel, VisitorId: shopId, notify: true });
   }
   else {
-    noti = !noti.notify;
-    noti.save();
+    noti = await Notify.findByIdAndUpdate({ _id: noti._id }, { notify: !noti.notify }, { new: true })
   }
   return noti;
 };
