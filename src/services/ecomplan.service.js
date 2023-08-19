@@ -13170,15 +13170,35 @@ const exhibitor_get_video_all = async (req) => {
 const get_exhibitor_details = async (req) => {
   const sellerId = req.query.channel;
   let shopId = req.shopId;
-  let sell = await Seller.findById(sellerId);
-  let noti = await Notify.findOne({ ExhibitorId: sellerId, VisitorId: shopId });
-  if (!noti) {
-    sell.notify = false;
+  let sell = await Seller.aggregate([
+    { $match: { $and: [{ _id: { $eq: sellerId } }] } },
+    {
+      $lookup: {
+        from: 'notifies',
+        localField: '_id',
+        foreignField: 'ExhibitorId',
+        pipeline: [
+          { $match: { $and: [{ VisitorId: { $eq: shopId } }] } },
+        ],
+        as: 'notifies',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$notifies',
+      },
+    },
+    {
+      $addFields: {
+        notify: { $ifNull: ['$notifies.notify', false] },
+      },
+    },
+  ])
+  if (sell.length == 0) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
   }
-  else {
-    sell.notify = noti.notify;
-  }
-  return sell;
+  return sell[0];
 };
 
 
