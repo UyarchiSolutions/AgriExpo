@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
 const { Usermessage, Interaction } = require('../models/PrivateChat.model');
 const { Seller } = require('../models/seller.models');
-const moment=require('moment');
+const moment = require('moment');
 const { Shop, AttendanceClone, AttendanceClonenew } = require('../models/b2b.ShopClone.model');
 const jwt = require('jsonwebtoken');
 const config = require('../config/config');
@@ -52,6 +52,7 @@ const get_old_chat = async (req) => {
         { $sort: { createdAt: -1 } },
         { $skip: 50 * page },
         { $limit: 50 },
+        { $sort: { createdAt: 1 } },
     ])
     let next = await Usermessage.aggregate([
         { $match: { $and: [{ channel: { $eq: channel } }, { visitorShow: { $eq: true } }] } },
