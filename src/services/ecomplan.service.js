@@ -13169,24 +13169,62 @@ const exhibitor_get_video_all = async (req) => {
 
 const get_exhibitor_details = async (req) => {
   const sellerId = req.query.channel;
-  let sell = await Seller.findById(sellerId);
-
-  return sell;
+  let shopId = req.shopId;
+  let sell = await Seller.aggregate([
+    { $match: { $and: [{ _id: { $eq: sellerId } }] } },
+    {
+      $lookup: {
+        from: 'notifies',
+        localField: '_id',
+        foreignField: 'ExhibitorId',
+        pipeline: [
+          { $match: { $and: [{ VisitorId: { $eq: shopId } }] } },
+        ],
+        as: 'notifies',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$notifies',
+      },
+    },
+    {
+      $addFields: {
+        notify: { $ifNull: ['$notifies.notify', false] },
+      },
+    },
+  ])
+  if (sell.length == 0) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
+  }
+  return sell[0];
 };
 
 
 const notify_me_toggle = async (req) => {
   const { channel } = req.body;
   let shopId = req.shopId;
+  let seller = await Seller.findById(channel);
   let noti = await Notify.findOne({ ExhibitorId: channel, VisitorId: shopId });
-  if (!sell) {
+  if (!noti) {
     noti = await Notify.create({ ExhibitorId: channel, VisitorId: shopId, notify: true });
+    seller.notifyCount = seller.notifyCount == null ? seller.notifyCount + 1 : 0;
+    seller.save();
   }
   else {
-    noti = !noti.notify;
-    noti.save();
+    noti = await Notify.findByIdAndUpdate({ _id: noti._id }, { notify: !noti.notify }, { new: true })
+
+    if (noti.notify) {
+      seller.notifyCount = seller.notifyCount + 1;
+      seller.save();
+    }
+    else {
+      seller.notifyCount = seller.notifyCount - 1;
+      seller.save();
+    }
   }
-  return sell;
+  return noti;
 };
 
 
