@@ -10,7 +10,7 @@ const intraction_exhibitor = async (req) => {
     let shopId = req.shopId;
     let intraction = await Interaction.findOne({ exhibitorId: channel, visitorId: shopId });
     if (!intraction) {
-        intraction = await Interaction.create({ exhibitorId: channel, visitorId: shopId, notify: true });
+        intraction = await Interaction.create({ exhibitorId: channel, visitorId: shopId });
     }
     return intraction;
 };
