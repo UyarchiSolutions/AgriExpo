@@ -116,6 +116,8 @@ const partnerSetPrice = require('./partner.setPrice.route');
 const SlotRoute = require('./slot.route');
 const SlotBookingRoute = require('./Slotbooking.route');
 const AdvertismentRoute = require('./Advertisment.route');
+const PrivateChatRoute = require('./PrivateChat.route');
+
 const defaultRoutes = [
   {
     path: '/purchaseplan',
@@ -124,6 +126,10 @@ const defaultRoutes = [
   {
     path: '/slotbooking',
     route: SlotBookingRoute,
+  },
+  {
+    path: '/privatechat',
+    route: PrivateChatRoute,
   },
   {
     path: '/Advertisment',
