@@ -13216,11 +13216,11 @@ const notify_me_toggle = async (req) => {
     noti = await Notify.findByIdAndUpdate({ _id: noti._id }, { notify: !noti.notify }, { new: true })
 
     if (noti.notify) {
-      seller.notifyCount = 0;
+      seller.notifyCount = seller.notifyCount + 1;
       seller.save();
     }
     else {
-      seller.notifyCount = 0;
+      seller.notifyCount = seller.notifyCount - 1;
       seller.save();
     }
   }
