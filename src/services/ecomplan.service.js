@@ -13194,6 +13194,30 @@ const get_exhibitor_details = async (req) => {
         notify: { $ifNull: ['$notifies.notify', false] },
       },
     },
+
+    {
+      $lookup: {
+        from: 'userinteractions',
+        localField: '_id',
+        foreignField: 'exhibitorId',
+        pipeline: [
+          { $match: { $and: [{ visitorId: { $eq: shopId } }] } },
+        ],
+        as: 'userinteraction',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$userinteraction',
+      },
+    },
+    {
+      $addFields: {
+        notify: { $ifNull: ['$userinteraction.chat', false] },
+      },
+    },
+
   ])
   if (sell.length == 0) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');

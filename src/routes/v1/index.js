@@ -579,6 +579,7 @@ const defaultRoutes = [
     route: EcomPlan,
   },
 
+
   // {
   //   path: '/sales',
   //   route: salesApp,
