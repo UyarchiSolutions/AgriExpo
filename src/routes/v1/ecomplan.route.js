@@ -104,9 +104,7 @@ router.route('/watchlive/go/live').get(Ecomcontroller.get_watch_live_token);
 router.route('/homepage/streamdatails/all').get(shopverify, Ecomcontroller.getall_homeage_streams);
 router.route('/on/going/stream').get(shopverify, Ecomcontroller.on_going_stream);
 router.route('/getStreamRequestById/:id').get(Ecomcontroller.getStreamRequestById);
-
 //live Stream pre register
-
 router.route('/stream/pre/register/live').post(shopverify, Ecomcontroller.regisetr_strean_instrest);
 router.route('/stream/pre/unregister/live').post(shopverify, Ecomcontroller.unregisetr_strean_instrest);
 
@@ -210,5 +208,6 @@ router.route('/saved/product').get(shopverify, Ecomcontroller.get_savedProduct_B
 
 router.route('/exhibitor/getvideo/all').get(shopverify, Ecomcontroller.exhibitor_get_video_all);
 router.route('/exhibitor/details').get(shopverify, Ecomcontroller.get_exhibitor_details);
+router.route('/notify/user/toggle').post(shopverify, Ecomcontroller.notify_me_toggle);
 
 module.exports = router;

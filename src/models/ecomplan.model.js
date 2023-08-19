@@ -790,7 +790,7 @@ const NotifySchema = new mongoose.Schema(
       type: String,
     },
     notify: {
-      type: String,
+      type: Boolean,
     },
   },
   { timestamps: true }

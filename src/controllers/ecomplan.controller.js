@@ -669,6 +669,12 @@ const get_exhibitor_details= catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const notify_me_toggle= catchAsync(async (req, res) => {
+  const data = await Ecomserive.notify_me_toggle(req);
+  res.send(data);
+});
+
+
 
 module.exports = {
   create_Plans,
@@ -799,5 +805,6 @@ module.exports = {
   getStreamProductDetailsBy_Customer,
   get_savedProduct_By_Visitor,
   exhibitor_get_video_all,
-  get_exhibitor_details
+  get_exhibitor_details,
+  notify_me_toggle
 };

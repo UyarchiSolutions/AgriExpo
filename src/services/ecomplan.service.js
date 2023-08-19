@@ -11,6 +11,7 @@ const {
   PlanSlot,
   Instestedproduct,
   Savedproduct,
+  Notify
 } = require('../models/ecomplan.model');
 const { Slot } = require('../models/slot.model');
 const axios = require('axios'); //
@@ -13174,6 +13175,21 @@ const get_exhibitor_details = async (req) => {
 };
 
 
+const notify_me_toggle = async (req) => {
+  const { channel } = req.body;
+  let shopId = req.shopId;
+  let noti = await Notify.findOne({ ExhibitorId: channel, VisitorId: shopId });
+  if (!sell) {
+    noti = await Notify.create({ ExhibitorId: channel, VisitorId: shopId, notify: true });
+  }
+  else {
+    noti = !noti.notify;
+    noti.save();
+  }
+  return sell;
+};
+
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -13311,5 +13327,6 @@ module.exports = {
   getStreamProductDetailsBy_Customer,
   get_savedProduct_By_Visitor,
   exhibitor_get_video_all,
-  get_exhibitor_details
+  get_exhibitor_details,
+  notify_me_toggle
 };
