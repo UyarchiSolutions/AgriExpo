@@ -3908,6 +3908,9 @@ const get_watch_live_steams_current = async (req) => {
         streamrequestposts_count: 1,
         streamEnd_Time: 1,
         productArray: '$streamrequestposts.productTitle',
+        channel: '$suppliers._id',
+        image: 1,
+        teaser: 1
       },
     },
     { $skip: 10 * page },
@@ -4365,6 +4368,9 @@ const get_watch_live_steams_upcoming = async (req) => {
         streamrequestposts_count: 1,
         streamEnd_Time: 1,
         productArray: '$streamrequestposts.productTitle',
+        channel: '$suppliers._id',
+        image: 1,
+        teaser: 1
       },
     },
     { $skip: 10 * page },
@@ -4689,6 +4695,9 @@ const get_watch_live_steams_interested = async (req) => {
         streamrequestposts_count: 1,
         streamEnd_Time: 1,
         productArray: '$streamrequestposts.productTitle',
+        image: 1,
+        teaser: 1,
+        channel: '$suppliers._id',
       },
     },
     { $skip: 10 * page },
@@ -5019,6 +5028,9 @@ const get_watch_live_steams_completed = async (req) => {
         streamrequestposts_count: 1,
         streamEnd_Time: 1,
         productArray: '$streamrequestposts.productTitle',
+        channel: '$suppliers._id',
+        image: 1,
+        teaser: 1
       },
     },
     { $skip: 10 * page },
@@ -5156,7 +5168,7 @@ const get_watch_live_steams_completed = async (req) => {
     { $skip: 10 * (page + 1) },
     { $limit: 10 },
   ]);
-  return { value, total: total.length };
+  return { value, next: total.length != 0 };
 };
 
 const get_watch_live_steams = async (req) => {
