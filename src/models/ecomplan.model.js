@@ -271,8 +271,8 @@ const streamPostschema = mongoose.Schema({
   },
   videoTime: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
 const StreamPost = mongoose.model('Streampost', streamPostschema);
@@ -452,7 +452,7 @@ const streamRequestschema = mongoose.Schema({
   },
   uploadStatus: {
     type: String,
-    default: "Pending"
+    default: 'Pending',
   },
   transaction: {
     type: String,
@@ -465,9 +465,8 @@ const streamRequestschema = mongoose.Schema({
   },
   show_completd: {
     type: Boolean,
-    default: false
-  }
-
+    default: false,
+  },
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);
@@ -714,9 +713,6 @@ const PlanSlotSchema = new mongoose.Schema(
 
 const PlanSlot = mongoose.model('planslot', PlanSlotSchema);
 
-
-
-
 const intrestedschema = mongoose.Schema({
   _id: {
     type: String,
@@ -781,8 +777,26 @@ const savedproductschema = mongoose.Schema({
 });
 const Savedproduct = mongoose.model('savedproduct', savedproductschema);
 
+const NotifySchema = new mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    ExhibitorId: {
+      type: String,
+    },
+    VisitorId: {
+      type: String,
+    },
+    notify: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
-
+const Notify = mongoose.model('Notify', NotifySchema);
 
 module.exports = {
   Streamplan,
@@ -795,6 +809,6 @@ module.exports = {
   shopNotification,
   PlanSlot,
   Instestedproduct,
-  Savedproduct
-
+  Savedproduct,
+  Notify,
 };
