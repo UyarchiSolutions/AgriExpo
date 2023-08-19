@@ -2222,6 +2222,15 @@ const get_Streaming_ordersByStream = async (id) => {
     },
     { $unwind: '$streamrequests' },
     {
+      $lookup: {
+        from: 'b2bshopclones',
+        localField: 'shopId',
+        foreignField: '_id',
+        as: 'shop',
+      },
+    },
+    { $unwind: '$shop' },
+    {
       $project: {
         _id: 1,
         status: 1,
@@ -2236,6 +2245,8 @@ const get_Streaming_ordersByStream = async (id) => {
         Amount: 1,
         DateIso: 1,
         created: 1,
+        shopId:1,
+        shop:'$shop',
         productTitle: '$streamingorderproducts',
         // productTitle: "$streamingorderproducts",
         orderAmount: '$streamingorderproducts.orderAmount',
