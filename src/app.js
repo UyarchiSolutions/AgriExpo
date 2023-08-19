@@ -20,6 +20,7 @@ const bodyParser = require("body-parser");
 const routes_v2 = require('./routes/v1/liveStreaming');
 const logger = require('./config/logger');
 const chetModule = require("./services/liveStreaming/chat.service")
+const privatechat = require("./services/PrivateChat.service")
 const socketService = require("./services/liveStreaming/socket.service")
 const moment = require('moment');
 const UAParser = require('ua-parser-js');
@@ -40,6 +41,7 @@ server.listen(config.port, () => {
   logger.info(`Listening to port ${config.port}`);
   // //console.log(moment(1674035400000).add(40, 'minutes').format('hh:mm:ss a'));
 });
+
 
 io.sockets.on('connection', async (socket) => {
   socket.on('groupchat', async (data) => {
@@ -106,9 +108,9 @@ io.sockets.on('connection', async (socket) => {
   socket.on('livejoined', async (data) => {
     await chetModule.livejoined_now(data, io, 'join')
   });
-  // socket.on('curent_live_count', async (data) => {
-  //   await chetModule.get_curren_live_count(data, io)
-  // });
+  socket.on('privateChat', async (data) => {
+    await privatechat.recived_message(data, io, socket.handshake.auth)
+  });
   socket.on('joinRoom', (room) => {
     //console.log(room)
     socket.join(room);

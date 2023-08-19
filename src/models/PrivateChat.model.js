@@ -35,6 +35,9 @@ const PrivateChatSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    sendBy: {
+      type: String,
+    }
   },
   { timestamps: true }
 );
@@ -57,6 +60,9 @@ const CommunicationSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    last_modify: {
+      type: Date
+    }
   },
   { timestamps: true }
 );

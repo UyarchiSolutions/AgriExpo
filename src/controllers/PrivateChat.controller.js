@@ -11,7 +11,16 @@ const intraction_exhibitor = catchAsync(async (req, res) => {
 });
 
 
+const get_old_chat= catchAsync(async (req, res) => {
+    let value = await PrivateChat.get_old_chat(req);
+    res.send(value);
+
+});
+
+
+
 
 module.exports = {
-    intraction_exhibitor
+    intraction_exhibitor,
+    get_old_chat
 }
