@@ -1682,7 +1682,7 @@ const start_rice_user_hands = async (req) => {
 
 const get_raise_hands = async (req) => {
 
-  let streamId = req.body.stream;
+  let streamId = req.query.stream;
   let find = await Streamrequest.aggregate([
     { $match: { $and: [{ _id: { $eq: streamId } }] } },
     {
