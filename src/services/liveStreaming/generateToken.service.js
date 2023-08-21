@@ -792,7 +792,8 @@ const get_sub_golive = async (req, io) => {
         temptokens_sub: '$temptokens_sub',
         joindedUserBan: 1,
         appID: "$streamrequests.agoraappids.appID",
-        raise_hands: 1
+        raise_hands: 1,
+        raiseID: "$raiseusers._id"
       },
     },
   ]);
