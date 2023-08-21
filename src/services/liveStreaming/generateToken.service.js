@@ -1683,10 +1683,6 @@ const start_rice_user_hands = async (req) => {
 const get_raise_hands = async (req) => {
 
   let streamId = req.body.stream;
-  let stream = await Streamrequest.findById(streamId);
-  let supplierId = req.userId;
-
-
   let find = await Streamrequest.aggregate([
     { $match: { $and: [{ _id: { $eq: streamId } }] } },
     {
@@ -1733,6 +1729,8 @@ const get_raise_hands = async (req) => {
   if (find.length == 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
   }
+
+  return find;
 }
 
 const raise_request = async (req) => {
@@ -1746,7 +1744,7 @@ const raise_request = async (req) => {
   if (!temp) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Waiting For user Start hand Raise');
   }
-  let raise = await RaiseUsers.findOne({ streamId: streamId, shopId: shopId, tempID: temp._id });
+  let raise = await RaiseUsers.findOne({ streamId: streamId, shopId: shopId, tempID: temp._id, status: { $ne: "completed" } });
   if (!raise) {
     raise = await RaiseUsers.create({ streamId: streamId, shopId: shopId, tempID: temp._id });
   }
