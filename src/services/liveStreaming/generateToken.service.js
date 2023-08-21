@@ -746,7 +746,25 @@ const get_sub_golive = async (req, io) => {
         as: 'temptokens_sub',
       },
     },
-
+    {
+      $lookup: {
+        from: 'raiseusers',
+        localField: '_id',
+        foreignField: 'shopId',
+        as: 'raiseusers',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$raiseusers',
+      },
+    },
+    {
+      $addFields: {
+        raise_hands: { $ifNull: ['$raiseusers.status', false] },
+      },
+    },
     {
       $project: {
         _id: 1,
@@ -773,7 +791,8 @@ const get_sub_golive = async (req, io) => {
         chat_need: '$streamrequests.chat_need',
         temptokens_sub: '$temptokens_sub',
         joindedUserBan: 1,
-        appID: "$streamrequests.agoraappids.appID"
+        appID: "$streamrequests.agoraappids.appID",
+        raise_hands:1
       },
     },
   ]);
