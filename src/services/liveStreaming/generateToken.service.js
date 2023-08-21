@@ -496,7 +496,6 @@ const get_sub_golive = async (req, io) => {
   let code = req.query.code;
   let streamId = req.query.id;
   io.emit(streamId + 'watching_live', { code: code, stream: streamId });
-  //console.log(req.query.id,code)
   let value = await Joinusers.aggregate([
     { $match: { $and: [{ _id: { $eq: req.query.id } }, { shopId: { $eq: req.shopId } }] } },
     {
@@ -1738,7 +1737,7 @@ const get_raise_hands = async (req) => {
               streamId: 1,
               shopId: 1,
               tempID: 1,
-              status:1
+              status: 1
             }
           }
         ],
@@ -1780,6 +1779,9 @@ const approve_request = async (req) => {
   if (!raise) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
   }
+  let stream = await Streamrequest.findById(raise.streamId);
+  stream.current_raise = raise._id;
+  stream.save();
   raise.status = 'approved';
   raise.save();
   req.io.emit(raise._id + '_status', { message: "approved" });
@@ -1792,6 +1794,9 @@ const pending_request = async (req) => {
   if (!raise) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
   }
+  let stream = await Streamrequest.findById(raise.streamId);
+  stream.current_raise = null;
+  stream.save();
   raise.status = 'Pending';
   raise.save();
   req.io.emit(raise._id + '_status', { message: "Pending" });
@@ -1804,6 +1809,9 @@ const reject_request = async (req) => {
   if (!raise) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
   }
+  let stream = await Streamrequest.findById(raise.streamId);
+  stream.current_raise = null;
+  stream.save();
   raise.status = 'rejected';
   raise.save();
   req.io.emit(raise._id + '_status', { message: "rejected" });
