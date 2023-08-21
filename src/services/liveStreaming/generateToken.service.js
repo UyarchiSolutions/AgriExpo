@@ -1730,7 +1730,7 @@ const get_raise_hands = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
   }
 
-  return find;
+  return find[0];
 }
 
 const raise_request = async (req) => {
