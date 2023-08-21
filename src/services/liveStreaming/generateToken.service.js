@@ -1707,7 +1707,7 @@ const get_raise_hands = async (req) => {
     { $match: { $and: [{ _id: { $eq: streamId } }] } },
     {
       $lookup: {
-        from: 'raiseuserss',
+        from: 'raiseusers',
         localField: '_id',
         foreignField: 'streamId',
         pipeline: [
@@ -1741,7 +1741,7 @@ const get_raise_hands = async (req) => {
             }
           }
         ],
-        as: 'raiseuserss',
+        as: 'raiseusers',
       },
     },
 
