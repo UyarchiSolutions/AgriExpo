@@ -749,7 +749,7 @@ const get_sub_golive = async (req, io) => {
     {
       $lookup: {
         from: 'raiseusers',
-        localField: '_id',
+        localField: 'shopId',
         foreignField: 'shopId',
         as: 'raiseusers',
       },
@@ -792,7 +792,7 @@ const get_sub_golive = async (req, io) => {
         temptokens_sub: '$temptokens_sub',
         joindedUserBan: 1,
         appID: "$streamrequests.agoraappids.appID",
-        raise_hands:1
+        raise_hands: 1
       },
     },
   ]);
