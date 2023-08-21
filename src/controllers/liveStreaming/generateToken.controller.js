@@ -186,6 +186,12 @@ const reject_request = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(tokens);
 });
 
+const jion_now_live = catchAsync(async (req, res) => {
+  let tokens = await generateTokenService.jion_now_live(req);
+  res.status(httpStatus.CREATED).send(tokens);
+});
+
+
 module.exports = {
   generateToken,
   getHostTokens,
@@ -221,5 +227,6 @@ module.exports = {
   raise_request,
   approve_request,
   reject_request,
-  pending_request
+  pending_request,
+  jion_now_live
 };

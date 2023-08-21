@@ -1851,6 +1851,76 @@ const reject_request = async (req) => {
   return raise;
 }
 
+const jion_now_live = async (req) => {
+  let raiseid = req.body.raise;
+  let raise = await RaiseUsers.findById(raiseid);
+  if (!raise) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
+  }
+  let stream = await Streamrequest.findById(raise.streamId);
+
+  if (stream.current_raise != raiseid) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Line Busy');
+  }
+
+  raise = await RaiseUsers.aggregate([
+    { $match: { $and: [{ _id: { $eq: raise._id } }] } },
+    {
+      $lookup: {
+        from: 'b2bshopclones',
+        localField: 'shopId',
+        foreignField: '_id',
+        as: 'shops',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$shops',
+      },
+    },
+    {
+      $lookup: {
+        from: 'temptokens',
+        localField: 'tempID',
+        foreignField: '_id',
+        as: 'temptokens',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$temptokens',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        SName: "$shops.SName",
+        mobile: "$shops.mobile",
+        address: "$shops.address",
+        country: "$shops.country",
+        state: "$shops.state",
+        companyName: "$shops.companyName",
+        designation: "$shops.designation",
+        streamId: 1,
+        shopId: 1,
+        tempID: 1,
+        status: 1,
+        Uid: "$temptokens.Uid",
+        chennel: "$temptokens.chennel",
+        token: "$temptokens.token",
+        expDate: "$temptokens.expDate",
+      }
+    }
+  ])
+  if (raise.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
+  }
+  return raise[0];
+}
+
+
 module.exports = {
   generateToken,
   getHostTokens,
@@ -1886,5 +1956,6 @@ module.exports = {
   raise_request,
   approve_request,
   reject_request,
-  pending_request
+  pending_request,
+  jion_now_live
 };
