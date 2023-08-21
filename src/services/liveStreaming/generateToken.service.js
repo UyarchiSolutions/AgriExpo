@@ -1801,7 +1801,7 @@ const raise_request = async (req) => {
       }
     }
   ])
-  req.io.emit(streamId + '_raise_hands_request', raise);
+  req.io.emit(streamId + '_raise_hands_request', raise[0]);
   return raise;
 }
 
