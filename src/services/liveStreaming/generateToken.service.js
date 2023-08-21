@@ -1708,8 +1708,8 @@ const get_raise_hands = async (req) => {
     {
       $lookup: {
         from: 'raiseuserss',
-        localField: 'streamId',
-        foreignField: '_id',
+        localField: '_id',
+        foreignField: 'streamId',
         pipeline: [
           {
             $lookup: {
