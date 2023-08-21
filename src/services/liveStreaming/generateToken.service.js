@@ -1768,6 +1768,39 @@ const raise_request = async (req) => {
   if (!raise) {
     raise = await RaiseUsers.create({ streamId: streamId, shopId: shopId, tempID: temp._id });
   }
+  raise = await RaiseUsers.aggregate([
+    { $match: { $and: [{ _id: { $eq: raise._id } }] } },
+    {
+      $lookup: {
+        from: 'b2bshopclones',
+        localField: 'shopId',
+        foreignField: '_id',
+        as: 'shops',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$shops',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        SName: "$shops.SName",
+        mobile: "$shops.mobile",
+        address: "$shops.address",
+        country: "$shops.country",
+        state: "$shops.state",
+        companyName: "$shops.companyName",
+        designation: "$shops.designation",
+        streamId: 1,
+        shopId: 1,
+        tempID: 1,
+        status: 1
+      }
+    }
+  ])
   req.io.emit(streamId + '_raise_hands_request', raise);
   return raise;
 }
