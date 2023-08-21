@@ -158,6 +158,30 @@ const get_cloude_recording = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(tokens);
 });
 
+const start_rice_user_hands = catchAsync(async (req, res) => {
+  let tokens = await generateTokenService.start_rice_user_hands(req);
+  res.status(httpStatus.CREATED).send(tokens);
+});
+
+
+const get_raise_hands = catchAsync(async (req, res) => {
+  let tokens = await generateTokenService.get_raise_hands(req);
+  res.status(httpStatus.CREATED).send(tokens);
+});
+
+const raise_request = catchAsync(async (req, res) => {
+  let tokens = await generateTokenService.raise_request(req);
+  res.status(httpStatus.CREATED).send(tokens);
+});
+const approve_request = catchAsync(async (req, res) => {
+  let tokens = await generateTokenService.approve_request(req);
+  res.status(httpStatus.CREATED).send(tokens);
+});
+const reject_request = catchAsync(async (req, res) => {
+  let tokens = await generateTokenService.reject_request(req);
+  res.status(httpStatus.CREATED).send(tokens);
+});
+
 module.exports = {
   generateToken,
   getHostTokens,
@@ -187,5 +211,10 @@ module.exports = {
   videoConverter,
   get_current_live_stream,
   cloud_recording_start,
-  get_cloude_recording
+  get_cloude_recording,
+  start_rice_user_hands,
+  get_raise_hands,
+  raise_request,
+  approve_request,
+  reject_request
 };

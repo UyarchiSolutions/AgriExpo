@@ -47,5 +47,11 @@ router.route('/download/video/aws').get(generateToken.videoConverter);
 
 
 router.route('/cloud/recording/start').get(generateToken.cloud_recording_start);
-router.route('/get/cloud/recording').get(authorization,generateToken.get_cloude_recording);
+router.route('/get/cloud/recording').get(authorization, generateToken.get_cloude_recording);
+
+
+router.route('/start/raicehands').post(SellerAuth, generateToken.start_rice_user_hands).get(SellerAuth, generateToken.get_raise_hands);
+router.route('/raise/request').post(shopverify, generateToken.raise_request);
+router.route('/raise/request').post(shopverify, generateToken.approve_request);
+router.route('/raise/request').post(shopverify, generateToken.reject_request);
 module.exports = router;

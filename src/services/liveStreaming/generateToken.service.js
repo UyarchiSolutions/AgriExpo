@@ -3,7 +3,7 @@ const ApiError = require('../../utils/ApiError');
 const { RtcTokenBuilder, RtcRole } = require('agora-access-token');
 const Agora = require('agora-access-token');
 const moment = require('moment');
-const { tempTokenModel, Joinusers } = require('../../models/liveStreaming/generateToken.model');
+const { tempTokenModel, Joinusers, RaiseUsers } = require('../../models/liveStreaming/generateToken.model');
 const axios = require('axios'); //
 // const appID = '1ba2592b16b74f3497e232e1b01f66b0';
 // const appCertificate = '8ae85f97802448c2a47b98715ff90ffb';
@@ -684,8 +684,8 @@ const get_sub_golive = async (req, io) => {
                     DateIso: 1,
                     created: '2023-01-20T11:46:58.201Z',
                     intrested: "$streamposts.intrested",
-                    saved:  "$streamposts.saved",
-                    unit:  "$streamposts.unit",
+                    saved: "$streamposts.saved",
+                    unit: "$streamposts.unit",
                   },
                 },
               ],
@@ -1638,6 +1638,147 @@ const get_cloude_recording = async (req) => {
   return stream;
 
 }
+const start_rice_user_hands = async (req) => {
+  let streamId = req.body.stream;
+  let stream = await Streamrequest.findById(streamId);
+  let supplierId = req.userId;
+  if (!stream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
+  }
+  let value = await tempTokenModel.findOne({ chennel: streamId, type: "raiseHands" });
+  //console.log(value)
+  if (!value) {
+    const uid = await generateUid();
+    const role = req.body.isPublisher ? Agora.RtcRole.PUBLISHER : Agora.RtcRole.SUBSCRIBER;
+    const expirationTimestamp = stream.endTime / 1000;
+    value = await tempTokenModel.create({
+      ...req.body,
+      ...{
+        date: moment().format('YYYY-MM-DD'),
+        time: moment().format('HHMMSS'),
+        supplierId: supplierId,
+        streamId: streamId,
+        created: moment(),
+        Uid: uid,
+        created_num: new Date(new Date(moment().format('YYYY-MM-DD') + ' ' + moment().format('HH:mm:ss'))).getTime(),
+        expDate: expirationTimestamp * 1000,
+        Duration: stream.Durationm,
+        type: 'raiseHands',
+      },
+    });
+    const token = await geenerate_rtc_token(streamId, uid, role, expirationTimestamp, stream.agoraID);
+    value.token = token;
+    value.chennel = streamId;
+    value.save();
+    stream.raise_hands = true;
+    stream.save();
+  }
+
+  req.io.emit(streamId + '_raise_hands_start', { raise_hands: true });
+  return value;
+
+
+}
+
+const get_raise_hands = async (req) => {
+
+  let streamId = req.body.stream;
+  let stream = await Streamrequest.findById(streamId);
+  let supplierId = req.userId;
+
+
+  let find = await Streamrequest.aggregate([
+    { $match: { $and: [{ _id: { $eq: streamId } }] } },
+    {
+      $lookup: {
+        from: 'raiseuserss',
+        localField: 'streamId',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'b2bshopclones',
+              localField: 'shopId',
+              foreignField: '_id',
+              as: 'shops',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$shops',
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              SName: "$shops.SName",
+              mobile: "$shops.mobile",
+              address: "$shops.address",
+              country: "$shops.country",
+              state: "$shops.state",
+              companyName: "$shops.companyName",
+              designation: "$shops.designation",
+              streamId: 1,
+              shopId: 1,
+              tempID: 1
+            }
+          }
+        ],
+        as: 'raiseuserss',
+      },
+    },
+
+  ])
+  if (find.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
+  }
+}
+
+const raise_request = async (req) => {
+  let shopId = req.shopId;
+  let streamId = req.body.streamId;
+  let stream = await Streamrequest.findById(streamId);
+  if (!stream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
+  }
+  let temp = await tempTokenModel.findOne({ chennel: streamId, type: "raiseHands" });
+  if (!temp) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Waiting For user Start hand Raise');
+  }
+  let raise = await RaiseUsers.findOne({ streamId: streamId, shopId: shopId, tempID: temp._id });
+  if (!raise) {
+    raise = await RaiseUsers.create({ streamId: streamId, shopId: shopId, tempID: temp._id });
+  }
+  req.io.emit(streamId + '_raise_hands_request', raise);
+  return raise;
+}
+
+
+const approve_request = async (req) => {
+  let raiseid = req.body.raise;
+  let raise = await RaiseUsers.findById(raiseid);
+  if (!raise) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
+  }
+  raise.status = 'approved';
+  raise.save();
+  req.io.emit(raise._id + '_status', { message: "approved" });
+  return raise;
+}
+
+
+const reject_request = async (req) => {
+  let raiseid = req.body.raise;
+  let raise = await RaiseUsers.findById(raiseid);
+  if (!raise) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
+  }
+  raise.status = 'rejected';
+  raise.save();
+  req.io.emit(raise._id + '_status', { message: "rejected" });
+  return raise;
+}
 
 module.exports = {
   generateToken,
@@ -1668,5 +1809,10 @@ module.exports = {
   videoConverter,
   get_current_live_stream,
   cloud_recording_start,
-  get_cloude_recording
+  get_cloude_recording,
+  start_rice_user_hands,
+  get_raise_hands,
+  raise_request,
+  approve_request,
+  reject_request
 };
