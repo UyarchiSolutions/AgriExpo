@@ -1737,7 +1737,8 @@ const get_raise_hands = async (req) => {
               designation: "$shops.designation",
               streamId: 1,
               shopId: 1,
-              tempID: 1
+              tempID: 1,
+              status:1
             }
           }
         ],
