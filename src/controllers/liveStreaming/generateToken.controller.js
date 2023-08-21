@@ -177,6 +177,10 @@ const approve_request = catchAsync(async (req, res) => {
   let tokens = await generateTokenService.approve_request(req);
   res.status(httpStatus.CREATED).send(tokens);
 });
+const pending_request = catchAsync(async (req, res) => {
+  let tokens = await generateTokenService.pending_request(req);
+  res.status(httpStatus.CREATED).send(tokens);
+});
 const reject_request = catchAsync(async (req, res) => {
   let tokens = await generateTokenService.reject_request(req);
   res.status(httpStatus.CREATED).send(tokens);
@@ -216,5 +220,6 @@ module.exports = {
   get_raise_hands,
   raise_request,
   approve_request,
-  reject_request
+  reject_request,
+  pending_request
 };

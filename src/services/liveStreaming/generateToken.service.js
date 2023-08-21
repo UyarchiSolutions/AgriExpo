@@ -1785,6 +1785,17 @@ const approve_request = async (req) => {
   return raise;
 }
 
+const pending_request = async (req) => {
+  let raiseid = req.body.raise;
+  let raise = await RaiseUsers.findById(raiseid);
+  if (!raise) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
+  }
+  raise.status = 'Pending';
+  raise.save();
+  req.io.emit(raise._id + '_status', { message: "Pending" });
+  return raise;
+}
 
 const reject_request = async (req) => {
   let raiseid = req.body.raise;
@@ -1832,5 +1843,6 @@ module.exports = {
   get_raise_hands,
   raise_request,
   approve_request,
-  reject_request
+  reject_request,
+  pending_request
 };
