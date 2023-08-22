@@ -60,6 +60,7 @@ const create_purchase_plan = async (req) => {
         expireDate: date_now,
         streamvalidity: plan.streamvalidity,
         no_of_host: plan.no_of_host,
+        RaiseHands: plan.RaiseHands
       };
       let con = await purchasePlan.create({ ...datas, ...req.body.PaymentDatails });
       await Dates.create_date(con);
@@ -113,6 +114,7 @@ const create_purchase_plan_private = async (req) => {
         expireDate: date_now,
         streamvalidity: plan.streamvalidity,
         no_of_host: plan.no_of_host,
+        RaiseHands: plan.RaiseHands
       };
       let con = await purchasePlan.create({ ...datas, ...req.body.PaymentDatails });
       await Dates.create_date(con);
