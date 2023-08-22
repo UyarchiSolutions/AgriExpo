@@ -3,7 +3,7 @@ const { Slot, Slotseperation } = require('../models/slot.model');
 const ApiError = require('../utils/ApiError');
 const moment = require('moment');
 const { purchasePlan } = require('../models/purchasePlan.model');
-const { Streamrequest } = require('../models/ecomplan.model');
+const { Streamrequest, PlanSlot } = require('../models/ecomplan.model');
 const Seller = require('../models/seller.models');
 
 const createSlot = async (body) => {
@@ -88,6 +88,8 @@ const getSlots_Minutse_Wise = async () => {
         _id: {
           Type: '$Type',
           Duration: '$Duration',
+          // startFormat: '$startFormat',
+          // endFormat: '$endFormat',
         },
         count: { $sum: 1 },
       },
@@ -98,8 +100,8 @@ const getSlots_Minutse_Wise = async () => {
         Type: '$_id.Type',
         Duration: '$_id.Duration',
         count: '$count',
-        startFormat: '$_id.StartFormat',
-        endFormat: '$_id.EndFormat',
+        startFormat: '$_id.startFormat',
+        endFormat: '$_id.endFormat',
       },
     },
   ]);
@@ -210,37 +212,156 @@ const getSlotsWitdSort = async (data, userId) => {
 };
 
 const getSlots_by_SlotInfo = async (query) => {
+  console.log(query);
+  const { id, type, duration } = query;
   let duratrionMatch = { active: true };
-  const { duration, type } = query;
   if (duration != '') {
     duratrionMatch = { Duration: parseInt(duration) };
   }
 
-  console.log(query);
+  // let values = await Slot.aggregate([
+  //   {
+  //     $match: {
+  //       $and: [duratrionMatch, { Type: type }],
+  //     },
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: 'slotbookings',
+  //       localField: '_id',
+  //       foreignField: 'slotId',
+  //       pipeline: [{ $match: { streamPlanId: query.id } }],
+  //       as: 'slot',
+  //     },
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: 'streamrequests',
+  //       localField: '_id',
+  //       foreignField: 'slotId',
+  //       as: 'streams',
+  //     },
+  //   },
+  // ]);
 
-  let values = await Slot.aggregate([
+  // let values = await Slotseperation.aggregate([
+  //   {
+  //     $match: {
+  //       streamPlanId: id,
+  //       SlotType: type,
+  //     },
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: 'slotbookings',
+  //       localField: 'streamPlanId',
+  //       foreignField: 'streamPlanId',
+  //       as: 'slotbookings',
+  //     },
+  //   },
+  // ]);
+
+  let values = await PlanSlot.aggregate([
     {
       $match: {
-        $and: [duratrionMatch, { Type: type }],
+        streamPlanId: id,
+        slotType: type,
       },
     },
     {
+      $addFields: { duration: { $toString: '$Duration' } },
+    },
+    // {
+    //   $lookup: {
+    //     from: 'streamplans',
+    //     localField: 'streamPlanId',
+    //     foreignField: '_id',
+    //     pipeline: [
+    //       {
+    //         $lookup: {
+    //           from: 'slotbookings',
+    //           localField: '_id',
+    //           foreignField: 'streamPlanId',
+    //           pipeline: [{ $match: { slotType: type, Durations: '$duration' } }],
+    //           as: 'slotbook',
+    //         },
+    //       },
+    //     ],
+    //     as: 'streamplan',
+    //   },
+    // },
+
+    {
       $lookup: {
-        from: 'slotbookings',
-        localField: '_id',
-        foreignField: 'slotId',
-        as: 'slot',
+        from: 'streamplans',
+        let: { calculatedDuration: '$duration' }, // Define the variable to pass into the pipeline
+        pipeline: [
+          {
+            $lookup: {
+              from: 'slotbookings',
+              localField: '_id',
+              foreignField: 'streamPlanId',
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $and: [
+                        { $eq: ['$slotType', type] },
+                        { $eq: ['$Durations', '$$calculatedDuration'] }, // Use the passed variable
+                      ],
+                    },
+                  },
+                },
+                {
+                  $lookup: {
+                    from: 'slots',
+                    localField: 'slotId',
+                    foreignField: '_id',
+                    pipeline: [
+                      {
+                        $lookup: {
+                          from: 'streamrequests',
+                          localField: '_id',
+                          foreignField: 'slotId',
+                          as: 'Stream',
+                        },
+                      },
+                    ],
+                    as: 'slots',
+                  },
+                },
+                {
+                  $unwind: '$slots',
+                },
+              ],
+              as: 'slotbook',
+            },
+          },
+          {
+            $unwind: '$slotbook',
+          },
+        ],
+        as: 'streamplan',
       },
     },
     {
-      $lookup: {
-        from: 'streamrequests',
-        localField: '_id',
-        foreignField: 'slotId',
-        as: 'streams',
+      $unwind: '$streamplan',
+    },
+    {
+      $project: {
+        _id: 1,
+        slotType: 1,
+        streamPlanId: 1,
+        Duration: 1,
+        slotId: '$streamplan.slotbook.slots._id',
+        start: { $ifNull: ['$streamplan.slotbook.slots.start', 'Not Booked yet slot'] },
+        end: { $ifNull: ['$streamplan.slotbook.slots.end', 'Not Booked yet slot'] },
+        date: { $ifNull: ['$streamplan.slotbook.slots.date', 'Not Booked yet slot'] },
+        stream: { $ifNull: [{ $size: '$streamplan.slotbook.slots.Stream' }, 0] },
       },
     },
   ]);
+
   return values;
 };
 

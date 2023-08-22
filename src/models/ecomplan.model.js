@@ -472,8 +472,8 @@ const streamRequestschema = mongoose.Schema({
     default: false,
   },
   current_raise: {
-    type: String
-  }
+    type: String,
+  },
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);
@@ -713,6 +713,9 @@ const PlanSlotSchema = new mongoose.Schema(
     active: {
       type: Boolean,
       default: true,
+    },
+    slotId: {
+      type: String,
     },
   },
   { timestamps: true }
