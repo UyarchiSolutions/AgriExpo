@@ -525,6 +525,7 @@ const Approve_Reject = async (id, body) => {
         userId: values.suppierId,
         Slots: e.No_Of_Slot,
         PlanId: values._id,
+        streamPlanId: values.planId,
       });
     });
   } else if (body.status == 'Rejected') {
@@ -852,6 +853,83 @@ const getuserAvailablePlanes = async (id, userId) => {
 };
 
 const get_All_Purchased_Plan = async (page) => {
+  let purchase = await purchasePlan.aggregate([
+    { $match: { status: 'Approved' } },
+    {
+      $lookup: {
+        from: 'streamplans',
+        localField: 'planId',
+        foreignField: '_id',
+        pipeline: [
+          { $unwind: '$slotInfo' },
+          {
+            $project: {
+              _id: 1,
+              slotType: '$slotInfo.slotType',
+            },
+          },
+          {
+            $group: {
+              _id: { slotType: '$slotType' },
+              count: { $sum: 1 },
+            },
+          },
+          {
+            $project: {
+              _id: '',
+              slotType: '$_id.slotType',
+              count: 1,
+            },
+          },
+          { $sort: { slotType: 1 } },
+        ],
+        as: 'streamplans',
+      },
+    },
+    // {streamplans: '$streamplans'},
+    {
+      $lookup: {
+        from: 'streamplans',
+        localField: 'planId',
+        foreignField: '_id',
+        as: 'streamplans_name',
+      },
+    },
+    { $unwind: '$streamplans_name' },
+    {
+      $project: {
+        streamplans: '$streamplans',
+        _id: '$streamplans_name._id',
+        planName: '$streamplans_name.planName',
+        planId: 1,
+      },
+    },
+    {
+      $group: {
+        _id: {
+          planName: '$planName',
+          streamplans: '$streamplans',
+          _id: '$_id',
+        },
+        purchasedCount: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: '$_id._id',
+        planName: '$_id.planName',
+        streamplans: '$_id.streamplans',
+        purchasedCount: '$purchasedCount',
+      },
+    },
+    {
+      $skip: page * 10,
+    },
+    {
+      $limit: 10,
+    },
+    // { $unwind: '$streamplans' },
+  ]);
   let values = await Streamplan.aggregate([
     {
       $lookup: {
@@ -862,16 +940,26 @@ const get_All_Purchased_Plan = async (page) => {
         as: 'planes',
       },
     },
+
+    { $unwind: '$slotInfo' },
     {
       $project: {
         _id: 1,
         planName: 1,
         purchasedCount: { $size: '$planes' },
-        slotInfo: 1,
+        slottype: '$slotInfo.slotType',
       },
     },
     {
-      $match: { purchasedCount: { $gt: 0 } },
+      $group: {
+        _id: {
+          planName: '$planName',
+          count: { $sum: 1 },
+        },
+      },
+    },
+    {
+      $sort: { purchasedCount: 1 },
     },
     {
       $skip: page * 10,
@@ -904,7 +992,7 @@ const get_All_Purchased_Plan = async (page) => {
     },
   ]);
 
-  return { values: values, total: Total.length };
+  return { values: purchase, total: Total.length };
 };
 
 const streamPlanById = async (id) => {

@@ -63,6 +63,9 @@ const SlotseperationSchema = mongoose.Schema(
     userId: {
       type: String,
     },
+    streamPlanId: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
