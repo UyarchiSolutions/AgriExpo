@@ -3120,7 +3120,8 @@ const go_live_stream_host = async (req, userId) => {
         temptokens_sub: '$temptokens_sub',
         no_of_host: '$purchasedplans.no_of_host',
         agoraappids: '$agoraappids',
-        raiseUID:1
+        raiseUID: 1,
+        RaiseHands:"$purchasedplans.RaiseHands"
       },
     },
   ]);
