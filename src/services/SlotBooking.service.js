@@ -33,6 +33,7 @@ const createSlotBooking = async (body, userId) => {
       slotType: slot.Type,
       PlanId: slot.planId,
       userId: userId,
+      streamPlanId: findAvailableSlot.streamPlanId,
     };
     await SlotBooking.create(data);
   }
