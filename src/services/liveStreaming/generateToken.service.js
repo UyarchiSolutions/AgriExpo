@@ -1741,7 +1741,7 @@ const get_raise_hands = async (req) => {
               shopId: 1,
               tempID: 1,
               status: 1,
-              createdAt:"$shops.createdAt"
+              createdAt:1
             }
           }
         ],
