@@ -748,8 +748,11 @@ const get_sub_golive = async (req, io) => {
     {
       $lookup: {
         from: 'raiseusers',
-        localField: 'shopId',
-        foreignField: 'shopId',
+        localField: 'streamId',
+        foreignField: 'streamId',
+        pipeline: [
+          { $match: { $and: [{ shopId: { $eq: req.shopId } }] } }
+        ],
         as: 'raiseusers',
       },
     },
