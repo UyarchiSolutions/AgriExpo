@@ -134,7 +134,7 @@ const tempToken = mongoose.Schema({
     type: String,
     default: 'Pending',
   },
-  appID:{
+  appID: {
     type: String,
   }
 });
@@ -187,4 +187,38 @@ const joinedusers = mongoose.Schema({
 
 const Joinusers = mongoose.model('joinedusers', joinedusers);
 
-module.exports = { tempTokenModel, Joinusers };
+
+
+const raiseUserschema = mongoose.Schema({
+  _id: {
+    type: String,
+    default: v4,
+  },
+  active: {
+    type: Boolean,
+    default: true,
+  },
+  archive: {
+    type: Boolean,
+    default: false,
+  },
+  shopId: {
+    type: String,
+  },
+  streamId: {
+    type: String,
+  },
+  tempID: {
+    type: String,
+  },
+  status: {
+    type: String,
+    default: 'Pending'
+  }
+},
+  { timestamps: true }
+);
+
+const RaiseUsers = mongoose.model('raiseusers', raiseUserschema);
+
+module.exports = { tempTokenModel, Joinusers, RaiseUsers };

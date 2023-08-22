@@ -3067,6 +3067,28 @@ const go_live_stream_host = async (req, userId) => {
       },
     },
     {
+      $lookup: {
+        from: 'temptokens',
+        localField: '_id',
+        foreignField: 'streamId',
+        pipeline: [
+          { $match: { $and: [{ type: { $eq: 'raiseHands' } }] } }
+        ],
+        as: 'raiseID',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$raiseID',
+      },
+    },
+    {
+      $addFields: {
+        raiseUID: { $ifNull: ['$raiseID.Uid', 0] },
+      },
+    },
+    {
       $project: {
         _id: 1,
         supplierName: '$suppliers.contactName',
@@ -3098,6 +3120,7 @@ const go_live_stream_host = async (req, userId) => {
         temptokens_sub: '$temptokens_sub',
         no_of_host: '$purchasedplans.no_of_host',
         agoraappids: '$agoraappids',
+        raiseUID:1
       },
     },
   ]);
@@ -13194,6 +13217,30 @@ const get_exhibitor_details = async (req) => {
         notify: { $ifNull: ['$notifies.notify', false] },
       },
     },
+
+    {
+      $lookup: {
+        from: 'userinteractions',
+        localField: '_id',
+        foreignField: 'exhibitorId',
+        pipeline: [
+          { $match: { $and: [{ visitorId: { $eq: shopId } }] } },
+        ],
+        as: 'userinteraction',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$userinteraction',
+      },
+    },
+    {
+      $addFields: {
+        chat: { $ifNull: ['$userinteraction._id', false] },
+      },
+    },
+
   ])
   if (sell.length == 0) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');

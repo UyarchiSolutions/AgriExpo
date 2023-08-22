@@ -12,6 +12,8 @@ const PlanImage = require('../../middlewares/plan');
 const { SetPass, SellerAuth } = require('../../controllers/sellerAuth.controller');
 const authorization = require('../../controllers/tokenVerify.controller');
 
+const Privatechat = require('../../controllers/ecomplan.controller');
+
 const storage = multer.memoryStorage({
   destination: function (req, res, callback) {
     callback(null, '');

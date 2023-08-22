@@ -14,6 +14,9 @@ const PrivateChatSchema = new mongoose.Schema(
     visitorId: {
       type: String,
     },
+    sender: {
+      type: String,
+    },
     exhibitorShow: {
       type: Boolean,
       default: true,
@@ -32,6 +35,9 @@ const PrivateChatSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    sendBy: {
+      type: String,
+    }
   },
   { timestamps: true }
 );
@@ -50,18 +56,13 @@ const CommunicationSchema = new mongoose.Schema(
     visitorId: {
       type: String,
     },
-    exhibitorShow: {
-      type: Boolean,
-      default: true,
-    },
-    visitorShow: {
-      type: Boolean,
-      default: true,
-    },
     active: {
       type: Boolean,
       default: true,
     },
+    last_modify: {
+      type: Date
+    }
   },
   { timestamps: true }
 );

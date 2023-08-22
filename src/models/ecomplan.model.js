@@ -467,6 +467,13 @@ const streamRequestschema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  raise_hands: {
+    type: Boolean,
+    default: false,
+  },
+  current_raise: {
+    type: String
+  }
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);

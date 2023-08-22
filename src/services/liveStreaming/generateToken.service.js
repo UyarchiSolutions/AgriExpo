@@ -3,7 +3,7 @@ const ApiError = require('../../utils/ApiError');
 const { RtcTokenBuilder, RtcRole } = require('agora-access-token');
 const Agora = require('agora-access-token');
 const moment = require('moment');
-const { tempTokenModel, Joinusers } = require('../../models/liveStreaming/generateToken.model');
+const { tempTokenModel, Joinusers, RaiseUsers } = require('../../models/liveStreaming/generateToken.model');
 const axios = require('axios'); //
 // const appID = '1ba2592b16b74f3497e232e1b01f66b0';
 // const appCertificate = '8ae85f97802448c2a47b98715ff90ffb';
@@ -496,7 +496,6 @@ const get_sub_golive = async (req, io) => {
   let code = req.query.code;
   let streamId = req.query.id;
   io.emit(streamId + 'watching_live', { code: code, stream: streamId });
-  //console.log(req.query.id,code)
   let value = await Joinusers.aggregate([
     { $match: { $and: [{ _id: { $eq: req.query.id } }, { shopId: { $eq: req.shopId } }] } },
     {
@@ -684,8 +683,8 @@ const get_sub_golive = async (req, io) => {
                     DateIso: 1,
                     created: '2023-01-20T11:46:58.201Z',
                     intrested: "$streamposts.intrested",
-                    saved:  "$streamposts.saved",
-                    unit:  "$streamposts.unit",
+                    saved: "$streamposts.saved",
+                    unit: "$streamposts.unit",
                   },
                 },
               ],
@@ -746,7 +745,28 @@ const get_sub_golive = async (req, io) => {
         as: 'temptokens_sub',
       },
     },
-
+    {
+      $lookup: {
+        from: 'raiseusers',
+        localField: 'streamId',
+        foreignField: 'streamId',
+        pipeline: [
+          { $match: { $and: [{ shopId: { $eq: req.shopId } }] } }
+        ],
+        as: 'raiseusers',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$raiseusers',
+      },
+    },
+    {
+      $addFields: {
+        raise_hands: { $ifNull: ['$raiseusers.status', false] },
+      },
+    },
     {
       $project: {
         _id: 1,
@@ -773,7 +793,9 @@ const get_sub_golive = async (req, io) => {
         chat_need: '$streamrequests.chat_need',
         temptokens_sub: '$temptokens_sub',
         joindedUserBan: 1,
-        appID: "$streamrequests.agoraappids.appID"
+        appID: "$streamrequests.agoraappids.appID",
+        raise_hands: 1,
+        raiseID: "$raiseusers._id"
       },
     },
   ]);
@@ -1638,6 +1660,269 @@ const get_cloude_recording = async (req) => {
   return stream;
 
 }
+const start_rice_user_hands = async (req) => {
+  let streamId = req.body.stream;
+  let stream = await Streamrequest.findById(streamId);
+  let supplierId = req.userId;
+  if (!stream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
+  }
+  let value = await tempTokenModel.findOne({ chennel: streamId, type: "raiseHands" });
+  //console.log(value)
+  if (!value) {
+    const uid = await generateUid();
+    const role = req.body.isPublisher ? Agora.RtcRole.PUBLISHER : Agora.RtcRole.SUBSCRIBER;
+    const expirationTimestamp = stream.endTime / 1000;
+    value = await tempTokenModel.create({
+      ...req.body,
+      ...{
+        date: moment().format('YYYY-MM-DD'),
+        time: moment().format('HHMMSS'),
+        supplierId: supplierId,
+        streamId: streamId,
+        created: moment(),
+        Uid: uid,
+        created_num: new Date(new Date(moment().format('YYYY-MM-DD') + ' ' + moment().format('HH:mm:ss'))).getTime(),
+        expDate: expirationTimestamp * 1000,
+        Duration: stream.Durationm,
+        type: 'raiseHands',
+      },
+    });
+    const token = await geenerate_rtc_token(streamId, uid, role, expirationTimestamp, stream.agoraID);
+    value.token = token;
+    value.chennel = streamId;
+    value.save();
+    stream.raise_hands = true;
+    stream.save();
+  }
+
+  req.io.emit(streamId + '_raise_hands_start', { raise_hands: true });
+  return value;
+
+
+}
+
+const get_raise_hands = async (req) => {
+
+  let streamId = req.query.stream;
+  let find = await Streamrequest.aggregate([
+    { $match: { $and: [{ _id: { $eq: streamId } }] } },
+    {
+      $lookup: {
+        from: 'raiseusers',
+        localField: '_id',
+        foreignField: 'streamId',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'b2bshopclones',
+              localField: 'shopId',
+              foreignField: '_id',
+              as: 'shops',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$shops',
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              SName: "$shops.SName",
+              mobile: "$shops.mobile",
+              address: "$shops.address",
+              country: "$shops.country",
+              state: "$shops.state",
+              companyName: "$shops.companyName",
+              designation: "$shops.designation",
+              streamId: 1,
+              shopId: 1,
+              tempID: 1,
+              status: 1
+            }
+          }
+        ],
+        as: 'raiseusers',
+      },
+    },
+
+  ])
+  if (find.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
+  }
+
+  return find[0];
+}
+
+const raise_request = async (req) => {
+  let shopId = req.shopId;
+  let streamId = req.body.streamId;
+  let stream = await Streamrequest.findById(streamId);
+  if (!stream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
+  }
+  let temp = await tempTokenModel.findOne({ chennel: streamId, type: "raiseHands" });
+  if (!temp) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Waiting For user Start hand Raise');
+  }
+  let raise = await RaiseUsers.findOne({ streamId: streamId, shopId: shopId, tempID: temp._id, status: { $ne: "completed" } });
+  if (!raise) {
+    raise = await RaiseUsers.create({ streamId: streamId, shopId: shopId, tempID: temp._id });
+  }
+  raise = await RaiseUsers.aggregate([
+    { $match: { $and: [{ _id: { $eq: raise._id } }] } },
+    {
+      $lookup: {
+        from: 'b2bshopclones',
+        localField: 'shopId',
+        foreignField: '_id',
+        as: 'shops',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$shops',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        SName: "$shops.SName",
+        mobile: "$shops.mobile",
+        address: "$shops.address",
+        country: "$shops.country",
+        state: "$shops.state",
+        companyName: "$shops.companyName",
+        designation: "$shops.designation",
+        streamId: 1,
+        shopId: 1,
+        tempID: 1,
+        status: 1
+      }
+    }
+  ])
+  req.io.emit(streamId + '_raise_hands_request', raise[0]);
+  return raise;
+}
+
+
+const approve_request = async (req) => {
+  let raiseid = req.body.raise;
+  let raise = await RaiseUsers.findById(raiseid);
+  if (!raise) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
+  }
+  let stream = await Streamrequest.findById(raise.streamId);
+  stream.current_raise = raise._id;
+  stream.save();
+  raise.status = 'approved';
+  raise.save();
+  req.io.emit(raise._id + '_status', { message: "approved" });
+  return raise;
+}
+
+const pending_request = async (req) => {
+  let raiseid = req.body.raise;
+  let raise = await RaiseUsers.findById(raiseid);
+  if (!raise) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
+  }
+  let stream = await Streamrequest.findById(raise.streamId);
+  stream.current_raise = null;
+  stream.save();
+  raise.status = 'Pending';
+  raise.save();
+  req.io.emit(raise._id + '_status', { message: "Pending" });
+  return raise;
+}
+
+const reject_request = async (req) => {
+  let raiseid = req.body.raise;
+  let raise = await RaiseUsers.findById(raiseid);
+  if (!raise) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
+  }
+  let stream = await Streamrequest.findById(raise.streamId);
+  stream.current_raise = null;
+  stream.save();
+  raise.status = 'rejected';
+  raise.save();
+  req.io.emit(raise._id + '_status', { message: "rejected" });
+  return raise;
+}
+
+const jion_now_live = async (req) => {
+  let raiseid = req.body.raise;
+  let raise = await RaiseUsers.findById(raiseid);
+  if (!raise) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
+  }
+  let stream = await Streamrequest.findById(raise.streamId);
+
+  if (stream.current_raise != raiseid) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Line Busy');
+  }
+
+  raise = await RaiseUsers.aggregate([
+    { $match: { $and: [{ _id: { $eq: raise._id } }] } },
+    {
+      $lookup: {
+        from: 'b2bshopclones',
+        localField: 'shopId',
+        foreignField: '_id',
+        as: 'shops',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$shops',
+      },
+    },
+    {
+      $lookup: {
+        from: 'temptokens',
+        localField: 'tempID',
+        foreignField: '_id',
+        as: 'temptokens',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$temptokens',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        SName: "$shops.SName",
+        mobile: "$shops.mobile",
+        address: "$shops.address",
+        country: "$shops.country",
+        state: "$shops.state",
+        companyName: "$shops.companyName",
+        designation: "$shops.designation",
+        streamId: 1,
+        shopId: 1,
+        tempID: 1,
+        status: 1,
+        Uid: "$temptokens.Uid",
+        chennel: "$temptokens.chennel",
+        token: "$temptokens.token",
+        expDate: "$temptokens.expDate",
+      }
+    }
+  ])
+  if (raise.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
+  }
+  return raise[0];
+}
+
 
 module.exports = {
   generateToken,
@@ -1668,5 +1953,12 @@ module.exports = {
   videoConverter,
   get_current_live_stream,
   cloud_recording_start,
-  get_cloude_recording
+  get_cloude_recording,
+  start_rice_user_hands,
+  get_raise_hands,
+  raise_request,
+  approve_request,
+  reject_request,
+  pending_request,
+  jion_now_live
 };
