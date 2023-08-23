@@ -60,7 +60,7 @@ const create_purchase_plan = async (req) => {
         expireDate: date_now,
         streamvalidity: plan.streamvalidity,
         no_of_host: plan.no_of_host,
-        RaiseHands: plan.RaiseHands
+        RaiseHands: plan.RaiseHands,
       };
       let con = await purchasePlan.create({ ...datas, ...req.body.PaymentDatails });
       await Dates.create_date(con);
@@ -114,7 +114,7 @@ const create_purchase_plan_private = async (req) => {
         expireDate: date_now,
         streamvalidity: plan.streamvalidity,
         no_of_host: plan.no_of_host,
-        RaiseHands: plan.RaiseHands
+        RaiseHands: plan.RaiseHands,
       };
       let con = await purchasePlan.create({ ...datas, ...req.body.PaymentDatails });
       await Dates.create_date(con);
@@ -305,6 +305,7 @@ const get_all_purchasePlans = async (req) => {
         numberOfStreamused: 1,
         expireDate: 1,
         no_of_host: 1,
+        planId: 1,
       },
     },
   ]);

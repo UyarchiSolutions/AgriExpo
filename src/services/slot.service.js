@@ -271,30 +271,10 @@ const getSlots_by_SlotInfo = async (query) => {
     {
       $addFields: { duration: { $toString: '$Duration' } },
     },
-    // {
-    //   $lookup: {
-    //     from: 'streamplans',
-    //     localField: 'streamPlanId',
-    //     foreignField: '_id',
-    //     pipeline: [
-    //       {
-    //         $lookup: {
-    //           from: 'slotbookings',
-    //           localField: '_id',
-    //           foreignField: 'streamPlanId',
-    //           pipeline: [{ $match: { slotType: type, Durations: '$duration' } }],
-    //           as: 'slotbook',
-    //         },
-    //       },
-    //     ],
-    //     as: 'streamplan',
-    //   },
-    // },
-
     {
       $lookup: {
         from: 'streamplans',
-        let: { calculatedDuration: '$duration' }, // Define the variable to pass into the pipeline
+        let: { calculatedDuration: '$duration' },
         pipeline: [
           {
             $lookup: {
@@ -307,7 +287,8 @@ const getSlots_by_SlotInfo = async (query) => {
                     $expr: {
                       $and: [
                         { $eq: ['$slotType', type] },
-                        { $eq: ['$Durations', '$$calculatedDuration'] }, // Use the passed variable
+                        { $eq: ['$Durations', '$$calculatedDuration'] },
+                        { $eq: ['$streamPlanId', id] },
                       ],
                     },
                   },
@@ -318,6 +299,11 @@ const getSlots_by_SlotInfo = async (query) => {
                     localField: 'slotId',
                     foreignField: '_id',
                     pipeline: [
+                      // {
+                      //   $match: {
+                      //     Type: '$$slotType',
+                      //   },
+                      // },
                       {
                         $lookup: {
                           from: 'streamrequests',
@@ -353,11 +339,12 @@ const getSlots_by_SlotInfo = async (query) => {
         slotType: 1,
         streamPlanId: 1,
         Duration: 1,
-        slotId: '$streamplan.slotbook.slots._id',
-        start: { $ifNull: ['$streamplan.slotbook.slots.start', 'Not Booked yet slot'] },
-        end: { $ifNull: ['$streamplan.slotbook.slots.end', 'Not Booked yet slot'] },
-        date: { $ifNull: ['$streamplan.slotbook.slots.date', 'Not Booked yet slot'] },
-        stream: { $ifNull: [{ $size: '$streamplan.slotbook.slots.Stream' }, 0] },
+        slotbook: '$streamplan.slotbook',
+        // slotId: '$streamplan.slotbook.slots._id',
+        // start: { $ifNull: ['$streamplan.slotbook.slots.start', 'Not Booked yet slot'] },
+        // end: { $ifNull: ['$streamplan.slotbook.slots.end', 'Not Booked yet slot'] },
+        // date: { $ifNull: ['$streamplan.slotbook.slots.date', 'Not Booked yet slot'] },
+        // stream: { $ifNull: [{ $size: '$streamplan.slotbook.slots.Stream' }, 0] },
       },
     },
   ]);
