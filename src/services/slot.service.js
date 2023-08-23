@@ -413,13 +413,13 @@ const getStreamBySlots = async (id) => {
     {
       $addFields: {
         isBetweenTime: {
-          $and: [{ $gt: ['$startTime', currentUnixTimestamp] }, { $lte: ['$streamEnd_Time', currentUnixTimestamp] }],
+          $and: [{ $lt: ['$startTime', currentUnixTimestamp] }, { $gte: ['$streamEnd_Time', currentUnixTimestamp] }],
         },
       },
     },
     {
       $addFields: {
-        PendingStatus: { $and: [{ $gte: ['$startTime', currentUnixTimestamp] }] },
+        PendingStatus: { $and: [{ $gt: ['$startTime', currentUnixTimestamp] }] },
       },
     },
     {
