@@ -11,7 +11,7 @@ const {
   PlanSlot,
   Instestedproduct,
   Savedproduct,
-  Notify
+  Notify,
 } = require('../models/ecomplan.model');
 const { Slot } = require('../models/slot.model');
 const axios = require('axios'); //
@@ -30,7 +30,7 @@ const { Shop } = require('../models/b2b.ShopClone.model');
 const agoraToken = require('./liveStreaming/AgoraAppId.service');
 
 const S3video = require('./S3video.service');
-const { Seller } = require('../models/seller.models')
+const { Seller } = require('../models/seller.models');
 
 const create_Plans = async (req) => {
   const { slotInfo } = req.body;
@@ -1400,6 +1400,7 @@ const create_stream_one = async (req) => {
       streamEnd_Time: datess,
       slotId: slot._id,
       streamingDate: slot.date,
+      streamPlanId: plan.planId,
     },
     { new: true }
   );
@@ -3071,9 +3072,7 @@ const go_live_stream_host = async (req, userId) => {
         from: 'temptokens',
         localField: '_id',
         foreignField: 'streamId',
-        pipeline: [
-          { $match: { $and: [{ type: { $eq: 'raiseHands' } }] } }
-        ],
+        pipeline: [{ $match: { $and: [{ type: { $eq: 'raiseHands' } }] } }],
         as: 'raiseID',
       },
     },
@@ -3121,7 +3120,7 @@ const go_live_stream_host = async (req, userId) => {
         no_of_host: '$purchasedplans.no_of_host',
         agoraappids: '$agoraappids',
         raiseUID: 1,
-        RaiseHands: "$purchasedplans.RaiseHands"
+        RaiseHands: '$purchasedplans.RaiseHands',
       },
     },
   ]);
@@ -3428,10 +3427,6 @@ const get_subhost_token = async (req, userId) => {
         temptokens_sub: '$temptokens_sub',
         no_of_host: '$purchasedplans.no_of_host',
         agoraappids: '$agoraappids',
-        RaiseHands: "$purchasedplans.RaiseHands",
-        raiseUID: 1,
-
-
       },
     },
   ]);
@@ -3939,7 +3934,7 @@ const get_watch_live_steams_current = async (req) => {
         productArray: '$streamrequestposts.productTitle',
         channel: '$suppliers._id',
         image: 1,
-        teaser: 1
+        teaser: 1,
       },
     },
     { $skip: 10 * page },
@@ -4399,7 +4394,7 @@ const get_watch_live_steams_upcoming = async (req) => {
         productArray: '$streamrequestposts.productTitle',
         channel: '$suppliers._id',
         image: 1,
-        teaser: 1
+        teaser: 1,
       },
     },
     { $skip: 10 * page },
@@ -5059,7 +5054,7 @@ const get_watch_live_steams_completed = async (req) => {
         productArray: '$streamrequestposts.productTitle',
         channel: '$suppliers._id',
         image: 1,
-        teaser: 1
+        teaser: 1,
       },
     },
     { $skip: 10 * page },
@@ -6691,7 +6686,6 @@ const getall_homeage_streams = async (req) => {
         suppliersName: '$suppliers.contactName',
         tradeName: '$suppliers.tradeName',
         channel: '$suppliers._id',
-
       },
     },
     { $limit: 10 },
@@ -6917,7 +6911,6 @@ const getall_homeage_streams = async (req) => {
         streamEnd_Time: 1,
         productArray: '$streamrequestposts.productTitle',
         channel: '$suppliers._id',
-
       },
     },
     { $skip: 10 },
@@ -7147,7 +7140,6 @@ const getall_homeage_streams = async (req) => {
         productArray: '$streamrequestposts.productTitle',
         teaser: 1,
         channel: '$suppliers._id',
-
       },
     },
     { $skip: 10 },
@@ -7376,7 +7368,6 @@ const getall_homeage_streams = async (req) => {
         productArray: '$streamrequestposts.productTitle',
         teaser: 1,
         channel: '$suppliers._id',
-
       },
     },
     { $limit: 10 },
@@ -7602,7 +7593,6 @@ const getall_homeage_streams = async (req) => {
         productArray: '$streamrequestposts.productTitle',
         teaser: 1,
         channel: '$suppliers._id',
-
       },
     },
     { $skip: 10 },
@@ -7835,7 +7825,6 @@ const getall_homeage_streams = async (req) => {
         image: 1,
         teaser: 1,
         channel: '$suppliers._id',
-
       },
     },
     { $limit: 10 },
@@ -8067,7 +8056,6 @@ const getall_homeage_streams = async (req) => {
         image: 1,
         teaser: 1,
         channel: '$suppliers._id',
-
       },
     },
     { $skip: 10 },
@@ -8090,7 +8078,6 @@ const getall_homeage_streams = async (req) => {
     upcoming_next: upcoming_next.length != 0,
     completed: completedStream,
     completed_next: completednext.length != 0,
-
   };
 };
 
@@ -8110,8 +8097,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+        ? 'RAC'
+        : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -8120,8 +8107,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-            ? 'RAC'
-            : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -12589,7 +12576,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => { };
+const get_video_link = async (req) => {};
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
@@ -13077,7 +13064,11 @@ const exhibitor_get_video_all = async (req) => {
   var date_now = new Date().getTime();
 
   let stream = await Streamrequest.aggregate([
-    { $match: { $and: [{ suppierId: { $eq: sellerId } }, { adminApprove: { $eq: 'Approved' } }, { status: { $ne: "Cancelled" } }] } },
+    {
+      $match: {
+        $and: [{ suppierId: { $eq: sellerId } }, { adminApprove: { $eq: 'Approved' } }, { status: { $ne: 'Cancelled' } }],
+      },
+    },
     {
       $lookup: {
         from: 'sellers',
@@ -13096,35 +13087,35 @@ const exhibitor_get_video_all = async (req) => {
       $addFields: {
         condition: {
           $cond: {
-            if: { $and: [{ $lte: ['$startTime', date_now] }, { $gte: ["$streamEnd_Time", date_now] }] },
+            if: { $and: [{ $lte: ['$startTime', date_now] }, { $gte: ['$streamEnd_Time', date_now] }] },
             then: 1,
             else: {
               $cond: {
                 if: { $and: [{ $gte: ['$startTime', date_now] }] },
                 then: 2,
-                else: 3
-              }
-            }
-          }
-        }
-      }
+                else: 3,
+              },
+            },
+          },
+        },
+      },
     },
     {
       $addFields: {
         streamStatus: {
           $cond: {
             if: { $and: [{ $eq: ['$condition', 1] }] },
-            then: "Live",
+            then: 'Live',
             else: {
               $cond: {
                 if: { $and: [{ $eq: ['$condition', 2] }] },
-                then: "Upcomming",
-                else: "Completed"
-              }
-            }
-          }
-        }
-      }
+                then: 'Upcomming',
+                else: 'Completed',
+              },
+            },
+          },
+        },
+      },
     },
     { $sort: { condition: 1 } },
     {
@@ -13145,7 +13136,7 @@ const exhibitor_get_video_all = async (req) => {
         streamEnd_Time: 1,
         teaser: 1,
         condition: 1,
-        streamStatus: 1
+        streamStatus: 1,
       },
     },
     { $skip: 20 * page },
@@ -13153,40 +13144,44 @@ const exhibitor_get_video_all = async (req) => {
   ]);
 
   let next = await Streamrequest.aggregate([
-    { $match: { $and: [{ suppierId: { $eq: sellerId } }, { adminApprove: { $eq: 'Approved' } }, { status: { $ne: "Cancelled" } }] } },
+    {
+      $match: {
+        $and: [{ suppierId: { $eq: sellerId } }, { adminApprove: { $eq: 'Approved' } }, { status: { $ne: 'Cancelled' } }],
+      },
+    },
     {
       $addFields: {
         condition: {
           $cond: {
-            if: { $and: [{ $lte: ['$startTime', date_now] }, { $gte: ["$streamEnd_Time", date_now] }] },
+            if: { $and: [{ $lte: ['$startTime', date_now] }, { $gte: ['$streamEnd_Time', date_now] }] },
             then: 1,
             else: {
               $cond: {
                 if: { $and: [{ $gte: ['$startTime', date_now] }] },
                 then: 2,
-                else: 3
-              }
-            }
-          }
-        }
-      }
+                else: 3,
+              },
+            },
+          },
+        },
+      },
     },
     {
       $addFields: {
         streamStatus: {
           $cond: {
             if: { $and: [{ $eq: ['$condition', 1] }] },
-            then: "Live",
+            then: 'Live',
             else: {
               $cond: {
                 if: { $and: [{ $eq: ['$condition', 2] }] },
-                then: "Upcomming",
-                else: "Completed"
-              }
-            }
-          }
-        }
-      }
+                then: 'Upcomming',
+                else: 'Completed',
+              },
+            },
+          },
+        },
+      },
     },
     { $sort: { condition: 1 } },
     { $skip: 20 * (page + 1) },
@@ -13205,9 +13200,7 @@ const get_exhibitor_details = async (req) => {
         from: 'notifies',
         localField: '_id',
         foreignField: 'ExhibitorId',
-        pipeline: [
-          { $match: { $and: [{ VisitorId: { $eq: shopId } }] } },
-        ],
+        pipeline: [{ $match: { $and: [{ VisitorId: { $eq: shopId } }] } }],
         as: 'notifies',
       },
     },
@@ -13228,9 +13221,7 @@ const get_exhibitor_details = async (req) => {
         from: 'userinteractions',
         localField: '_id',
         foreignField: 'exhibitorId',
-        pipeline: [
-          { $match: { $and: [{ visitorId: { $eq: shopId } }] } },
-        ],
+        pipeline: [{ $match: { $and: [{ visitorId: { $eq: shopId } }] } }],
         as: 'userinteraction',
       },
     },
@@ -13245,14 +13236,12 @@ const get_exhibitor_details = async (req) => {
         chat: { $ifNull: ['$userinteraction._id', false] },
       },
     },
-
-  ])
+  ]);
   if (sell.length == 0) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
   }
   return sell[0];
 };
-
 
 const notify_me_toggle = async (req) => {
   const { channel } = req.body;
@@ -13263,22 +13252,19 @@ const notify_me_toggle = async (req) => {
     noti = await Notify.create({ ExhibitorId: channel, VisitorId: shopId, notify: true });
     seller.notifyCount = seller.notifyCount == null ? seller.notifyCount + 1 : 0;
     seller.save();
-  }
-  else {
-    noti = await Notify.findByIdAndUpdate({ _id: noti._id }, { notify: !noti.notify }, { new: true })
+  } else {
+    noti = await Notify.findByIdAndUpdate({ _id: noti._id }, { notify: !noti.notify }, { new: true });
 
     if (noti.notify) {
       seller.notifyCount = seller.notifyCount + 1;
       seller.save();
-    }
-    else {
+    } else {
       seller.notifyCount = seller.notifyCount - 1;
       seller.save();
     }
   }
   return noti;
 };
-
 
 module.exports = {
   create_Plans,
@@ -13418,5 +13404,5 @@ module.exports = {
   get_savedProduct_By_Visitor,
   exhibitor_get_video_all,
   get_exhibitor_details,
-  notify_me_toggle
+  notify_me_toggle,
 };

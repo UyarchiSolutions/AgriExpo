@@ -474,6 +474,9 @@ const streamRequestschema = mongoose.Schema({
   current_raise: {
     type: String,
   },
+  streamPlanId: {
+    type: String,
+  },
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);
