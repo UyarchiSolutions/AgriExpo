@@ -902,6 +902,7 @@ const get_All_Purchased_Plan = async (page) => {
         _id: '$streamplans_name._id',
         planName: '$streamplans_name.planName',
         planId: 1,
+        slotInfo: 1,
       },
     },
     {
@@ -909,6 +910,7 @@ const get_All_Purchased_Plan = async (page) => {
         _id: {
           planName: '$planName',
           streamplans: '$streamplans',
+          slotInfo: '$slotInfo',
           _id: '$_id',
         },
         purchasedCount: { $sum: 1 },
@@ -920,6 +922,7 @@ const get_All_Purchased_Plan = async (page) => {
         planName: '$_id.planName',
         streamplans: '$_id.streamplans',
         purchasedCount: '$purchasedCount',
+        slotInfo: '$_id.slotInfo',
       },
     },
     {
