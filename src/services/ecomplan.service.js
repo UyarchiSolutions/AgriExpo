@@ -3427,6 +3427,8 @@ const get_subhost_token = async (req, userId) => {
         temptokens_sub: '$temptokens_sub',
         no_of_host: '$purchasedplans.no_of_host',
         agoraappids: '$agoraappids',
+        raiseUID: 1,
+        RaiseHands: '$purchasedplans.RaiseHands',
       },
     },
   ]);
