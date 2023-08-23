@@ -3396,6 +3396,26 @@ const get_subhost_token = async (req, userId) => {
       },
     },
     {
+      $lookup: {
+        from: 'temptokens',
+        localField: '_id',
+        foreignField: 'streamId',
+        pipeline: [{ $match: { $and: [{ type: { $eq: 'raiseHands' } }] } }],
+        as: 'raiseID',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$raiseID',
+      },
+    },
+    {
+      $addFields: {
+        raiseUID: { $ifNull: ['$raiseID.Uid', 0] },
+      },
+    },
+    {
       $project: {
         _id: 1,
         supplierName: '$suppliers.contactName',
