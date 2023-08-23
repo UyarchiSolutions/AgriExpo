@@ -311,13 +311,7 @@ const getSlots_by_SlotInfo = async (query) => {
                           foreignField: 'slotId',
                           pipeline: [
                             {
-                              $lookup: {
-                                from: 'purchasedplans',
-                                localField: 'planId',
-                                foreignField: '_id',
-                                pipeline: [{ $match: { planId: id } }],
-                                as: 'purchasedPlan',
-                              },
+                              $match: { streamPlanId: id },
                             },
                           ],
                           as: 'Stream',
@@ -351,7 +345,7 @@ const getSlots_by_SlotInfo = async (query) => {
         streamPlanId: 1,
         Duration: 1,
         // slotbook: '$streamplan.slotbook',
-        // slotId: '$streamplan.slotbook.slots._id',
+        slotId: '$streamplan.slotbook.slots._id',
         start: { $ifNull: ['$streamplan.slotbook.slots.start', 'Not Booked yet slot'] },
         end: { $ifNull: ['$streamplan.slotbook.slots.end', 'Not Booked yet slot'] },
         date: { $ifNull: ['$streamplan.slotbook.slots.date', 'Not Booked yet slot'] },
