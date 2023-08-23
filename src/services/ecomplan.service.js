@@ -3121,7 +3121,7 @@ const go_live_stream_host = async (req, userId) => {
         no_of_host: '$purchasedplans.no_of_host',
         agoraappids: '$agoraappids',
         raiseUID: 1,
-        RaiseHands:"$purchasedplans.RaiseHands"
+        RaiseHands: "$purchasedplans.RaiseHands"
       },
     },
   ]);
@@ -3428,6 +3428,10 @@ const get_subhost_token = async (req, userId) => {
         temptokens_sub: '$temptokens_sub',
         no_of_host: '$purchasedplans.no_of_host',
         agoraappids: '$agoraappids',
+        RaiseHands: "$purchasedplans.RaiseHands",
+        raiseUID: 1,
+
+
       },
     },
   ]);
