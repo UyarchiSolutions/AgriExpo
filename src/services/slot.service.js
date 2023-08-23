@@ -352,6 +352,15 @@ const getSlots_by_SlotInfo = async (query) => {
         stream: { $ifNull: [{ $size: '$streamplan.slotbook.slots.Stream' }, 0] },
       },
     },
+    {
+      $group: {
+        _id: '$slotId',
+        doc: { $first: '$$ROOT' },
+      },
+    },
+    {
+      $replaceRoot: { newRoot: '$doc' },
+    },
   ]);
 
   return values;
@@ -404,7 +413,7 @@ const getStreamBySlots = async (id) => {
     {
       $addFields: {
         isBetweenTime: {
-          $and: [{ $gte: ['$startTime', currentUnixTimestamp] }, { $gte: ['$streamEnd_Time', currentUnixTimestamp] }],
+          $and: [{ $gt: ['$startTime', currentUnixTimestamp] }, { $lte: ['$streamEnd_Time', currentUnixTimestamp] }],
         },
       },
     },
