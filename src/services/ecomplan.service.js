@@ -7390,6 +7390,8 @@ const getall_homeage_streams = async (req) => {
         productArray: '$streamrequestposts.productTitle',
         teaser: 1,
         channel: '$suppliers._id',
+        tradeName: '$suppliers.tradeName',
+
       },
     },
     { $limit: 10 },
@@ -7615,6 +7617,8 @@ const getall_homeage_streams = async (req) => {
         productArray: '$streamrequestposts.productTitle',
         teaser: 1,
         channel: '$suppliers._id',
+        tradeName: '$suppliers.tradeName',
+
       },
     },
     { $skip: 10 },
@@ -7847,6 +7851,8 @@ const getall_homeage_streams = async (req) => {
         image: 1,
         teaser: 1,
         channel: '$suppliers._id',
+        tradeName: '$suppliers.tradeName',
+
       },
     },
     { $limit: 10 },
@@ -8078,6 +8084,8 @@ const getall_homeage_streams = async (req) => {
         image: 1,
         teaser: 1,
         channel: '$suppliers._id',
+        tradeName: '$suppliers.tradeName',
+
       },
     },
     { $skip: 10 },
