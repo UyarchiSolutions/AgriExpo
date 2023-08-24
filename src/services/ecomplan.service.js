@@ -3957,6 +3957,8 @@ const get_watch_live_steams_current = async (req) => {
         channel: '$suppliers._id',
         image: 1,
         teaser: 1,
+        tradeName: '$suppliers.tradeName',
+
       },
     },
     { $skip: 10 * page },
