@@ -117,8 +117,13 @@ const SlotRoute = require('./slot.route');
 const SlotBookingRoute = require('./Slotbooking.route');
 const AdvertismentRoute = require('./Advertisment.route');
 const PrivateChatRoute = require('./PrivateChat.route');
+const ccavenue = require('./ccavenue.route');
 
 const defaultRoutes = [
+  {
+    path: '/ccavenue',
+    route: ccavenue,
+  },
   {
     path: '/purchaseplan',
     route: purchasePlan,

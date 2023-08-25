@@ -1409,7 +1409,9 @@ const create_stream_one = async (req) => {
   let no_of_host = plan.no_of_host * Duration;
 
   let totalMinutes = numberOfParticipants + no_of_host + Duration;
+  console.log(totalMinutes)
   let agoraID = await agoraToken.token_assign(totalMinutes, value._id, 'agri');
+  console.log(agoraID)
   if (agoraID) {
     agoraID.element._id;
     await Streamrequest.findByIdAndUpdate(
@@ -3957,6 +3959,8 @@ const get_watch_live_steams_current = async (req) => {
         channel: '$suppliers._id',
         image: 1,
         teaser: 1,
+        tradeName: '$suppliers.tradeName',
+
       },
     },
     { $skip: 10 * page },
@@ -4903,7 +4907,7 @@ const get_watch_live_steams_completed = async (req) => {
     },
     {
       $lookup: {
-        from: 'suppliers',
+        from: 'sellers',
         localField: 'suppierId',
         foreignField: '_id',
         as: 'suppliers',
@@ -5077,6 +5081,8 @@ const get_watch_live_steams_completed = async (req) => {
         channel: '$suppliers._id',
         image: 1,
         teaser: 1,
+        tradeName: '$suppliers.tradeName',
+
       },
     },
     { $skip: 10 * page },
@@ -7390,6 +7396,8 @@ const getall_homeage_streams = async (req) => {
         productArray: '$streamrequestposts.productTitle',
         teaser: 1,
         channel: '$suppliers._id',
+        tradeName: '$suppliers.tradeName',
+
       },
     },
     { $limit: 10 },
@@ -7615,6 +7623,8 @@ const getall_homeage_streams = async (req) => {
         productArray: '$streamrequestposts.productTitle',
         teaser: 1,
         channel: '$suppliers._id',
+        tradeName: '$suppliers.tradeName',
+
       },
     },
     { $skip: 10 },
@@ -7847,6 +7857,8 @@ const getall_homeage_streams = async (req) => {
         image: 1,
         teaser: 1,
         channel: '$suppliers._id',
+        tradeName: '$suppliers.tradeName',
+
       },
     },
     { $limit: 10 },
@@ -8078,6 +8090,8 @@ const getall_homeage_streams = async (req) => {
         image: 1,
         teaser: 1,
         channel: '$suppliers._id',
+        tradeName: '$suppliers.tradeName',
+
       },
     },
     { $skip: 10 },
@@ -8119,8 +8133,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-        ? 'RAC'
-        : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -8129,8 +8143,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+            ? 'RAC'
+            : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -12598,7 +12612,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => {};
+const get_video_link = async (req) => { };
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
