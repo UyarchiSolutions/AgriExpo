@@ -8872,6 +8872,8 @@ const get_completed_stream_buyer = async (req) => {
         status: 1,
         streamrequestposts_count: '$streamrequestposts_count',
         temptokens: '$temptokens',
+        showLink: 1,
+        selectvideo: 1,
       },
     },
   ]);
