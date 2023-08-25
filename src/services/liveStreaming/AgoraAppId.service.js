@@ -75,7 +75,7 @@ const get_city_list = async (req) => {
 
 const token_assign = async (minutes, streamID, streamType) => {
 
-  // let minimum = 10000 - parseInt(minutes);
+  let minimum = 10000 - parseInt(minutes);
   let token = await AgoraAppId.find({ expired: false, usedMinutes: { $lte: minimum } });
   return new Promise(async (resolve) => {
     for (let i = 0; i < token.length; i++) {
