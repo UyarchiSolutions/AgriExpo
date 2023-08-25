@@ -78,7 +78,9 @@ const token_assign = async (minutes, streamID, streamType) => {
   let minimum = 10000 - parseInt(minutes);
   console.log(minimum)
   let token = await AgoraAppId.find({ expired: false, usedMinutes: { $lte: minimum } }).limit(10);
-  console.log(token)
+  let token1 = await AgoraAppId.find({ expired: false, usedMinutes: { $gte: minimum } }).limit(10);
+  console.log(token,1231)
+  console.log(token1,423)
   return new Promise(async (resolve) => {
     for (let i = 0; i < token.length; i++) {
       let element = token[i];
