@@ -1409,7 +1409,9 @@ const create_stream_one = async (req) => {
   let no_of_host = plan.no_of_host * Duration;
 
   let totalMinutes = numberOfParticipants + no_of_host + Duration;
+  console.log(totalMinutes)
   let agoraID = await agoraToken.token_assign(totalMinutes, value._id, 'agri');
+  console.log(agoraID)
   if (agoraID) {
     agoraID.element._id;
     await Streamrequest.findByIdAndUpdate(
