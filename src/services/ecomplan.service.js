@@ -8825,21 +8825,21 @@ const get_completed_stream_buyer = async (req) => {
       },
     },
     { $unwind: '$suppliers' },
-    {
-      $lookup: {
-        from: 'temptokens',
-        localField: '_id',
-        foreignField: 'streamId',
-        pipeline: [
-          {
-            $match: {
-              $and: [{ type: { $eq: 'CloudRecording' } }, { videoLink: { $ne: '' } }, { videoLink: { $ne: null } }],
-            },
-          },
-        ],
-        as: 'temptokens',
-      },
-    },
+    // {
+    //   $lookup: {
+    //     from: 'temptokens',
+    //     localField: '_id',
+    //     foreignField: 'streamId',
+    //     pipeline: [
+    //       {
+    //         $match: {
+    //           $and: [{ type: { $eq: 'CloudRecording' } }, { videoLink: { $ne: '' } }, { videoLink: { $ne: null } }],
+    //         },
+    //       },
+    //     ],
+    //     as: 'temptokens',
+    //   },
+    // },
     {
       $project: {
         _id: 1,
@@ -8871,7 +8871,7 @@ const get_completed_stream_buyer = async (req) => {
         max_post_per_stream: 1,
         status: 1,
         streamrequestposts_count: '$streamrequestposts_count',
-        temptokens: '$temptokens',
+        // temptokens: '$temptokens',
         showLink: 1,
         selectvideo: 1,
       },
