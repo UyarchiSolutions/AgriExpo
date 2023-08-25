@@ -21,14 +21,24 @@ const Otp = async (mobile, user, msg) => {
   // data = 'send/?apikey=' + apiKey + '&numbers=' + numbers + '&sender=' + sender + '&message=' + message;
   // var options = 'https://api.textlocal.in/' + data;
   let message;
+  let reva;
   if (msg == 'forgot') {
     message = `${OTPCODE} is the Onetime password(OTP) to reset the password. This is usable once and valid for 5 mins from the request. PLS DO NOT SHARE WITH ANYONE - AgriExpoLive2023(An Ookam company event)`;
-  } else {
+    reva = await axios.get(
+      `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${contact}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707169089051541000`
+    );
+  } else if (msg == 'cont') {
     message = `Dear ${user.contactName},thank you for the registration to the event AgriExpoLive2023 .Your OTP for logging into the account is ${OTPCODE}- AgriExpoLive2023(An Ookam company event)`;
+    reva = await axios.get(
+      `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${contact}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707169038127561646`
+    );
+  } else {
+    message = `${OTPCODE} is the Onetime password(OTP) to reset the password. This is usable once and valid for 5 mins from the request. PLS DO NOT SHARE WITH ANYONE - AgriExpoLive2023(An Ookam company event)`;
+    reva = await axios.get(
+      `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${contact}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707169089051541000`
+    );
   }
-  let reva = await axios.get(
-    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${contact}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707169089051541000`
-  );
+
   await saveOtp(contact, OTPCODE, user);
   console.log('test..');
   // https.request(options, callback).end();
