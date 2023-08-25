@@ -44,6 +44,7 @@ const createSlotBooking = async (body, userId) => {
 };
 
 const getBooked_Slot = async (userId, id) => {
+  console.log(userId);
   let val = await SlotBooking.aggregate([
     { $match: { userId: userId, PlanId: id } },
     {
@@ -65,6 +66,7 @@ const getBooked_Slot = async (userId, id) => {
         from: 'streamrequests',
         localField: 'slotId',
         foreignField: 'slotId',
+        pipeline: [{ $match: { suppierId: userId } }],
         as: 'Stream',
       },
     },
