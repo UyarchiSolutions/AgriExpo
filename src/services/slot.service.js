@@ -309,11 +309,11 @@ const getSlots_by_SlotInfo = async (query) => {
                           from: 'streamrequests',
                           localField: '_id',
                           foreignField: 'slotId',
-                          pipeline: [
-                            {
-                              $match: { streamPlanId: id },
-                            },
-                          ],
+                          // pipeline: [
+                          //   {
+                          //     $match: { streamPlanId: id },
+                          //   },
+                          // ],
                           as: 'Stream',
                         },
                       },
