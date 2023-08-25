@@ -4861,7 +4861,7 @@ const get_watch_live_steams_completed = async (req) => {
   let registeredFilter = { registerStatus: { $in: ['Not Registered', 'Unregistered'] } };
   let value = await Streamrequest.aggregate([
     { $sort: { startTime: -1 } },
-    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }, { status: { $ne: 'Cancelled' } }] } },
+    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }, { status: { $ne: 'Cancelled' } }, { show_completd: { $eq: true } }] } },
     {
       $lookup: {
         from: 'joinedusers',
@@ -5082,6 +5082,8 @@ const get_watch_live_steams_completed = async (req) => {
         image: 1,
         teaser: 1,
         tradeName: '$suppliers.tradeName',
+        showLink: 1,
+        selectvideo: 1,
 
       },
     },
@@ -5090,7 +5092,7 @@ const get_watch_live_steams_completed = async (req) => {
   ]);
   let total = await Streamrequest.aggregate([
     { $sort: { startTime: 1 } },
-    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }] } },
+    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }, { show_completd: { $eq: true } }] } },
     {
       $lookup: {
         from: 'joinedusers',
@@ -6476,6 +6478,8 @@ const getall_homeage_streams = async (req) => {
         streamEnd_Time: 1,
         productArray: '$streamrequestposts.productTitle',
         teaser: 1,
+        showLink: 1,
+        selectvideo: 1,
       },
     },
     { $limit: 10 },
@@ -6492,7 +6496,7 @@ const getall_homeage_streams = async (req) => {
   let registeredFilter = { registerStatus: { $in: ['Not Registered', 'Unregistered'] } };
   let completedStream = await Streamrequest.aggregate([
     { $sort: { startTime: -1 } },
-    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }, { status: { $ne: 'Cancelled' } }] } },
+    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }, { status: { $ne: 'Cancelled' } }, { show_completd: { $eq: true } }] } },
     {
       $lookup: {
         from: 'joinedusers',
@@ -6714,6 +6718,8 @@ const getall_homeage_streams = async (req) => {
         suppliersName: '$suppliers.contactName',
         tradeName: '$suppliers.tradeName',
         channel: '$suppliers._id',
+        showLink: 1,
+        selectvideo: 1,
       },
     },
     { $limit: 10 },
@@ -6721,7 +6727,7 @@ const getall_homeage_streams = async (req) => {
 
   let completednext = await Streamrequest.aggregate([
     { $sort: { startTime: -1 } },
-    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }, { status: { $ne: 'Cancelled' } }] } },
+    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }, { status: { $ne: 'Cancelled' } }, { show_completd: { $eq: true } }] } },
     {
       $lookup: {
         from: 'joinedusers',
@@ -6939,6 +6945,8 @@ const getall_homeage_streams = async (req) => {
         streamEnd_Time: 1,
         productArray: '$streamrequestposts.productTitle',
         channel: '$suppliers._id',
+        showLink: 1,
+        selectvideo: 1,
       },
     },
     { $skip: 10 },
@@ -8817,21 +8825,21 @@ const get_completed_stream_buyer = async (req) => {
       },
     },
     { $unwind: '$suppliers' },
-    {
-      $lookup: {
-        from: 'temptokens',
-        localField: '_id',
-        foreignField: 'streamId',
-        pipeline: [
-          {
-            $match: {
-              $and: [{ type: { $eq: 'CloudRecording' } }, { videoLink: { $ne: '' } }, { videoLink: { $ne: null } }],
-            },
-          },
-        ],
-        as: 'temptokens',
-      },
-    },
+    // {
+    //   $lookup: {
+    //     from: 'temptokens',
+    //     localField: '_id',
+    //     foreignField: 'streamId',
+    //     pipeline: [
+    //       {
+    //         $match: {
+    //           $and: [{ type: { $eq: 'CloudRecording' } }, { videoLink: { $ne: '' } }, { videoLink: { $ne: null } }],
+    //         },
+    //       },
+    //     ],
+    //     as: 'temptokens',
+    //   },
+    // },
     {
       $project: {
         _id: 1,
@@ -8863,7 +8871,9 @@ const get_completed_stream_buyer = async (req) => {
         max_post_per_stream: 1,
         status: 1,
         streamrequestposts_count: '$streamrequestposts_count',
-        temptokens: '$temptokens',
+        // temptokens: '$temptokens',
+        showLink: 1,
+        selectvideo: 1,
       },
     },
   ]);
