@@ -1870,6 +1870,7 @@ const pending_request = async (req) => {
   raise.status = 'end';
   raise.save();
   req.io.emit(raise._id + '_status', { message: "end" });
+  req.io.emit(raise.streamId + '_raise_hands_request', raise);
   return raise;
 }
 
