@@ -1761,7 +1761,9 @@ const get_raise_hands = async (req) => {
               shopId: 1,
               tempID: 1,
               status: 1,
-              createdAt: 1
+              createdAt: 1,
+              raised_count: 1
+
             }
           }
         ],
@@ -1830,7 +1832,8 @@ const raise_request = async (req) => {
         shopId: 1,
         tempID: 1,
         status: 1,
-        createdAt: 1
+        createdAt: 1,
+        raised_count: 1
       }
     }
   ])
