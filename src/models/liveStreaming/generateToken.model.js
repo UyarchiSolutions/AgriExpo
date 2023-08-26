@@ -218,6 +218,10 @@ const raiseUserschema = mongoose.Schema({
   status: {
     type: String,
     default: 'Pending'
+  },
+  raised_count: {
+    type: Number,
+    default:0
   }
 },
   { timestamps: true }

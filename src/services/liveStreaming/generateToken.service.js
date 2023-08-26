@@ -751,7 +751,7 @@ const get_sub_golive = async (req, io) => {
         localField: 'streamId',
         foreignField: 'streamId',
         pipeline: [
-          { $match: { $and: [{ shopId: { $eq: req.shopId } }, { status: { $ne: "end" } }] } }
+          { $match: { $and: [{ shopId: { $eq: req.shopId } }] } }
         ],
         as: 'raiseusers',
       },
@@ -1716,9 +1716,9 @@ const pending_request_switch = async (req, raiseid) => {
   let stream = await Streamrequest.findById(raise.streamId);
   stream.current_raise = null;
   stream.save();
-  raise.status = 'Pending';
+  raise.status = 'end';
   raise.save();
-  req.io.emit(raise._id + '_status', { message: "Pending" });
+  req.io.emit(raise._id + '_status', { message: "end" });
   return raise;
 }
 
@@ -1788,10 +1788,17 @@ const raise_request = async (req) => {
   if (!temp) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Waiting For user Start hand Raise');
   }
-  let raise = await RaiseUsers.findOne({ streamId: streamId, shopId: shopId, tempID: temp._id, status: { $ne: "completed" } });
+  let raise = await RaiseUsers.findOne({ streamId: streamId, shopId: shopId, tempID: temp._id, status: { $eq: "end" } });
   if (!raise) {
     raise = await RaiseUsers.create({ streamId: streamId, shopId: shopId, tempID: temp._id });
   }
+
+  if (raise) {
+    raise.status = "Pending"
+    raise.raised_count = raise.raised_count + 1;
+    raise.save();
+  }
+
   raise = await RaiseUsers.aggregate([
     { $match: { $and: [{ _id: { $eq: raise._id } }] } },
     {
@@ -1855,9 +1862,9 @@ const pending_request = async (req) => {
   let stream = await Streamrequest.findById(raise.streamId);
   stream.current_raise = null;
   stream.save();
-  raise.status = 'Pending';
+  raise.status = 'end';
   raise.save();
-  req.io.emit(raise._id + '_status', { message: "Pending" });
+  req.io.emit(raise._id + '_status', { message: "end" });
   return raise;
 }
 
