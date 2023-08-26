@@ -1699,9 +1699,30 @@ const start_rice_user_hands = async (req) => {
   value.raise_hands = stream.raise_hands;
   value.save();
   req.io.emit(streamId + '_raise_hands_start', { raise_hands: stream.raise_hands });
+
+  if (!stream.raise_hands) {
+    req.io.emit(raise._id + '_status', { message: "Pending" });
+  }
+  if (!stream.raise_hands && stream.current_raise != null) {
+    pending_request_switch(stream.current_raise);
+  }
   return value;
 
 
+}
+
+const pending_request_switch = async (raiseid) => {
+  let raise = await RaiseUsers.findById(raiseid);
+  if (!raise) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
+  }
+  let stream = await Streamrequest.findById(raise.streamId);
+  stream.current_raise = null;
+  stream.save();
+  raise.status = 'Pending';
+  raise.save();
+  req.io.emit(raise._id + '_status', { message: "Pending" });
+  return raise;
 }
 
 const get_raise_hands = async (req) => {
