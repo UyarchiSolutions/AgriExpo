@@ -1691,12 +1691,14 @@ const start_rice_user_hands = async (req) => {
     const token = await geenerate_rtc_token(streamId, uid, role, expirationTimestamp, stream.agoraID);
     value.token = token;
     value.chennel = streamId;
-    value.save();
-    stream.raise_hands = true;
-    stream.save();
-  }
+    // value.save();
 
-  req.io.emit(streamId + '_raise_hands_start', { raise_hands: true });
+  }
+  stream.raise_hands = !stream.raise_hands;
+  stream.save();
+  value.raise_hands = stream.raise_hands;
+  value.save();
+  req.io.emit(streamId + '_raise_hands_start', { raise_hands: stream.raise_hands });
   return value;
 
 
@@ -1741,7 +1743,7 @@ const get_raise_hands = async (req) => {
               shopId: 1,
               tempID: 1,
               status: 1,
-              createdAt:1
+              createdAt: 1
             }
           }
         ],
@@ -1802,7 +1804,7 @@ const raise_request = async (req) => {
         shopId: 1,
         tempID: 1,
         status: 1,
-        createdAt:1
+        createdAt: 1
       }
     }
   ])

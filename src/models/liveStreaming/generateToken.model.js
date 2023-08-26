@@ -136,6 +136,10 @@ const tempToken = mongoose.Schema({
   },
   appID: {
     type: String,
+  },
+  raise_hands: {
+    type: Boolean,
+    default: true
   }
 });
 
