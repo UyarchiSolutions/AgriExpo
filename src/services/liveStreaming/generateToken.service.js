@@ -1790,7 +1790,7 @@ const raise_request = async (req) => {
   }
   let raise = await RaiseUsers.findOne({ streamId: streamId, shopId: shopId, tempID: temp._id, status: { $eq: "end" } });
   if (raise) {
-    raise  =await RaiseUsers.findByIdAndUpdate({ _id: raise._id }, { status: 'Pending', raised_count: (raise.raised_count + 1) }, { new: true });
+    raise = await RaiseUsers.findByIdAndUpdate({ _id: raise._id }, { status: 'Pending', raised_count: (raise.raised_count + 1) }, { new: true });
   }
   if (!raise) {
     raise = await RaiseUsers.create({ streamId: streamId, shopId: shopId, tempID: temp._id });
@@ -1834,8 +1834,9 @@ const raise_request = async (req) => {
       }
     }
   ])
+  raise[0].status = 'Pending';
   req.io.emit(streamId + '_raise_hands_request', raise[0]);
-  return raise;
+  return raise[0];
 }
 
 
