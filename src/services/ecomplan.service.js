@@ -1364,46 +1364,7 @@ const create_stream_one = async (req) => {
   let time = slot.startFormat;
   slot = await Slot.findByIdAndUpdate({ _id: slot._id }, { Status: 'Booked' }, { new: true });
   let startTime = new Date(new Date(data + ' ' + time)).getTime();
-  console.log(time, startTime);
-
-  const value = await Streamrequest.create({
-    ...req.body,
-    ...{ suppierId: req.userId, postCount: req.body.post.length, startTime: startTime },
-  });
-  req.body.post.forEach(async (a) => {
-    await StreamPost.findByIdAndUpdate({ _id: a }, { isUsed: true, status: 'Assigned' }, { new: true });
-    let post = await StreamrequestPost.create({ suppierId: req.userId, streamRequest: value._id, postId: a });
-    await Dates.create_date(post);
-  });
-  await Dates.create_date(value);
-  //step two
   let plan = await purchasePlan.findById(req.body.planId);
-  // let plan = await Streamplan.findById(myplan.planId);
-  // if (myplan.numberOfStreamused + 1 == plan.numberofStream) {
-  //   myplan.active = false;
-  // }
-  // myplan.numberOfStreamused = myplan.numberOfStreamused + 1;
-  // myplan.save();
-  let streamss = await Streamrequest.findById(value._id);
-  let datess = new Date().setTime(new Date(streamss.startTime).getTime() + slot.Duration * 60 * 1000);
-  await Streamrequest.findByIdAndUpdate(
-    { _id: value._id },
-    {
-      Duration: slot.Duration,
-      noOfParticipants: plan.numberOfParticipants,
-      chat: plan.chat_Option,
-      max_post_per_stream: parseInt(plan.PostCount),
-      sepTwo: 'Completed',
-      planId: req.body.planId,
-      Duration: slot.Duration,
-      endTime: datess,
-      streamEnd_Time: datess,
-      slotId: slot._id,
-      streamingDate: slot.date,
-      streamPlanId: plan.planId,
-    },
-    { new: true }
-  );
   let Duration = slot.Duration;
   let numberOfParticipants = plan.numberOfParticipants * Duration;
   let no_of_host = plan.no_of_host * Duration;
@@ -1411,14 +1372,41 @@ const create_stream_one = async (req) => {
   let totalMinutes = numberOfParticipants + no_of_host + Duration;
   let agoraID = await agoraToken.token_assign(totalMinutes, value._id, 'agri');
   console.log(agoraID)
+  let datess = new Date().setTime(new Date(startTime).getTime() + slot.Duration * 60 * 1000);
+  let value;
   if (agoraID) {
-    agoraID.element._id;
-    await Streamrequest.findByIdAndUpdate(
-      { _id: value._id },
-      { agoraID: agoraID.element._id, totalMinues: totalMinutes },
-      { new: true }
-    );
+    value = await Streamrequest.create({
+      ...req.body, ...{
+        suppierId: req.userId,
+        postCount: req.body.post.length,
+        startTime: startTime,
+        Duration: slot.Duration,
+        noOfParticipants: plan.numberOfParticipants,
+        chat: plan.chat_Option,
+        max_post_per_stream: parseInt(plan.PostCount),
+        sepTwo: 'Completed',
+        planId: req.body.planId,
+        Duration: slot.Duration,
+        endTime: datess,
+        streamEnd_Time: datess,
+        slotId: slot._id,
+        streamingDate: slot.date,
+        streamPlanId: plan.planId,
+        agoraID: agoraID.element._id,
+        totalMinues: totalMinutes
+      },
+    });
+    req.body.post.forEach(async (a) => {
+      await StreamPost.findByIdAndUpdate({ _id: a }, { isUsed: true, status: 'Assigned' }, { new: true });
+      let post = await StreamrequestPost.create({ suppierId: req.userId, streamRequest: value._id, postId: a });
+      await Dates.create_date(post);
+    });
+    await Dates.create_date(value);
   }
+  else {
+    throw new ApiError(httpStatus.NOT_FOUND, 'App id Not found');
+  }
+
 
   return value;
 };
