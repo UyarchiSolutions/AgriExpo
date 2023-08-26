@@ -1700,9 +1700,6 @@ const start_rice_user_hands = async (req) => {
   value.save();
   req.io.emit(streamId + '_raise_hands_start', { raise_hands: stream.raise_hands });
 
-  if (!stream.raise_hands) {
-    req.io.emit(raise._id + '_status', { message: "Pending" });
-  }
   if (!stream.raise_hands && stream.current_raise != null) {
     pending_request_switch(stream.current_raise);
   }
