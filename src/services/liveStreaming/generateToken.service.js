@@ -1836,7 +1836,7 @@ const raise_request = async (req) => {
   ])
   raise[0].status = 'Pending';
   req.io.emit(streamId + '_raise_hands_request', raise[0]);
-  return raise[0];
+  return raise;
 }
 
 
