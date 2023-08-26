@@ -1789,15 +1789,16 @@ const raise_request = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Waiting For user Start hand Raise');
   }
   let raise = await RaiseUsers.findOne({ streamId: streamId, shopId: shopId, tempID: temp._id, status: { $eq: "end" } });
+  if (raise) {
+    raise  =await RaiseUsers.findByIdAndUpdate({ _id: raise._id }, { status: 'Pending', raised_count: (raise.raised_count + 1) }, { new: true });
+  }
   if (!raise) {
     raise = await RaiseUsers.create({ streamId: streamId, shopId: shopId, tempID: temp._id });
   }
 
-  if (raise) {
-    raise.status = "Pending"
-    raise.raised_count = raise.raised_count + 1;
-    raise.save();
-  }
+  raise.status = "Pending"
+  raise.raised_count = raise.raised_count + 1;
+  raise.save();
 
   raise = await RaiseUsers.aggregate([
     { $match: { $and: [{ _id: { $eq: raise._id } }] } },
