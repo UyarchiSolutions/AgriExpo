@@ -1376,7 +1376,7 @@ const create_stream_one = async (req) => {
   UsageAppID
   let datess = new Date().setTime(new Date(startTime).getTime() + slot.Duration * 60 * 1000);
   let value;
-  if (agoraID) {
+  if (agoraID.element != null && agoraID.element != '' && agoraID.element != undefined) {
     value = await Streamrequest.create({
       ...req.body, ...{
         suppierId: req.userId,
@@ -1398,7 +1398,6 @@ const create_stream_one = async (req) => {
         totalMinues: totalMinutes
       },
     });
-
     await UsageAppID.findOneAndUpdate({ _id: agoraID.element._id }, { streamID: value._id }, { new: true })
     req.body.post.forEach(async (a) => {
       await StreamPost.findByIdAndUpdate({ _id: a }, { isUsed: true, status: 'Assigned' }, { new: true });
