@@ -29,6 +29,7 @@ const { Shop } = require('../models/b2b.ShopClone.model');
 
 const agoraToken = require('./liveStreaming/AgoraAppId.service');
 
+const { UsageAppID } = require('../models/liveStreaming/AgoraAppId.model')
 const S3video = require('./S3video.service');
 const { Seller } = require('../models/seller.models');
 
@@ -1370,8 +1371,9 @@ const create_stream_one = async (req) => {
   let no_of_host = plan.no_of_host * Duration;
 
   let totalMinutes = numberOfParticipants + no_of_host + Duration;
-  let agoraID = await agoraToken.token_assign(totalMinutes, value._id, 'agri');
+  let agoraID = await agoraToken.token_assign(totalMinutes, '', 'agri');
   console.log(agoraID)
+  UsageAppID
   let datess = new Date().setTime(new Date(startTime).getTime() + slot.Duration * 60 * 1000);
   let value;
   if (agoraID) {
@@ -1396,6 +1398,8 @@ const create_stream_one = async (req) => {
         totalMinues: totalMinutes
       },
     });
+
+    await UsageAppID.findOneAndUpdate({ _id: agoraID.element._id }, { streamID: value._id }, { new: true })
     req.body.post.forEach(async (a) => {
       await StreamPost.findByIdAndUpdate({ _id: a }, { isUsed: true, status: 'Assigned' }, { new: true });
       let post = await StreamrequestPost.create({ suppierId: req.userId, streamRequest: value._id, postId: a });
