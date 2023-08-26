@@ -1701,7 +1701,7 @@ const start_rice_user_hands = async (req) => {
   req.io.emit(streamId + '_raise_hands_start', { raise_hands: stream.raise_hands });
 
   if (!stream.raise_hands && stream.current_raise != null) {
-    await pending_request_switch(stream.current_raise);
+    await pending_request_switch(req,stream.current_raise);
   }
   return value;
 
