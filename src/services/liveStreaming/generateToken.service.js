@@ -1708,7 +1708,7 @@ const start_rice_user_hands = async (req) => {
 
 }
 
-const pending_request_switch = async (raiseid) => {
+const pending_request_switch = async (req,raiseid) => {
   let raise = await RaiseUsers.findById(raiseid);
   if (!raise) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
