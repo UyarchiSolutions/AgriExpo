@@ -1398,7 +1398,7 @@ const create_stream_one = async (req) => {
         totalMinues: totalMinutes
       },
     });
-    await UsageAppID.findByIdAndUpdate({ _id: agoraID.element._id }, { streamID: value._id }, { new: true })
+    await UsageAppID.findByIdAndUpdate({ _id: agoraID.vals._id }, { streamID: value._id }, { new: true })
     req.body.post.forEach(async (a) => {
       await StreamPost.findByIdAndUpdate({ _id: a }, { isUsed: true, status: 'Assigned' }, { new: true });
       let post = await StreamrequestPost.create({ suppierId: req.userId, streamRequest: value._id, postId: a });
