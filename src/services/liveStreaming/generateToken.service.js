@@ -751,7 +751,7 @@ const get_sub_golive = async (req, io) => {
         localField: 'streamId',
         foreignField: 'streamId',
         pipeline: [
-          { $match: { $and: [{ shopId: { $eq: req.shopId } }] } }
+          { $match: { $and: [{ shopId: { $eq: req.shopId } }, { status: { $ne: "end" } }] } }
         ],
         as: 'raiseusers',
       },
@@ -764,7 +764,7 @@ const get_sub_golive = async (req, io) => {
     },
     {
       $addFields: {
-        raise_hands: { $ifNull: ['$raiseusers.status', false] },
+        raise_hands: { $ifNull: ['$raiseusers.status', 'raise'] },
       },
     },
     {
@@ -1701,14 +1701,14 @@ const start_rice_user_hands = async (req) => {
   req.io.emit(streamId + '_raise_hands_start', { raise_hands: stream.raise_hands });
 
   if (!stream.raise_hands && stream.current_raise != null) {
-    await pending_request_switch(req,stream.current_raise);
+    await pending_request_switch(req, stream.current_raise);
   }
   return value;
 
 
 }
 
-const pending_request_switch = async (req,raiseid) => {
+const pending_request_switch = async (req, raiseid) => {
   let raise = await RaiseUsers.findById(raiseid);
   if (!raise) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
