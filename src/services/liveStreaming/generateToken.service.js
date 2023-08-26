@@ -1762,7 +1762,8 @@ const get_raise_hands = async (req) => {
               tempID: 1,
               status: 1,
               createdAt: 1,
-              raised_count: 1
+              raised_count: 1,
+              already_joined: 1
 
             }
           }
@@ -1833,7 +1834,8 @@ const raise_request = async (req) => {
         tempID: 1,
         status: 1,
         createdAt: 1,
-        raised_count: 1
+        raised_count: 1,
+        already_joined: 1,
       }
     }
   ])
@@ -1900,7 +1902,8 @@ const jion_now_live = async (req) => {
   if (stream.current_raise != raiseid) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Line Busy');
   }
-
+  raise.already_joined = true;
+  raise.save();
   raise = await RaiseUsers.aggregate([
     { $match: { $and: [{ _id: { $eq: raise._id } }] } },
     {
@@ -1949,6 +1952,7 @@ const jion_now_live = async (req) => {
         chennel: "$temptokens.chennel",
         token: "$temptokens.token",
         expDate: "$temptokens.expDate",
+        already_joined: 1
       }
     }
   ])

@@ -221,7 +221,11 @@ const raiseUserschema = mongoose.Schema({
   },
   raised_count: {
     type: Number,
-    default:0
+    default: 0
+  },
+  already_joined: {
+    type: Boolean,
+    default: false
   }
 },
   { timestamps: true }
