@@ -1849,6 +1849,7 @@ const raise_request = async (req) => {
     }
   ])
   raise[0].status = 'Pending';
+  raise[0].dateISO=moment();
   req.io.emit(streamId + '_raise_hands_request', raise[0]);
   return raise;
 }
