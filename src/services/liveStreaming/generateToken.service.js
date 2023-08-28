@@ -1770,6 +1770,7 @@ const get_raise_hands = async (req) => {
               raised_count: 1,
               already_joined: 1,
               updatedAt: 1,
+              dateISO:1
             }
           }
         ],
@@ -1806,6 +1807,7 @@ const raise_request = async (req) => {
 
   raise.status = "Pending"
   raise.raised_count = raise.raised_count + 1;
+  raise.dateISO=moment();
   raise.save();
 
   raise = await RaiseUsers.aggregate([
@@ -1842,6 +1844,7 @@ const raise_request = async (req) => {
         raised_count: 1,
         already_joined: 1,
         updatedAt: 1,
+        dateISO:1
       }
     }
   ])
@@ -1960,7 +1963,8 @@ const jion_now_live = async (req) => {
         expDate: "$temptokens.expDate",
         already_joined: 1,
         updatedAt: 1,
-        createdAt: 1
+        createdAt: 1,
+        dateISO:1
       }
     }
   ])

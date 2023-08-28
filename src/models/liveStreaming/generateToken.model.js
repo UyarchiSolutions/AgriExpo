@@ -226,6 +226,9 @@ const raiseUserschema = mongoose.Schema({
   already_joined: {
     type: Boolean,
     default: false
+  },
+  dateISO: {
+    type: Number,
   }
 },
   { timestamps: true }
