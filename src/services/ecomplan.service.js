@@ -3271,7 +3271,7 @@ const get_subhost_token = async (req, userId) => {
         from: 'temptokens',
         localField: '_id',
         foreignField: 'streamId',
-        pipeline: [{ $match: { $and: [{ supplierId: { $eq: userId } }] } }],
+        pipeline: [{ $match: { $and: [{ supplierId: { $eq: userId } },{type:{$eq:"subhost"}}] } }],
         as: 'temptokens',
       },
     },
