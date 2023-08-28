@@ -1748,6 +1748,11 @@ const get_raise_hands = async (req) => {
             },
           },
           {
+            $addFields: {
+              raised_count: { $cond: { if: { $eq: ['$status', 'end'] }, then: 0, else: "$raised_count" } }
+            },
+          },
+          {
             $project: {
               _id: 1,
               SName: "$shops.SName",
@@ -1763,8 +1768,8 @@ const get_raise_hands = async (req) => {
               status: 1,
               createdAt: 1,
               raised_count: 1,
-              already_joined: 1
-
+              already_joined: 1,
+              updatedAt: 1,
             }
           }
         ],
@@ -1836,6 +1841,7 @@ const raise_request = async (req) => {
         createdAt: 1,
         raised_count: 1,
         already_joined: 1,
+        updatedAt: 1,
       }
     }
   ])
@@ -1952,7 +1958,9 @@ const jion_now_live = async (req) => {
         chennel: "$temptokens.chennel",
         token: "$temptokens.token",
         expDate: "$temptokens.expDate",
-        already_joined: 1
+        already_joined: 1,
+        updatedAt: 1,
+        createdAt: 1
       }
     }
   ])
