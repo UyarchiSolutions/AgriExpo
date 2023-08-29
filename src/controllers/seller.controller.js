@@ -131,6 +131,11 @@ const DisableSeller = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getAllSeller = catchAsync(async (req, res) => {
+  const data = await SellerService.getAllSeller();
+  res.send(data);
+});
+
 module.exports = {
   createSeller,
   verifyOTP,
@@ -158,4 +163,5 @@ module.exports = {
   getSellers_With_Paginations,
   DisableSeller,
   sendOTP_continue,
+  getAllSeller,
 };

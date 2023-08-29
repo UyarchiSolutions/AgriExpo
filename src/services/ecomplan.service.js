@@ -93,6 +93,33 @@ const get_all_Plans_pagination = async (req) => {
   return { value, next: total.length != 0 };
 };
 
+const getAllPlanes_view = async () => {
+  const value = await Streamplan.aggregate([
+    {
+      $lookup: {
+        from: 'purchasedplans',
+        localField: '_id',
+        foreignField: 'planId',
+        pipeline: [{ $group: { _id: null, count: { $sum: 1 } } }],
+        as: 'purchasedplans',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$purchasedplans',
+      },
+    },
+    {
+      $addFields: {
+        no_of_person_used: { $ifNull: ['$purchasedplans.count', 0] },
+      },
+    },
+    { $sort: { DateIso: -1 } },
+  ]);
+  return { value };
+};
+
 const get_all_Plans_addon = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
   const value = await Streamplan.aggregate([
@@ -4009,7 +4036,6 @@ const get_watch_live_steams_current = async (req) => {
         image: 1,
         teaser: 1,
         tradeName: '$suppliers.tradeName',
-
       },
     },
     { $skip: 10 * page },
@@ -4910,7 +4936,16 @@ const get_watch_live_steams_completed = async (req) => {
   let registeredFilter = { registerStatus: { $in: ['Not Registered', 'Unregistered'] } };
   let value = await Streamrequest.aggregate([
     { $sort: { startTime: -1 } },
-    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }, { status: { $ne: 'Cancelled' } }, { show_completd: { $eq: true } }] } },
+    {
+      $match: {
+        $and: [
+          statusFilter,
+          { adminApprove: { $eq: 'Approved' } },
+          { status: { $ne: 'Cancelled' } },
+          { show_completd: { $eq: true } },
+        ],
+      },
+    },
     {
       $lookup: {
         from: 'joinedusers',
@@ -5133,7 +5168,6 @@ const get_watch_live_steams_completed = async (req) => {
         tradeName: '$suppliers.tradeName',
         showLink: 1,
         selectvideo: 1,
-
       },
     },
     { $skip: 10 * page },
@@ -6545,7 +6579,16 @@ const getall_homeage_streams = async (req) => {
   let registeredFilter = { registerStatus: { $in: ['Not Registered', 'Unregistered'] } };
   let completedStream = await Streamrequest.aggregate([
     { $sort: { startTime: -1 } },
-    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }, { status: { $ne: 'Cancelled' } }, { show_completd: { $eq: true } }] } },
+    {
+      $match: {
+        $and: [
+          statusFilter,
+          { adminApprove: { $eq: 'Approved' } },
+          { status: { $ne: 'Cancelled' } },
+          { show_completd: { $eq: true } },
+        ],
+      },
+    },
     {
       $lookup: {
         from: 'joinedusers',
@@ -6776,7 +6819,16 @@ const getall_homeage_streams = async (req) => {
 
   let completednext = await Streamrequest.aggregate([
     { $sort: { startTime: -1 } },
-    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }, { status: { $ne: 'Cancelled' } }, { show_completd: { $eq: true } }] } },
+    {
+      $match: {
+        $and: [
+          statusFilter,
+          { adminApprove: { $eq: 'Approved' } },
+          { status: { $ne: 'Cancelled' } },
+          { show_completd: { $eq: true } },
+        ],
+      },
+    },
     {
       $lookup: {
         from: 'joinedusers',
@@ -7454,7 +7506,6 @@ const getall_homeage_streams = async (req) => {
         teaser: 1,
         channel: '$suppliers._id',
         tradeName: '$suppliers.tradeName',
-
       },
     },
     { $limit: 10 },
@@ -7681,7 +7732,6 @@ const getall_homeage_streams = async (req) => {
         teaser: 1,
         channel: '$suppliers._id',
         tradeName: '$suppliers.tradeName',
-
       },
     },
     { $skip: 10 },
@@ -7915,7 +7965,6 @@ const getall_homeage_streams = async (req) => {
         teaser: 1,
         channel: '$suppliers._id',
         tradeName: '$suppliers.tradeName',
-
       },
     },
     { $limit: 10 },
@@ -8148,7 +8197,6 @@ const getall_homeage_streams = async (req) => {
         teaser: 1,
         channel: '$suppliers._id',
         tradeName: '$suppliers.tradeName',
-
       },
     },
     { $skip: 10 },
@@ -8190,8 +8238,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+        ? 'RAC'
+        : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -8200,8 +8248,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-            ? 'RAC'
-            : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -12671,7 +12719,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => { };
+const get_video_link = async (req) => {};
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
@@ -13500,4 +13548,5 @@ module.exports = {
   exhibitor_get_video_all,
   get_exhibitor_details,
   notify_me_toggle,
+  getAllPlanes_view,
 };

@@ -658,23 +658,25 @@ const get_savedProduct_By_Visitor = catchAsync(async (req, res) => {
   res.send(data);
 });
 
-const exhibitor_get_video_all= catchAsync(async (req, res) => {
+const exhibitor_get_video_all = catchAsync(async (req, res) => {
   const data = await Ecomserive.exhibitor_get_video_all(req);
   res.send(data);
 });
 
-
-const get_exhibitor_details= catchAsync(async (req, res) => {
+const get_exhibitor_details = catchAsync(async (req, res) => {
   const data = await Ecomserive.get_exhibitor_details(req);
   res.send(data);
 });
 
-const notify_me_toggle= catchAsync(async (req, res) => {
+const notify_me_toggle = catchAsync(async (req, res) => {
   const data = await Ecomserive.notify_me_toggle(req);
   res.send(data);
 });
 
-
+const getAllPlanes_view = catchAsync(async (req, res) => {
+  const data = await Ecomserive.getAllPlanes_view();
+  res.send(data);
+});
 
 module.exports = {
   create_Plans,
@@ -806,5 +808,6 @@ module.exports = {
   get_savedProduct_By_Visitor,
   exhibitor_get_video_all,
   get_exhibitor_details,
-  notify_me_toggle
+  notify_me_toggle,
+  getAllPlanes_view,
 };

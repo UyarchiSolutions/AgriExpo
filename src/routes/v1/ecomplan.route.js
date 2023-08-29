@@ -205,11 +205,9 @@ router.route('/getStreamDetails').get(SellerAuth, Ecomcontroller.getStreamDetail
 router.route('/getStreamProductDetailsBy/Customer/:id/:StreamId').get(Ecomcontroller.getStreamProductDetailsBy_Customer);
 router.route('/saved/product').get(shopverify, Ecomcontroller.get_savedProduct_By_Visitor);
 
-
-
-
 router.route('/exhibitor/getvideo/all').get(shopverify, Ecomcontroller.exhibitor_get_video_all);
 router.route('/exhibitor/details').get(shopverify, Ecomcontroller.get_exhibitor_details);
 router.route('/notify/user/toggle').post(shopverify, Ecomcontroller.notify_me_toggle);
+router.route('/getAllPlanes/view').get(Ecomcontroller.getAllPlanes_view);
 
 module.exports = router;
