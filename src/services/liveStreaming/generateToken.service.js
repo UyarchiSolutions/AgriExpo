@@ -1770,7 +1770,7 @@ const get_raise_hands = async (req) => {
               raised_count: 1,
               already_joined: 1,
               updatedAt: 1,
-              dateISO:1
+              dateISO: 1
             }
           }
         ],
@@ -1807,7 +1807,7 @@ const raise_request = async (req) => {
 
   raise.status = "Pending"
   raise.raised_count = raise.raised_count + 1;
-  raise.dateISO=moment();
+  raise.dateISO = moment();
   raise.save();
 
   raise = await RaiseUsers.aggregate([
@@ -1844,12 +1844,12 @@ const raise_request = async (req) => {
         raised_count: 1,
         already_joined: 1,
         updatedAt: 1,
-        dateISO:1
+        dateISO: 1
       }
     }
   ])
   raise[0].status = 'Pending';
-  raise[0].dateISO=moment();
+  raise[0].dateISO = moment();
   req.io.emit(streamId + '_raise_hands_request', raise[0]);
   return raise;
 }
@@ -1965,7 +1965,7 @@ const jion_now_live = async (req) => {
         already_joined: 1,
         updatedAt: 1,
         createdAt: 1,
-        dateISO:1
+        dateISO: 1
       }
     }
   ])
@@ -1975,6 +1975,44 @@ const jion_now_live = async (req) => {
   return raise[0];
 }
 
+
+
+const get_raise_hand_user = async (req) => {
+  let raise = req.query.id;
+  let user = await RaiseUsers.aggregate([
+    { $match: { $and: [{ _id: { $eq: raise } }] } },
+    {
+      $lookup: {
+        from: 'b2bshopclones',
+        localField: 'shopId',
+        foreignField: '_id',
+        as: 'shops',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$shops',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        SName: "$shops.SName",
+        mobile: "$shops.mobile",
+        address: "$shops.address",
+        country: "$shops.country",
+        state: "$shops.state",
+        companyName: "$shops.companyName",
+        designation: "$shops.designation",
+      }
+    }
+  ]);
+  if (user.length > 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Raise User Not Found');
+  }
+  return user[0];
+}
 
 module.exports = {
   generateToken,
@@ -2012,5 +2050,6 @@ module.exports = {
   approve_request,
   reject_request,
   pending_request,
-  jion_now_live
+  jion_now_live,
+  get_raise_hand_user
 };

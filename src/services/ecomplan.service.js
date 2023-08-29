@@ -3080,6 +3080,20 @@ const go_live_stream_host = async (req, userId) => {
       },
     },
     {
+      $lookup: {
+        from: 'b2bshopclones',
+        localField: 'shopId',
+        foreignField: '_id',
+        as: 'shops',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$agoraappids',
+      },
+    },
+    {
       $project: {
         _id: 1,
         supplierName: '$suppliers.contactName',
@@ -3113,6 +3127,7 @@ const go_live_stream_host = async (req, userId) => {
         agoraappids: '$agoraappids',
         raiseUID: 1,
         RaiseHands: '$purchasedplans.RaiseHands',
+        current_raise:1
       },
     },
   ]);
@@ -3441,6 +3456,7 @@ const get_subhost_token = async (req, userId) => {
         agoraappids: '$agoraappids',
         raiseUID: 1,
         RaiseHands: '$purchasedplans.RaiseHands',
+        current_raise:1
       },
     },
   ]);
