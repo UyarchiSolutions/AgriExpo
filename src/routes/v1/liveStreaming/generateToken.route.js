@@ -56,5 +56,9 @@ router.route('/raise/appove').post(SellerAuth, generateToken.approve_request);
 router.route('/raise/reject').post(SellerAuth, generateToken.reject_request);
 router.route('/raise/pending').post(SellerAuth, generateToken.pending_request);
 router.route('/jion/now/live').post(shopverify, generateToken.jion_now_live);
+router.route('/end/raise_hands').post(shopverify, generateToken.pending_request);
+
+router.route('/get/raise/hand/user').post(SellerAuth, generateToken.get_raise_hand_user);
+
 
 module.exports = router;

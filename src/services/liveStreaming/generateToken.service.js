@@ -764,7 +764,7 @@ const get_sub_golive = async (req, io) => {
     },
     {
       $addFields: {
-        raise_hands: { $ifNull: ['$raiseusers.status', false] },
+        raise_hands: { $ifNull: ['$raiseusers.status', 'raise'] },
       },
     },
     {
@@ -1691,15 +1691,35 @@ const start_rice_user_hands = async (req) => {
     const token = await geenerate_rtc_token(streamId, uid, role, expirationTimestamp, stream.agoraID);
     value.token = token;
     value.chennel = streamId;
-    value.save();
-    stream.raise_hands = true;
-    stream.save();
-  }
+    // value.save();
 
-  req.io.emit(streamId + '_raise_hands_start', { raise_hands: true });
+  }
+  stream.raise_hands = !stream.raise_hands;
+  stream.save();
+  value.raise_hands = stream.raise_hands;
+  value.save();
+  req.io.emit(streamId + '_raise_hands_start', { raise_hands: stream.raise_hands });
+
+  if (!stream.raise_hands && stream.current_raise != null) {
+    await pending_request_switch(req, stream.current_raise);
+  }
   return value;
 
 
+}
+
+const pending_request_switch = async (req, raiseid) => {
+  let raise = await RaiseUsers.findById(raiseid);
+  if (!raise) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
+  }
+  let stream = await Streamrequest.findById(raise.streamId);
+  stream.current_raise = null;
+  stream.save();
+  raise.status = 'end';
+  raise.save();
+  req.io.emit(raise._id + '_status', { message: "end" });
+  return raise;
 }
 
 const get_raise_hands = async (req) => {
@@ -1728,6 +1748,11 @@ const get_raise_hands = async (req) => {
             },
           },
           {
+            $addFields: {
+              raised_count: { $cond: { if: { $eq: ['$status', 'end'] }, then: 0, else: "$raised_count" } }
+            },
+          },
+          {
             $project: {
               _id: 1,
               SName: "$shops.SName",
@@ -1741,7 +1766,11 @@ const get_raise_hands = async (req) => {
               shopId: 1,
               tempID: 1,
               status: 1,
-              createdAt:1
+              createdAt: 1,
+              raised_count: 1,
+              already_joined: 1,
+              updatedAt: 1,
+              dateISO: 1
             }
           }
         ],
@@ -1768,10 +1797,19 @@ const raise_request = async (req) => {
   if (!temp) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Waiting For user Start hand Raise');
   }
-  let raise = await RaiseUsers.findOne({ streamId: streamId, shopId: shopId, tempID: temp._id, status: { $ne: "completed" } });
+  let raise = await RaiseUsers.findOne({ streamId: streamId, shopId: shopId, tempID: temp._id, status: { $eq: "end" } });
+  if (raise) {
+    raise = await RaiseUsers.findByIdAndUpdate({ _id: raise._id }, { status: 'Pending', raised_count: (raise.raised_count + 1) }, { new: true });
+  }
   if (!raise) {
     raise = await RaiseUsers.create({ streamId: streamId, shopId: shopId, tempID: temp._id });
   }
+
+  raise.status = "Pending"
+  raise.raised_count = raise.raised_count + 1;
+  raise.dateISO = moment();
+  raise.save();
+
   raise = await RaiseUsers.aggregate([
     { $match: { $and: [{ _id: { $eq: raise._id } }] } },
     {
@@ -1802,10 +1840,16 @@ const raise_request = async (req) => {
         shopId: 1,
         tempID: 1,
         status: 1,
-        createdAt:1
+        createdAt: 1,
+        raised_count: 1,
+        already_joined: 1,
+        updatedAt: 1,
+        dateISO: 1
       }
     }
   ])
+  raise[0].status = 'Pending';
+  raise[0].dateISO = moment();
   req.io.emit(streamId + '_raise_hands_request', raise[0]);
   return raise;
 }
@@ -1835,9 +1879,10 @@ const pending_request = async (req) => {
   let stream = await Streamrequest.findById(raise.streamId);
   stream.current_raise = null;
   stream.save();
-  raise.status = 'Pending';
+  raise.status = 'end';
   raise.save();
-  req.io.emit(raise._id + '_status', { message: "Pending" });
+  req.io.emit(raise._id + '_status', { message: "end" });
+  req.io.emit(stream._id + '_raise_hands_request', raise);
   return raise;
 }
 
@@ -1867,7 +1912,8 @@ const jion_now_live = async (req) => {
   if (stream.current_raise != raiseid) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Line Busy');
   }
-
+  raise.already_joined = true;
+  raise.save();
   raise = await RaiseUsers.aggregate([
     { $match: { $and: [{ _id: { $eq: raise._id } }] } },
     {
@@ -1916,6 +1962,10 @@ const jion_now_live = async (req) => {
         chennel: "$temptokens.chennel",
         token: "$temptokens.token",
         expDate: "$temptokens.expDate",
+        already_joined: 1,
+        updatedAt: 1,
+        createdAt: 1,
+        dateISO: 1
       }
     }
   ])
@@ -1925,6 +1975,44 @@ const jion_now_live = async (req) => {
   return raise[0];
 }
 
+
+
+const get_raise_hand_user = async (req) => {
+  let raise = req.query.id;
+  let user = await RaiseUsers.aggregate([
+    { $match: { $and: [{ _id: { $eq: raise } }] } },
+    {
+      $lookup: {
+        from: 'b2bshopclones',
+        localField: 'shopId',
+        foreignField: '_id',
+        as: 'shops',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$shops',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        SName: "$shops.SName",
+        mobile: "$shops.mobile",
+        address: "$shops.address",
+        country: "$shops.country",
+        state: "$shops.state",
+        companyName: "$shops.companyName",
+        designation: "$shops.designation",
+      }
+    }
+  ]);
+  if (user.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Raise User Not Found');
+  }
+  return user[0];
+}
 
 module.exports = {
   generateToken,
@@ -1962,5 +2050,6 @@ module.exports = {
   approve_request,
   reject_request,
   pending_request,
-  jion_now_live
+  jion_now_live,
+  get_raise_hand_user
 };

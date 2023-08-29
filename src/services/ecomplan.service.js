@@ -29,6 +29,7 @@ const { Shop } = require('../models/b2b.ShopClone.model');
 
 const agoraToken = require('./liveStreaming/AgoraAppId.service');
 
+const { UsageAppID } = require('../models/liveStreaming/AgoraAppId.model')
 const S3video = require('./S3video.service');
 const { Seller } = require('../models/seller.models');
 
@@ -1391,62 +1392,51 @@ const create_stream_one = async (req) => {
   let time = slot.startFormat;
   slot = await Slot.findByIdAndUpdate({ _id: slot._id }, { Status: 'Booked' }, { new: true });
   let startTime = new Date(new Date(data + ' ' + time)).getTime();
-  console.log(time, startTime);
-
-  const value = await Streamrequest.create({
-    ...req.body,
-    ...{ suppierId: req.userId, postCount: req.body.post.length, startTime: startTime },
-  });
-  req.body.post.forEach(async (a) => {
-    await StreamPost.findByIdAndUpdate({ _id: a }, { isUsed: true, status: 'Assigned' }, { new: true });
-    let post = await StreamrequestPost.create({ suppierId: req.userId, streamRequest: value._id, postId: a });
-    await Dates.create_date(post);
-  });
-  await Dates.create_date(value);
-  //step two
   let plan = await purchasePlan.findById(req.body.planId);
-  // let plan = await Streamplan.findById(myplan.planId);
-  // if (myplan.numberOfStreamused + 1 == plan.numberofStream) {
-  //   myplan.active = false;
-  // }
-  // myplan.numberOfStreamused = myplan.numberOfStreamused + 1;
-  // myplan.save();
-  let streamss = await Streamrequest.findById(value._id);
-  let datess = new Date().setTime(new Date(streamss.startTime).getTime() + slot.Duration * 60 * 1000);
-  await Streamrequest.findByIdAndUpdate(
-    { _id: value._id },
-    {
-      Duration: slot.Duration,
-      noOfParticipants: plan.numberOfParticipants,
-      chat: plan.chat_Option,
-      max_post_per_stream: parseInt(plan.PostCount),
-      sepTwo: 'Completed',
-      planId: req.body.planId,
-      Duration: slot.Duration,
-      endTime: datess,
-      streamEnd_Time: datess,
-      slotId: slot._id,
-      streamingDate: slot.date,
-      streamPlanId: plan.planId,
-    },
-    { new: true }
-  );
   let Duration = slot.Duration;
   let numberOfParticipants = plan.numberOfParticipants * Duration;
   let no_of_host = plan.no_of_host * Duration;
 
   let totalMinutes = numberOfParticipants + no_of_host + Duration;
-  console.log(totalMinutes);
-  let agoraID = await agoraToken.token_assign(totalMinutes, value._id, 'agri');
-  console.log(agoraID);
-  if (agoraID) {
-    agoraID.element._id;
-    await Streamrequest.findByIdAndUpdate(
-      { _id: value._id },
-      { agoraID: agoraID.element._id, totalMinues: totalMinutes },
-      { new: true }
-    );
+  let agoraID = await agoraToken.token_assign(totalMinutes, '', 'agri');
+  console.log(agoraID)
+  UsageAppID
+  let datess = new Date().setTime(new Date(startTime).getTime() + slot.Duration * 60 * 1000);
+  let value;
+  if (agoraID.element != null && agoraID.element != '' && agoraID.element != undefined) {
+    value = await Streamrequest.create({
+      ...req.body, ...{
+        suppierId: req.userId,
+        postCount: req.body.post.length,
+        startTime: startTime,
+        Duration: slot.Duration,
+        noOfParticipants: plan.numberOfParticipants,
+        chat: plan.chat_Option,
+        max_post_per_stream: parseInt(plan.PostCount),
+        sepTwo: 'Completed',
+        planId: req.body.planId,
+        Duration: slot.Duration,
+        endTime: datess,
+        streamEnd_Time: datess,
+        slotId: slot._id,
+        streamingDate: slot.date,
+        streamPlanId: plan.planId,
+        agoraID: agoraID.element._id,
+        totalMinues: totalMinutes
+      },
+    });
+    await UsageAppID.findByIdAndUpdate({ _id: agoraID.vals._id }, { streamID: value._id }, { new: true })
+    req.body.post.forEach(async (a) => {
+      await StreamPost.findByIdAndUpdate({ _id: a }, { isUsed: true, status: 'Assigned' }, { new: true });
+      let post = await StreamrequestPost.create({ suppierId: req.userId, streamRequest: value._id, postId: a });
+      await Dates.create_date(post);
+    });
+    await Dates.create_date(value);
   }
+  else {
+    throw new ApiError(httpStatus.NOT_FOUND, 'App id Not found');
+  }
+
 
   return value;
 };
@@ -3004,7 +2994,25 @@ const go_live_stream_host = async (req, userId) => {
         from: 'temptokens',
         localField: '_id',
         foreignField: 'streamId',
-        pipeline: [{ $match: { $and: [{ supplierId: { $eq: userId } }] } }],
+        pipeline: [
+          { $match: { $and: [{ supplierId: { $eq: userId } }] } },
+          {
+            $lookup: {
+              from: 'sellers',
+              localField: 'supplierId',
+              foreignField: '_id',
+              as: 'subhosts',
+            },
+          },
+          {
+            $unwind: '$subhosts',
+          },
+          {
+            $addFields: {
+              supplierName: { $ifNull: ['$subhosts.tradeName', ''] },
+            },
+          },
+        ],
         as: 'temptokens',
       },
     },
@@ -3117,9 +3125,23 @@ const go_live_stream_host = async (req, userId) => {
       },
     },
     {
+      $lookup: {
+        from: 'b2bshopclones',
+        localField: 'shopId',
+        foreignField: '_id',
+        as: 'shops',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$agoraappids',
+      },
+    },
+    {
       $project: {
         _id: 1,
-        supplierName: '$suppliers.contactName',
+        supplierName: '$suppliers.tradeName',
         active: 1,
         archive: 1,
         post: 1,
@@ -3150,6 +3172,8 @@ const go_live_stream_host = async (req, userId) => {
         agoraappids: '$agoraappids',
         raiseUID: 1,
         RaiseHands: '$purchasedplans.RaiseHands',
+        current_raise: 1,
+        allot_host_1: 1
       },
     },
   ]);
@@ -3308,7 +3332,25 @@ const get_subhost_token = async (req, userId) => {
         from: 'temptokens',
         localField: '_id',
         foreignField: 'streamId',
-        pipeline: [{ $match: { $and: [{ supplierId: { $eq: userId } }] } }],
+        pipeline: [
+          { $match: { $and: [{ supplierId: { $eq: userId } }, { type: { $eq: "subhost" } }] } },
+          {
+            $lookup: {
+              from: 'sellers',
+              localField: 'supplierId',
+              foreignField: '_id',
+              as: 'subhosts',
+            },
+          },
+          {
+            $unwind: '$subhosts',
+          },
+          {
+            $addFields: {
+              supplierName: { $ifNull: ['$subhosts.contactName', ''] },
+            },
+          },
+        ],
         as: 'temptokens',
       },
     },
@@ -3357,7 +3399,7 @@ const get_subhost_token = async (req, userId) => {
           },
           {
             $addFields: {
-              supplierName: { $ifNull: ['$suppliers.contactName', '$subhosts.contactName'] },
+              supplierName: { $ifNull: ['$suppliers.tradeName', '$subhosts.contactName'] },
             },
           },
         ],
@@ -3478,6 +3520,8 @@ const get_subhost_token = async (req, userId) => {
         agoraappids: '$agoraappids',
         raiseUID: 1,
         RaiseHands: '$purchasedplans.RaiseHands',
+        current_raise: 1,
+        allot_host_1:1
       },
     },
   ]);

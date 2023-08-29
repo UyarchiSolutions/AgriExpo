@@ -190,6 +190,10 @@ const jion_now_live = catchAsync(async (req, res) => {
   let tokens = await generateTokenService.jion_now_live(req);
   res.status(httpStatus.CREATED).send(tokens);
 });
+const get_raise_hand_user = catchAsync(async (req, res) => {
+  let tokens = await generateTokenService.get_raise_hand_user(req);
+  res.status(httpStatus.CREATED).send(tokens);
+});
 
 
 module.exports = {
@@ -228,5 +232,6 @@ module.exports = {
   approve_request,
   reject_request,
   pending_request,
-  jion_now_live
+  jion_now_live,
+  get_raise_hand_user
 };

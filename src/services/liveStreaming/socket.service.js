@@ -32,8 +32,10 @@ const leave_subhost = async (req, io) => {
   io.sockets.emit(req.streamId + req.uid, { req, token });
 }
 const stream_view_change = async (req, io) => {
-  let stream = await tempTokenModel.updateMany({ chennel: req.chennel }, { bigSize: false }, { new: true });
+  let stream = await tempTokenModel.updateMany({ chennel: req.streamId }, { bigSize: false }, { new: true });
   let token = await tempTokenModel.findByIdAndUpdate({ _id: req.tokenId }, { bigSize: req.bigSize }, { new: true });
+  console.log(stream)
+  console.log(token)
   io.sockets.emit(req.streamId + "stream_view_change", { req, token, stream });
 }
 

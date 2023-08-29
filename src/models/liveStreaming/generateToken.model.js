@@ -136,6 +136,10 @@ const tempToken = mongoose.Schema({
   },
   appID: {
     type: String,
+  },
+  raise_hands: {
+    type: Boolean,
+    default: true
   }
 });
 
@@ -214,6 +218,17 @@ const raiseUserschema = mongoose.Schema({
   status: {
     type: String,
     default: 'Pending'
+  },
+  raised_count: {
+    type: Number,
+    default: 0
+  },
+  already_joined: {
+    type: Boolean,
+    default: false
+  },
+  dateISO: {
+    type: Number,
   }
 },
   { timestamps: true }
