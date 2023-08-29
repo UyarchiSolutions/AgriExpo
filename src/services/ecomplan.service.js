@@ -2967,7 +2967,25 @@ const go_live_stream_host = async (req, userId) => {
         from: 'temptokens',
         localField: '_id',
         foreignField: 'streamId',
-        pipeline: [{ $match: { $and: [{ supplierId: { $eq: userId } }] } }],
+        pipeline: [
+          { $match: { $and: [{ supplierId: { $eq: userId } }] } },
+          {
+            $lookup: {
+              from: 'sellers',
+              localField: 'supplierId',
+              foreignField: '_id',
+              as: 'subhosts',
+            },
+          },
+          {
+            $unwind: '$subhosts',
+          },
+          {
+            $addFields: {
+              supplierName: { $ifNull: ['$subhosts.tradeName', ''] },
+            },
+          },
+        ],
         as: 'temptokens',
       },
     },
@@ -3096,7 +3114,7 @@ const go_live_stream_host = async (req, userId) => {
     {
       $project: {
         _id: 1,
-        supplierName: '$suppliers.contactName',
+        supplierName: '$suppliers.tradeName',
         active: 1,
         archive: 1,
         post: 1,
@@ -3127,7 +3145,8 @@ const go_live_stream_host = async (req, userId) => {
         agoraappids: '$agoraappids',
         raiseUID: 1,
         RaiseHands: '$purchasedplans.RaiseHands',
-        current_raise:1
+        current_raise: 1,
+        allot_host_1:1
       },
     },
   ]);
@@ -3286,7 +3305,7 @@ const get_subhost_token = async (req, userId) => {
         from: 'temptokens',
         localField: '_id',
         foreignField: 'streamId',
-        pipeline: [{ $match: { $and: [{ supplierId: { $eq: userId } },{type:{$eq:"subhost"}}] } }],
+        pipeline: [{ $match: { $and: [{ supplierId: { $eq: userId } }, { type: { $eq: "subhost" } }] } }],
         as: 'temptokens',
       },
     },
@@ -3456,7 +3475,7 @@ const get_subhost_token = async (req, userId) => {
         agoraappids: '$agoraappids',
         raiseUID: 1,
         RaiseHands: '$purchasedplans.RaiseHands',
-        current_raise:1
+        current_raise: 1
       },
     },
   ]);
