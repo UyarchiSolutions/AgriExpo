@@ -54,29 +54,47 @@ const get_paymnent_url = async () => {
     const accessCode = 'AVRI05KH14CC73IRCC';
     const workingKey = '6EB13DAEA5810ACB66C7C95BDD4D2684';
     const orderId = uuid.v4();
+    const baseUrl = 'https://secure.ccavenue.com/transaction/transaction.do';
 
-    // Create a secure hash to send along with the request
-    const hashString = `${merchantId}|${orderAmount}||${orderId}|bharathiraja996574@gmail.com|919965740303|||||||||||${workingKey}`;
-    const secureHash = crypto.createHash('sha256').update(hashString).digest('hex');
+    const paymentData = {
+        merchant_id: merchantId,
+        order_id: orderId,
+        amount: '100.00',
+        currency: 'INR',
+        redirect_url: 'https://exhibitor.agriexpo.live/',
+        cancel_url: 'https://exhibitor.agriexpo.live/',
+        language: 'EN',
+        billing_name: 'John Doe',
+        billing_address: '123 Main St',
+        billing_city: 'chennai',
+        billing_state: 'tamilnadu',
+        billing_zip: '600017',
+        billing_country: 'India',
+        billing_tel: '9965740303',
+        billing_email: 'bharathiraja996574@gmail.com',
+    };
 
-    // Make the API request
-    try {
-        const response = await axios.post('https://secure.ccavenue.com/transaction/transaction.do', {
-            merchant_id: merchantId,
-            order_id: orderId,
-            amount: orderAmount,
-            currency: 'INR',
-            redirect_url: 'https://exhibitor.agriexpo.live',
-            cancel_url: 'https://exhibitor.agriexpo.live',
-            secure_hash: secureHash,
+    // Calculate checksum
+    const crypto = require('crypto');
+    const keys = Object.keys(paymentData).sort();
+    const values = keys.map(key => paymentData[key]);
+    const concatenatedString = values.join('|');
+    const checksum = crypto
+        .createHmac('sha256', workingKey)
+        .update(concatenatedString)
+        .digest('hex')
+        .toUpperCase();
+
+    paymentData.checksum = checksum;
+
+    // Send payment request
+    axios.post(baseUrl, paymentData)
+        .then(response => {
+            console.log('Payment URL:', response.data);
+        })
+        .catch(error => {
+            console.error('Payment Error:', error);
         });
-
-        // Process the response and handle the payment result
-        console.log(response.data);
-        return response.data
-    } catch (error) {
-        console.error(error);
-    }
 };
 
 
