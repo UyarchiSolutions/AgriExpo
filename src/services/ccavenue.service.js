@@ -73,6 +73,7 @@ const get_paymnent_url = async () => {
 
         // Process the response and handle the payment result
         console.log(response.data);
+        return response.data
     } catch (error) {
         console.error(error);
     }
