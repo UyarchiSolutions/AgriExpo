@@ -1212,65 +1212,72 @@ const getStreamByUserAndPlan = async (userId, planId) => {
 };
 
 const getPlanesByUser = async (uuserId) => {
+  console.log(uuserId);
   let values = await purchasePlan.aggregate([
     {
       $match: {
         suppierId: uuserId,
       },
     },
-    { $addFields: { slots: '$slotInfo' } },
+    // { $addFields: { slots: '$slotInfo' } },
+    // {
+    //   $unwind: '$slotInfo',
+    // },
+    // {
+    //   $group: {
+    //     _id: {
+    //       id: '$_id',
+    //       planName: '$planName',
+    //       slotType: '$slotInfo.slotType',
+    //       status: '$status',
+    //       DateIso: '$DateIso',
+    //     },
+    //     typeCount: { $sum: 1 },
+    //     slotInfo: { $push: '$slotInfo' },
+    //   },
+    // },
+    // {
+    //   $group: {
+    //     _id: '$_id.planName',
+    //     id: { $first: '$_id.id' },
+    //     status: { $first: '$_id.status' },
+    //     planName: { $first: '$_id.planName' },
+    //     DateIso: { $first: '$_id.DateIso' },
+    //     types: {
+    //       $push: {
+    //         type: '$_id.slotType',
+    //         count: '$typeCount',
+    //         slotInfo: '$slotInfo',
+    //       },
+    //     },
+    //   },
+    // },
     {
       $unwind: '$slotInfo',
     },
     {
       $group: {
         _id: {
-          id: '$_id',
           planName: '$planName',
           slotType: '$slotInfo.slotType',
-          status: '$status',
+          id: '$_id',
           DateIso: '$DateIso',
-          no_of_host: '$no_of_host',
-          numberOfParticipants: '$numberOfParticipants',
-          salesCommission: '$salesCommission',
-          StreamVideos: '$StreamVideos',
-          completedStream: '$completedStream',
-          Teaser: '$Teaser',
-          Pdf: '$Pdf',
-          description: '$description',
-          chat_Option: '$chat_Option',
-          image: '$image',
-          Advertisement_Display: '$Advertisement_Display',
-          Special_Notification: '$Special_Notification',
-          slotDetail: '$slots',
+          status: '$status',
         },
-        typeCount: { $sum: 1 },
-        slotInfo: { $push: '$slotInfo' },
+        count: { $sum: 1 },
+        slotInfo: { $addToSet: '$slotInfo' },
       },
     },
     {
       $group: {
-        _id: '$_id.planName',
-        id: { $first: '$_id.id' },
-        status: { $first: '$_id.status' },
+        _id: '$_id.id',
         planName: { $first: '$_id.planName' },
         DateIso: { $first: '$_id.DateIso' },
-        no_of_host: { $first: '$_id.no_of_host' },
-        numberOfParticipants: { $first: '$_id.numberOfParticipants' },
-        salesCommission: { $first: '$_id.salesCommission' },
-        completedStream: { $first: '$_id.completedStream' },
-        Teaser: { $first: '$_id.Teaser' },
-        Pdf: { $first: '$_id.Pdf' },
-        description: { $first: '$_id.description' },
-        chat_Option: { $first: '$_id.chatOption' },
-        image: { $first: '$_id.image' },
-        Advertisement_Display: { $first: '$_id.Advertisement_Display' },
-        Special_Notification: { $first: '$_id.Special_Notification' },
-        slotDetail: { $first: '$_id.slotDetail' },
+        status: { $first: '$_id.status' },
         types: {
           $push: {
             type: '$_id.slotType',
-            count: '$typeCount',
+            count: '$count',
             slotInfo: '$slotInfo',
           },
         },
@@ -1278,23 +1285,16 @@ const getPlanesByUser = async (uuserId) => {
     },
     {
       $project: {
-        _id: '$id',
-        planName: '$planName',
+        _id: 1,
+        planName: 1,
+        DateIso: 1,
+        status: 1,
         Type: '$types',
-        status: '$status',
-        DateIso: '$DateIso',
-        no_of_host: '$no_of_host',
-        numberOfParticipants: '$numberOfParticipants',
-        salesCommission: '$salesCommission',
-        completedStream: '$completedStream',
-        Teaser: '$Teaser',
-        Pdf: '$Pdf',
-        description: '$description',
-        chat_Option: '$chat_Option',
-        image: '$image',
-        Advertisement_Display: '$Advertisement_Display',
-        Special_Notification: '$Special_Notification',
-        slotDetail: '$slotDetail',
+      },
+    },
+    {
+      $sort: {
+        _id: -1,
       },
     },
   ]);
