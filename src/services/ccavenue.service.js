@@ -39,9 +39,7 @@ const get_paymnent_url = async () => {
 
         console.log(requestData)
         const response = await axios.post('https://secure.ccavenue.com/transaction/initiate.do', requestData);
-
-        // Extract the payment page URL from the response
-        const paymentPageUrl = response.data.url;
+        const paymentPageUrl = response.data;
         console.log(paymentPageUrl)
         console.log(response.data)
         return response.data;
