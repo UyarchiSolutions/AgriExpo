@@ -2008,7 +2008,7 @@ const get_raise_hand_user = async (req) => {
       }
     }
   ]);
-  if (user.length > 0) {
+  if (user.length == 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Raise User Not Found');
   }
   return user[0];
