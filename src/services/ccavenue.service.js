@@ -8,10 +8,10 @@ var crypto = require('crypto');
 const axios = require('axios');
 const get_paymnent_url = async () => {
     const merchantId = '2742878';
-    const accessCode = 'AVTO97KH72AS17OTSA';
+    const accessCode = 'AVRI05KH14CC73IRCC';
     const amount = 100;
     const orderId = uuid.v4();
-    const workingID = "C90164B612A8C5A954E8F87E8E6F020E";
+    const workingID = "6EB13DAEA5810ACB66C7C95BDD4D2684";
     const paymentData = {
         amount: 100, // Set the payment amount
         orderId: orderId, // Set a unique order ID
