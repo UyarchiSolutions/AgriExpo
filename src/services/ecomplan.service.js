@@ -3305,7 +3305,25 @@ const get_subhost_token = async (req, userId) => {
         from: 'temptokens',
         localField: '_id',
         foreignField: 'streamId',
-        pipeline: [{ $match: { $and: [{ supplierId: { $eq: userId } }, { type: { $eq: "subhost" } }] } }],
+        pipeline: [
+          { $match: { $and: [{ supplierId: { $eq: userId } }, { type: { $eq: "subhost" } }] } },
+          {
+            $lookup: {
+              from: 'sellers',
+              localField: 'supplierId',
+              foreignField: '_id',
+              as: 'subhosts',
+            },
+          },
+          {
+            $unwind: '$subhosts',
+          },
+          {
+            $addFields: {
+              supplierName: { $ifNull: ['$subhosts.contactName', ''] },
+            },
+          },
+        ],
         as: 'temptokens',
       },
     },
@@ -3475,7 +3493,8 @@ const get_subhost_token = async (req, userId) => {
         agoraappids: '$agoraappids',
         raiseUID: 1,
         RaiseHands: '$purchasedplans.RaiseHands',
-        current_raise: 1
+        current_raise: 1,
+        allot_host_1:1
       },
     },
   ]);
