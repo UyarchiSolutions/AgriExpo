@@ -1533,10 +1533,34 @@ const create_stream_two = async (req) => {
 };
 const get_all_stream = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
-  //console.log(req.userId);
   const value = await Streamrequest.aggregate([
     { $match: { $and: [{ suppierId: { $eq: req.userId } }] } },
     { $sort: { DateIso: -1 } },
+
+    {
+      $lookup: {
+        from: 'slots',
+        localField: 'slotId',
+        foreignField: '_id',
+        as: 'slots',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$slots',
+      },
+    },
+    {
+      $addFields: {
+        Duration: { $ifNull: ['$slots.Duration', ''] },
+      },
+    },
+    {
+      $addFields: {
+        slotType: { $ifNull: ['$slots.Type', ''] },
+      },
+    },
     {
       $lookup: {
         from: 'purchasedplans',
@@ -1549,6 +1573,11 @@ const get_all_stream = async (req) => {
       $unwind: {
         preserveNullAndEmptyArrays: true,
         path: '$purchasedplans',
+      },
+    },
+    {
+      $addFields: {
+        planNmae: { $ifNull: ['$purchasedplans.planName', ''] },
       },
     },
     {
@@ -3488,7 +3517,7 @@ const get_subhost_token = async (req, userId) => {
     },
     {
       $addFields: {
-        allot_host_1_details: { $cond: { if: { $eq: ['$allot_host_1', 'my self'] }, then: '$suppierId', else: '$allot_host_1'} },
+        allot_host_1_details: { $cond: { if: { $eq: ['$allot_host_1', 'my self'] }, then: '$suppierId', else: '$allot_host_1' } },
       },
     },
     {
@@ -3527,7 +3556,7 @@ const get_subhost_token = async (req, userId) => {
         RaiseHands: '$purchasedplans.RaiseHands',
         current_raise: 1,
         allot_host_1: 1,
-        allot_host_1_details:1
+        allot_host_1_details: 1
       },
     },
   ]);
@@ -8239,8 +8268,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-        ? 'RAC'
-        : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -8249,8 +8278,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+            ? 'RAC'
+            : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -12720,7 +12749,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => {};
+const get_video_link = async (req) => { };
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
