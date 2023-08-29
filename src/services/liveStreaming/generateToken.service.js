@@ -1972,6 +1972,8 @@ const jion_now_live = async (req) => {
   if (raise.length == 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Raise not found');
   }
+
+  req.io.emit(raise[0].streamId + "_raise_user_jion", raise[0])
   return raise[0];
 }
 

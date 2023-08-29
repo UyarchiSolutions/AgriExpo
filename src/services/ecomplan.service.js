@@ -3487,6 +3487,11 @@ const get_subhost_token = async (req, userId) => {
       },
     },
     {
+      $addFields: {
+        allot_host_1_details: { $cond: { if: { $eq: ['$allot_host_1', 'my self'] }, then: '$suppierId', else: '$allot_host_1'} },
+      },
+    },
+    {
       $project: {
         _id: 1,
         supplierName: '$suppliers.contactName',
@@ -3521,7 +3526,8 @@ const get_subhost_token = async (req, userId) => {
         raiseUID: 1,
         RaiseHands: '$purchasedplans.RaiseHands',
         current_raise: 1,
-        allot_host_1:1
+        allot_host_1: 1,
+        allot_host_1_details:1
       },
     },
   ]);
