@@ -47,8 +47,8 @@ const get_paymnent_url = async () => {
         return response.data;
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal server error' });
+        console.log(error)
+        return error;
     }
 };
 
