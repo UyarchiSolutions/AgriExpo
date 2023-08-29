@@ -38,4 +38,5 @@ router.route('/:id').get(SellerController.GetSellerById).put(SellerController.Up
 
 router.route('/getSellers/With/Paginations/:page').get(SellerController.getSellers_With_Paginations);
 router.route('/DisableSeller/:id/:type').get(SellerController.DisableSeller);
+router.route('/get/all/').get(SellerController.getAllSeller);
 module.exports = router;

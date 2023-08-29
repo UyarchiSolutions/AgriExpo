@@ -491,6 +491,11 @@ const DisableSeller = async (id, type) => {
   return values;
 };
 
+const getAllSeller = async () => {
+  let values = await Seller.find();
+  return values;
+};
+
 module.exports = {
   createSeller,
   verifyOTP,
@@ -518,4 +523,5 @@ module.exports = {
   getSellers_With_Paginations,
   DisableSeller,
   sendOTP_continue,
+  getAllSeller,
 };

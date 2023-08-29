@@ -365,6 +365,44 @@ const create_PurchasePlan_EXpo = async (body, userId) => {
   return creations;
 };
 
+const create_PurchasePlan_EXpo_Admin = async (body, userId) => {
+  let findUser = await Seller.findById(userId);
+  if (!findUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  let findPlan = await Streamplan.findById(body.planId).select(['-_id', '-active', '-__v']);
+  if (!findPlan) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Plan not found');
+  }
+  let data = {
+    streamvalidity: findPlan.streamvalidity,
+    slotInfo: findPlan.slotInfo,
+    planName: findPlan.planName,
+    numberOfParticipants: findPlan.numberOfParticipants,
+    Teaser: findPlan.Teaser,
+    StreamVideos: findPlan.StreamVideos,
+    completedStream: findPlan.completedStream,
+    Pdf: findPlan.Pdf,
+    image: findPlan.image,
+    description: findPlan.description,
+    RaiseHands: findPlan.RaiseHands,
+    Advertisement_Display: findPlan.Advertisement_Display,
+    Special_Notification: findPlan.Special_Notification,
+    chat_Option: findPlan.chat_Option,
+    salesCommission: findPlan.salesCommission,
+    Price: findPlan.Price,
+    PostCount: findPlan.PostCount,
+    no_of_host: findPlan.no_of_host,
+    planType: findPlan.planType,
+    DateIso: moment(),
+    planId: body.planId,
+    suppierId: userId,
+  };
+  const creations = await purchasePlan.create(data);
+  await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
+  return creations;
+};
+
 const getPurchasedPlan = async (userId) => {
   let values = await purchasePlan.aggregate([{ $match: { suppierId: userId } }]);
   return values;
@@ -454,6 +492,12 @@ const get_All_Planes = async (page) => {
         chat_Option: 1,
         salesCommission: 1,
         PostCount: 1,
+        Discount: 1,
+        Referral: 1,
+        RevisedAmount: 1,
+        TelName: 1,
+        Tele_Caller: 1,
+        Type: 1,
       },
     },
     { $skip: 10 * page },
@@ -502,10 +546,25 @@ const UploadProof = async (id, body) => {
 };
 
 const getPlanyById = async (id) => {
+  console.log('ASDJKHG');
   const plan = await purchasePlan.aggregate([
     {
       $match: {
         _id: id,
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'exhibitor',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$exhibitor',
       },
     },
   ]);
@@ -1152,6 +1211,104 @@ const getStreamByUserAndPlan = async (userId, planId) => {
   return values;
 };
 
+const getPlanesByUser = async (uuserId) => {
+  let values = await purchasePlan.aggregate([
+    {
+      $match: {
+        suppierId: uuserId,
+      },
+    },
+    { $addFields: { slots: '$slotInfo' } },
+    {
+      $unwind: '$slotInfo',
+    },
+    {
+      $group: {
+        _id: {
+          id: '$_id',
+          planName: '$planName',
+          slotType: '$slotInfo.slotType',
+          status: '$status',
+          DateIso: '$DateIso',
+          no_of_host: '$no_of_host',
+          numberOfParticipants: '$numberOfParticipants',
+          salesCommission: '$salesCommission',
+          StreamVideos: '$StreamVideos',
+          completedStream: '$completedStream',
+          Teaser: '$Teaser',
+          Pdf: '$Pdf',
+          description: '$description',
+          chat_Option: '$chat_Option',
+          image: '$image',
+          Advertisement_Display: '$Advertisement_Display',
+          Special_Notification: '$Special_Notification',
+          slotDetail: '$slots',
+        },
+        typeCount: { $sum: 1 },
+        slotInfo: { $push: '$slotInfo' },
+      },
+    },
+    {
+      $group: {
+        _id: '$_id.planName',
+        id: { $first: '$_id.id' },
+        status: { $first: '$_id.status' },
+        planName: { $first: '$_id.planName' },
+        DateIso: { $first: '$_id.DateIso' },
+        no_of_host: { $first: '$_id.no_of_host' },
+        numberOfParticipants: { $first: '$_id.numberOfParticipants' },
+        salesCommission: { $first: '$_id.salesCommission' },
+        completedStream: { $first: '$_id.completedStream' },
+        Teaser: { $first: '$_id.Teaser' },
+        Pdf: { $first: '$_id.Pdf' },
+        description: { $first: '$_id.description' },
+        chat_Option: { $first: '$_id.chatOption' },
+        image: { $first: '$_id.image' },
+        Advertisement_Display: { $first: '$_id.Advertisement_Display' },
+        Special_Notification: { $first: '$_id.Special_Notification' },
+        slotDetail: { $first: '$_id.slotDetail' },
+        types: {
+          $push: {
+            type: '$_id.slotType',
+            count: '$typeCount',
+            slotInfo: '$slotInfo',
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: '$id',
+        planName: '$planName',
+        Type: '$types',
+        status: '$status',
+        DateIso: '$DateIso',
+        no_of_host: '$no_of_host',
+        numberOfParticipants: '$numberOfParticipants',
+        salesCommission: '$salesCommission',
+        completedStream: '$completedStream',
+        Teaser: '$Teaser',
+        Pdf: '$Pdf',
+        description: '$description',
+        chat_Option: '$chat_Option',
+        image: '$image',
+        Advertisement_Display: '$Advertisement_Display',
+        Special_Notification: '$Special_Notification',
+        slotDetail: '$slotDetail',
+      },
+    },
+  ]);
+  return values;
+};
+
+const getPurchasedPlanById = async (id) => {
+  let values = await purchasePlan.findById(id);
+  if (!values) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'plan not found');
+  }
+  return values;
+};
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -1176,4 +1333,7 @@ module.exports = {
   streamPlanById,
   getPurchased_ByPlanId,
   getStreamByUserAndPlan,
+  create_PurchasePlan_EXpo_Admin,
+  getPlanesByUser,
+  getPurchasedPlanById,
 };

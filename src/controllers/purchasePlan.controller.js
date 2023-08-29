@@ -66,6 +66,12 @@ const create_PurchasePlan_EXpo = catchAsync(async (req, res) => {
   res.send(value);
 });
 
+const create_PurchasePlan_EXpo_Admin = catchAsync(async (req, res) => {
+  let userId = req.body.userId;
+  const value = await purchasePlan.create_PurchasePlan_EXpo_Admin(req.body, userId);
+  res.send(value);
+});
+
 const getPurchasedPlan = catchAsync(async (req, res) => {
   let userId = req.userId;
   const value = await purchasePlan.getPurchasedPlan(userId);
@@ -147,6 +153,16 @@ const getStreamByUserAndPlan = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getPlanesByUser = catchAsync(async (req, res) => {
+  const data = await purchasePlan.getPlanesByUser(req.userId);
+  res.send(data);
+});
+
+const getPurchasedPlanById = catchAsync(async (req, res) => {
+  const data = await purchasePlan.getPurchasedPlanById(req.params.id);
+  res.send(data);
+});
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -171,4 +187,7 @@ module.exports = {
   streamPlanById,
   getPurchased_ByPlanId,
   getStreamByUserAndPlan,
+  create_PurchasePlan_EXpo_Admin,
+  getPlanesByUser,
+  getPurchasedPlanById,
 };

@@ -21,6 +21,7 @@ router.route('/getpayment/details/all/normal').get(SellerAuth, purchasePlan.get_
 router.route('/mypurchase/plans/gellall').get(SellerAuth, purchasePlan.get_all_purchasePlans);
 router.route('/purchase/suceess/private').post(purchasePlan.create_purchase_plan_private);
 router.route('/purchase/PurchasePlan/EXpo').post(SellerAuth, purchasePlan.create_PurchasePlan_EXpo);
+router.route('/purchase/PurchasePlan/expo/admin').post(purchasePlan.create_PurchasePlan_EXpo_Admin);
 router.route('/fetch/getPurchasedPlan').get(SellerAuth, purchasePlan.getPurchasedPlan);
 router.route('/:id').put(SellerAuth, purchasePlan.updatePurchasedPlan).get(purchasePlan.getPlanyById);
 router.route('/update/:id').put(purchasePlan.updatePurchasedPlanById);
@@ -35,4 +36,6 @@ router.route('/get/All/Purchased/Plan/:page').get(purchasePlan.get_All_Purchased
 router.route('/stream/PlanById/:id').get(purchasePlan.streamPlanById);
 router.route('/get/Purchased/ByPlanId/:id/:page').get(purchasePlan.getPurchased_ByPlanId);
 router.route('/getStreamByUserAndPlan/:user/:plan').get(purchasePlan.getStreamByUserAndPlan);
+router.route('/getPlanes/ByUser').get(SellerAuth, purchasePlan.getPlanesByUser);
+router.route('/getPurchasedPlanById/:id').get(purchasePlan.getPurchasedPlanById);
 module.exports = router;

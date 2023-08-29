@@ -10,7 +10,7 @@ const TextlocalChat = require('../config/chat-bot.OTP');
 const Verfy = require('../config/OtpVerify');
 const WardAssign = require('../models/wardAssign.model');
 const { MarketClone } = require('../models/market.model');
-const {OTP} = require('../models/saveOtp.model');
+const { OTP } = require('../models/saveOtp.model');
 const ChatBotOTP = require('../models/chatBot.OTP.model');
 
 const moment = require('moment');
@@ -643,6 +643,17 @@ const getFines_Details = async (id) => {
   return values;
 };
 
+const get_Tele_Sales = async () => {
+  let values = await Users.aggregate([
+    {
+      $match: {
+        userRole: { $in: ['fb0dd028-c608-4caa-a7a9-b700389a098d', 'ae601146-dadd-443b-85b2-6c0fbe9f964c'] },
+      },
+    },
+  ]);
+  return values;
+};
+
 module.exports = {
   createUser,
   UsersLogin,
@@ -680,4 +691,5 @@ module.exports = {
   getFines_Details,
   chatBotOtp,
   chatBotOtpVerify,
+  get_Tele_Sales,
 };

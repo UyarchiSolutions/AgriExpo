@@ -197,6 +197,24 @@ const purchasePlanSchema = mongoose.Schema(
     approvalDate: {
       type: Number,
     },
+    Discount: {
+      type: Number,
+    },
+    RevisedAmount: {
+      type: Number,
+    },
+    Referral: {
+      type: String,
+    },
+    Tele_Caller: {
+      type: String,
+    },
+    TelName: {
+      type: String,
+    },
+    Type: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
