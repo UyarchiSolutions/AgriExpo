@@ -18,7 +18,7 @@ const createSlot = async (body) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'This Slot Already Available');
   }
   const existSlot = await find_exist_slot(Start, end);
-
+  console.log(existSlot);
   const data = {
     chooseTime: isoDateTime,
     start: Start,
