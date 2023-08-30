@@ -3203,7 +3203,8 @@ const go_live_stream_host = async (req, userId) => {
         raiseUID: 1,
         RaiseHands: '$purchasedplans.RaiseHands',
         current_raise: 1,
-        allot_host_1: 1
+        allot_host_1: 1,
+        transaction:1
       },
     },
   ]);
