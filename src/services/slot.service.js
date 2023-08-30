@@ -13,7 +13,7 @@ const createSlot = async (body) => {
   const end = moment(Start).add(Duration, 'minutes').valueOf();
   const startFormat = moment(`${date}T${chooseTime}`).format('HH:mm');
   const endFormat = moment(Start).add(Duration, 'minutes').format('HH:mm');
-  const findExist = await Slot.findOne({ date: data, Type: Type, startFormat: startFormat, endFormat: endFormat });
+  const findExist = await Slot.findOne({ date: date, startFormat: startFormat, endFormat: endFormat });
   if (findExist) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'This Slot Already Available');
   }
