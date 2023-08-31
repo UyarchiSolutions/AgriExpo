@@ -9,14 +9,16 @@ const Seller = require('../models/seller.models');
 const createSlot = async (body) => {
   const { chooseTime, Duration, date, Type } = body;
   const isoDateTime = moment(`${date}T${chooseTime}`).toDate();
-  const Start = moment(`${date}T${chooseTime}`);
-  const end = moment(Start).add(Duration, 'minutes');
+  const Start = moment(`${date}T${chooseTime}`).valueOf();
+  const end = moment(Start).add(Duration, 'minutes').valueOf();
   const startFormat = moment(`${date}T${chooseTime}`).format('HH:mm');
   const endFormat = moment(Start).add(Duration, 'minutes').format('HH:mm');
-  const existSlot = await Slot.findOne({ date: date, startFormat: chooseTime, endFormat: endFormat, Type: Type });
-  if (existSlot) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'This Slot Already Booked');
-  }
+  // const findExist = await Slot.findOne({ date: date, startFormat: startFormat, endFormat: endFormat });
+  // if (findExist) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, 'This Slot Already Available');
+  // }
+  // const existSlot = await find_exist_slot(Start, end);
+  // console.log(existSlot);
   const data = {
     chooseTime: isoDateTime,
     start: Start,
@@ -31,6 +33,56 @@ const createSlot = async (body) => {
   const creation = await Slot.create(data);
   return creation;
 };
+
+// const find_exist_slot = async (start, end) => {
+//   let condition_1 = { $and: [{ start: { $lt: start } }, { end: { $gte: end } }] };
+//   let condition_2 = { $and: [{ start: { $gte: start } }, { end: { $lte: end } }] };
+//   let condition_3 = { $and: [{ start: { $lte: start } }, { start: { $gt: end } }] };
+//   let condition_4 = { $and: [{ end: { $gt: start } }, { end: { $lt: end } }] };
+
+//   // let condition_1 = { $and: [{ $lt: ['$start', start] }] };
+//   // let condition_2 = { $and: [{ $lte: ['$start', start] }, { $gte: ['$end', end] }] };
+//   // let condition_3 = { $and: [{ $lte: ['$start', start] }, { $gt: ['$start', end] }] };
+//   // let condition_4 = { $and: [{ $gt: ['$end', start] }, { $lt: ['$end', end] }] };
+//   let slotmatch = await Slot.aggregate([
+//     { $match: { $or: [condition_1, condition_2, condition_3, condition_4] } },
+//     // {
+//     //   $addFields: {
+//     //     duration: {
+//     //       $cond: {
+//     //         if: { $and: [condition_1] },
+//     //         then: 'cond-1',
+//     //         else: {
+//     //           $cond: {
+//     //             if: { $and: [condition_2] },
+//     //             then: 'cond2',
+//     //             else: {
+//     //               $cond: {
+//     //                 if: { $and: [condition_3] },
+//     //                 then: 'cond-3',
+//     //                 else: {
+//     //                   $cond: {
+//     //                     if: { $and: [condition_4] },
+//     //                     then: 'cond-4',
+//     //                     else: 'Completed',
+//     //                   },
+//     //                 },
+//     //               },
+//     //             },
+//     //           },
+//     //         },
+//     //       },
+//     //     },
+//     //   },
+//     // },
+//     // { $match: { $and: [{ duration: { $ne: 'Completed' } }] } },
+//   ]);
+//   if (slotmatch.length != 0) {
+//     throw new ApiError(httpStatus.BAD_REQUEST, 'This Slot Already Available');
+//   }
+
+//   return slotmatch;
+// };
 
 const Fetch_Slot = async (query) => {
   let { Type, Duration, start, end, date } = query;

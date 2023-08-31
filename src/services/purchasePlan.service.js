@@ -259,6 +259,153 @@ const get_all_my_orders_normal = async (req) => {
   let plan = await purchasePlan.aggregate([
     { $sort: { DateIso: -1 } },
     { $match: { $and: [{ suppierId: req.userId }, { planType: { $eq: 'normal' } }] } },
+    {
+      $lookup: {
+        from: 'slotseperations',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [
+          {
+            $match: {
+              SlotType: 'Normal',
+            },
+          },
+          {
+            $addFields: {
+              sumval: { $add: ['$usedSlots', '$Slots'] },
+            },
+          },
+          {
+            $group: { _id: null, total: { $sum: '$sumval' } },
+          },
+        ],
+        as: 'NormalSlot',
+      },
+    },
+    { $unwind: { preserveNullAndEmptyArrays: true, path: '$NormalSlot' } },
+    {
+      $lookup: {
+        from: 'slotseperations',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [
+          {
+            $match: {
+              SlotType: 'Peak',
+            },
+          },
+          {
+            $addFields: {
+              sumval: { $add: ['$usedSlots', '$Slots'] },
+            },
+          },
+          {
+            $group: { _id: null, total: { $sum: '$sumval' } },
+          },
+        ],
+        as: 'PeakSlot',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$PeakSlot',
+      },
+    },
+    {
+      $lookup: {
+        from: 'slotseperations',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [
+          {
+            $match: {
+              SlotType: 'Exclusive',
+            },
+          },
+          {
+            $addFields: {
+              sumval: { $add: ['$usedSlots', '$Slots'] },
+            },
+          },
+          {
+            $group: { _id: null, total: { $sum: '$sumval' } },
+          },
+        ],
+
+        as: 'ExclusiveSlot',
+      },
+    },
+    { $unwind: { preserveNullAndEmptyArrays: true, path: '$ExclusiveSlot' } },
+    {
+      $lookup: {
+        from: 'slotbookings',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $match: { slotType: 'Normal' } }],
+        as: 'BookedSlotsNormal',
+      },
+    },
+    {
+      $lookup: {
+        from: 'slotbookings',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $match: { slotType: 'Peak' } }],
+        as: 'BookedSlotsPeak',
+      },
+    },
+    {
+      $lookup: {
+        from: 'slotbookings',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $match: { slotType: 'Exclusive' } }],
+        as: 'BookedSlotsExclusive',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        active: 1,
+        status: 1,
+        planName: 1,
+        planType: 1,
+        streamvalidity: 1,
+        slotInfo: 1,
+        numberOfStreamused: 1,
+        numberOfParticipants: 1,
+        Teaser: 1,
+        StreamVideos: 1,
+        completedStream: 1,
+        Pdf: 1,
+        image: 1,
+        description: 1,
+        RaiseHands: 1,
+        Advertisement_Display: 1,
+        Special_Notification: 1,
+        chat_Option: 1,
+        salesCommission: 1,
+        Price: 1,
+        PostCount: 1,
+        no_of_host: 1,
+        planId: 1,
+        DateIso: 1,
+        suppierId: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        FromBank: 1,
+        PayementMode: 1,
+        TransactionId: 1,
+        approvalDate: 1,
+        Normal: { $ifNull: ['$NormalSlot.total', 0] },
+        Peak: { $ifNull: ['$PeakSlot.total', 0] },
+        Exclusive: { $ifNull: ['$ExclusiveSlot.total', 0] },
+        NormalSlots: { $ifNull: [{ $size: '$BookedSlotsNormal' }, 0] },
+        PeakSlots: { $ifNull: [{ $size: '$BookedSlotsPeak' }, 0] },
+        ExclusiveSlots: { $ifNull: [{ $size: '$BookedSlotsExclusive' }, 0] },
+      },
+    },
     { $skip: 10 * page },
     { $limit: 10 },
   ]);
