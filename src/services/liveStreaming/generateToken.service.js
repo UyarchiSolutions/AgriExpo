@@ -738,7 +738,7 @@ const get_sub_golive = async (req, io) => {
           },
           {
             $addFields: {
-              supplierName: { $ifNull: ['$suppliers.primaryContactName', '$subhosts.Name'] },
+              supplierName: { $ifNull: ['$suppliers.tradeName', '$subhosts.contactName'] },
             },
           },
         ],
