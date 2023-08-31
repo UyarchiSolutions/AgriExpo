@@ -823,7 +823,6 @@ const get_sub_golive = async (req, io) => {
         raiseID: "$raiseusers._id",
         raiseUID: 1,
         allot_host_1_details: 1,
-        raiseID: 1,
         current_raise: "$streamrequests.current_raise",
       },
     },
