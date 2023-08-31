@@ -738,7 +738,7 @@ const get_sub_golive = async (req, io) => {
           },
           {
             $addFields: {
-              supplierName: { $ifNull: ['$suppliers.primaryContactName', '$subhosts.Name'] },
+              supplierName: { $ifNull: ['$suppliers.tradeName', '$subhosts.contactName'] },
             },
           },
         ],
@@ -765,6 +765,31 @@ const get_sub_golive = async (req, io) => {
     {
       $addFields: {
         raise_hands: { $ifNull: ['$raiseusers.status', 'raise'] },
+      },
+    },
+    {
+      $addFields: {
+        allot_host_1_details: { $cond: { if: { $eq: ['$streamrequests.allot_host_1', 'my self'] }, then: '$streamrequests.suppierId', else: '$streamrequests.allot_host_1' } },
+      },
+    },
+    {
+      $lookup: {
+        from: 'temptokens',
+        localField: 'streamId',
+        foreignField: 'streamId',
+        pipeline: [{ $match: { $and: [{ type: { $eq: 'raiseHands' } }] } }],
+        as: 'raiseID',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$raiseID',
+      },
+    },
+    {
+      $addFields: {
+        raiseUID: { $ifNull: ['$raiseID.Uid', 0] },
       },
     },
     {
@@ -795,7 +820,11 @@ const get_sub_golive = async (req, io) => {
         joindedUserBan: 1,
         appID: "$streamrequests.agoraappids.appID",
         raise_hands: 1,
-        raiseID: "$raiseusers._id"
+        raiseID: "$raiseusers._id",
+        raiseUID: 1,
+        allot_host_1_details: 1,
+        raiseID: 1,
+        current_raise: "$streamrequests.current_raise",
       },
     },
   ]);
