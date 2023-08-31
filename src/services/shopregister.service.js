@@ -75,11 +75,19 @@ const verify_otp = async (body) => {
   let findOTP = await OTP.findOne({
     mobileNumber: mobileNumber,
     OTP: otp,
-    create: { $gte: moment(new Date().getTime() - 15 * 60 * 1000) },
     active: true,
   });
   if (!findOTP) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Invalid OTP');
+  }
+  const findotp = {
+    create: moment(new Date()).subtract(1, 'minutes'),
+  };
+  const createTimestampString = findOTP.create;
+  const createTimestamp = moment(createTimestampString);
+
+  if (createTimestamp.isBefore(findotp.create)) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'OTP Expired');
   }
   let shop = await Shop.findById({ _id: findOTP.userId });
   await Shop.findByIdAndUpdate({ _id: findOTP.userId }, { registered: true }, { new: true });
@@ -2245,8 +2253,8 @@ const get_Streaming_ordersByStream = async (id) => {
         Amount: 1,
         DateIso: 1,
         created: 1,
-        shopId:1,
-        shop:'$shop',
+        shopId: 1,
+        shop: '$shop',
         productTitle: '$streamingorderproducts',
         // productTitle: "$streamingorderproducts",
         orderAmount: '$streamingorderproducts.orderAmount',
