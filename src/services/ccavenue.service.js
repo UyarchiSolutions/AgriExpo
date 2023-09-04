@@ -7,7 +7,7 @@ var crypto = require('crypto');
 var ccavenue = require('ccavenue');
 
 const axios = require('axios');
-const get_paymnent_url = async (aa,dd,res) => {
+const get_paymnent_url = async (aa, dd, res) => {
     // const orderAmount = 1000; // Example order amount in paise
     const merchantId = '2742878';
     const accessCode = 'AVRI05KH14CC73IRCC';
@@ -42,27 +42,27 @@ const get_paymnent_url = async (aa,dd,res) => {
         .digest('hex')
         .toUpperCase();
     paymentData.checksum = checksum;
-    // // let data = await axios.post(baseUrl, paymentData)
-    // //     .then(response => {
-    // //         console.log('Payment URL:', response.data);
-    // //         return response.data;
-    // //     })
-    // //     .catch(error => {
-    // //         // console.error('Payment Error:', error);
-    // //         return error;
-    // //     });
-
-    // // return { data };
-
-    axios.post('https://test.ccavenue.com/transaction/transaction.do', paymentData)
+    let data = await axios.post(baseUrl, paymentData)
         .then(response => {
-            // Handle the response from CCAvenue
-            console.log(response.data);
+            console.log('Payment URL:', response.data);
+            return response.data;
         })
         .catch(error => {
-            // Handle errors
-            console.error(error);
+            // console.error('Payment Error:', error);
+            return error;
         });
+
+    return { data };
+
+    // axios.post('https://test.ccavenue.com/transaction/transaction.do', paymentData)
+    //     .then(response => {
+    //         // Handle the response from CCAvenue
+    //         console.log(response.data);
+    //     })
+    //     .catch(error => {
+    //         // Handle errors
+    //         console.error(error);
+    //     });
 
 
 };
