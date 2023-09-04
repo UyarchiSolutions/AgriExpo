@@ -45,16 +45,18 @@ const get_paymnent_url = async (aa, dd, res) => {
     // Create a secure hash to send with the request
     const secureHash = createSecureHash(paymentData, workingKey);
     paymentData.secure_hash = secureHash;
-    axios.post('https://secure.ccavenue.com/transaction/initTrans', paymentData)
+    let data = await axios.post('https://test.ccavenue.com/transaction/transaction.do', paymentData)
         .then((response) => {
             // Handle the CCAvenue response
             console.log(response.data);
+            return response.data;
         })
         .catch((error) => {
             // Handle errors
             console.error(error);
+            return error
         });
-
+    return data;
 };
 
 
