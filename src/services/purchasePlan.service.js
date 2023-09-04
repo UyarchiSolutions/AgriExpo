@@ -1507,7 +1507,6 @@ const getPurchasedPlanPayment = async () => {
 
 const create_PlanPayment = async (body) => {
   let finding = await PlanPayment.find().count();
-  console.log(finding);
   let center = '';
   if (finding < 9) {
     center = '0000';
