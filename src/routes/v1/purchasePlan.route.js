@@ -38,4 +38,7 @@ router.route('/get/Purchased/ByPlanId/:id/:page').get(purchasePlan.getPurchased_
 router.route('/getStreamByUserAndPlan/:user/:plan').get(purchasePlan.getStreamByUserAndPlan);
 router.route('/getPlanes/ByUser').get(SellerAuth, purchasePlan.getPlanesByUser);
 router.route('/getPurchasedPlanById/:id').get(purchasePlan.getPurchasedPlanById);
+router.route('/getPurchasedPlan/Payment').get(purchasePlan.getPurchasedPlanPayment);
+router.route('/create/PlanPayment').post(purchasePlan.create_PlanPayment);
+router.route('/get_Payment/ById/:id').get(purchasePlan.get_Payment_ById);
 module.exports = router;

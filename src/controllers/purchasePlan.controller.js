@@ -163,6 +163,21 @@ const getPurchasedPlanById = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getPurchasedPlanPayment = catchAsync(async (req, res) => {
+  const data = await purchasePlan.getPurchasedPlanPayment();
+  res.send(data);
+});
+
+const create_PlanPayment = catchAsync(async (req, res) => {
+  const data = await purchasePlan.create_PlanPayment(req.body);
+  res.send(data);
+});
+
+const get_Payment_ById = catchAsync(async (req, res)=>{
+  const data = await purchasePlan.get_Payment_ById(req.params.id)
+  res.send(data); 
+})
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -190,4 +205,7 @@ module.exports = {
   create_PurchasePlan_EXpo_Admin,
   getPlanesByUser,
   getPurchasedPlanById,
+  getPurchasedPlanPayment,
+  create_PlanPayment,
+  get_Payment_ById
 };

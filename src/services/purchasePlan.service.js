@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const bcrypt = require('bcryptjs');
 const ApiError = require('../utils/ApiError');
 const moment = require('moment');
-const { purchasePlan } = require('../models/purchasePlan.model');
+const { purchasePlan, PlanPayment } = require('../models/purchasePlan.model');
 const paymentgatway = require('./paymentgatway.service');
 const Dates = require('./Date.serive');
 const AWS = require('aws-sdk');
@@ -1456,6 +1456,110 @@ const getPurchasedPlanById = async (id) => {
   return values;
 };
 
+const getPurchasedPlanPayment = async () => {
+  let values = await purchasePlan.aggregate([
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'Sellers',
+      },
+    },
+    {
+      $unwind: {
+        path: '$Sellers',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'agriplanpayments',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $group: { _id: null, Amount: { $sum: '$Amount' } } }],
+        as: 'Payment',
+      },
+    },
+    {
+      $unwind: {
+        path: '$Payment',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    { $addFields: { Price: { $toInt: '$Price' } } },
+    {
+      $project: {
+        _id: 1,
+        planName: 1,
+        active: 1,
+        Price: 1,
+        exhibitorName: '$Sellers.tradeName',
+        paidAmount: { $ifNull: ['$Payment.Amount', 0] },
+        PendingAmount: { $ifNull: [{ $subtract: ['$Price', '$Payment.Amount'] }, '$Price'] },
+        Type: 1,
+        status: 1,
+      },
+    },
+  ]);
+  return values;
+};
+
+const create_PlanPayment = async (body) => {
+  let finding = await PlanPayment.find().count();
+  console.log(finding);
+  let center = '';
+  if (finding < 9) {
+    center = '0000';
+  }
+  if (finding < 99 && finding >= 9) {
+    center = '000';
+  }
+  if (finding < 999 && finding >= 99) {
+    center = '00';
+  }
+  if (finding < 9999 && finding >= 999) {
+    center = '0';
+  }
+  let billId = 'BID' + center + finding + 1;
+  let data = { ...body, billId: billId };
+  const datas = await PlanPayment.create(data);
+  return datas;
+};
+
+const get_Payment_ById = async (id) => {
+  let values = await PlanPayment.aggregate([
+    {
+      $match: {
+        PlanId: id,
+      },
+    },
+    {
+      $lookup: {
+        from: 'purchasedplans',
+        localField: 'PlanId',
+        foreignField: '_id',
+        as: 'plan',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$plan',
+      },
+    },
+  ]);
+
+  let findPlan = await purchasePlan.findById(id);
+  if (!findPlan) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'plan not found');
+  }
+
+  let sellers = await Seller.findById(findPlan.suppierId);
+
+  return { values, sellers };
+};
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -1483,4 +1587,7 @@ module.exports = {
   create_PurchasePlan_EXpo_Admin,
   getPlanesByUser,
   getPurchasedPlanById,
+  getPurchasedPlanPayment,
+  create_PlanPayment,
+  get_Payment_ById,
 };
