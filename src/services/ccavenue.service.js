@@ -54,8 +54,7 @@ const get_paymnent_url = async (aa,dd,res) => {
 
     // // return { data };
 
-
-    axios.post('https://secure.ccavenue.com/transaction/transaction.do', paymentData)
+    axios.post('https://test.ccavenue.com/transaction/transaction.do', paymentData)
         .then(response => {
             // Handle the response from CCAvenue
             console.log(response.data);
