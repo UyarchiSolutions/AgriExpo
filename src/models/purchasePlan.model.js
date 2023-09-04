@@ -221,4 +221,59 @@ const purchasePlanSchema = mongoose.Schema(
 
 purchasePlan = mongoose.model('purchasedPlans', purchasePlanSchema);
 
-module.exports = { purchasePlan };
+const PlanPaymentSchema = new mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    PlanId: {
+      type: String,
+    },
+    userId: {
+      type: String,
+    },
+    Amount: {
+      type: Number,
+    },
+    PaymentMode: {
+      type: String,
+    },
+    BankName: {
+      type: String,
+    },
+    utrNo: {
+      type: String,
+    },
+    TransactionId: {
+      type: String,
+    },
+    platform: {
+      type: String,
+    },
+    chequeDD: {
+      type: String,
+    },
+    chequeDD_Date: {
+      type: String,
+    },
+    branchName: {
+      type: String,
+    },
+    To: {
+      type: String,
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+    billId: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
+
+const PlanPayment = mongoose.model('agriplanPayment', PlanPaymentSchema);
+
+module.exports = { purchasePlan, PlanPayment };

@@ -29,7 +29,7 @@ const { Shop } = require('../models/b2b.ShopClone.model');
 
 const agoraToken = require('./liveStreaming/AgoraAppId.service');
 
-const { UsageAppID } = require('../models/liveStreaming/AgoraAppId.model')
+const { UsageAppID } = require('../models/liveStreaming/AgoraAppId.model');
 const S3video = require('./S3video.service');
 const { Seller } = require('../models/seller.models');
 
@@ -1405,7 +1405,8 @@ const create_stream_one = async (req) => {
   let value;
   if (agoraID.element != null && agoraID.element != '' && agoraID.element != undefined) {
     value = await Streamrequest.create({
-      ...req.body, ...{
+      ...req.body,
+      ...{
         suppierId: req.userId,
         postCount: req.body.post.length,
         startTime: startTime,
@@ -1423,21 +1424,19 @@ const create_stream_one = async (req) => {
         streamPlanId: plan.planId,
         agoraID: agoraID.element._id,
         totalMinues: totalMinutes,
-        chat_need: plan.chat_Option
+        chat_need: plan.chat_Option,
       },
     });
-    await UsageAppID.findByIdAndUpdate({ _id: agoraID.vals._id }, { streamID: value._id }, { new: true })
+    await UsageAppID.findByIdAndUpdate({ _id: agoraID.vals._id }, { streamID: value._id }, { new: true });
     req.body.post.forEach(async (a) => {
       await StreamPost.findByIdAndUpdate({ _id: a }, { isUsed: true, status: 'Assigned' }, { new: true });
       let post = await StreamrequestPost.create({ suppierId: req.userId, streamRequest: value._id, postId: a });
       await Dates.create_date(post);
     });
     await Dates.create_date(value);
-  }
-  else {
+  } else {
     throw new ApiError(httpStatus.NOT_FOUND, 'App id Not found');
   }
-
 
   return value;
 };
@@ -3204,7 +3203,7 @@ const go_live_stream_host = async (req, userId) => {
         RaiseHands: '$purchasedplans.RaiseHands',
         current_raise: 1,
         allot_host_1: 1,
-        transaction:1
+        transaction: 1,
       },
     },
   ]);
@@ -3364,7 +3363,7 @@ const get_subhost_token = async (req, userId) => {
         localField: '_id',
         foreignField: 'streamId',
         pipeline: [
-          { $match: { $and: [{ supplierId: { $eq: userId } }, { type: { $eq: "subhost" } }] } },
+          { $match: { $and: [{ supplierId: { $eq: userId } }, { type: { $eq: 'subhost' } }] } },
           {
             $lookup: {
               from: 'sellers',
@@ -3519,7 +3518,9 @@ const get_subhost_token = async (req, userId) => {
     },
     {
       $addFields: {
-        allot_host_1_details: { $cond: { if: { $eq: ['$allot_host_1', 'my self'] }, then: '$suppierId', else: '$allot_host_1' } },
+        allot_host_1_details: {
+          $cond: { if: { $eq: ['$allot_host_1', 'my self'] }, then: '$suppierId', else: '$allot_host_1' },
+        },
       },
     },
     {
@@ -3558,7 +3559,7 @@ const get_subhost_token = async (req, userId) => {
         RaiseHands: '$purchasedplans.RaiseHands',
         current_raise: 1,
         allot_host_1: 1,
-        allot_host_1_details: 1
+        allot_host_1_details: 1,
       },
     },
   ]);
@@ -8270,8 +8271,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+        ? 'RAC'
+        : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -8280,8 +8281,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-            ? 'RAC'
-            : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -12751,7 +12752,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => { };
+const get_video_link = async (req) => {};
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
