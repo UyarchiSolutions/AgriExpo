@@ -13,7 +13,7 @@ const get_paymnent_url = async (aa, dd, res) => {
     const accessCode = 'AVRI05KH14CC73IRCC';
     const workingKey = '6EB13DAEA5810ACB66C7C95BDD4D2684';
     const orderId = uuid.v4();
-    // const baseUrl = 'https://secure.ccavenue.com/transaction/transaction.do';
+    const baseUrl = 'https://test.ccavenue.com/transaction/transaction.do';
 
     const paymentData = {
         merchant_id: merchantId,
