@@ -37,6 +37,10 @@ let server = http.Server(app);
 let socketIO = require('socket.io');
 let io = socketIO(server);
 
+app.use(express.static('public'));
+app.set('views', __dirname + '/public');
+app.engine('html', require('ejs').renderFile);
+
 server.listen(config.port, () => {
   logger.info(`Listening to port ${config.port}`);
   // //console.log(moment(1674035400000).add(40, 'minutes').format('hh:mm:ss a'));
@@ -142,7 +146,6 @@ app.use(function (req, res, next) {
 
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 
-app.use(express.static('public'));
 
 if (config.env !== 'test') {
   app.use(morgan.successHandler);

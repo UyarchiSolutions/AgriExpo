@@ -65,16 +65,16 @@ const get_paymnent_url = async (aa, dd, res) => {
     // //         console.error(error);
     // //     });
     var body = '',
-        workingKey = '6EB13DAEA5810ACB66C7C95BDD4D2684',	//Put in the 32-Bit key shared by CCAvenues.
-        accessCode = 'AVRI05KH14CC73IRCC',			//Put in the Access Code shared by CCAvenues.
+        workingKey = 'C90164B612A8C5A954E8F87E8E6F020E',	//Put in the 32-Bit key shared by CCAvenues.
+        accessCode = 'AVTO97KH72AS17OTSA',			//Put in the Access Code shared by CCAvenues.
         encRequest = '',
         formbody = '';
     // res.on('data',  (data) =>{
     //     body += data;
     //     console.log("asda")
-    //     // console.log(body)
+    //     // console.log(body)p
     encRequest = ccavReqHandler.encrypt(body, workingKey);
-    formbody = '<form id="nonseamless" method="post" name="redirect" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction"/> <input type="hidden" id="encRequest" name="encRequest" value="' + encRequest + '"><input type="hidden" name="access_code" id="access_code" value="' + accessCode + '"><script language="javascript">document.redirect.submit();</script></form>';
+    formbody = '<form id="nonseamless" method="post" name="redirect" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction"/> <input type="hidden" id="encRequest" name="encRequest" value="' + encRequest + '"><input type="hidden" name="access_code" id="access_code" value="' + accessCode + '"><button>pay</button><script language="javascript">document.redirect.submit();</script></form>';
     // });
 
     // res.on('end', function () {
