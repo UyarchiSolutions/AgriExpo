@@ -36,8 +36,10 @@ let http = require('http');
 let server = http.Server(app);
 let socketIO = require('socket.io');
 let io = socketIO(server);
+var path = require('path');
 
 app.use(express.static('public'));
+// app.use(express.static(path.join(__dirname, '../public')));
 app.set('views', __dirname + '/public');
 app.engine('html', require('ejs').renderFile);
 
@@ -151,7 +153,15 @@ if (config.env !== 'test') {
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
 }
+const ccavReqHandler = require('./ccavRequestHandler.js');
 
+app.get('/about', function (req, res) {
+  res.render('dataFrom.html');
+});
+app.post('/ccavRequestHandler', function (request, response) {
+  console.log("sadas")
+  ccavReqHandler.postReq(request, response);
+});
 // set security HTTP headers
 app.use(helmet());
 
