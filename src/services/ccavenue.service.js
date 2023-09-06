@@ -5,66 +5,103 @@ const moment = require('moment');
 const uuid = require('uuid');
 var crypto = require('crypto');
 var ccavenue = require('ccavenue');
+// const ccavenue = require('ccavenue-node');
+const nodeCCAvenue = require("node-ccavenue");
 
 const axios = require('axios');
+
+
+const ccavenueConfig = {
+    merchant_id: '2742878',
+    working_key: '6EB13DAEA5810ACB66C7C95BDD4D2684',
+    access_code: 'AVRI05KH14CC73IRCC',
+    redirect_url: 'https://agriexpo.live',
+};
+
+const ccav = new nodeCCAvenue.Configure(ccavenueConfig);
+
+
 const get_paymnent_url = async (aa, dd, res) => {
-    // const orderAmount = 1000; // Example order amount in paise
-    const merchantId = '2742878';
-    const accessCode = 'AVRI05KH14CC73IRCC';
-    const workingKey = '6EB13DAEA5810ACB66C7C95BDD4D2684';
-    const orderId = uuid.v4();
-    const baseUrl = 'https://test.ccavenue.com/transaction/transaction.do';
-    const paymentData = {
-        merchant_id: merchantId,
-        order_id: orderId,
-        amount: '100.00',
-        currency: 'INR',
-        redirect_url: 'https://agriexpo.click/',
-        cancel_url: 'https://agriexpo.live/',
-        language: 'EN',
-        billing_name: 'John Doe',
-        billing_address: '123 Main St',
-        billing_city: 'chennai',
-        billing_state: 'tamilnadu',
-        billing_zip: '600017',
-        billing_country: 'India',
-        billing_tel: '9965740303',
-        billing_email: 'bharathiraja996574@gmail.com',
-    };
-    const crypto = require('crypto');
-    const keys = Object.keys(paymentData).sort();
-    const values = keys.map(key => paymentData[key]);
-    const concatenatedString = values.join('|');
-    const checksum = crypto
-        .createHmac('sha256', workingKey)
-        .update(concatenatedString)
-        .digest('hex')
-        .toUpperCase();
-    paymentData.checksum = checksum;
-    let data = await axios.post(baseUrl, paymentData)
-        .then(response => {
-            console.log('Payment URL:', response.data);
-            return response.data;
-        })
-        .catch(error => {
-            // console.error('Payment Error:', error);
-            return error;
-        });
-
-    return data;
-
-
-    // axios.post('https://secure.ccavenue.com/transaction/transaction.do', paymentData)
+    // // const orderAmount = 1000; // Example order amount in paise
+    // const merchantId = '2742878';
+    // const accessCode = 'AVRI05KH14CC73IRCC';
+    // const workingKey = '6EB13DAEA5810ACB66C7C95BDD4D2684';
+    // const orderId = uuid.v4();
+    // const baseUrl = 'https://test.ccavenue.com/transaction/transaction.do';
+    // const paymentData = {
+    //     merchant_id: merchantId,
+    //     order_id: orderId,
+    //     amount: '100.00',
+    //     currency: 'INR',
+    //     redirect_url: 'https://agriexpo.click/',
+    //     cancel_url: 'https://agriexpo.click/',
+    //     language: 'EN',
+    //     billing_name: 'John Doe',
+    //     billing_address: '123 Main St',
+    //     billing_city: 'chennai',
+    //     billing_state: 'tamilnadu',
+    //     billing_zip: '600017',
+    //     billing_country: 'India',
+    //     billing_tel: '9965740303',
+    //     billing_email: 'bharathiraja996574@gmail.com',
+    // };
+    // const crypto = require('crypto');
+    // const keys = Object.keys(paymentData).sort();
+    // const values = keys.map(key => paymentData[key]);
+    // const concatenatedString = values.join('|');
+    // const checksum = crypto
+    //     .createHmac('sha256', workingKey)
+    //     .update(concatenatedString)
+    //     .digest('hex')
+    //     .toUpperCase();
+    // paymentData.checksum = checksum;
+    // let data = await axios.post(baseUrl, paymentData)
     //     .then(response => {
-    //         // Handle the response from CCAvenue
-    //         console.log(response.data);
+    //         console.log('Payment URL:', response.data);
+    //         return response.data;
     //     })
     //     .catch(error => {
-    //         // Handle errors
-    //         console.error(error);
+    //         // console.error('Payment Error:', error);
+    //         return error;
     //     });
 
-    return paymentData;
+    // return data;
+
+
+    // // axios.post('https://secure.ccavenue.com/transaction/transaction.do', paymentData)
+    // //     .then(response => {
+    // //         // Handle the response from CCAvenue
+    // //         console.log(response.data);
+    // //     })
+    // //     .catch(error => {
+    // //         // Handle errors
+    // //         console.error(error);
+    // //     });
+
+    // return paymentData;
+
+    // const order_id = '12345'; // Replace with your dynamic order ID
+    // const amount = '100.00'; // Replace with your dynamic order amount
+
+    // // Construct the payment URL
+    // ccav.de
+    // const paymentUrl = ccav.getPaymentUrl(order_id, amount);
+
+    // res.json({ payment_url: paymentUrl });
+
+    const orderParams = {
+        order_id: 8765432,
+        currency: 'INR',
+        amount: '100',
+        redirect_url: encodeURIComponent(`http://localhost:3000/api/redirect_url/`),
+        billing_name: 'Name of the customer',
+        // etc etc
+    };
+
+    const encryptedOrderData = ccav.getEncryptedOrder(orderParams);
+    console.log(encryptedOrderData);
+
+    return encryptedOrderData;
 
 };
 
