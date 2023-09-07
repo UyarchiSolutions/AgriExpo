@@ -81,9 +81,10 @@ io.sockets.on('connection', async (socket) => {
   });
 
   socket.on('livejoin_count', async (roomName) => {
+    socket.join(roomName);
     const room = io.sockets.adapter.rooms.get(roomName);
     const numUsersInRoom = room ? room.size : 0;
-    console.log(numUsersInRoom)
+    console.log(numUsersInRoom,788)
     console.log(io.sockets.adapter.rooms.get(roomName))
     io.to(roomName).emit(roomName + '_userCountUpdate', numUsersInRoom);
   });
