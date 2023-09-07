@@ -80,6 +80,12 @@ io.sockets.on('connection', async (socket) => {
     await socketService.admin_allow_controls(data, io)
   });
 
+  socket.on('livejoin_count', async (data) => {
+    const room = io.sockets.adapter.rooms.get(roomName);
+    const numUsersInRoom = room ? room.size : 0;
+    io.to(roomName).emit('userCountUpdate', numUsersInRoom);
+  });
+
   socket.on('', (msg) => {
     //console.log('message: ' + msg);
   });
