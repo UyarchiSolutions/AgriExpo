@@ -83,7 +83,7 @@ io.sockets.on('connection', async (socket) => {
   socket.on('livejoin_count', async (data) => {
     const room = io.sockets.adapter.rooms.get(roomName);
     const numUsersInRoom = room ? room.size : 0;
-    io.to(roomName).emit('userCountUpdate', numUsersInRoom);
+    io.to(roomName).emit(numUsersInRoom + '_userCountUpdate', numUsersInRoom);
   });
 
   socket.on('', (msg) => {
