@@ -235,6 +235,10 @@ const startStop_post = async (req, io) => {
 
 }
 
+const current_live_jion_count = async (req, io) => {
+
+}
+
 module.exports = {
   startStop_post,
   leave_subhost,
@@ -245,4 +249,5 @@ module.exports = {
   stream_view_change,
   romove_message,
   ban_user_chat,
+  current_live_jion_count
 };

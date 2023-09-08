@@ -92,6 +92,7 @@
     "mongoose": "^5.7.7",
     "morgan": "^1.9.1",
     "multer": "^1.4.5-lts.1",
+    "node-ccavenue": "^1.0.5",
     "node-sass": "^7.0.1",
     "nodemailer": "^6.7.3",
     "npm": "^8.11.0",

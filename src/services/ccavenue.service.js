@@ -4,29 +4,62 @@ const ApiError = require('../utils/ApiError');
 const moment = require('moment');
 const uuid = require('uuid');
 var crypto = require('crypto');
-
-const ccavReqHandler = require('./../utils/ccavutil')
-const ccav = require('ccavenue');
+var ccavenue = require('ccavenue');
 
 const axios = require('axios');
+
+
+const ccavenueConfig = {
+    merchant_id: '2742878',
+    working_key: '6EB13DAEA5810ACB66C7C95BDD4D2684',
+    access_code: 'AVRI05KH14CC73IRCC',
+    redirect_url: 'https://agriexpo.live',
+};
+
+const nodeCCAvenue = require('node-ccavenue');
+const ccav = new nodeCCAvenue.Configure({
+    merchant_id: 2742878,
+    working_key: '6EB13DAEA5810ACB66C7C95BDD4D2684',
+});
+
 const get_paymnent_url = async (aa, dd, res) => {
-    const ccavConfig = {
-        merchant_id: '2742878',
-        working_key: 'AVRI05KH14CC73IRCC',
-        redirect_url: 'https://agriexpo.click/about',
-        cancel_url: 'https://agriexpo.click/about',
-    };
-    const ccavInstance = ccav(ccavConfig);
+    // const orderAmount = 1000; // Example order amount in paise
+    const merchantId = '2742878';
+    const accessCode = 'AVRI05KH14CC73IRCC';
+    const workingKey = '6EB13DAEA5810ACB66C7C95BDD4D2684';
+    const orderId = uuid.v4();
+    const baseUrl = 'https://test.ccavenue.com/transaction/transaction.do';
     const paymentData = {
-        order_id: 'ORDER12345', // Generate a unique order ID
-        amount: 100, // Set the payment amount
-        currency: 'INR', // Set the currency
-        redirect: 'true', // Redirect to CCAvenue page
+        merchant_id: merchantId,
+        order_id: orderId,
+        amount: '100.00',
+        currency: 'INR',
+        redirect_url: 'https://agriexpo.click/',
+        cancel_url: 'https://agriexpo.live/',
+        language: 'EN',
+        billing_name: 'John Doe',
+        billing_address: '123 Main St',
+        billing_city: 'chennai',
+        billing_state: 'tamilnadu',
+        billing_zip: '600017',
+        billing_country: 'India',
+        billing_tel: '9965740303',
+        billing_email: 'bharathiraja996574@gmail.com',
+    };
+    const orderParams = {
+        order_id: 8765432,
+        currency: 'INR',
+        amount: '100',
+        redirect_url: encodeURIComponent(`http://localhost:3000/api/redirect_url/`),
+        billing_name: 'Name of the customer',
+        // etc etc
     };
 
-    const paymentUrl = ccavInstance.getRedirectUrl(paymentData);
-    console.log(paymentUrl)
-
+    const encryptedOrderData = ccav.getEncryptedOrder(orderParams);
+    console.log(encryptedOrderData)
+    // const encryptedData = ccav.encrypt(paymentData);
+    // console.log(encryptedData); // Proceed further
+    return encryptedOrderData;
 };
 
 
