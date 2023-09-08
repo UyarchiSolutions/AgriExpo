@@ -12,6 +12,7 @@ const storage = multer.memoryStorage({
   },
 });
 const upload = multer({ storage }).single('Paidimage');
+const adUpload = multer({ storage }).single('adImage');
 
 router.route('/purchase/suceess').post(SellerAuth, purchasePlan.create_purchase_plan);
 router.route('/purchase/addon/suceess').post(SellerAuth, purchasePlan.create_purchase_plan_addon);
@@ -41,4 +42,10 @@ router.route('/getPurchasedPlanById/:id').get(purchasePlan.getPurchasedPlanById)
 router.route('/getPurchasedPlan/Payment').get(purchasePlan.getPurchasedPlanPayment);
 router.route('/create/PlanPayment').post(purchasePlan.create_PlanPayment);
 router.route('/get_Payment/ById/:id').get(purchasePlan.get_Payment_ById);
+router.route('/create/ad').post(purchasePlan.createExpoAd);
+router.route('/upload/ad/byid/:id').put(adUpload, purchasePlan.uploadAdById);
+router.route('/getAll/Expo/Ad').get(purchasePlan.getAllAds);
+router.route('/create/AdPlan').post(purchasePlan.createAdPlan);
+router.route('/getAll/Ad_Planes').get(purchasePlan.getAll_Ad_Planes);
+router.route('/updateAd/PlanBtId/:id').put(purchasePlan.updateAdPlanBtId);
 module.exports = router;
