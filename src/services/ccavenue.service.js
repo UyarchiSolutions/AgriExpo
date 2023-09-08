@@ -4,85 +4,28 @@ const ApiError = require('../utils/ApiError');
 const moment = require('moment');
 const uuid = require('uuid');
 var crypto = require('crypto');
-var ccavenue = require('ccavenue');
+
 const ccavReqHandler = require('./../utils/ccavutil')
+const ccav = require('ccavenue');
 
 const axios = require('axios');
 const get_paymnent_url = async (aa, dd, res) => {
-    // // const orderAmount = 1000; // Example order amount in paise
-    // const merchantId = '2742878';
-    // const accessCode = 'AVRI05KH14CC73IRCC';
-    // const workingKey = '6EB13DAEA5810ACB66C7C95BDD4D2684';
-    // const orderId = uuid.v4();
-    // const baseUrl = 'https://test.ccavenue.com/transaction/transaction.do';
-    // const paymentData = {
-    //     merchant_id: merchantId,
-    //     order_id: orderId,
-    //     amount: '100.00',
-    //     currency: 'INR',
-    //     redirect_url: 'https://agriexpo.click/',
-    //     cancel_url: 'https://agriexpo.live/',
-    //     language: 'EN',
-    //     billing_name: 'John Doe',
-    //     billing_address: '123 Main St',
-    //     billing_city: 'chennai',
-    //     billing_state: 'tamilnadu',
-    //     billing_zip: '600017',
-    //     billing_country: 'India',
-    //     billing_tel: '9965740303',
-    //     billing_email: 'bharathiraja996574@gmail.com',
-    // };
-    // const crypto = require('crypto');
-    // const keys = Object.keys(paymentData).sort();
-    // const values = keys.map(key => paymentData[key]);
-    // const concatenatedString = values.join('|');
-    // const checksum = crypto
-    //     .createHmac('sha256', workingKey)
-    //     .update(concatenatedString)
-    //     .digest('hex')
-    //     .toUpperCase();
-    // paymentData.checksum = checksum;
-    // let data = await axios.post(baseUrl, paymentData)
-    //     .then(response => {
-    //         console.log('Payment URL:', response.data);
-    //         return response.data;
-    //     })
-    //     .catch(error => {
-    //         // console.error('Payment Error:', error);
-    //         return error;
-    //     });
+    const ccavConfig = {
+        merchant_id: '2742878',
+        working_key: 'AVRI05KH14CC73IRCC',
+        redirect_url: 'https://agriexpo.click/about',
+        cancel_url: 'https://agriexpo.click/about',
+    };
+    const ccavInstance = ccav(ccavConfig);
+    const paymentData = {
+        order_id: 'ORDER12345', // Generate a unique order ID
+        amount: 100, // Set the payment amount
+        currency: 'INR', // Set the currency
+        redirect: 'true', // Redirect to CCAvenue page
+    };
 
-    // return data;
-
-
-    // // axios.post('https://secure.ccavenue.com/transaction/transaction.do', paymentData)
-    // //     .then(response => {
-    // //         // Handle the response from CCAvenue
-    // //         console.log(response.data);
-    // //     })
-    // //     .catch(error => {
-    // //         // Handle errors
-    // //         console.error(error);
-    // //     });
-    var body = '',
-        workingKey = 'C90164B612A8C5A954E8F87E8E6F020E',	//Put in the 32-Bit key shared by CCAvenues.
-        accessCode = 'AVTO97KH72AS17OTSA',			//Put in the Access Code shared by CCAvenues.
-        encRequest = '',
-        formbody = '';
-    // res.on('data',  (data) =>{
-    //     body += data;
-    //     console.log("asda")
-    //     // console.log(body)p
-    encRequest = ccavReqHandler.encrypt(body, workingKey);
-    formbody = '<form id="nonseamless" method="post" name="redirect" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction"/> <input type="hidden" id="encRequest" name="encRequest" value="' + encRequest + '"><input type="hidden" name="access_code" id="access_code" value="' + accessCode + '"><button>pay</button><script language="javascript">document.redirect.submit();</script></form>';
-    // });
-
-    // res.on('end', function () {
-    res.writeHeader(200, { "Content-Type": "text/html" });
-    res.write(formbody);
-    res.end();
-    // });
-    return;
+    const paymentUrl = ccavInstance.getRedirectUrl(paymentData);
+    console.log(paymentUrl)
 
 };
 
