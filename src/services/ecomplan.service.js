@@ -189,7 +189,7 @@ const delete_one_Plans = async (req) => {
 const create_post = async (req, images) => {
   // //console.log(req.userId, "asdas", { ...req.body, ...{ suppierId: req.userId, images: images } })
   if (images.length == 0 && (req.body.old_accept == 'true' || req.body.old_accept == true)) {
-    let old_post = await StreamPost.findById(req.old_post);
+    let old_post = await StreamPost.findById(req.body.old_post);
     if (old_post) {
       images = old_post.images;
       req.body.video = old_post.video;
