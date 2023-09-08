@@ -188,6 +188,13 @@ const delete_one_Plans = async (req) => {
 
 const create_post = async (req, images) => {
   // //console.log(req.userId, "asdas", { ...req.body, ...{ suppierId: req.userId, images: images } })
+  if (images.length == 0 && (res.body.old_accept == 'true' || res.body.old_accept == true)) {
+    let old_post = await StreamPost.findById(res.old_post);
+    if (old_post) {
+      images = old_post.images;
+      req.body.video = old_post.video;
+    }
+  }
   const value = await StreamPost.create({
     ...req.body,
     ...{ suppierId: req.userId, images: images, pendingQTY: req.body.quantity },
@@ -13444,7 +13451,7 @@ const notify_me_toggle = async (req) => {
 
 const get_previes_post = async (req) => {
   console.log(req.query.id)
-  const prev = await StreamPost.findOne({ productId: req.query.id ,suppierId:req.userId}).sort({DateIso:-1});
+  const prev = await StreamPost.findOne({ productId: req.query.id, suppierId: req.userId }).sort({ DateIso: -1 });
 
   return prev;
 }
