@@ -173,10 +173,40 @@ const create_PlanPayment = catchAsync(async (req, res) => {
   res.send(data);
 });
 
-const get_Payment_ById = catchAsync(async (req, res)=>{
-  const data = await purchasePlan.get_Payment_ById(req.params.id)
-  res.send(data); 
-})
+const get_Payment_ById = catchAsync(async (req, res) => {
+  const data = await purchasePlan.get_Payment_ById(req.params.id);
+  res.send(data);
+});
+
+const createExpoAd = catchAsync(async (req, res) => {
+  const data = await purchasePlan.createExpoAd(req.body);
+  res.send(data);
+});
+
+const uploadAdById = catchAsync(async (req, res) => {
+  const data = await purchasePlan.uploadAdById(req.params.id, req);
+  res.send(data);
+});
+
+const getAllAds = catchAsync(async (req, res) => {
+  const data = await purchasePlan.getAllAds();
+  res.send(data);
+});
+
+const createAdPlan = catchAsync(async (req, res) => {
+  const data = await purchasePlan.createAdPlan(req.body);
+  res.send(data);
+});
+
+const getAll_Ad_Planes = catchAsync(async (req, res) => {
+  const data = await purchasePlan.getAll_Ad_Planes();
+  res.send(data);
+});
+
+const updateAdPlanBtId = catchAsync(async (req, res) => {
+  const data = await purchasePlan.updateAdPlanBtId(req.params.id, req.body);
+  res.send(data);
+});
 
 module.exports = {
   create_purchase_plan,
@@ -207,5 +237,11 @@ module.exports = {
   getPurchasedPlanById,
   getPurchasedPlanPayment,
   create_PlanPayment,
-  get_Payment_ById
+  get_Payment_ById,
+  createExpoAd,
+  uploadAdById,
+  getAllAds,
+  createAdPlan,
+  getAll_Ad_Planes,
+  updateAdPlanBtId,
 };

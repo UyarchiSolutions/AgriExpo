@@ -13,10 +13,10 @@ const createSeller = async (req) => {
 
   if (value) {
     if (value.email == body.email) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'Email Already Exit');
+      throw new ApiError(httpStatus.NOT_FOUND, 'Email Already Exists');
     }
     if (value.mobileNumber == body.mobileNumber) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'Phone Number Exit');
+      throw new ApiError(httpStatus.NOT_FOUND, 'Phone Number Exists');
     }
   } else {
     value = await Seller.create({ ...body, ...{ mainSeller: 'admin', sellerType: 'MainSeller', sellerRole: 'admin' } });
