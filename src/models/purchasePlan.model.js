@@ -276,4 +276,85 @@ const PlanPaymentSchema = new mongoose.Schema(
 
 const PlanPayment = mongoose.model('agriplanPayment', PlanPaymentSchema);
 
-module.exports = { purchasePlan, PlanPayment };
+const ExpoAdSchema = new mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    adName: {
+      type: String,
+    },
+    fileType: {
+      type: String,
+    },
+    adImage: {
+      type: String,
+    },
+    adtype: {
+      type: String,
+    },
+    displayType: {
+      type: String,
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  { timestamps: true }
+);
+
+const ExpoAd = mongoose.model('ExpoAd', ExpoAdSchema);
+
+const AdPlanSchema = new mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    PlanName: {
+      type: String,
+    },
+    Ad: {
+      type: String,
+    },
+    Price: {
+      type: Number,
+    },
+    Offer_Price: {
+      type: Number,
+    },
+    Total_Ads: {
+      type: Number,
+    },
+    Display_Per_Day: {
+      type: Number,
+    },
+    Display_Per_Stream: {
+      type: Number,
+    },
+    Stream_Type: {
+      type: String,
+    },
+    Display_Mode: {
+      type: String,
+    },
+    Ad_Duration: {
+      type: String,
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+    archive: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
+
+const AdPlan = mongoose.model('ExpoAdPlan', AdPlanSchema);
+
+module.exports = { purchasePlan, PlanPayment, ExpoAd, AdPlan };

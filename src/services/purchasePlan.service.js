@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const bcrypt = require('bcryptjs');
 const ApiError = require('../utils/ApiError');
 const moment = require('moment');
-const { purchasePlan, PlanPayment } = require('../models/purchasePlan.model');
+const { purchasePlan, PlanPayment, ExpoAd, AdPlan } = require('../models/purchasePlan.model');
 const paymentgatway = require('./paymentgatway.service');
 const Dates = require('./Date.serive');
 const AWS = require('aws-sdk');
@@ -1459,6 +1459,11 @@ const getPurchasedPlanById = async (id) => {
 const getPurchasedPlanPayment = async () => {
   let values = await purchasePlan.aggregate([
     {
+      $match: {
+        status: { $in: ['Approved', 'Activated', 'Deactivated'] },
+      },
+    },
+    {
       $lookup: {
         from: 'sellers',
         localField: 'suppierId',
@@ -1559,6 +1564,82 @@ const get_Payment_ById = async (id) => {
   return { values, sellers };
 };
 
+const createExpoAd = async (Body) => {
+  let createAd = await ExpoAd.create(Body);
+  return createAd;
+};
+
+const uploadAdById = async (id, body) => {
+  let findAd = await ExpoAd.findById(id);
+  if (!findAd) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Not Found');
+  }
+  const s3 = new AWS.S3({
+    accessKeyId: 'AKIAZEVZUULIPMENZZH7',
+    secretAccessKey: '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',
+    region: 'ap-south-1',
+  });
+
+  let params = {
+    Bucket: 'agriexpoupload',
+    Key: body.file.originalname,
+    Body: body.file.buffer,
+  };
+  let stream;
+  return new Promise((resolve) => {
+    s3.upload(params, async (err, data) => {
+      if (err) {
+      }
+      stream = await ExpoAd.findByIdAndUpdate({ _id: id }, { adImage: data.Location }, { new: true });
+      resolve({ ad: 'success', stream: stream });
+    });
+  });
+};
+
+const getAllAds = async () => {
+  let values = await ExpoAd.find();
+  return values;
+};
+
+const createAdPlan = async (body) => {
+  let ad = await AdPlan.create(body);
+  return ad;
+};
+
+const getAll_Ad_Planes = async () => {
+  let values = await AdPlan.aggregate([
+    {
+      $match: {
+        archive: false,
+      },
+    },
+    {
+      $lookup: {
+        from: 'expoads',
+        localField: 'Ad',
+        foreignField: '_id',
+        as: 'Ads',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$Ads',
+      },
+    },
+  ]);
+  return values;
+};
+
+const updateAdPlanBtId = async (id, body) => {
+  let value = await AdPlan.findById(id);
+  if (!value) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Not Found');
+  }
+  value = await AdPlan.findByIdAndUpdate({ _id: id }, body, { new: true });
+  return value;
+};
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -1589,4 +1670,10 @@ module.exports = {
   getPurchasedPlanPayment,
   create_PlanPayment,
   get_Payment_ById,
+  createExpoAd,
+  uploadAdById,
+  getAllAds,
+  createAdPlan,
+  getAll_Ad_Planes,
+  updateAdPlanBtId,
 };
