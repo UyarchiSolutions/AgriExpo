@@ -255,6 +255,19 @@ const disabled_hosts = async (req) => {
   return host;
 };
 
+const delete_hosts = async (req) => {
+  let host = await Seller.findById(req.query.id);
+  if (!host) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Sellar Not Found');
+  }
+  if (host.mainSeller != req.userId) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Sellar Not Found');
+  }
+  await Seller.findByIdAndDelete(host._id)
+  return { message: "delete Success" };
+};
+
+
 const get_single_host = async (req) => {
   let host = await Seller.findById(req.query.id);
   if (!host) {
@@ -522,6 +535,7 @@ module.exports = {
   getsubuserAll,
   subhost_free_users,
   disabled_hosts,
+  delete_hosts,
   disabled_subuser,
   get_single_host,
   update_single_host,

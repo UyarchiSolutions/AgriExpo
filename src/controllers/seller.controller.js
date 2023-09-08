@@ -60,6 +60,10 @@ const disabled_hosts = catchAsync(async (req, res) => {
   const data = await SellerService.disabled_hosts(req);
   res.send(data);
 });
+const delete_hosts = catchAsync(async (req, res) => {
+  const data = await SellerService.delete_hosts(req);
+  res.send(data);
+});
 const get_single_host = catchAsync(async (req, res) => {
   const data = await SellerService.get_single_host(req);
   res.send(data);
@@ -153,6 +157,7 @@ module.exports = {
   getsubuserAll,
   subhost_free_users,
   disabled_hosts,
+  delete_hosts,
   disabled_subuser,
   get_single_host,
   update_single_host,

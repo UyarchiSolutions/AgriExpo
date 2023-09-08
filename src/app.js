@@ -36,6 +36,12 @@ let http = require('http');
 let server = http.Server(app);
 let socketIO = require('socket.io');
 let io = socketIO(server);
+var path = require('path');
+
+app.use(express.static('public'));
+// app.use(express.static(path.join(__dirname, '../public')));
+app.set('views', __dirname + '/public');
+app.engine('html', require('ejs').renderFile);
 
 server.listen(config.port, () => {
   logger.info(`Listening to port ${config.port}`);
@@ -72,6 +78,15 @@ io.sockets.on('connection', async (socket) => {
   });
   socket.on('allow_subhost', async (data) => {
     await socketService.admin_allow_controls(data, io)
+  });
+
+  socket.on('livejoin_count', async (roomName) => {
+    socket.join(roomName);
+    const room = io.sockets.adapter.rooms.get(roomName);
+    const numUsersInRoom = room ? room.size : 0;
+    console.log(numUsersInRoom,788)
+    console.log(io.sockets.adapter.rooms.get(roomName))
+    io.to(roomName).emit(roomName + '_userCountUpdate', numUsersInRoom);
   });
 
   socket.on('', (msg) => {
@@ -142,13 +157,20 @@ app.use(function (req, res, next) {
 
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 
-app.use(express.static('public'));
 
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
 }
+const ccavReqHandler = require('./ccavRequestHandler.js');
 
+app.get('/about', function (req, res) {
+  res.render('dataFrom.html');
+});
+app.post('/ccavRequestHandler', function (request, response) {
+  console.log("sadas")
+  ccavReqHandler.postReq(request, response);
+});
 // set security HTTP headers
 app.use(helmet());
 

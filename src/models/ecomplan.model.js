@@ -273,6 +273,27 @@ const streamPostschema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  define_QTY: {
+    type: Number,
+  },
+  define_UNIT:{
+    type: String,
+  },
+  booking_charge:{
+    type: String,
+  },
+  booking_percentage:{
+    type: Number,
+  },
+  pack_discription:{
+    type: String,
+  },
+  dispatchPincode:{
+    type: Number,
+  },
+  transaction:{
+    type: String,
+  }
 });
 
 const StreamPost = mongoose.model('Streampost', streamPostschema);
