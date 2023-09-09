@@ -27,7 +27,7 @@ exports.encrypt = function (plainText, workingKey) {
 	var cipher = crypto.createCipheriv('aes-128-cbc', hash, iv);
 	var encoded = cipher.update(plainText, 'utf8', 'hex');
 	encoded += cipher.final('hex');
-	console.log(encoded)
+	// console.log(encoded)
 	return encoded;
 };
 
