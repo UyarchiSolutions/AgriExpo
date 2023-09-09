@@ -188,6 +188,13 @@ const delete_one_Plans = async (req) => {
 
 const create_post = async (req, images) => {
   // //console.log(req.userId, "asdas", { ...req.body, ...{ suppierId: req.userId, images: images } })
+  if (images.length == 0 && (req.body.old_accept == 'true' || req.body.old_accept == true)) {
+    let old_post = await StreamPost.findById(req.body.old_post);
+    if (old_post) {
+      images = old_post.images;
+      req.body.video = old_post.video;
+    }
+  }
   const value = await StreamPost.create({
     ...req.body,
     ...{ suppierId: req.userId, images: images, pendingQTY: req.body.quantity },
@@ -8271,8 +8278,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-        ? 'RAC'
-        : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -8281,8 +8288,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+            ? 'RAC'
+            : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -12752,7 +12759,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => {};
+const get_video_link = async (req) => { };
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
@@ -13442,6 +13449,13 @@ const notify_me_toggle = async (req) => {
   return noti;
 };
 
+const get_previes_post = async (req) => {
+  console.log(req.query.id)
+  const prev = await StreamPost.findOne({ productId: req.query.id, suppierId: req.userId }).sort({ DateIso: -1 });
+
+  return prev;
+}
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -13582,4 +13596,5 @@ module.exports = {
   get_exhibitor_details,
   notify_me_toggle,
   getAllPlanes_view,
+  get_previes_post
 };

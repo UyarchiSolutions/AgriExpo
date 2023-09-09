@@ -82,11 +82,23 @@ io.sockets.on('connection', async (socket) => {
 
   socket.on('livejoin_count', async (roomName) => {
     socket.join(roomName);
-    const room = io.sockets.adapter.rooms.get(roomName);
-    const numUsersInRoom = room ? room.size : 0;
-    console.log(numUsersInRoom,788)
-    console.log(io.sockets.adapter.rooms.get(roomName))
-    io.to(roomName).emit(roomName + '_userCountUpdate', numUsersInRoom);
+    socket.on(roomName + "_room_jion", (streamId) => {
+      let room = io.sockets.adapter.rooms.get(streamId);
+      let numUsersInRoom = room ? room.size : 0;
+      console.log(numUsersInRoom, 788)
+      console.log(io.sockets.adapter.rooms.get(streamId))
+      // io.sockets.emit(streamId + '_userCountUpdate', numUsersInRoom);
+      socket.broadcast.emit(streamId + '_userCountUpdate', numUsersInRoom);
+      socket.on('disconnect', () => {
+        console.log(streamId, 2312312987)
+        room = io.sockets.adapter.rooms.get(streamId);
+        numUsersInRoom = room ? room.size : 0;
+        console.log(numUsersInRoom, 788)
+        console.log(io.sockets.adapter.rooms.get(streamId))
+        socket.broadcast.emit(streamId + '_userCountUpdate', numUsersInRoom);
+      });
+
+    });
   });
 
   socket.on('', (msg) => {
@@ -166,6 +178,14 @@ const ccavReqHandler = require('./ccavRequestHandler.js');
 
 app.get('/about', function (req, res) {
   res.render('dataFrom.html');
+});
+app.post('/success', function (req, res) {
+  console.log(req.body)
+  console.log(req,23421)
+  
+  // console.log(req)
+  res.write("<h1>hello</h1>")
+  res.end();
 });
 app.post('/ccavRequestHandler', function (request, response) {
   console.log("sadas")

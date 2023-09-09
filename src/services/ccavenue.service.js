@@ -16,7 +16,11 @@ const ccavenueConfig = {
     redirect_url: 'https://agriexpo.live',
 };
 
-
+const nodeCCAvenue = require('node-ccavenue');
+const ccav = new nodeCCAvenue.Configure({
+    merchant_id: 2742878,
+    working_key: '6EB13DAEA5810ACB66C7C95BDD4D2684',
+});
 
 const get_paymnent_url = async (aa, dd, res) => {
     // const orderAmount = 1000; // Example order amount in paise
@@ -42,41 +46,20 @@ const get_paymnent_url = async (aa, dd, res) => {
         billing_tel: '9965740303',
         billing_email: 'bharathiraja996574@gmail.com',
     };
-    const crypto = require('crypto');
-    const keys = Object.keys(paymentData).sort();
-    const values = keys.map(key => paymentData[key]);
-    const concatenatedString = values.join('|');
-    const checksum = crypto
-        .createHmac('sha256', workingKey)
-        .update(concatenatedString)
-        .digest('hex')
-        .toUpperCase();
-    paymentData.checksum = checksum;
-    let data = await axios.post(baseUrl, paymentData)
-        .then(response => {
-            console.log('Payment URL:', response.data);
-            return response.data;
-        })
-        .catch(error => {
-            // console.error('Payment Error:', error);
-            return error;
-        });
+    const orderParams = {
+        order_id: 8765432,
+        currency: 'INR',
+        amount: '100',
+        redirect_url: encodeURIComponent(`http://localhost:3000/api/redirect_url/`),
+        billing_name: 'Name of the customer',
+        // etc etc
+    };
 
-    return data;
-
-
-    // axios.post('https://secure.ccavenue.com/transaction/transaction.do', paymentData)
-    //     .then(response => {
-    //         console.log('Payment URL:', response.data);
-    //         return response.data;
-    //     })
-    //     .catch(error => {
-    //         // console.error('Payment Error:', error);
-    //         return error;
-    //     });
-
-    return paymentData;
-
+    const encryptedOrderData = ccav.getEncryptedOrder(orderParams);
+    console.log(encryptedOrderData)
+    // const encryptedData = ccav.encrypt(paymentData);
+    // console.log(encryptedData); // Proceed further
+    return encryptedOrderData;
 };
 
 

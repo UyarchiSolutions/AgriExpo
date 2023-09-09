@@ -9,14 +9,12 @@ exports.postReq = function (request, response) {
         accessCode = 'AVOI05KI17AK41IOKA',			//Put in the Access Code shared by CCAvenues.
         encRequest = '',
         formbody = '';
-    console.log(workingKey)
-    console.log(accessCode)
+    // console.log(workingKey)
+    // console.log(accessCode)
 
     request.on('data', function (data) {
         body += data;
-        console.log(data)
-        // console.log(body)
-        encRequest = ccav.encrypt(body, workingKey);
+        encRequest = ccav.encrypt(body,workingKey); 
         formbody = '<form id="nonseamless" method="post" name="redirect" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction"/> <input type="hidden" id="encRequest" name="encRequest" value="' + encRequest + '"><input type="hidden" name="access_code" id="access_code" value="' + accessCode + '"><script language="javascript">document.redirect.submit();</script></form>';
     });
 

@@ -678,6 +678,10 @@ const getAllPlanes_view = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const get_previes_post= catchAsync(async (req, res) => {
+  const data = await Ecomserive.get_previes_post(req);
+  res.send(data);
+});
 module.exports = {
   create_Plans,
   UploadProof,
@@ -810,4 +814,5 @@ module.exports = {
   get_exhibitor_details,
   notify_me_toggle,
   getAllPlanes_view,
+  get_previes_post
 };

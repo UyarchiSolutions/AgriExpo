@@ -210,4 +210,9 @@ router.route('/exhibitor/details').get(shopverify, Ecomcontroller.get_exhibitor_
 router.route('/notify/user/toggle').post(shopverify, Ecomcontroller.notify_me_toggle);
 router.route('/getAllPlanes/view').get(Ecomcontroller.getAllPlanes_view);
 
+
+
+router.route('/get/previus/post').get(SellerAuth,Ecomcontroller.get_previes_post);
+
+
 module.exports = router;
