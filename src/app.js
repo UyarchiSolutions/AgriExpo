@@ -179,7 +179,7 @@ const ccavReqHandler = require('./ccavRequestHandler.js');
 app.get('/about', function (req, res) {
   res.render('dataFrom.html');
 });
-app.post('/about', function (req, res) {
+app.post('/success', function (req, res) {
   console.log(req.body)
   console.log(req)
   res.render('dataFrom.html');
