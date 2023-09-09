@@ -86,11 +86,11 @@ const createSlot = async (body) => {
 
 const Fetch_Slot = async (query) => {
   let { Type, Duration, start, end, date } = query;
-  let TypeMatch = { active: true };
-  let DuarationMatch = { active: true };
-  let startMatch = { active: true };
-  let endMatch = { active: true };
-  let dateMatch = { active: true };
+  let TypeMatch = { _id: { $ne: null } };
+  let DuarationMatch = { _id: { $ne: null } };
+  let startMatch = { _id: { $ne: null } };
+  let endMatch = { _id: { $ne: null } };
+  let dateMatch = { _id: { $ne: null } };
 
   if (Type) {
     TypeMatch = { Type: Type };
@@ -134,7 +134,10 @@ const DeleteSlotById = async (id) => {
 };
 
 const getSlots_Minutse_Wise = async () => {
+  const currentDateTime = moment().format('YYYY-MM-DD');
+  console.log(currentDateTime);
   let value = await Slot.aggregate([
+    { $match: { date: { $gte: currentDateTime } } },
     {
       $group: {
         _id: {
