@@ -182,7 +182,8 @@ app.get('/about', function (req, res) {
 app.post('/success', function (req, res) {
   console.log(req.body)
   console.log(req)
-  res.render('dataFrom.html');
+  res.write("<h1>hello</h1>")
+  res.end();
 });
 app.post('/ccavRequestHandler', function (request, response) {
   console.log("sadas")
