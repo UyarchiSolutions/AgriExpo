@@ -181,6 +181,8 @@ app.get('/about', function (req, res) {
 });
 app.post('/success', function (req, res) {
   console.log(req.body)
+  const { encResp } = req.body;
+  console.log(encResp,87687)
   // console.log(req)
   res.write("<h1>hello</h1>")
   res.end();
