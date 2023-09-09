@@ -293,6 +293,9 @@ const streamPostschema = mongoose.Schema({
   },
   transaction:{
     type: String,
+  },
+  dispatchLocation:{
+    type: String,
   }
 });
 
