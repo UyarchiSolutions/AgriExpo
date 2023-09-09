@@ -54,6 +54,7 @@ const getStreamBySlots = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+
 module.exports = {
   SlotCreation,
   Fetch_Slot,
