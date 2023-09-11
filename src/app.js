@@ -51,7 +51,6 @@ server.listen(config.port, () => {
 
 io.sockets.on('connection', async (socket) => {
   socket.on('groupchat', async (data) => {
-    //console.log("hello", data)
     await chetModule.chat_room_create(data, io)
   });
 
@@ -138,6 +137,9 @@ io.sockets.on('connection', async (socket) => {
   socket.on('privateChat', async (data) => {
     await privatechat.recived_message(data, io, socket.handshake.auth)
   });
+  socket.on('same_user_jion_exhibitor', async (data) => {
+    await privatechat.same_user_jion_exhibitor(data, io, socket.handshake.auth)
+  });
   socket.on('joinRoom', (room) => {
     //console.log(room)
     socket.join(room);
@@ -181,8 +183,8 @@ app.get('/about', function (req, res) {
 });
 app.post('/success', function (req, res) {
   console.log(req.body)
-  console.log(req,23421)
-  
+  console.log(req, 23421)
+
   // console.log(req)
   res.write("<h1>hello</h1>")
   res.end();

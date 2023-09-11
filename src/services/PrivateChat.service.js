@@ -42,6 +42,18 @@ const recived_message = async (data, io, header) => {
     }
 };
 
+const same_user_jion_exhibitor = async (data, io, header) => {
+    // console.log(data,header);
+    const payload = jwt.verify(header.token, config.jwt.secret);
+    const userss = await Seller.findOne({ _id: payload._id, active: true });
+    // console.log(userss)
+    if (userss) {
+        console.log(data.stream + userss._id)
+        io.sockets.emit(data.stream + userss._id, { code: data.code });
+    }
+};
+
+
 
 
 const get_old_chat = async (req) => {
@@ -67,5 +79,6 @@ const get_old_chat = async (req) => {
 module.exports = {
     intraction_exhibitor,
     recived_message,
-    get_old_chat
+    get_old_chat,
+    same_user_jion_exhibitor
 }
