@@ -215,6 +215,17 @@ const purchasePlanSchema = mongoose.Schema(
     Type: {
       type: String,
     },
+    PayementStatus: {
+      type: String,
+      default: 'Pending',
+    },
+    PaidAmount: {
+      type: Number,
+      default: 0,
+    },
+    referal: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
