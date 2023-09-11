@@ -1498,12 +1498,19 @@ const getPurchasedPlanPayment = async () => {
         _id: 1,
         planName: 1,
         active: 1,
-        Price: 1,
+        Price: { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
         exhibitorName: '$Sellers.tradeName',
         paidAmount: { $ifNull: ['$Payment.Amount', 0] },
-        PendingAmount: { $ifNull: [{ $subtract: ['$Price', '$Payment.Amount'] }, '$Price'] },
+        PendingAmount: {
+          $ifNull: [
+            { $subtract: [{ $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] }, '$Payment.Amount'] },
+            { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+          ],
+        },
         Type: 1,
         status: 1,
+        Discount: { $ifNull: ['$Discount', 0] },
+        PayementStatus: 1,
       },
     },
   ]);
@@ -1511,6 +1518,15 @@ const getPurchasedPlanPayment = async () => {
 };
 
 const create_PlanPayment = async (body) => {
+  const { PlanId } = body;
+  let Plan = await purchasePlan.findById(PlanId);
+  if (!Plan) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan not found');
+  }
+  let discound = Plan.Discount ? Plan.Discount : 0;
+  let PlanPrice = parseInt(Plan.Price) - discound;
+  let PaidAmount = Plan.PaidAmount ? Plan.PaidAmount : 0;
+  let ToBePaid = PaidAmount + body.Amount;
   let finding = await PlanPayment.find().count();
   let center = '';
   if (finding < 9) {
@@ -1527,6 +1543,15 @@ const create_PlanPayment = async (body) => {
   }
   let billId = 'BID' + center + finding + 1;
   let data = { ...body, billId: billId };
+  let paid = await purchasePlan.findByIdAndUpdate({ _id: PlanId }, { PaidAmount: ToBePaid }, { new: true });
+  if (PlanPrice > 0) {
+    if (PlanPrice == paid.PaidAmount ? paid.PaidAmount : 0) {
+      paid.PayementStatus = 'FullyPaid';
+    } else {
+      paid.PayementStatus = 'PartiallyPaid';
+    }
+    await paid.save();
+  }
   const datas = await PlanPayment.create(data);
   return datas;
 };
