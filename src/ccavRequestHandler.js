@@ -15,12 +15,13 @@ exports.postReq = function (request, response) {
 
     request.on('data', function (data) {
         // console.log(data)
-        // bufferToJson = buffer.toString();
-        // bufferToJson = JSON.stringify(data)
-        // bufferToJson = JSON.parse(bufferToJson)
+        bufferToJson = data.toString();
+        bufferToJson = JSON.stringify(bufferToJson)
+        bufferToJson = JSON.parse(bufferToJson)
+        console.log(bufferToJson)
         body += data;
         encRequest = ccav.encrypt(body, workingKey);
-        console.log(encRequest)
+        // console.log(encRequest)
         formbody = '<form id="nonseamless" method="post" name="redirect" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction"/> <input type="hidden" id="encRequest" name="encRequest" value="' + encRequest + '"><input type="hidden" name="access_code" id="access_code" value="' + accessCode + '"><script language="javascript">document.redirect.submit();</script></form>';
     });
 
