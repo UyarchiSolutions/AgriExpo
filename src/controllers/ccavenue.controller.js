@@ -12,8 +12,21 @@ const get_paymnent_url = catchAsync(async (req, res) => {
     res.send(category)
 });
 
+const pay_now_encript_value = catchAsync(async (req, res) => {
+    const category = await ccavenue.pay_now_encript_value(req);
+    // res.writeHeader(200, { "Content-Type": "text/html" });
+    // res.write(category)
+    // res.end()
+    // console.log(category)
+    res.writeHeader(200, { "Content-Type": "text/html" });
+    res.write(category)
+    res.end()
+});
+
+
 
 
 module.exports = {
     get_paymnent_url,
+    pay_now_encript_value
 }
