@@ -61,23 +61,7 @@ const pay_now_encript_value = async (req) => {
     // console.log(req.body)
     // formbody = '<h1>hello<h1>';
     const merchantId = '2742878';
-    // const paymentData = {
-    //     merchant_id: merchantId,
-    //     order_id: orderId,
-    //     amount: 100,
-    //     currency: 'INR',
-    //     redirect_url: 'https://agriexpo.click/',
-    //     cancel_url: 'https://agriexpo.live/',
-    //     language: 'EN',
-    //     billing_name: 'John Doe',
-    //     billing_address: '123 Main St',
-    //     billing_city: 'chennai',
-    //     billing_state: 'tamilnadu',
-    //     billing_zip: '600017',
-    //     billing_country: 'India',
-    //     billing_tel: '9965740303',
-    //     billing_email: 'bharathiraja996574@gmail.com',
-    // };
+
     const data = {
         merchant_id: merchantId,
         order_id: orderId,
@@ -86,31 +70,30 @@ const pay_now_encript_value = async (req) => {
         redirect_url: "https://agriexpo.click/success",
         cancel_url: "https://agriexpo.click/success",
         language: "EN",
-        billing_name: "Peter",
-        billing_address: "Santacruz",
-        billing_city: "Mumbai",
-        billing_state: "MH",
-        billing_zip: "400054",
-        billing_country: "India",
-        billing_tel: "9876543210",
-        billing_email: "testing@domain.com",
-        delivery_name: "Sam",
-        delivery_address: "Vile Parle",
-        delivery_city: "Mumbai",
-        delivery_state: "Maharashtra",
-        delivery_zip: "400038",
-        delivery_country: "India",
-        delivery_tel: "0123456789",
-        merchant_param1: "additional Info.",
-        merchant_param2: "additional Info.",
-        merchant_param3: "additional Info.",
-        merchant_param4: "additional Info.",
-        merchant_param5: "additional Info.",
-        promo_code: "",
-        customer_identifier: ""
+        // billing_name: "Peter",
+        // billing_address: "Santacruz",
+        // billing_city: "Mumbai",
+        // billing_state: "MH",
+        // billing_zip: "400054",
+        // billing_country: "India",
+        // billing_tel: "9876543210",
+        // billing_email: "testing@domain.com",
+        // delivery_name: "Sam",
+        // delivery_address: "Vile Parle",
+        // delivery_city: "Mumbai",
+        // delivery_state: "Maharashtra",
+        // delivery_zip: "400038",
+        // delivery_country: "India",
+        // delivery_tel: "0123456789",
+        // merchant_param1: "additional Info.",
+        // merchant_param2: "additional Info.",
+        // merchant_param3: "additional Info.",
+        // merchant_param4: "additional Info.",
+        // merchant_param5: "additional Info.",
+        // promo_code: "",
+        // customer_identifier: ""
     };
     const queryString = objectToQueryString(data);
-    // console.log(queryString)
     const bufferData = Buffer.from(queryString, 'utf-8');
     encRequest = ccav.encrypt(bufferData, workingKey);
     formbody = '<form id="nonseamless" method="post" name="redirect" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction"/> <input type="hidden" id="encRequest" name="encRequest" value="' + encRequest + '"><input type="hidden" name="access_code" id="access_code" value="' + accessCode + '"><button>pay</button><script language="javascript">document.redirect.submit();</script></form>';

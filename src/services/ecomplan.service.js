@@ -13456,6 +13456,16 @@ const get_previes_post = async (req) => {
   return prev;
 }
 
+const get_address_log = async (req) => {
+  let { lat, long } = req.query;
+  lat = parseFloat(lat);
+  long = parseFloat(long);
+  let apikey = 'AIzaSyARM6-Qr_hsR53GExv9Gmu9EtFTV5ZuDX4';
+  let values = await Axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apikey}`);
+  return values.data.results;
+}
+
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -13596,5 +13606,6 @@ module.exports = {
   get_exhibitor_details,
   notify_me_toggle,
   getAllPlanes_view,
-  get_previes_post
+  get_previes_post,
+  get_address_log
 };

@@ -212,7 +212,10 @@ router.route('/getAllPlanes/view').get(Ecomcontroller.getAllPlanes_view);
 
 
 
-router.route('/get/previus/post').get(SellerAuth,Ecomcontroller.get_previes_post);
+router.route('/get/previus/post').get(SellerAuth, Ecomcontroller.get_previes_post);
+
+router.route('/get/address/lat/log').get(SellerAuth, Ecomcontroller.get_address_log);
+
 
 
 module.exports = router;
