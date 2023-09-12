@@ -276,26 +276,32 @@ const streamPostschema = mongoose.Schema({
   define_QTY: {
     type: Number,
   },
-  define_UNIT:{
+  define_UNIT: {
     type: String,
   },
-  booking_charge:{
+  booking_charge: {
     type: String,
   },
-  booking_percentage:{
+  booking_percentage: {
     type: Number,
   },
-  pack_discription:{
+  pack_discription: {
     type: String,
   },
-  dispatchPincode:{
+  dispatchPincode: {
     type: Number,
   },
-  transaction:{
+  transaction: {
     type: String,
   },
-  dispatchLocation:{
+  dispatchLocation: {
     type: String,
+  },
+  latitude: {
+    type: Number,
+  },
+  longitude: {
+    type: Number,
   }
 });
 
