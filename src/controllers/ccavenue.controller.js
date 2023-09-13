@@ -18,9 +18,11 @@ const pay_now_encript_value = catchAsync(async (req, res) => {
     // res.write(category)
     // res.end()
     // console.log(category)
-    res.writeHeader(200, { "Content-Type": "text/html" });
-    res.write(category)
-    res.end()
+    // res.writeHeader(200, { "Content-Type": "text/html" });
+    // res.write(category)
+    // res.end()
+    res.send(category)
+
 });
 
 
