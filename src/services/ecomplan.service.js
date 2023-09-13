@@ -13072,6 +13072,31 @@ const completed_show_vidio = async (req) => {
 
   return { message: 'success' };
 };
+const completed_show_vidio_admin = async (req) => {
+  let userID = req.userId;
+  let { stream, show } = req.body;
+  let streamss = await Streamrequest.findById(stream);
+  if (!streamss) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Stream Not Found');
+  }
+  if (show == 'upload') {
+    streamss.showLink = streamss.uploadLink;
+    streamss.selectvideo = show;
+    streamss.show_completd = true;
+    streamss.save();
+  } else {
+    let temp = await tempTokenModel.findById(show);
+    if (!temp) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'recored Not Found');
+    }
+    streamss.showLink = 'https://streamingupload.s3.ap-south-1.amazonaws.com/' + temp.videoLink_mp4;
+    streamss.selectvideo = show;
+    streamss.show_completd = true;
+    streamss.save();
+  }
+
+  return { message: 'success' };
+};
 
 const visitor_save_product = async (req) => {
   let userID = req.shopId;
@@ -13630,6 +13655,7 @@ module.exports = {
   get_stream_by_user,
   getStreambyId,
   completed_show_vidio,
+  completed_show_vidio_admin,
   visitor_save_product,
   visitor_interested_product,
   getIntrested_product,

@@ -632,6 +632,11 @@ const completed_show_vidio = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const completed_show_vidio_admin= catchAsync(async (req, res) => {
+  const data = await Ecomserive.completed_show_vidio_admin(req);
+  res.send(data);
+});
+
 const visitor_save_product = catchAsync(async (req, res) => {
   const data = await Ecomserive.visitor_save_product(req);
   res.send(data);
@@ -812,6 +817,7 @@ module.exports = {
   get_stream_by_user,
   getStreambyId,
   completed_show_vidio,
+  completed_show_vidio_admin,
   visitor_save_product,
   visitor_interested_product,
   getIntrested_product,
