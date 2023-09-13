@@ -53,6 +53,7 @@ const get_paymnent_url = async (aa, dd, res) => {
 
 
 const pay_now_encript_value = async (req) => {
+    // req.query.amount
     var body = '',
         workingKey = 'DC4FE2F109D4E40DA189C229CCAC2DF0',	//Put in the 32-Bit key shared by CCAvenues.
         accessCode = 'AVVK05KI18AW29KVWA',			//Put in the Access Code shared by CCAvenues.
@@ -66,7 +67,7 @@ const pay_now_encript_value = async (req) => {
         merchant_id: merchantId,
         order_id: orderId,
         currency: "INR",
-        amount: "1.00",
+        amount: req.query.amount,
         redirect_url: "https://agriexpo.click/success",
         cancel_url: "https://agriexpo.click/success",
         language: "EN",
