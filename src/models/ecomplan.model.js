@@ -507,6 +507,12 @@ const streamRequestschema = mongoose.Schema({
   streamPlanId: {
     type: String,
   },
+  uploatedBy: {
+    type: String,
+  },
+  updatedBy_id: {
+    type: String,
+  }
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);

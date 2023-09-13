@@ -613,7 +613,10 @@ const upload_s3_stream_video = catchAsync(async (req, res) => {
   const data = await Ecomserive.upload_s3_stream_video(req);
   res.send(data);
 });
-
+const upload_s3_stream_video_admin= catchAsync(async (req, res) => {
+  const data = await Ecomserive.upload_s3_stream_video_admin(req);
+  res.send(data);
+});
 const get_stream_by_user = catchAsync(async (req, res) => {
   const data = await Ecomserive.get_stream_by_user(req);
   res.send(data);
@@ -803,6 +806,7 @@ module.exports = {
   get_Live_Streams,
   update_pump_views,
   upload_s3_stream_video,
+  upload_s3_stream_video_admin,
   only_chat_join,
   only_chat_get,
   get_stream_by_user,

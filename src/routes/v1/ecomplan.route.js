@@ -191,9 +191,8 @@ router.route('/get/Live/Stream').get(Ecomcontroller.get_Live_Streams);
 router.route('/update/pump/views').post(Ecomcontroller.update_pump_views);
 
 router.route('/upload/stream/video').post(authorization, upload_s3.single('video'), Ecomcontroller.upload_s3_stream_video);
-router
-  .route('/upload/stream/video/byuser')
-  .post(SellerAuth, upload_s3.single('video'), Ecomcontroller.upload_s3_stream_video);
+router.route('/upload/stream/video/byuser').post(SellerAuth, upload_s3.single('video'), Ecomcontroller.upload_s3_stream_video);
+router.route('/upload/stream/video/admin').post(authorization, upload_s3.single('video'), Ecomcontroller.upload_s3_stream_video_admin);
 router.route('/get/stream/by/user').get(SellerAuth, Ecomcontroller.get_stream_by_user);
 router.route('/getStreambyId/:id').get(Ecomcontroller.getStreambyId);
 

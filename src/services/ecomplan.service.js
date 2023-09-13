@@ -28,7 +28,7 @@ const { findById } = require('../models/token.model');
 const { Shop } = require('../models/b2b.ShopClone.model');
 
 const agoraToken = require('./liveStreaming/AgoraAppId.service');
-const Axios=require('axios');
+const Axios = require('axios');
 const { UsageAppID } = require('../models/liveStreaming/AgoraAppId.model');
 const S3video = require('./S3video.service');
 const { Seller } = require('../models/seller.models');
@@ -12969,7 +12969,40 @@ const upload_s3_stream_video = async (req) => {
     stream.uploadLink = up.Location;
     stream.uploadDate = moment();
     stream.uploadStatus = 'upload';
+    stream.uploatedBy = "Me";
+    stream.updatedBy_id = req.userId;
+    stream.save();
+  }
+  fileupload.unlink(req.file.path, (err) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+  });
+  return stream;
+};
+const upload_s3_stream_video_admin = async (req) => {
+  console.log(req.file);
+  let streamId = req.query.id;
+  let stream = await Streamrequest.findById(streamId);
 
+  if (!stream) {
+    fileupload.unlink(req.file.path, (err) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+    });
+    throw new ApiError(httpStatus.NOT_FOUND, 'Not Found stream');
+  }
+  let up = await S3video.videoupload(req.file, 'upload/admin/upload', 'mp4');
+  console.log(up);
+  if (up) {
+    stream.uploadLink = up.Location;
+    stream.uploadDate = moment();
+    stream.uploadStatus = 'upload';
+    stream.uploatedBy = "Admin";
+    stream.updatedBy_id = req.userId;
     stream.save();
   }
   fileupload.unlink(req.file.path, (err) => {
@@ -13591,6 +13624,7 @@ module.exports = {
   get_Live_Streams,
   update_pump_views,
   upload_s3_stream_video,
+  upload_s3_stream_video_admin,
   only_chat_join,
   only_chat_get,
   get_stream_by_user,
