@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const ApiError = require('../../utils/ApiError');
 const moment = require('moment');
 const { AgoraAppId, UsageAppID } = require('../../models/liveStreaming/AgoraAppId.model');
+const Agora = require('agora-access-token');
 
 
 const InsertAppId = async (req) => {
@@ -176,6 +177,38 @@ const get_token_usage_demo = async (req) => {
 
   ])
 }
+const generateUid = async (req) => {
+  const length = 5;
+  const randomNo = Math.floor(Math.pow(10, length - 1) + Math.random() * 9 * Math.pow(10, length - 1));
+  return randomNo;
+};
+
+
+const test_appid = async (req) => {
+  let id = req.query.id;
+  let appId = await AgoraAppId.findById(id)
+  const uid = await generateUid();
+  const role = req.body.isPublisher ? Agora.RtcRole.PUBLISHER : Agora.RtcRole.SUBSCRIBER;
+  const currentTimestamp = moment().add(30, 'seconds');
+  const expirationTimestamp = currentTimestamp / 1000
+  const token = await geenerate_rtc_token(id, uid, role, expirationTimestamp, appId._id);
+  appId.testToken = token;
+  appId.testUD = uid;
+  appId.endTime = currentTimestamp;
+  return appId;
+}
+const geenerate_rtc_token = async (chennel, uid, role, expirationTimestamp, agoraID) => {
+  let agoraToken = await AgoraAppId.findById(agoraID)
+  return Agora.RtcTokenBuilder.buildTokenWithUid(agoraToken.appID.replace(/\s/g, ''), agoraToken.appCertificate.replace(/\s/g, ''), chennel, uid, role, expirationTimestamp);
+};
+
+
+const start_cloud_record = async () => {
+  const role = Agora.RtcRole.SUBSCRIBER;
+}
+
+
+
 module.exports = {
   InsertAppId,
   InsertAget_app_id,
@@ -185,5 +218,6 @@ module.exports = {
   get_city_list,
   token_assign,
   get_token_usage_agri,
-  get_token_usage_demo
+  get_token_usage_demo,
+  test_appid
 };
