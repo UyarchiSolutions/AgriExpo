@@ -52,15 +52,24 @@ router.route('/start/raicehands/admin').post(authorization, generateToken.start_
 
 
 router.route('/start/raicehands').post(SellerAuth, generateToken.start_rice_user_hands).get(SellerAuth, generateToken.get_raise_hands);
-router.route('/raise/request').post(shopverify, generateToken.raise_request);
 router.route('/raise/appove').post(SellerAuth, generateToken.approve_request);
 router.route('/raise/reject').post(SellerAuth, generateToken.reject_request);
 router.route('/raise/pending').post(SellerAuth, generateToken.pending_request);
+router.route('/get/raise/hand/user').post(SellerAuth, generateToken.get_raise_hand_user);
+
+
 router.route('/jion/now/live').post(shopverify, generateToken.jion_now_live);
 router.route('/end/raise_hands').post(shopverify, generateToken.pending_request);
-
-router.route('/get/raise/hand/user').post(SellerAuth, generateToken.get_raise_hand_user);
+router.route('/raise/request').post(shopverify, generateToken.raise_request);
 router.route('/get/raise/visitor').post(shopverify, generateToken.get_raise_hand_user);
+
+
+// admin
+router.route('/raise/appove/admin').post(authorization, generateToken.approve_request);
+router.route('/raise/reject/admin').post(authorization, generateToken.reject_request);
+router.route('/raise/pending/admin').post(authorization, generateToken.pending_request);
+router.route('/get/raise/hand/user/admin').post(authorization, generateToken.get_raise_hand_user);
+
 
 
 module.exports = router;
