@@ -49,6 +49,7 @@ exports.success_recive = function (request, response) {
         console.log(ccavPOST)
         var encryption = ccavPOST.encResp;
         ccavResponse = ccav.decrypt(encryption, workingKey);
+        console.log(ccavResponse)
     });
 
     request.on('end', function () {
