@@ -877,7 +877,7 @@ const getPlanDetailsByUser = async (userId) => {
 const getPlanes_Request_Streams = async (userId) => {
   let val = await purchasePlan.aggregate([
     {
-      $match: { status: 'Approved', suppierId: userId },
+      $match: { status: { $in: ['Activated'] }, suppierId: userId },
     },
     {
       $lookup: {
