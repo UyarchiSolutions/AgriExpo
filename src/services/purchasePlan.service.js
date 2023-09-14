@@ -749,7 +749,7 @@ const Approve_Reject = async (id, body) => {
 const getPlanDetailsByUser = async (userId) => {
   let val = await purchasePlan.aggregate([
     {
-      $match: { status: 'Approved', suppierId: userId },
+      $match: { status: { $in: ['Activated', 'Deactivated'] }, suppierId: userId },
     },
     {
       $lookup: {
