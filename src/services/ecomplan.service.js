@@ -28,7 +28,7 @@ const { findById } = require('../models/token.model');
 const { Shop } = require('../models/b2b.ShopClone.model');
 
 const agoraToken = require('./liveStreaming/AgoraAppId.service');
-
+const Axios = require('axios');
 const { UsageAppID } = require('../models/liveStreaming/AgoraAppId.model');
 const S3video = require('./S3video.service');
 const { Seller } = require('../models/seller.models');
@@ -12969,7 +12969,40 @@ const upload_s3_stream_video = async (req) => {
     stream.uploadLink = up.Location;
     stream.uploadDate = moment();
     stream.uploadStatus = 'upload';
+    stream.uploatedBy = "Me";
+    stream.updatedBy_id = req.userId;
+    stream.save();
+  }
+  fileupload.unlink(req.file.path, (err) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+  });
+  return stream;
+};
+const upload_s3_stream_video_admin = async (req) => {
+  console.log(req.file);
+  let streamId = req.query.id;
+  let stream = await Streamrequest.findById(streamId);
 
+  if (!stream) {
+    fileupload.unlink(req.file.path, (err) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+    });
+    throw new ApiError(httpStatus.NOT_FOUND, 'Not Found stream');
+  }
+  let up = await S3video.videoupload(req.file, 'upload/admin/upload', 'mp4');
+  console.log(up);
+  if (up) {
+    stream.uploadLink = up.Location;
+    stream.uploadDate = moment();
+    stream.uploadStatus = 'upload';
+    stream.uploatedBy = "Admin";
+    stream.updatedBy_id = req.userId;
     stream.save();
   }
   fileupload.unlink(req.file.path, (err) => {
@@ -13021,6 +13054,31 @@ const completed_show_vidio = async (req) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'illegal to Access Stream');
   }
 
+  if (show == 'upload') {
+    streamss.showLink = streamss.uploadLink;
+    streamss.selectvideo = show;
+    streamss.show_completd = true;
+    streamss.save();
+  } else {
+    let temp = await tempTokenModel.findById(show);
+    if (!temp) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'recored Not Found');
+    }
+    streamss.showLink = 'https://streamingupload.s3.ap-south-1.amazonaws.com/' + temp.videoLink_mp4;
+    streamss.selectvideo = show;
+    streamss.show_completd = true;
+    streamss.save();
+  }
+
+  return { message: 'success' };
+};
+const completed_show_vidio_admin = async (req) => {
+  let userID = req.userId;
+  let { stream, show } = req.body;
+  let streamss = await Streamrequest.findById(stream);
+  if (!streamss) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Stream Not Found');
+  }
   if (show == 'upload') {
     streamss.showLink = streamss.uploadLink;
     streamss.selectvideo = show;
@@ -13456,6 +13514,16 @@ const get_previes_post = async (req) => {
   return prev;
 }
 
+const get_address_log = async (req) => {
+  let { lat, long } = req.query;
+  lat = parseFloat(lat);
+  long = parseFloat(long);
+  let apikey = 'AIzaSyARM6-Qr_hsR53GExv9Gmu9EtFTV5ZuDX4';
+  let values = await Axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apikey}`);
+  return values.data.results;
+}
+
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -13581,11 +13649,13 @@ module.exports = {
   get_Live_Streams,
   update_pump_views,
   upload_s3_stream_video,
+  upload_s3_stream_video_admin,
   only_chat_join,
   only_chat_get,
   get_stream_by_user,
   getStreambyId,
   completed_show_vidio,
+  completed_show_vidio_admin,
   visitor_save_product,
   visitor_interested_product,
   getIntrested_product,
@@ -13596,5 +13666,6 @@ module.exports = {
   get_exhibitor_details,
   notify_me_toggle,
   getAllPlanes_view,
-  get_previes_post
+  get_previes_post,
+  get_address_log
 };

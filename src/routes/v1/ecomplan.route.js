@@ -191,13 +191,13 @@ router.route('/get/Live/Stream').get(Ecomcontroller.get_Live_Streams);
 router.route('/update/pump/views').post(Ecomcontroller.update_pump_views);
 
 router.route('/upload/stream/video').post(authorization, upload_s3.single('video'), Ecomcontroller.upload_s3_stream_video);
-router
-  .route('/upload/stream/video/byuser')
-  .post(SellerAuth, upload_s3.single('video'), Ecomcontroller.upload_s3_stream_video);
+router.route('/upload/stream/video/byuser').post(SellerAuth, upload_s3.single('video'), Ecomcontroller.upload_s3_stream_video);
+router.route('/upload/stream/video/admin').post(authorization, upload_s3.single('video'), Ecomcontroller.upload_s3_stream_video_admin);
 router.route('/get/stream/by/user').get(SellerAuth, Ecomcontroller.get_stream_by_user);
 router.route('/getStreambyId/:id').get(Ecomcontroller.getStreambyId);
 
 router.route('/completed/show/visitor/video').put(SellerAuth, Ecomcontroller.completed_show_vidio);
+router.route('/completed/show/visitor/video/admin').put(authorization, Ecomcontroller.completed_show_vidio_admin);
 router.route('/visitor/saved').post(shopverify, Ecomcontroller.visitor_save_product);
 router.route('/visitor/interested').post(shopverify, Ecomcontroller.visitor_interested_product);
 router.route('/getIntrested/product/:id').get(Ecomcontroller.getIntrested_product);
@@ -212,7 +212,10 @@ router.route('/getAllPlanes/view').get(Ecomcontroller.getAllPlanes_view);
 
 
 
-router.route('/get/previus/post').get(SellerAuth,Ecomcontroller.get_previes_post);
+router.route('/get/previus/post').get(SellerAuth, Ecomcontroller.get_previes_post);
+
+router.route('/get/address/lat/log').get(SellerAuth, Ecomcontroller.get_address_log);
+
 
 
 module.exports = router;

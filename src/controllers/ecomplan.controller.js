@@ -613,7 +613,10 @@ const upload_s3_stream_video = catchAsync(async (req, res) => {
   const data = await Ecomserive.upload_s3_stream_video(req);
   res.send(data);
 });
-
+const upload_s3_stream_video_admin= catchAsync(async (req, res) => {
+  const data = await Ecomserive.upload_s3_stream_video_admin(req);
+  res.send(data);
+});
 const get_stream_by_user = catchAsync(async (req, res) => {
   const data = await Ecomserive.get_stream_by_user(req);
   res.send(data);
@@ -626,6 +629,11 @@ const getStreambyId = catchAsync(async (req, res) => {
 
 const completed_show_vidio = catchAsync(async (req, res) => {
   const data = await Ecomserive.completed_show_vidio(req);
+  res.send(data);
+});
+
+const completed_show_vidio_admin= catchAsync(async (req, res) => {
+  const data = await Ecomserive.completed_show_vidio_admin(req);
   res.send(data);
 });
 
@@ -680,6 +688,10 @@ const getAllPlanes_view = catchAsync(async (req, res) => {
 
 const get_previes_post= catchAsync(async (req, res) => {
   const data = await Ecomserive.get_previes_post(req);
+  res.send(data);
+});
+const get_address_log= catchAsync(async (req, res) => {
+  const data = await Ecomserive.get_address_log(req);
   res.send(data);
 });
 module.exports = {
@@ -799,11 +811,13 @@ module.exports = {
   get_Live_Streams,
   update_pump_views,
   upload_s3_stream_video,
+  upload_s3_stream_video_admin,
   only_chat_join,
   only_chat_get,
   get_stream_by_user,
   getStreambyId,
   completed_show_vidio,
+  completed_show_vidio_admin,
   visitor_save_product,
   visitor_interested_product,
   getIntrested_product,
@@ -814,5 +828,6 @@ module.exports = {
   get_exhibitor_details,
   notify_me_toggle,
   getAllPlanes_view,
-  get_previes_post
+  get_previes_post,
+  get_address_log
 };
