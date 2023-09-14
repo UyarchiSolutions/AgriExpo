@@ -1736,6 +1736,54 @@ const start_rice_user_hands = async (req) => {
 
 }
 
+const start_rice_user_hands_admin = async (req) => {
+  let streamId = req.body.stream;
+  let stream = await Streamrequest.findById(streamId);
+  let supplierId = stream.suppierId;
+  if (!stream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
+  }
+  let value = await tempTokenModel.findOne({ chennel: streamId, type: "raiseHands" });
+  //console.log(value)
+  if (!value) {
+    const uid = await generateUid();
+    const role = req.body.isPublisher ? Agora.RtcRole.PUBLISHER : Agora.RtcRole.SUBSCRIBER;
+    const expirationTimestamp = stream.endTime / 1000;
+    value = await tempTokenModel.create({
+      ...req.body,
+      ...{
+        date: moment().format('YYYY-MM-DD'),
+        time: moment().format('HHMMSS'),
+        supplierId: supplierId,
+        streamId: streamId,
+        created: moment(),
+        Uid: uid,
+        created_num: new Date(new Date(moment().format('YYYY-MM-DD') + ' ' + moment().format('HH:mm:ss'))).getTime(),
+        expDate: expirationTimestamp * 1000,
+        Duration: stream.Durationm,
+        type: 'raiseHands',
+      },
+    });
+    const token = await geenerate_rtc_token(streamId, uid, role, expirationTimestamp, stream.agoraID);
+    value.token = token;
+    value.chennel = streamId;
+    // value.save();
+
+  }
+  stream.raise_hands = !stream.raise_hands;
+  stream.save();
+  value.raise_hands = stream.raise_hands;
+  value.save();
+  req.io.emit(streamId + '_raise_hands_start', { raise_hands: stream.raise_hands });
+
+  if (!stream.raise_hands && stream.current_raise != null) {
+    await pending_request_switch(req, stream.current_raise);
+  }
+  return value;
+
+
+}
+
 const pending_request_switch = async (req, raiseid) => {
   let raise = await RaiseUsers.findById(raiseid);
   if (!raise) {
@@ -1751,6 +1799,70 @@ const pending_request_switch = async (req, raiseid) => {
 }
 
 const get_raise_hands = async (req) => {
+
+  let streamId = req.query.stream;
+  let find = await Streamrequest.aggregate([
+    { $match: { $and: [{ _id: { $eq: streamId } }] } },
+    {
+      $lookup: {
+        from: 'raiseusers',
+        localField: '_id',
+        foreignField: 'streamId',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'b2bshopclones',
+              localField: 'shopId',
+              foreignField: '_id',
+              as: 'shops',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$shops',
+            },
+          },
+          {
+            $addFields: {
+              raised_count: { $cond: { if: { $eq: ['$status', 'end'] }, then: 0, else: "$raised_count" } }
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              SName: "$shops.SName",
+              mobile: "$shops.mobile",
+              address: "$shops.address",
+              country: "$shops.country",
+              state: "$shops.state",
+              companyName: "$shops.companyName",
+              designation: "$shops.designation",
+              streamId: 1,
+              shopId: 1,
+              tempID: 1,
+              status: 1,
+              createdAt: 1,
+              raised_count: 1,
+              already_joined: 1,
+              updatedAt: 1,
+              dateISO: 1
+            }
+          }
+        ],
+        as: 'raiseusers',
+      },
+    },
+
+  ])
+  if (find.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
+  }
+
+  return find[0];
+}
+
+const get_raise_hands_admin = async (req) => {
 
   let streamId = req.query.stream;
   let find = await Streamrequest.aggregate([
@@ -2081,5 +2193,9 @@ module.exports = {
   reject_request,
   pending_request,
   jion_now_live,
-  get_raise_hand_user
+  get_raise_hand_user,
+
+  // raise Hands
+  start_rice_user_hands_admin,
+  get_raise_hands_admin
 };

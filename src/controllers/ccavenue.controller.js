@@ -26,9 +26,15 @@ const pay_now_encript_value = catchAsync(async (req, res) => {
 });
 
 
+const nearby_value = catchAsync(async (req, res) => {
+    const category = await ccavenue.placesNearby(req.shopId, req.body, res);
+    res.send(category)
+});
+
 
 
 module.exports = {
     get_paymnent_url,
-    pay_now_encript_value
+    pay_now_encript_value,
+    nearby_value
 }

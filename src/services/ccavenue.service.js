@@ -112,8 +112,33 @@ function objectToQueryString(obj) {
 
 
 
+
+const { google } = require("googleapis");
+
+const places = google.places({
+    version: "v1",
+    apiKey: "AIzaSyARM6-Qr_hsR53GExv9Gmu9EtFTV5ZuDX4",
+});
+
+const nearby_value = async (req) => {
+    const location = {
+        lat: 12.9716,
+        lng: 77.5946,
+      };
+    
+      const request = {
+        location: location,
+        radius: 10000,
+        type: "locality",
+      };
+    
+      const response = await places.nearbySearch(request);
+    
+      console.log(response.results);
+}
 module.exports = {
     get_paymnent_url,
-    pay_now_encript_value
+    pay_now_encript_value,
+    nearby_value
 }
 

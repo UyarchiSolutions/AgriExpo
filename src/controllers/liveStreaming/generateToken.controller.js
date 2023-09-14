@@ -162,12 +162,21 @@ const start_rice_user_hands = catchAsync(async (req, res) => {
   let tokens = await generateTokenService.start_rice_user_hands(req);
   res.status(httpStatus.CREATED).send(tokens);
 });
-
+const start_rice_user_hands_admin = catchAsync(async (req, res) => {
+  let tokens = await generateTokenService.start_rice_user_hands_admin(req);
+  res.status(httpStatus.CREATED).send(tokens);
+});
 
 const get_raise_hands = catchAsync(async (req, res) => {
   let tokens = await generateTokenService.get_raise_hands(req);
   res.status(httpStatus.CREATED).send(tokens);
 });
+
+const get_raise_hands_admin = catchAsync(async (req, res) => {
+  let tokens = await generateTokenService.get_raise_hands_admin(req);
+  res.status(httpStatus.CREATED).send(tokens);
+});
+
 
 const raise_request = catchAsync(async (req, res) => {
   let tokens = await generateTokenService.raise_request(req);
@@ -233,5 +242,10 @@ module.exports = {
   reject_request,
   pending_request,
   jion_now_live,
-  get_raise_hand_user
+  get_raise_hand_user,
+
+
+  // raise Hands admin
+  start_rice_user_hands_admin,
+  get_raise_hands_admin
 };
