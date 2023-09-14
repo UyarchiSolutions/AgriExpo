@@ -24,7 +24,6 @@ const InsertAget_app_id = async (req) => {
   return appId;
 
 }
-
 const get_all_token = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
   let appId = await AgoraAppId.aggregate([
@@ -74,40 +73,58 @@ const get_city_list = async (req) => {
 }
 
 const token_assign = async (minutes, streamID, streamType) => {
-
+  // 
   let minimum = 9500 - parseInt(minutes);
   console.log(minimum)
-  let token = await AgoraAppId.find({ expired: false, userMinutes: { $lte: minimum } }).limit(10);
+  let token = await AgoraAppId.find({ expired: false, userMinutes: { $lte: minimum }, type: { $eq: "paid" } }).limit(10);
+  let paid = await AgoraAppId.findById('33ee26ed-c087-4e5f-b11d-dc0972e2bd36');
   return new Promise(async (resolve) => {
-    for (let i = 0; i < token.length; i++) {
-      // console.log(element)
-      let element = token[i];
-      let usedMinutes = element.userMinutes ? element.userMinutes : 0;
-      if (usedMinutes + minutes < 9500) {
-        let vals = await UsageAppID.create({
-          dateISO: moment(),
-          date: moment().format('YYYY-MM-DD'),
-          streamID: streamID,
-          appID: element._id,
-          minutes: minutes,
-          streamType: streamType
-        })
-        element.userMinutes = usedMinutes + minutes;
+    if (minutes < 9500) {
+      for (let i = 0; i < token.length; i++) {
+        // console.log(element)
+        let element = token[i];
+        let usedMinutes = element.userMinutes ? element.userMinutes : 0;
+        if (usedMinutes + minutes < 9500) {
+          let vals = await UsageAppID.create({
+            dateISO: moment(),
+            date: moment().format('YYYY-MM-DD'),
+            streamID: streamID,
+            appID: element._id,
+            minutes: minutes,
+            streamType: streamType
+          })
+          element.userMinutes = usedMinutes + minutes;
+          element.save();
+          resolve({ vals, element });
+          if (9450 < element.userMinutes) {
+            element.expired = true;
+          }
+          break;
+        }
+        else {
+          if (9400 < usedMinutes) {
+            element.expired = true;
+          }
+        }
         element.save();
-        resolve({ vals, element });
-        if (9450 < element.userMinutes) {
-          element.expired = true;
-        }
-        break;
       }
-      else {
-        if (9400 < usedMinutes) {
-          element.expired = true;
-        }
-      }
-      element.save();
+    }
+    else {
+      let usedMinutes = paid.userMinutes ? paid.userMinutes : 0;
+      let vals = await UsageAppID.create({
+        dateISO: moment(),
+        date: moment().format('YYYY-MM-DD'),
+        streamID: streamID,
+        appID: paid._id,
+        minutes: minutes,
+        streamType: streamType
+      })
+      paid.userMinutes = usedMinutes + minutes;
+      paid.save();
+      resolve({ vals, element: paid });
     }
   });
+
 }
 
 const get_token_usage_agri = async (req) => {
