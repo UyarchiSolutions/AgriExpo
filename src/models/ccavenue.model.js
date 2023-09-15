@@ -107,7 +107,12 @@ const ccavenueSchema = mongoose.Schema({
         type: Boolean,
         default: false,
     },
-});
+    encRequest: {
+        type: String,
+    }
+},
+    { timestamps: true }
+);
 ccavenueSchema.plugin(toJSON);
 ccavenueSchema.plugin(paginate);
 const ccavenue_paymnet = mongoose.model('ccavanuepayment', ccavenueSchema);
