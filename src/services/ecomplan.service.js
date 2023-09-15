@@ -276,12 +276,16 @@ const get_all_Post = async (req) => {
 };
 
 const get_all_post_transation = async (req) => {
-  let transaction
-  if (req.query.transaction == 'With Transaction') {
-    transaction = req.query.transaction = 'With'
+  let purchsae = await purchasePlan.findById(req.query.id);
+  if (!purchsae) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Plan Not Found');
   }
-  if (req.query.transaction == 'Without Transaction') {
-    transaction = req.query.transaction = 'Without'
+  let transaction = 'null'
+  if (purchsae.transaction == 'With Transaction') {
+    transaction = 'With'
+  }
+  if (purchsae.transaction == 'Without Transaction') {
+    transaction = 'Without'
   }
   const value = await StreamPost.aggregate([
     { $match: { $and: [{ suppierId: { $eq: req.userId } }, { isUsed: { $eq: false } }, { transaction: { $eq: transaction } }] } },
