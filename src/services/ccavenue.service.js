@@ -71,6 +71,7 @@ const pay_now_encript_value = async (req) => {
         redirect_url: "https://agriexpo.click/success",
         cancel_url: "https://agriexpo.click/success",
         language: "EN",
+        my_redirect_url: "https://agriexpo.click/"
         // billing_name: "Peter",
         // billing_address: "Santacruz",
         // billing_city: "Mumbai",
@@ -97,10 +98,10 @@ const pay_now_encript_value = async (req) => {
     const queryString = objectToQueryString(data);
     const bufferData = Buffer.from(queryString, 'utf-8');
     encRequest = ccav.encrypt(bufferData, workingKey);
-    // formbody = '<form id="nonseamless" method="post" name="redirect" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction"/> <input type="hidden" id="encRequest" name="encRequest" value="' + encRequest + '"><input type="hidden" name="access_code" id="access_code" value="' + accessCode + '"><button>pay</button><script language="javascript">document.redirect.submit();</script></form>';
+    formbody = '<form id="nonseamless" method="post" name="redirect" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction"/> <input type="hidden" id="encRequest" name="encRequest" value="' + encRequest + '"><input type="hidden" name="access_code" id="access_code" value="' + accessCode + '"><button>pay</button><script language="javascript">document.redirect.submit();</script></form>';
     // formbody = '<html><head><title>Sub-merchant checkout page</title><script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script></head><body><center><!-- width required mininmum 482px --><iframe  width="482" height="500" scrolling="No" frameborder="0"  id="paymentFrame" src="https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction&merchant_id='+merchantId+'&encRequest='+encRequest+'&access_code='+accessCode+'"></iframe></center><script type="text/javascript">$(document).ready(function(){$("iframe#paymentFrame").load(function() {window.addEventListener("message", function(e) {$("#paymentFrame").css("height",e.data["newHeight"]+"px"); }, false);}); });</script></body></html>';
-    let url = "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction&merchant_id=2742878&encRequest=" + encRequest + "&access_code=AVVK05KI18AW29KVWA"
-    return { encRequest, url };
+    // let url = "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction&merchant_id=2742878&encRequest=" + encRequest + "&access_code=AVVK05KI18AW29KVWA"
+    return formbody;
 }
 
 
@@ -124,17 +125,17 @@ const nearby_value = async (req) => {
     const location = {
         lat: 12.9716,
         lng: 77.5946,
-      };
-    
-      const request = {
+    };
+
+    const request = {
         location: location,
         radius: 10000,
         type: "locality",
-      };
-    
-      const response = await places.nearbySearch(request);
-    
-      console.log(response.results);
+    };
+
+    const response = await places.nearbySearch(request);
+
+    console.log(response.results);
 }
 module.exports = {
     get_paymnent_url,

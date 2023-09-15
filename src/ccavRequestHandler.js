@@ -12,7 +12,6 @@ exports.postReq = function (request, response) {
     // console.log(workingKey)
     // console.log(accessCode)
     // console.log(request)
-
     request.on('data', function (data) {
         body += data;
         encRequest = ccav.encrypt(body, workingKey);
@@ -20,13 +19,6 @@ exports.postReq = function (request, response) {
         console.log(POST)
         formbody = '<form id="nonseamless" method="post" name="redirect" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction"/> <input type="hidden" id="encRequest" name="encRequest" value="' + encRequest + '"><input type="hidden" name="access_code" id="access_code" value="' + accessCode + '"><script language="javascript">document.redirect.submit();</script></form>';
     });
-
-
-
-
-
-
-
     request.on('end', function () {
         response.writeHeader(200, { "Content-Type": "text/html" });
         response.write(formbody);
@@ -34,8 +26,6 @@ exports.postReq = function (request, response) {
     });
     return;
 };
-
-
 
 exports.success_recive = function (request, response) {
     var ccavEncResponse = '',
@@ -50,7 +40,7 @@ exports.success_recive = function (request, response) {
         var encryption = ccavPOST.encResp;
         ccavResponse = ccav.decrypt(encryption, workingKey);
         console.log(ccavResponse)
-        
+
     });
 
     request.on('end', function () {
