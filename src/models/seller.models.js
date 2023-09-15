@@ -87,8 +87,11 @@ const SellerSchema = new mongoose.Schema(
     },
     notifyCount: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
+    GST_Number: {
+      type: String,
+    },
   },
   {
     timestamps: { createdAt: 'createdDate', updatedAt: 'updatedDate' },
