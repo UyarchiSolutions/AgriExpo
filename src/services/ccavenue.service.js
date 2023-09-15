@@ -158,11 +158,10 @@ const pay_nowredirect_url = async (amount, redirct) => {
         merchant_id: merchantId,
         order_id: orderId,
         currency: "INR",
-        amount: 100,
+        amount: amount,
         redirect_url: "https://agriexpo.click/success",
         cancel_url: "https://agriexpo.click/success",
         language: "EN",
-        my_redirect_url: "https://agriexpo.click/",
         billing_name: "Peter",
         billing_address: "Santacruz",
         billing_city: "Mumbai",
@@ -184,7 +183,8 @@ const pay_nowredirect_url = async (amount, redirct) => {
         merchant_param4: "additional Info.",
         merchant_param5: "additional Info.",
         promo_code: "",
-        redirct: redirct
+        redirct: redirct,
+        my_redirect_url: redirct
         // customer_identifier: ""
     };
     const queryString = objectToQueryString(data);
