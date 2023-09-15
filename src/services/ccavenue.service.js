@@ -67,7 +67,7 @@ const pay_now_encript_value = async (req) => {
         merchant_id: merchantId,
         order_id: orderId,
         currency: "INR",
-        amount: req.query.amount,
+        amount: 100,
         redirect_url: "https://agriexpo.click/success",
         cancel_url: "https://agriexpo.click/success",
         language: "EN",
