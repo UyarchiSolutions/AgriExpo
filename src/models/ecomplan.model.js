@@ -153,6 +153,9 @@ const streamplanschema = mongoose.Schema({
   ChequeDDdate: {
     type: String,
   },
+  transaction: {
+    type: String,
+  }
 });
 
 const Streamplan = mongoose.model('streamplan', streamplanschema);

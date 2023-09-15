@@ -506,7 +506,8 @@ const create_PurchasePlan_EXpo = async (planId, userId, ccavenue) => {
     DateIso: moment(),
     planId: planId,
     suppierId: userId,
-    ccavanue: ccavenue
+    ccavanue: ccavenue,
+    transaction: findPlan.transaction,
   };
   const creations = await purchasePlan.create(data);
   await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
