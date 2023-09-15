@@ -547,6 +547,7 @@ const create_PurchasePlan_EXpo_Admin = async (body, userId) => {
     DateIso: moment(),
     planId: body.planId,
     suppierId: userId,
+    transaction: findPlan.transaction,
   };
   const creations = await purchasePlan.create(data);
   await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
