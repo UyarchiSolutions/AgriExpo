@@ -26,11 +26,12 @@ exports.postReq = function (request, response) {
     });
     return;
 };
-
+// workingKey = '1AC82EC283C6AE1561C420D21169F52F',	//Put in the 32-Bit key shared by CCAvenues.
+// accessCode = 'AVUK05KI18AW28KUWA',	
 exports.success_recive = function (request, response) {
     var ccavEncResponse = '',
         ccavResponse = '',
-        workingKey = 'B0050D8C882D10898AE305B141D27C8C',	//Put in the 32-Bit Key provided by CCAvenue.
+        workingKey = '1AC82EC283C6AE1561C420D21169F52F',	//Put in the 32-Bit Key provided by CCAvenue.
         ccavPOST = '';
     request.on('data', function (data) {
         ccavEncResponse += data;

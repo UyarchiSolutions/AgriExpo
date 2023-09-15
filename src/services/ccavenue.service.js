@@ -140,14 +140,15 @@ const nearby_value = async (req) => {
 
     console.log(response.results);
 }
-
+// workingKey = '1AC82EC283C6AE1561C420D21169F52F',	//Put in the 32-Bit key shared by CCAvenues.
+// accessCode = 'AVUK05KI18AW28KUWA',
 
 
 const pay_nowredirect_url = async (amount, redirct) => {
     // req.query.amount
     var body = '',
-        workingKey = 'B0050D8C882D10898AE305B141D27C8C',	//Put in the 32-Bit key shared by CCAvenues.
-        accessCode = 'AVOI05KI17AK41IOKA',				//Put in the Access Code shared by CCAvenues.
+        workingKey = '1AC82EC283C6AE1561C420D21169F52F',	//Put in the 32-Bit key shared by CCAvenues.
+        accessCode = 'AVUK05KI18AW28KUWA',				//Put in the Access Code shared by CCAvenues.
         encRequest = '';
     const orderId = uuid.v4();
     // console.log(req.body)
@@ -159,8 +160,8 @@ const pay_nowredirect_url = async (amount, redirct) => {
         order_id: orderId,
         currency: "INR",
         amount: amount,
-        redirect_url: "https://agriexpo.click/success",
-        cancel_url: "https://agriexpo.click/success",
+        redirect_url: "https://exhibitor.agriexpo.click/success",
+        cancel_url: "https://exhibitor.agriexpo.click/success",
         language: "EN",
         billing_name: "Peter",
         billing_address: "Santacruz",
