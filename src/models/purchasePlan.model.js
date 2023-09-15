@@ -226,6 +226,9 @@ const purchasePlanSchema = mongoose.Schema(
     referal: {
       type: String,
     },
+    ccavenue: {
+      type: String,
+    }
   },
   { timestamps: true }
 );
