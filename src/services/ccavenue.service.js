@@ -55,8 +55,8 @@ const get_paymnent_url = async (aa, dd, res) => {
 const pay_now_encript_value = async (req) => {
     // req.query.amount
     var body = '',
-        workingKey = 'DC4FE2F109D4E40DA189C229CCAC2DF0',	//Put in the 32-Bit key shared by CCAvenues.
-        accessCode = 'AVVK05KI18AW29KVWA',			//Put in the Access Code shared by CCAvenues.
+        workingKey = 'B0050D8C882D10898AE305B141D27C8C',	//Put in the 32-Bit key shared by CCAvenues.
+        accessCode = 'AVOI05KI17AK41IOKA',				//Put in the Access Code shared by CCAvenues.
         encRequest = '';
     const orderId = uuid.v4();
     // console.log(req.body)
