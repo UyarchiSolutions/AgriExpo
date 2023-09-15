@@ -228,12 +228,15 @@ const purchasePlanSchema = mongoose.Schema(
     },
     ccavenue: {
       type: String,
+    },
+    transaction: {
+      type: String,
     }
   },
   { timestamps: true }
 );
 
-purchasePlan = mongoose.model('purchasedPlans', purchasePlanSchema);
+const purchasePlan = mongoose.model('purchasedPlans', purchasePlanSchema);
 
 const PlanPaymentSchema = new mongoose.Schema(
   {
