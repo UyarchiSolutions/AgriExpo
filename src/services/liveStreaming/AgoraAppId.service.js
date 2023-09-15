@@ -76,7 +76,7 @@ const token_assign = async (minutes, streamID, streamType) => {
   // 
   let minimum = 9500 - parseInt(minutes);
   console.log(minimum)
-  let token = await AgoraAppId.find({ expired: false, userMinutes: { $lte: minimum }, type: { $eq: "paid" } }).limit(10);
+  let token = await AgoraAppId.find({ expired: false, userMinutes: { $lte: minimum }, type: { $ne: "paid" } }).limit(10);
   let paid = await AgoraAppId.findById('33ee26ed-c087-4e5f-b11d-dc0972e2bd36');
   return new Promise(async (resolve) => {
     if (minutes < 9500) {
