@@ -219,7 +219,7 @@ router.route('/get/address/lat/log').get(SellerAuth, Ecomcontroller.get_address_
 
 
 
-router.route('/purchese/plan/exhibitor').get(SellerAuth, Ecomcontroller.purchesPlane_exhibitor);
+router.route('/purchese/plan/exhibitor').post(SellerAuth, Ecomcontroller.purchesPlane_exhibitor);
 
 
 
