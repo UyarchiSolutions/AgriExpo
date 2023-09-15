@@ -276,7 +276,13 @@ const get_all_Post = async (req) => {
 };
 
 const get_all_post_transation = async (req) => {
-  const transaction = req.query.transaction == 'With Transaction' ? 'With' : 'Without';
+  let transaction
+  if (req.query.transaction == 'With Transaction') {
+    transaction = req.query.transaction = 'With'
+  }
+  if (req.query.transaction == 'Without Transaction') {
+    transaction = req.query.transaction = 'Without'
+  }
   const value = await StreamPost.aggregate([
     { $match: { $and: [{ suppierId: { $eq: req.userId } }, { isUsed: { $eq: false } }, { transaction: { $eq: transaction } }] } },
     {
