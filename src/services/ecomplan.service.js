@@ -95,6 +95,7 @@ const get_all_Plans_pagination = async (req) => {
 
 const getAllPlanes_view = async () => {
   const value = await Streamplan.aggregate([
+    { $match: { active: true } },
     {
       $lookup: {
         from: 'purchasedplans',
@@ -8278,8 +8279,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+        ? 'RAC'
+        : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -8288,8 +8289,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-            ? 'RAC'
-            : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -12759,7 +12760,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => { };
+const get_video_link = async (req) => {};
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
@@ -12969,7 +12970,7 @@ const upload_s3_stream_video = async (req) => {
     stream.uploadLink = up.Location;
     stream.uploadDate = moment();
     stream.uploadStatus = 'upload';
-    stream.uploatedBy = "Me";
+    stream.uploatedBy = 'Me';
     stream.updatedBy_id = req.userId;
     stream.save();
   }
@@ -13001,7 +13002,7 @@ const upload_s3_stream_video_admin = async (req) => {
     stream.uploadLink = up.Location;
     stream.uploadDate = moment();
     stream.uploadStatus = 'upload';
-    stream.uploatedBy = "Admin";
+    stream.uploatedBy = 'Admin';
     stream.updatedBy_id = req.userId;
     stream.save();
   }
@@ -13508,11 +13509,11 @@ const notify_me_toggle = async (req) => {
 };
 
 const get_previes_post = async (req) => {
-  console.log(req.query.id)
+  console.log(req.query.id);
   const prev = await StreamPost.findOne({ productId: req.query.id, suppierId: req.userId }).sort({ DateIso: -1 });
 
   return prev;
-}
+};
 
 const get_address_log = async (req) => {
   let { lat, long } = req.query;
@@ -13521,8 +13522,7 @@ const get_address_log = async (req) => {
   let apikey = 'AIzaSyARM6-Qr_hsR53GExv9Gmu9EtFTV5ZuDX4';
   let values = await Axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apikey}`);
   return values.data.results;
-}
-
+};
 
 module.exports = {
   create_Plans,
@@ -13667,5 +13667,5 @@ module.exports = {
   notify_me_toggle,
   getAllPlanes_view,
   get_previes_post,
-  get_address_log
+  get_address_log,
 };
