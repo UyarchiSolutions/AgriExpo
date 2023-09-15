@@ -362,6 +362,9 @@ const AdPlanSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    ccavanue: {
+      type: String,
+    }
   },
   { timestamps: true }
 );

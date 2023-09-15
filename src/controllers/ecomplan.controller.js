@@ -613,7 +613,7 @@ const upload_s3_stream_video = catchAsync(async (req, res) => {
   const data = await Ecomserive.upload_s3_stream_video(req);
   res.send(data);
 });
-const upload_s3_stream_video_admin= catchAsync(async (req, res) => {
+const upload_s3_stream_video_admin = catchAsync(async (req, res) => {
   const data = await Ecomserive.upload_s3_stream_video_admin(req);
   res.send(data);
 });
@@ -632,7 +632,7 @@ const completed_show_vidio = catchAsync(async (req, res) => {
   res.send(data);
 });
 
-const completed_show_vidio_admin= catchAsync(async (req, res) => {
+const completed_show_vidio_admin = catchAsync(async (req, res) => {
   const data = await Ecomserive.completed_show_vidio_admin(req);
   res.send(data);
 });
@@ -686,12 +686,17 @@ const getAllPlanes_view = catchAsync(async (req, res) => {
   res.send(data);
 });
 
-const get_previes_post= catchAsync(async (req, res) => {
+const get_previes_post = catchAsync(async (req, res) => {
   const data = await Ecomserive.get_previes_post(req);
   res.send(data);
 });
-const get_address_log= catchAsync(async (req, res) => {
+const get_address_log = catchAsync(async (req, res) => {
   const data = await Ecomserive.get_address_log(req);
+  res.send(data);
+});
+
+const purchesPlane_exhibitor = catchAsync(async (req, res) => {
+  const data = await Ecomserive.purchesPlane_exhibitor(req,res);
   res.send(data);
 });
 module.exports = {
@@ -829,5 +834,8 @@ module.exports = {
   notify_me_toggle,
   getAllPlanes_view,
   get_previes_post,
-  get_address_log
+  get_address_log,
+
+  // pruchese plan
+  purchesPlane_exhibitor
 };

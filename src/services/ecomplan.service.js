@@ -32,7 +32,8 @@ const Axios = require('axios');
 const { UsageAppID } = require('../models/liveStreaming/AgoraAppId.model');
 const S3video = require('./S3video.service');
 const { Seller } = require('../models/seller.models');
-
+const ccavenue = require('./ccavenue.service');
+const purchese_plan = require('./purchasePlan.service');
 const create_Plans = async (req) => {
   const { slotInfo } = req.body;
   const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal' } });
@@ -1442,7 +1443,7 @@ const create_stream_one = async (req) => {
     });
     await Dates.create_date(value);
   } else {
-    
+
     throw new ApiError(httpStatus.NOT_FOUND, 'App id Not found');
   }
 
@@ -13524,6 +13525,13 @@ const get_address_log = async (req) => {
   return values.data.results;
 }
 
+const purchesPlane_exhibitor = async (req, res) => {
+  const { amount, plan, redirct } = req.body;
+  let paynow = await ccavenue.pay_nowredirect_url(amount, redirct);
+  await purchese_plan.create_PurchasePlan_EXpo(plan, req.userId, paynow.payment._id);
+  await ccavenue.pay_nowredirect_url(paynow.formbody, res)
+}
+
 
 module.exports = {
   create_Plans,
@@ -13668,5 +13676,9 @@ module.exports = {
   notify_me_toggle,
   getAllPlanes_view,
   get_previes_post,
-  get_address_log
+  get_address_log,
+
+
+  // purchese plan
+  purchesPlane_exhibitor
 };

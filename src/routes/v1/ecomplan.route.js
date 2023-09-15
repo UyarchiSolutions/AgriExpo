@@ -218,4 +218,9 @@ router.route('/get/address/lat/log').get(SellerAuth, Ecomcontroller.get_address_
 
 
 
+
+router.route('/purchese/plan/exhibitor').get(SellerAuth, Ecomcontroller.purchesPlane_exhibitor);
+
+
+
 module.exports = router;
