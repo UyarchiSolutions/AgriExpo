@@ -51,7 +51,7 @@ router.route('/disable/Enable/Plan/:id').put(Ecomcontroller.disable_Enable_Plan)
 router.route('/create/post').post(SellerAuth, uploadimage.fields([{ name: 'galleryImages' }]), Ecomcontroller.create_post);
 router.route('/create/post/teaser').post(upload, Ecomcontroller.create_post_teaser);
 router.route('/get/all/post').get(SellerAuth, Ecomcontroller.get_all_post);
-router.route('/get/all/post').get(SellerAuth, Ecomcontroller.get_all_post);
+router.route('/get/all/post/transation').get(SellerAuth, Ecomcontroller.get_all_post_transation);
 router.route('/get/all/post/pagenation').get(SellerAuth, Ecomcontroller.get_all_Post_with_page);
 router.route('/get/stream/post/view').get(Ecomcontroller.get_post_view);
 

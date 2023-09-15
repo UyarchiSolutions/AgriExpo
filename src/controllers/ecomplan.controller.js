@@ -68,6 +68,12 @@ const get_all_post = catchAsync(async (req, res) => {
   const value = await Ecomserive.get_all_Post(req);
   res.send(value);
 });
+
+const get_all_post_transation= catchAsync(async (req, res) => {
+  const value = await Ecomserive.get_all_post_transation(req);
+  res.send(value);
+});
+
 const get_all_Post_with_page = catchAsync(async (req, res) => {
   let status = req.query.status;
   let value;
@@ -835,7 +841,8 @@ module.exports = {
   getAllPlanes_view,
   get_previes_post,
   get_address_log,
+  get_all_post_transation,
 
   // pruchese plan
-  purchesPlane_exhibitor
+  purchesPlane_exhibitor,
 };

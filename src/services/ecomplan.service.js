@@ -275,6 +275,55 @@ const get_all_Post = async (req) => {
   return value;
 };
 
+const get_all_post_transation = async (req) => {
+  const transaction = req.query.transaction == 'With Transaction' ? 'With' : 'Without';
+  const value = await StreamPost.aggregate([
+    { $match: { $and: [{ suppierId: { $eq: req.userId } }, { isUsed: { $eq: false } }, { transaction: { $eq: transaction } }] } },
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'productId',
+        foreignField: '_id',
+        as: 'productName',
+      },
+    },
+    {
+      $unwind: '$productName',
+    },
+    {
+      $lookup: {
+        from: 'categories',
+        localField: 'categoryId',
+        foreignField: '_id',
+        as: 'categories',
+      },
+    },
+    {
+      $unwind: '$categories',
+    },
+    {
+      $project: {
+        productId: 1,
+        categoryId: 1,
+        quantity: 1,
+        marketPlace: 1,
+        offerPrice: 1,
+        postLiveStreamingPirce: 1,
+        validity: 1,
+        minLots: 1,
+        incrementalLots: 1,
+        _id: 1,
+        catName: '$categories.categoryName',
+        productName: '$productName.productTitle',
+        created: 1,
+        DateIso: 1,
+      },
+    },
+    { $sort: { DateIso: -1 } },
+  ]);
+  return value;
+};
+
 const get_all_Post_with_page_live = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
   var date_now = new Date().getTime();
@@ -8281,8 +8330,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-        ? 'RAC'
-        : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -8291,8 +8340,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+            ? 'RAC'
+            : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -12762,7 +12811,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => {};
+const get_video_link = async (req) => { };
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
@@ -13681,7 +13730,7 @@ module.exports = {
   getAllPlanes_view,
   get_previes_post,
   get_address_log,
-
+  get_all_post_transation,
 
   // purchese plan
   purchesPlane_exhibitor
