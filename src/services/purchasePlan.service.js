@@ -453,6 +453,7 @@ const get_all_purchasePlans = async (req) => {
         expireDate: 1,
         no_of_host: 1,
         planId: 1,
+        transaction: 1
       },
     },
   ]);
