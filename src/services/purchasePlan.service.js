@@ -474,12 +474,12 @@ const Purchased_Message = async (Name, plan, mobile) => {
   return reva.data;
 };
 
-const create_PurchasePlan_EXpo = async (body, userId) => {
+const create_PurchasePlan_EXpo = async (planId, userId, ccavenue) => {
   let findUser = await Seller.findById(userId);
   if (!findUser) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-  let findPlan = await Streamplan.findById(body.planId).select(['-_id', '-active', '-__v']);
+  let findPlan = await Streamplan.findById(planId).select(['-_id', '-active', '-__v']);
   if (!findPlan) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Plan not found');
   }
@@ -504,8 +504,9 @@ const create_PurchasePlan_EXpo = async (body, userId) => {
     no_of_host: findPlan.no_of_host,
     planType: findPlan.planType,
     DateIso: moment(),
-    planId: body.planId,
+    planId: planId,
     suppierId: userId,
+    ccavanue: ccavenue
   };
   const creations = await purchasePlan.create(data);
   await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);

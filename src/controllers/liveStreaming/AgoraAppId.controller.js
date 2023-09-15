@@ -39,6 +39,11 @@ const get_token_usage_demo= catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(data);
 });
 
+const test_appid= catchAsync(async (req, res) => {
+  const data = await AgoraAppId.test_appid(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
 module.exports = {
   InsertAppId,
   InsertAget_app_id,
@@ -47,6 +52,7 @@ module.exports = {
   get_state_list,
   get_city_list,
   get_token_usage_demo,
-  get_token_usage_agri
+  get_token_usage_agri,
+  test_appid
   };
   

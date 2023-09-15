@@ -14,21 +14,23 @@ const get_paymnent_url = catchAsync(async (req, res) => {
 
 const pay_now_encript_value = catchAsync(async (req, res) => {
     const category = await ccavenue.pay_now_encript_value(req);
-    // res.writeHeader(200, { "Content-Type": "text/html" });
-    // res.write(category)
-    // res.end()
-    // console.log(category)
-    // res.writeHeader(200, { "Content-Type": "text/html" });
-    // res.write(category)
-    // res.end()
-    res.send(category)
+    res.writeHeader(200, { "Content-Type": "text/html" });
+    res.write(category)
+    res.end()
+    // res.send(category)
 
 });
 
+
+const nearby_value = catchAsync(async (req, res) => {
+    const category = await ccavenue.placesNearby(req.shopId, req.body, res);
+    res.send(category)
+});
 
 
 
 module.exports = {
     get_paymnent_url,
-    pay_now_encript_value
+    pay_now_encript_value,
+    nearby_value
 }

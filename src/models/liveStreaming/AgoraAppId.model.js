@@ -52,9 +52,35 @@ const agoraAppIdschema = mongoose.Schema({
     userMinutes: {
         type: Number,
         default: 0
+    },
+    testToken: {
+        type: String,
+    },
+    testUD: {
+        type: Number,
+    },
+    cloud_testToken: {
+        type: String,
+    },
+    cloud_testUD: {
+        type: Number,
+    },
+    endTime: {
+        type: Number,
+    },
+    completed: {
+        type: String,
+    },
+    resourceId: {
+        type: String,
+    },
+    sid: {
+        type: String,
+    },
+    type: {
+        type: String,
+        default: "demo"
     }
-
-
 });
 
 const AgoraAppId = mongoose.model('AgoraAppId', agoraAppIdschema);

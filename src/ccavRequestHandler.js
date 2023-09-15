@@ -8,30 +8,51 @@ exports.postReq = function (request, response) {
         workingKey = 'B0050D8C882D10898AE305B141D27C8C',	//Put in the 32-Bit key shared by CCAvenues.
         accessCode = 'AVOI05KI17AK41IOKA',			//Put in the Access Code shared by CCAvenues.
         encRequest = '',
-        formbody = '<h1>hello<h1>';
+        formbody = '';
     // console.log(workingKey)
     // console.log(accessCode)
     // console.log(request)
-
     request.on('data', function (data) {
         body += data;
         encRequest = ccav.encrypt(body, workingKey);
         POST = qs.parse(body);
         console.log(POST)
-        formbody = '<html><head><title>Sub-merchant checkout page</title></head><body><center><!-- width required mininmum 482px --><iframe  width="482" height="500" scrolling="No" frameborder="0"  id="paymentFrame" src="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction&merchant_id=' + POST.merchant_id + '&encRequest=' + encRequest + '&access_code=' + accessCode + '"></iframe></center><script type="text/javascript">document.addEventListener("DOMContentLoaded", function () { var paymentFrame = document.querySelector("iframe#paymentFrame");paymentFrame.addEventListener("load", function () {window.addEventListener("message", function (e) {if (e.data.newHeight) { paymentFrame.style.height = e.data.newHeight + "px";}}, false);});});</script></body></html>';
+        formbody = '<form id="nonseamless" method="post" name="redirect" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction"/> <input type="hidden" id="encRequest" name="encRequest" value="' + encRequest + '"><input type="hidden" name="access_code" id="access_code" value="' + accessCode + '"><script language="javascript">document.redirect.submit();</script></form>';
     });
-    
-      
-      
-      
-      
-      
-      
     request.on('end', function () {
-        response.setHeader('X-Frame-Options', 'DENY');
         response.writeHeader(200, { "Content-Type": "text/html" });
         response.write(formbody);
         response.end();
     });
     return;
+};
+
+exports.success_recive = function (request, response) {
+    var ccavEncResponse = '',
+        ccavResponse = '',
+        workingKey = 'B0050D8C882D10898AE305B141D27C8C',	//Put in the 32-Bit Key provided by CCAvenue.
+        ccavPOST = '';
+    request.on('data', function (data) {
+        ccavEncResponse += data;
+        ccavPOST = qs.parse(ccavEncResponse);
+        console.log(ccavPOST)
+        var encryption = ccavPOST.encResp;
+        ccavResponse = ccav.decrypt(encryption, workingKey);
+        console.log(ccavResponse)
+        console.log(ccavPOST.my_redirect_url)
+
+
+    });
+
+    request.on('end', function () {
+        var pData = '';
+        pData = '<table border=1 cellspacing=2 cellpadding=2><tr><td>'
+        pData = pData + ccavResponse.replace(/=/gi, '</td><td>')
+        pData = pData.replace(/&/gi, '</td></tr><tr><td>')
+        pData = pData + '</td></tr></table>'
+        htmlcode = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Response Handler</title></head><body><center><font size="4" color="blue"><b>Response Page</b></font><br>' + pData + '</center><br></body></html>';
+        response.writeHeader(200, { "Content-Type": "text/html" });
+        response.write(htmlcode);
+        response.end();
+    });
 };
