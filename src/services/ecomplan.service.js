@@ -2143,6 +2143,16 @@ const cancel_stream = async (req) => {
   });
   return value;
 };
+
+const remove_stream = async (req) => {
+  let value = await Streamrequest.findByIdAndUpdate({ _id: req.body.id }, { status: 'Removed' }, { new: true });
+  let assginStream = await StreamrequestPost.find({ streamRequest: req.body.id });
+  assginStream.forEach(async (a) => {
+    await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Removed' }, { new: true });
+  });
+  return value;
+};
+
 // const appID = '1ba2592b16b74f3497e232e1b01f66b0';
 // const appCertificate = '8ae85f97802448c2a47b98715ff90ffb';
 // const Authorization = `Basic ${Buffer.from(`61b817e750214d58ba9d8148e7c89a1b:88401de254b2436a9da15b2f872937de`).toString(
@@ -13644,6 +13654,7 @@ module.exports = {
   get_subhost_token,
   get_subhost_streams,
   cancel_stream,
+  remove_stream,
   end_stream,
   get_all_Post_with_page_all,
   get_all_Post_with_page_live,

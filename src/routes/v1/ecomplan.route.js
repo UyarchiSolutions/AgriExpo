@@ -86,6 +86,7 @@ router.route('/get/chat/join').get(SellerAuth, Ecomcontroller.only_chat_get);
 router.route('/subhost/assign/streams').get(SellerAuth, Ecomcontroller.get_subhost_streams);
 router.route('/allot/stream/subhost').put(SellerAuth, Ecomcontroller.allot_stream_subhost);
 router.route('/cancel/stream').put(SellerAuth, Ecomcontroller.cancel_stream);
+router.route('/remove/stream').put(SellerAuth, Ecomcontroller.remove_stream);
 router.route('/cancel/stream/admin').put(Ecomcontroller.cancel_stream);
 router.route('/steam/end/now').put(Ecomcontroller.end_stream);
 

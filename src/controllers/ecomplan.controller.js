@@ -69,7 +69,7 @@ const get_all_post = catchAsync(async (req, res) => {
   res.send(value);
 });
 
-const get_all_post_transation= catchAsync(async (req, res) => {
+const get_all_post_transation = catchAsync(async (req, res) => {
   const value = await Ecomserive.get_all_post_transation(req);
   res.send(value);
 });
@@ -246,6 +246,11 @@ const cancel_stream = catchAsync(async (req, res) => {
   res.send(value);
 });
 
+const remove_stream = catchAsync(async (req, res) => {
+  //console.log('sdas');
+  const value = await Ecomserive.remove_stream(req);
+  res.send(value);
+});
 const end_stream = catchAsync(async (req, res) => {
   //console.log('sdas');
   const value = await Ecomserive.end_stream(req);
@@ -702,7 +707,7 @@ const get_address_log = catchAsync(async (req, res) => {
 });
 
 const purchesPlane_exhibitor = catchAsync(async (req, res) => {
-  const data = await Ecomserive.purchesPlane_exhibitor(req,res);
+  const data = await Ecomserive.purchesPlane_exhibitor(req, res);
   res.send(data);
 });
 module.exports = {
@@ -746,6 +751,7 @@ module.exports = {
   get_all_Plans_pagination,
   allot_stream_subhost,
   cancel_stream,
+  remove_stream,
   get_completed_stream,
   get_completed_stream_byid,
   get_completed_stream_buyer,
