@@ -53,6 +53,7 @@ exports.success_recive = function (request, response) {
         }
         console.log(result)
         const find = await ccavenue_paymnet.findById(result.order_id);
+        console.log(find)
         if (!find) {
             throw new ApiError(httpStatus.BAD_REQUEST, 'pursace not found');
         }
