@@ -13153,7 +13153,7 @@ const completed_show_vidio = async (req) => {
     streamss.save();
   }
 
-  return { message: 'success' };
+  return { message: 'success', completed_stream_by: "Myself" };
 };
 const completed_show_vidio_admin = async (req) => {
   let userID = req.userId;
@@ -13180,7 +13180,7 @@ const completed_show_vidio_admin = async (req) => {
     streamss.save();
   }
 
-  return { message: 'success' };
+  return { message: 'success', completed_stream_by: "Admin" };
 };
 
 const visitor_save_product = async (req) => {
