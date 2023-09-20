@@ -178,7 +178,7 @@ const pay_nowredirect_url = async (amount, redirct) => {
         delivery_zip: "400038",
         delivery_country: "India",
         delivery_tel: "0123456789",
-        merchant_param1: "additional Info.",
+        merchant_param1: 'http://localhost:4200/dashboard/payment-success',
         merchant_param2: "additional Info.",
         merchant_param3: "additional Info.",
         merchant_param4: "additional Info.",
@@ -196,8 +196,6 @@ const pay_nowredirect_url = async (amount, redirct) => {
     let payment = await ccavenue_paymnet.create(data);
     data.merchant_param1 = payment._id;
     formbody = '<form id="nonseamless" method="post" name="redirect" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction"/> <input type="hidden" id="encRequest" name="encRequest" value="' + encRequest + '"><input type="hidden" name="access_code" id="access_code" value="' + accessCode + '"><button>pay</button><script language="javascript">document.redirect.submit();</script></form>';
-    // formbody = '<html><head><title>Sub-merchant checkout page</title><script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script></head><body><center><!-- width required mininmum 482px --><iframe  width="482" height="500" scrolling="No" frameborder="0"  id="paymentFrame" src="https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction&merchant_id='+merchantId+'&encRequest='+encRequest+'&access_code='+accessCode+'"></iframe></center><script type="text/javascript">$(document).ready(function(){$("iframe#paymentFrame").load(function() {window.addEventListener("message", function(e) {$("#paymentFrame").css("height",e.data["newHeight"]+"px"); }, false);}); });</script></body></html>';
-    // let url = "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction&merchant_id=2742878&encRequest=" + encRequest + "&access_code=AVVK05KI18AW29KVWA"
     return { payment, formbody };
 }
 const redirect_payment_gateway = async (html, res) => {
