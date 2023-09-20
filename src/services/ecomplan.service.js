@@ -13148,6 +13148,8 @@ const completed_show_vidio = async (req) => {
     streamss.showLink = 'https://streamingupload.s3.ap-south-1.amazonaws.com/' + temp.videoLink_mp4;
     streamss.selectvideo = show;
     streamss.show_completd = true;
+    streamss.completed_stream = userID;
+    streamss.completed_stream_by = "Myself";
     streamss.save();
   }
 
@@ -13173,6 +13175,8 @@ const completed_show_vidio_admin = async (req) => {
     streamss.showLink = 'https://streamingupload.s3.ap-south-1.amazonaws.com/' + temp.videoLink_mp4;
     streamss.selectvideo = show;
     streamss.show_completd = true;
+    streamss.completed_stream = userID;
+    streamss.completed_stream_by = "Admin";
     streamss.save();
   }
 

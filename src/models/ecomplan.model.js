@@ -515,6 +515,12 @@ const streamRequestschema = mongoose.Schema({
   },
   updatedBy_id: {
     type: String,
+  },
+  completed_stream:{
+    type: String,
+  },
+  completed_stream_by:{
+    type: String,
   }
 });
 
