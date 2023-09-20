@@ -116,7 +116,7 @@ const exhibitor_purchese_plan = async (amount, redirct) => {
     const orderId = uuid.v4();
     const merchantId = '2742878';
 
-    const data = {
+    let data = {
         merchant_id: merchantId,
         order_id: orderId,
         currency: "INR",

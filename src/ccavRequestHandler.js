@@ -36,11 +36,12 @@ exports.success_recive = function (request, response) {
         ccavPOST = '';
     var result = {};
     let orders = { _id: null };
-    request.on('data', async function (data) {
+    let encryption;
+    request.on('data', function (data) {
         ccavEncResponse += data;
         ccavPOST = qs.parse(ccavEncResponse);
         console.log(ccavPOST)
-        var encryption = ccavPOST.encResp;
+        encryption = ccavPOST.encResp;
         ccavResponse = ccav.decrypt(encryption, workingKey);
         console.log(ccavResponse)
         console.log(ccavPOST.my_redirect_url)
@@ -54,11 +55,10 @@ exports.success_recive = function (request, response) {
             result[key] = value;
         }
         console.log(result)
-        orders = await update_ccavenue_payment(result, encryption)
         // let dd = await ccavenue_paymnet.findById('23852f86-cba3-4ce1-ab54-3bfcf47b319e');
         // console.log(dd, 232, result.order_id)
     });
-    request.on('end', function () {
+    request.on('end', async function () {
         // var pData = '';
         // pData = '<table border=1 cellspacing=2 cellpadding=2><tr><td>'
         // pData = pData + ccavResponse.replace(/=/gi, '</td><td>')
@@ -69,7 +69,8 @@ exports.success_recive = function (request, response) {
         // // response.write(htmlcode);
         // // response.end();
         // response.render("payment-success.html", { data: ccavResponse });
-        const redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/payment-success/' + orders._id;
+        orders = await update_ccavenue_payment(result, encryption)
+        const redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/payment-success/' + orders.order_id;
         response.redirect(301, redirectUrl);
 
         // response.redirect(result.merchant_param1 + "/" + result.order_id)
