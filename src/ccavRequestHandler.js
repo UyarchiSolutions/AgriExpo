@@ -52,6 +52,8 @@ exports.success_recive = function (request, response) {
             result[key] = value;
         }
         console.log(result)
+        let dd = await ccavenue_paymnet.findById('23852f86-cba3-4ce1-ab54-3bfcf47b319e');
+        console.log(dd, 232, result.order_id)
         const find = await ccavenue_paymnet.findById(result.order_id);
         console.log(find)
         if (!find) {
