@@ -7,6 +7,7 @@ const { ccavenue_paymnet } = require("./models/ccavenue.model")
 const { purchasePlan, PlanPayment } = require("./models/purchasePlan.model")
 const ApiError = require('./utils/ApiError');
 const httpStatus = require('http-status');
+const { Slotseperation } = require('./models/slot.model');
 
 exports.postReq = function (request, response) {
     var body = '',
@@ -99,7 +100,20 @@ const update_ccavenue_payment = async (result, encryption) => {
     else {
         plan.status = 'Activated';
         plan.save();
+        plan.slotInfo.forEach(async (e) => {
+            // suppierId
+            await Slotseperation.create({
+                SlotType: e.slotType,
+                Duration: e.Duration,
+                userId: plan.suppierId,
+                Slots: e.No_Of_Slot,
+                PlanId: plan._id,
+                streamPlanId: plan.planId,
+            });
+        });
     }
+
+
     return find;
 }
 
