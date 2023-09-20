@@ -53,19 +53,9 @@ exports.success_recive = function (request, response) {
             result[key] = value;
         }
         console.log(result)
-        let dd = await ccavenue_paymnet.findById('23852f86-cba3-4ce1-ab54-3bfcf47b319e');
-        console.log(dd, 232, result.order_id)
-        const find = await ccavenue_paymnet.findById(result.order_id);
-        console.log(find)
-        if (!find) {
-            throw new ApiError(httpStatus.BAD_REQUEST, 'pursace not found');
-        }
-        else {
-            find.response_enq = encryption;
-            find.response = result;
-            find.save();
-        }
-
+        await update_ccavenue_payment(result,)
+        // let dd = await ccavenue_paymnet.findById('23852f86-cba3-4ce1-ab54-3bfcf47b319e');
+        // console.log(dd, 232, result.order_id)
     });
     request.on('end', function () {
         // var pData = '';
@@ -84,3 +74,17 @@ exports.success_recive = function (request, response) {
         // response.redirect(result.merchant_param1 + "/" + result.order_id)
     });
 };
+
+
+const update_ccavenue_payment = async (result) => {
+    const find = await ccavenue_paymnet.findById(result.order_id);
+    if (!find) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'pursace not found');
+    }
+    else {
+        find.response_enq = encryption;
+        find.response = result;
+        find.save();
+    }
+    return find;
+}
