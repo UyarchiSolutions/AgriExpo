@@ -67,7 +67,7 @@ exports.success_recive = function (request, response) {
         // // response.end();
         // response.render("payment-success.html", { data: ccavResponse });
         console.log(result)
-        const redirectUrl = 'https://agriexpo.live/dashboard/payment-success/81e033bb-662b-42a6-b06b-2011855dc23e';
+        const redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/payment-success/' + result.order_id;
 
         response.redirect(301, redirectUrl);
 
