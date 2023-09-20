@@ -67,6 +67,9 @@ exports.success_recive = function (request, response) {
         // // response.end();
         // response.render("payment-success.html", { data: ccavResponse });
         console.log(result)
-        response.redirect(result.merchant_param1 + "/" + result.order_id)
+        const redirectUrl = result.merchant_param1 + "/" + result.order_id;
+        response.redirect(301, redirectUrl);
+
+        // response.redirect(result.merchant_param1 + "/" + result.order_id)
     });
 };
