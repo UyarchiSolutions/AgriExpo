@@ -33,6 +33,7 @@ exports.success_recive = function (request, response) {
         ccavResponse = '',
         workingKey = '1AC82EC283C6AE1561C420D21169F52F',	//Put in the 32-Bit Key provided by CCAvenue.
         ccavPOST = '';
+    var result = {};
     request.on('data', function (data) {
         ccavEncResponse += data;
         ccavPOST = qs.parse(ccavEncResponse);
@@ -41,6 +42,17 @@ exports.success_recive = function (request, response) {
         ccavResponse = ccav.decrypt(encryption, workingKey);
         console.log(ccavResponse)
         console.log(ccavPOST.my_redirect_url)
+        var keyValuePairs = ccavResponse.split('&');
+        // Create an empty object to store the result
+
+        // Iterate through the key-value pairs and assign them to the object
+        for (var i = 0; i < keyValuePairs.length; i++) {
+            var pair = keyValuePairs[i].split('=');
+            var key = decodeURIComponent(pair[0]);
+            var value = decodeURIComponent(pair[1] || ''); // Use an empty string if the value is missing
+            result[key] = value;
+        }
+        console.log(result)
     });
 
     request.on('end', function () {
@@ -54,6 +66,7 @@ exports.success_recive = function (request, response) {
         // // response.write(htmlcode);
         // // response.end();
         // response.render("payment-success.html", { data: ccavResponse });
-        response.redirect(ccavResponse.merchant_param1 + "/" + ccavResponse.order_id)
+        console.log(result)
+        response.redirect(result.merchant_param1 + "/" + result.order_id)
     });
 };
