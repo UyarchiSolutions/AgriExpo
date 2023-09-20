@@ -60,9 +60,12 @@ exports.success_recive = function (request, response) {
         if (!find) {
             throw new ApiError(httpStatus.BAD_REQUEST, 'pursace not found');
         }
-        find.response_enq = encryption;
-        find.response = result;
-        find.save();
+        else {
+            find.response_enq = encryption;
+            find.response = result;
+            find.save();
+        }
+
     });
     request.on('end', function () {
         // var pData = '';
