@@ -476,6 +476,7 @@ const Purchased_Message = async (Name, plan, mobile) => {
 };
 
 const create_PurchasePlan_EXpo = async (planId, userId, ccavenue) => {
+  console.log(ccavenue, 98765789)
   let findUser = await Seller.findById(userId);
   if (!findUser) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
@@ -507,9 +508,10 @@ const create_PurchasePlan_EXpo = async (planId, userId, ccavenue) => {
     DateIso: moment(),
     planId: planId,
     suppierId: userId,
-    ccavanue: ccavenue,
+    ccavenue: ccavenue,
     transaction: findPlan.transaction,
   };
+  console.log(data)
   const creations = await purchasePlan.create(data);
   await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
   return creations;

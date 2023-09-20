@@ -13596,9 +13596,9 @@ const get_address_log = async (req) => {
 const purchesPlane_exhibitor = async (req, res) => {
   const { amount, plan, redirct } = req.body;
   let paynow = await ccavenue.exhibitor_purchese_plan(amount, redirct);
-  console.log(paynow)
+  console.log(paynow.payment.id, paynow.payment._id)
   let purchase = await purchese_plan.create_PurchasePlan_EXpo(plan, req.userId, paynow.payment.id);
-  console.log(purchase)
+  // console.log(purchase)
 
   return paynow;
   // await ccavenue.pay_nowredirect_url(paynow.formbody, res)

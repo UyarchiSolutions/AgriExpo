@@ -229,6 +229,9 @@ const purchasePlanSchema = mongoose.Schema(
     ccavenue: {
       type: String,
     },
+    ccavenue_payment_id: {
+      type: String,
+    },
     transaction: {
       type: String,
     }

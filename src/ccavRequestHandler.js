@@ -93,15 +93,13 @@ const update_ccavenue_payment = async (result, encryption) => {
     }
 
     let plan = await purchasePlan.findOne({ ccavenue: find._id })
-    console.log(find)
-    // console.log(plan)
-    // if (!plan) {
-    //     throw new ApiError(httpStatus.BAD_REQUEST, 'pursace Plan  not found');
-    // }
-    // else {
-    //     plan.status = 'Activated';
-    //     plan.save();
-    // }
+    if (!plan) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'pursace Plan  not found');
+    }
+    else {
+        plan.status = 'Activated';
+        plan.save();
+    }
     return find;
 }
 

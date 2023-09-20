@@ -151,7 +151,7 @@ const exhibitor_purchese_plan = async (amount, redirct) => {
     const queryString = objectToQueryString(data);
     const bufferData = Buffer.from(queryString, 'utf-8');
     encRequest = ccav.encrypt(bufferData, workingKey);
-    console.log(encRequest)
+    // console.log(encRequest)
     data.encRequest = encRequest;
     const payment = await create_plan_paymant(data)
     data.merchant_param1 = payment._id;
