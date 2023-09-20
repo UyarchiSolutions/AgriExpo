@@ -41,8 +41,6 @@ exports.success_recive = function (request, response) {
         ccavResponse = ccav.decrypt(encryption, workingKey);
         console.log(ccavResponse)
         console.log(ccavPOST.my_redirect_url)
-
-
     });
 
     request.on('end', function () {

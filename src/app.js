@@ -179,7 +179,7 @@ if (config.env !== 'test') {
 const ccavReqHandler = require('./ccavRequestHandler.js');
 
 app.get('/about', function (req, res) {
-  res.render('dataFrom.html');
+  res.render('dataFrom.html', { name: "bharathi" });
 });
 app.post('/success', function (req, res) {
   ccavReqHandler.success_recive(req, res);
