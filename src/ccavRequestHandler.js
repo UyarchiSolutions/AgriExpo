@@ -35,6 +35,7 @@ exports.success_recive = function (request, response) {
         workingKey = '1AC82EC283C6AE1561C420D21169F52F',	//Put in the 32-Bit Key provided by CCAvenue.
         ccavPOST = '';
     var result = {};
+    let orders = { _id: null };
     request.on('data', async function (data) {
         ccavEncResponse += data;
         ccavPOST = qs.parse(ccavEncResponse);
@@ -53,7 +54,7 @@ exports.success_recive = function (request, response) {
             result[key] = value;
         }
         console.log(result)
-        await update_ccavenue_payment(result, encryption)
+        orders = await update_ccavenue_payment(result, encryption)
         // let dd = await ccavenue_paymnet.findById('23852f86-cba3-4ce1-ab54-3bfcf47b319e');
         // console.log(dd, 232, result.order_id)
     });
@@ -68,7 +69,7 @@ exports.success_recive = function (request, response) {
         // // response.write(htmlcode);
         // // response.end();
         // response.render("payment-success.html", { data: ccavResponse });
-        const redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/payment-success/' + result.order_id;
+        const redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/payment-success/' + orders._id;
         response.redirect(301, redirectUrl);
 
         // response.redirect(result.merchant_param1 + "/" + result.order_id)
