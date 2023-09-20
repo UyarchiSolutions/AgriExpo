@@ -2561,6 +2561,7 @@ const get_all_streams = async (req) => {
         secondarycommunication: 1,
         originalDate: 1,
         stream_expired: 1,
+        show_completd: 1
       },
     },
 
