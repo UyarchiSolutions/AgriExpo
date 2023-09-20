@@ -13597,7 +13597,8 @@ const purchesPlane_exhibitor = async (req, res) => {
   const { amount, plan, redirct } = req.body;
   let paynow = await ccavenue.exhibitor_purchese_plan(amount, redirct);
   console.log(paynow)
-  await purchese_plan.create_PurchasePlan_EXpo(plan, req.userId, paynow.payment._id);
+  let purchase = await purchese_plan.create_PurchasePlan_EXpo(plan, req.userId, paynow.payment._id);
+  console.log(purchase)
 
   return paynow;
   // await ccavenue.pay_nowredirect_url(paynow.formbody, res)
