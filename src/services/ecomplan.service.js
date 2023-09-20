@@ -5064,6 +5064,7 @@ const get_watch_live_steams_completed = async (req) => {
           { adminApprove: { $eq: 'Approved' } },
           { status: { $ne: 'Cancelled' } },
           { show_completd: { $eq: true } },
+          { status: { $ne: 'Removed' } },
         ],
       },
     },
@@ -6460,7 +6461,7 @@ const on_going_stream = async (req) => {
 
 const getall_homeage_streams = async (req) => {
   let interested = await Streamrequest.aggregate([
-    { $match: { $and: [{ adminApprove: { $eq: 'Approved' } }] } },
+    { $match: { $and: [{ adminApprove: { $eq: 'Approved' } },{ status: { $ne: 'Removed' } },] } },
     {
       $lookup: {
         from: 'joinedusers',
@@ -6707,6 +6708,7 @@ const getall_homeage_streams = async (req) => {
           { adminApprove: { $eq: 'Approved' } },
           { status: { $ne: 'Cancelled' } },
           { show_completd: { $eq: true } },
+          { status: { $ne: 'Removed' } },
         ],
       },
     },
