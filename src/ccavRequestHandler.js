@@ -53,6 +53,7 @@ exports.success_recive = function (request, response) {
         // response.writeHeader(200, { "Content-Type": "text/html" });
         // response.write(htmlcode);
         // response.end();
-        response.render("payment-success.html", { data: ccavResponse });
+        // response.render("payment-success.html", { data: ccavResponse });
+        response.redirect("https://agriexpo.live/sdcs")
     });
 };
