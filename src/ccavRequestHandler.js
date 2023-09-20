@@ -4,6 +4,7 @@ var http = require('http'),
     qs = require('querystring');
 
 const { ccavenue_paymnet } = require("./models/ccavenue.model")
+const ApiError = require('./utils/ApiError');
 
 exports.postReq = function (request, response) {
     var body = '',
