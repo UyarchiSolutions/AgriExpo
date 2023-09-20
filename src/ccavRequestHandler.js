@@ -69,7 +69,7 @@ exports.success_recive = function (request, response) {
         console.log(result)
         const redirectUrl = 'https://agriexpo.live/dashboard/payment-success/81e033bb-662b-42a6-b06b-2011855dc23e';
 
-        res.redirect(301, redirectUrl);
+        response.redirect(301, redirectUrl);
 
         // response.redirect(result.merchant_param1 + "/" + result.order_id)
     });
