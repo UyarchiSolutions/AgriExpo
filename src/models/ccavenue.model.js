@@ -109,6 +109,12 @@ const ccavenueSchema = mongoose.Schema({
     },
     encRequest: {
         type: String,
+    },
+    response: {
+        type: Object,
+    },
+    response_enq: {
+        type: String,
     }
 },
     { timestamps: true }

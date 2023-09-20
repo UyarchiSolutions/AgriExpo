@@ -3,15 +3,14 @@ var http = require('http'),
     ccav = require('./utils/ccavutil'),
     qs = require('querystring');
 
+const { ccavenue_paymnet } = require("./models/ccavenue.model")
+
 exports.postReq = function (request, response) {
     var body = '',
         workingKey = 'B0050D8C882D10898AE305B141D27C8C',	//Put in the 32-Bit key shared by CCAvenues.
         accessCode = 'AVOI05KI17AK41IOKA',			//Put in the Access Code shared by CCAvenues.
         encRequest = '',
         formbody = '';
-    // console.log(workingKey)
-    // console.log(accessCode)
-    // console.log(request)
     request.on('data', function (data) {
         body += data;
         encRequest = ccav.encrypt(body, workingKey);
@@ -34,7 +33,7 @@ exports.success_recive = function (request, response) {
         workingKey = '1AC82EC283C6AE1561C420D21169F52F',	//Put in the 32-Bit Key provided by CCAvenue.
         ccavPOST = '';
     var result = {};
-    request.on('data', function (data) {
+    request.on('data', async function (data) {
         ccavEncResponse += data;
         ccavPOST = qs.parse(ccavEncResponse);
         console.log(ccavPOST)
@@ -44,7 +43,6 @@ exports.success_recive = function (request, response) {
         console.log(ccavPOST.my_redirect_url)
         var keyValuePairs = ccavResponse.split('&');
         // Create an empty object to store the result
-
         // Iterate through the key-value pairs and assign them to the object
         for (var i = 0; i < keyValuePairs.length; i++) {
             var pair = keyValuePairs[i].split('=');
@@ -53,8 +51,14 @@ exports.success_recive = function (request, response) {
             result[key] = value;
         }
         console.log(result)
+        const find = await ccavenue_paymnet.findById(result.order_id);
+        if (!find) {
+            throw new ApiError(httpStatus.BAD_REQUEST, 'pursace not found');
+        }
+        find.response_enq = encryption;
+        find.response = result;
+        find.save();
     });
-
     request.on('end', function () {
         // var pData = '';
         // pData = '<table border=1 cellspacing=2 cellpadding=2><tr><td>'
@@ -66,9 +70,7 @@ exports.success_recive = function (request, response) {
         // // response.write(htmlcode);
         // // response.end();
         // response.render("payment-success.html", { data: ccavResponse });
-        console.log(result)
         const redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/payment-success/' + result.order_id;
-
         response.redirect(301, redirectUrl);
 
         // response.redirect(result.merchant_param1 + "/" + result.order_id)

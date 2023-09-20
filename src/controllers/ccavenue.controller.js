@@ -21,6 +21,15 @@ const pay_now_encript_value = catchAsync(async (req, res) => {
 
 });
 
+const exhibitor_purchese_plan = catchAsync(async (req, res) => {
+    const category = await ccavenue.exhibitor_purchese_plan(req);
+    res.writeHeader(200, { "Content-Type": "text/html" });
+    res.write(category)
+    res.end()
+    // res.send(category)
+
+});
+
 
 const nearby_value = catchAsync(async (req, res) => {
     const category = await ccavenue.placesNearby(req.shopId, req.body, res);
@@ -32,5 +41,6 @@ const nearby_value = catchAsync(async (req, res) => {
 module.exports = {
     get_paymnent_url,
     pay_now_encript_value,
-    nearby_value
+    nearby_value,
+    exhibitor_purchese_plan
 }
