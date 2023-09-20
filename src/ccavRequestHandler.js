@@ -77,6 +77,7 @@ exports.success_recive = function (request, response) {
 
 
 const update_ccavenue_payment = async (result) => {
+    console.log(result.order_id, 867890876)
     const find = await ccavenue_paymnet.findById(result.order_id);
     if (!find) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'pursace not found');
