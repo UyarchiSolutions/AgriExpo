@@ -4,6 +4,7 @@ var http = require('http'),
     qs = require('querystring');
 
 const { ccavenue_paymnet } = require("./models/ccavenue.model")
+const { purchasePlan, PlanPayment } = require("./models/purchasePlan.model")
 const ApiError = require('./utils/ApiError');
 const httpStatus = require('http-status');
 
@@ -79,6 +80,7 @@ exports.success_recive = function (request, response) {
 
 
 const update_ccavenue_payment = async (result, encryption) => {
+    // purchasePlan
     console.log(result.order_id, 867890876)
     const find = await ccavenue_paymnet.findOne({ order_id: result.order_id });
     if (!find) {
@@ -89,6 +91,54 @@ const update_ccavenue_payment = async (result, encryption) => {
         find.response = result;
         find.save();
     }
+
+    let plan = await purchasePlan.findOne({ ccavenue: find._id })
     console.log(find)
+    console.log(plan)
+    if (!plan) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'pursace Plan  not found');
+    }
+    else {
+        plan.status = 'Activated';
+        plan.save();
+    }
     return find;
 }
+
+const create_PlanPayment = async (PlanId, body) => {
+    let Plan = await purchasePlan.findById(PlanId);
+    if (!Plan) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Plan not found');
+    }
+    let discound = Plan.Discount ? Plan.Discount : 0;
+    let PlanPrice = parseInt(Plan.Price) - discound;
+    let PaidAmount = Plan.PaidAmount ? Plan.PaidAmount : 0;
+    let ToBePaid = PaidAmount + body.Amount;
+    let finding = await PlanPayment.find().count();
+    let center = '';
+    if (finding < 9) {
+        center = '0000';
+    }
+    if (finding < 99 && finding >= 9) {
+        center = '000';
+    }
+    if (finding < 999 && finding >= 99) {
+        center = '00';
+    }
+    if (finding < 9999 && finding >= 999) {
+        center = '0';
+    }
+    let billId = 'BID' + center + finding + 1;
+    let data = { ...body, billId: billId };
+    let paid = await purchasePlan.findByIdAndUpdate({ _id: PlanId }, { PaidAmount: ToBePaid }, { new: true });
+    if (PlanPrice > 0) {
+        if (PlanPrice == paid.PaidAmount ? paid.PaidAmount : 0) {
+            paid.PayementStatus = 'FullyPaid';
+        } else {
+            paid.PayementStatus = 'PartiallyPaid';
+        }
+        await paid.save();
+    }
+    const datas = await PlanPayment.create(data);
+    return datas;
+};
