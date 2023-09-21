@@ -280,15 +280,19 @@ const get_all_post_transation = async (req) => {
   if (!purchsae) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Plan Not Found');
   }
-  let transaction = 'null'
+  let transaction = 'null';
   if (purchsae.transaction == 'With Transaction') {
-    transaction = 'With'
+    transaction = 'With';
   }
   if (purchsae.transaction == 'Without Transaction') {
-    transaction = 'Without'
+    transaction = 'Without';
   }
   const value = await StreamPost.aggregate([
-    { $match: { $and: [{ suppierId: { $eq: req.userId } }, { isUsed: { $eq: false } }, { transaction: { $eq: transaction } }] } },
+    {
+      $match: {
+        $and: [{ suppierId: { $eq: req.userId } }, { isUsed: { $eq: false } }, { transaction: { $eq: transaction } }],
+      },
+    },
     {
       $lookup: {
         from: 'products',
@@ -1503,7 +1507,6 @@ const create_stream_one = async (req) => {
     });
     await Dates.create_date(value);
   } else {
-
     throw new ApiError(httpStatus.NOT_FOUND, 'App id Not found');
   }
 
@@ -2571,7 +2574,7 @@ const get_all_streams = async (req) => {
         secondarycommunication: 1,
         originalDate: 1,
         stream_expired: 1,
-        show_completd: 1
+        show_completd: 1,
       },
     },
 
@@ -6461,7 +6464,7 @@ const on_going_stream = async (req) => {
 
 const getall_homeage_streams = async (req) => {
   let interested = await Streamrequest.aggregate([
-    { $match: { $and: [{ adminApprove: { $eq: 'Approved' } },{ status: { $ne: 'Removed' } },] } },
+    { $match: { $and: [{ adminApprove: { $eq: 'Approved' } }, { status: { $ne: 'Removed' } }] } },
     {
       $lookup: {
         from: 'joinedusers',
@@ -8361,8 +8364,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+        ? 'RAC'
+        : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -8371,8 +8374,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-            ? 'RAC'
-            : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -12842,7 +12845,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => { };
+const get_video_link = async (req) => {};
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
@@ -13151,11 +13154,11 @@ const completed_show_vidio = async (req) => {
     streamss.selectvideo = show;
     streamss.show_completd = true;
     streamss.completed_stream = userID;
-    streamss.completed_stream_by = "Myself";
+    streamss.completed_stream_by = 'Myself';
     streamss.save();
   }
 
-  return { message: 'success', completed_stream_by: "Myself" };
+  return { message: 'success', completed_stream_by: 'Myself' };
 };
 const completed_show_vidio_admin = async (req) => {
   let userID = req.userId;
@@ -13178,11 +13181,11 @@ const completed_show_vidio_admin = async (req) => {
     streamss.selectvideo = show;
     streamss.show_completd = true;
     streamss.completed_stream = userID;
-    streamss.completed_stream_by = "Admin";
+    streamss.completed_stream_by = 'Admin';
     streamss.save();
   }
 
-  return { message: 'success', completed_stream_by: "Admin" };
+  return { message: 'success', completed_stream_by: 'Admin' };
 };
 
 const visitor_save_product = async (req) => {
@@ -13608,19 +13611,115 @@ const get_address_log = async (req) => {
   let apikey = 'AIzaSyARM6-Qr_hsR53GExv9Gmu9EtFTV5ZuDX4';
   let values = await Axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apikey}`);
   return values.data.results;
-}
+};
 
 const purchesPlane_exhibitor = async (req, res) => {
   const { amount, plan, redirct } = req.body;
   let paynow = await ccavenue.exhibitor_purchese_plan(amount, redirct);
-  console.log(paynow.payment.id, paynow.payment._id)
+  console.log(paynow.payment.id, paynow.payment._id);
   let purchase = await purchese_plan.create_PurchasePlan_EXpo(plan, req.userId, paynow.payment.id);
   // console.log(purchase)
 
   return paynow;
   // await ccavenue.pay_nowredirect_url(paynow.formbody, res)
-}
+};
 
+const get_Saved_Product = async (userId) => {
+  var date_now = new Date().getTime();
+  let values = await Savedproduct.aggregate([
+    {
+      $match: {
+        userID: userId,
+      },
+    },
+    {
+      $lookup: {
+        from: 'streamrequests',
+        localField: 'streamID',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $addFields: {
+              condition: {
+                $cond: {
+                  if: { $and: [{ $lte: ['$startTime', date_now] }, { $gte: ['$streamEnd_Time', date_now] }] },
+                  then: 1,
+                  else: {
+                    $cond: {
+                      if: { $and: [{ $gte: ['$startTime', date_now] }] },
+                      then: 2,
+                      else: 3,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          {
+            $addFields: {
+              streamStatus: {
+                $cond: {
+                  if: { $and: [{ $eq: ['$condition', 1] }] },
+                  then: 'Live',
+                  else: {
+                    $cond: {
+                      if: { $and: [{ $eq: ['$condition', 2] }] },
+                      then: 'Upcomming',
+                      else: 'Completed',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        ],
+        as: 'Stream',
+      },
+    },
+    {
+      $unwind: '$Stream',
+    },
+    {
+      $lookup: {
+        from: 'streamposts',
+        localField: 'productID',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'products',
+              localField: 'productId',
+              foreignField: '_id',
+              as: 'product',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$product',
+            },
+          },
+        ],
+        as: 'streamPost',
+      },
+    },
+    {
+      $unwind: '$streamPost',
+    },
+    {
+      $project: {
+        _id: 1,
+        saved: 1,
+        productID: 1,
+        streamID: 1,
+        created: 1,
+        StreamDetails: '$Stream',
+        ProdctDetails: '$streamPost.product',
+      },
+    },
+  ]);
+  return values;
+};
 
 module.exports = {
   create_Plans,
@@ -13770,5 +13869,6 @@ module.exports = {
   get_all_post_transation,
 
   // purchese plan
-  purchesPlane_exhibitor
+  purchesPlane_exhibitor,
+  get_Saved_Product,
 };
