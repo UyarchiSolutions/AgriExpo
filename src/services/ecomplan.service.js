@@ -1529,16 +1529,12 @@ const find_and_update_one = async (req) => {
   return value;
 };
 
-const create_stream_one_image = async (req) => {
-  //console.log(req.file, 'asdasda');
-  if (req.file != null) {
-    await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, { image: 'images/stream/' + req.file.filename });
-    return { image: 'success' };
-  }
-  return { image: 'faild' };
-};
-const create_stream_one_video = async (req) => {
-  // //console.log(req.file, "asdasda")
+const create_stream_one_image = async (req, type) => {
+  // if (req.file != null) {
+  //   await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, { image: 'images/stream/' + req.file.filename });
+  //   return { image: 'success' };
+  // }
+  // return { image: 'faild' };
   if (req.file != null) {
     const s3 = new AWS.S3({
       accessKeyId: 'AKIA3323XNN7Y2RU77UG',
@@ -1554,9 +1550,37 @@ const create_stream_one_video = async (req) => {
     return new Promise((resolve) => {
       s3.upload(params, async (err, data) => {
         if (err) {
-          //console.log(err);
         }
-        //console.log(data);
+        if (type == 'broucher') {
+          stream = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, { broucher: data.Location }, { new: true });
+        }
+        if (type == 'image') {
+          stream = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, { image: data.Location }, { new: true });
+        }
+        resolve({ teaser: 'success', stream });
+      });
+    });
+  } else {
+    return { message: 'Invalid' };
+  }
+};
+const create_stream_one_video = async (req) => {
+  if (req.file != null) {
+    const s3 = new AWS.S3({
+      accessKeyId: 'AKIA3323XNN7Y2RU77UG',
+      secretAccessKey: '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',
+      region: 'ap-south-1',
+    });
+    let params = {
+      Bucket: 'realestatevideoupload',
+      Key: req.file.originalname,
+      Body: req.file.buffer,
+    };
+    let stream;
+    return new Promise((resolve) => {
+      s3.upload(params, async (err, data) => {
+        if (err) {
+        }
         stream = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, { teaser: data.Location });
         resolve({ teaser: 'success', stream });
       });
@@ -1566,7 +1590,6 @@ const create_stream_one_video = async (req) => {
   }
 };
 const create_stream_one_Broucher = async (req) => {
-  // //console.log(req.file, "asdasda")
   if (req.file != null) {
     const s3 = new AWS.S3({
       accessKeyId: 'AKIA3323XNN7Y2RU77UG',
@@ -1582,9 +1605,7 @@ const create_stream_one_Broucher = async (req) => {
     return new Promise((resolve) => {
       s3.upload(params, async (err, data) => {
         if (err) {
-          //console.log(err);
         }
-        //console.log(data);
         stream = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, { brouchers: data.Location });
         resolve({ brouchers: 'success', stream });
       });
@@ -6461,7 +6482,7 @@ const on_going_stream = async (req) => {
 
 const getall_homeage_streams = async (req) => {
   let interested = await Streamrequest.aggregate([
-    { $match: { $and: [{ adminApprove: { $eq: 'Approved' } },{ status: { $ne: 'Removed' } },] } },
+    { $match: { $and: [{ adminApprove: { $eq: 'Approved' } }, { status: { $ne: 'Removed' } },] } },
     {
       $lookup: {
         from: 'joinedusers',

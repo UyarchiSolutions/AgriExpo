@@ -142,9 +142,17 @@ const find_and_update_one = catchAsync(async (req, res) => {
 const create_stream_one_image = catchAsync(async (req, res) => {
   //console.log('asdasasas');
   //console.log(req.file);
-  const value = await Ecomserive.create_stream_one_image(req);
+  const value = await Ecomserive.create_stream_one_image(req, 'image');
   res.send(value);
 });
+
+const create_stream_one_broucher = catchAsync(async (req, res) => {
+  //console.log('asdasasas');
+  //console.log(req.file);
+  const value = await Ecomserive.create_stream_one_image(req, 'broucher');
+  res.send(value);
+});
+
 
 const create_stream_one_video = catchAsync(async (req, res) => {
   //console.log('asdasasas');
@@ -739,6 +747,7 @@ module.exports = {
   delete_one_stream,
   create_stream_one_image,
   create_stream_one_video,
+  create_stream_one_broucher,
   get_one_stream_step_two,
   update_one_stream_two,
   update_one_stream_one,

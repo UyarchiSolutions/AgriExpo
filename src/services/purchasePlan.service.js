@@ -1023,6 +1023,7 @@ const getPlanes_Request_Streams = async (userId) => {
             { $eq: ['$Exclusive', '$ExclusiveSlots'] },
           ],
         },
+        transaction: 1
       },
     },
     {

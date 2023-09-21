@@ -20,6 +20,8 @@ const storage = multer.memoryStorage({
   },
 });
 const upload = multer({ storage }).single('teaser');
+const upload_image = multer({ storage }).single('image');
+const upload_broucher = multer({ storage }).single('broucher');
 const uploadBroucher = multer({ storage }).single('brouchers');
 const storage_s3 = multer.diskStorage({
   destination(req, file, cb) {
@@ -65,7 +67,8 @@ router.route('/remove/one/post').put(SellerAuth, Ecomcontroller.remove_one_post)
 // Stream Request APIS
 router.route('/create/stream/one').post(SellerAuth, Ecomcontroller.create_stream_one);
 router.route('/create/stream/one').put(SellerAuth, Ecomcontroller.find_and_update_one);
-router.route('/create/stream/one/image').post(ecommulter.single('image'), Ecomcontroller.create_stream_one_image);
+router.route('/create/stream/one/image').post(upload_image, Ecomcontroller.create_stream_one_image);
+router.route('/create/stream/one/broucher').post(upload_broucher, Ecomcontroller.create_stream_one_broucher);
 router.route('/create/stream/one/video').post(upload, Ecomcontroller.create_stream_one_video);
 router.route('/create/stream/one/Broucher').post(uploadBroucher, Ecomcontroller.create_stream_one_Broucher);
 router.route('/create/stream/two').post(SellerAuth, Ecomcontroller.create_stream_two);
