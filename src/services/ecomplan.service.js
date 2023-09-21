@@ -13715,6 +13715,7 @@ const get_Saved_Product = async (userId) => {
         created: 1,
         StreamDetails: '$Stream',
         ProdctDetails: '$streamPost.product',
+        StreamPost:"$streamPost"
       },
     },
   ]);
