@@ -15,6 +15,7 @@ const SellerAuth = async (req, res, next) => {
   }
   try {
     const payload = jwt.verify(token, config.jwt.secret);
+    console.log(payload['_id'])
     const userss = await Seller.findById(payload['_id']);
     if (!userss) {
       return res.send(httpStatus.UNAUTHORIZED, 'Seller Not Found');

@@ -718,6 +718,13 @@ const purchesPlane_exhibitor = catchAsync(async (req, res) => {
   const data = await Ecomserive.purchesPlane_exhibitor(req, res);
   res.send(data);
 });
+
+const get_Saved_Product = catchAsync(async (req, res) => {
+  let userId = req.shopId;
+  const data = await Ecomserive.get_Saved_Product(userId);
+  res.send(data);
+});
+
 module.exports = {
   create_Plans,
   UploadProof,
@@ -860,4 +867,5 @@ module.exports = {
 
   // pruchese plan
   purchesPlane_exhibitor,
+  get_Saved_Product
 };
