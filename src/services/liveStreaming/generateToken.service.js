@@ -1942,11 +1942,13 @@ const raise_request = async (req) => {
     raise = await RaiseUsers.findByIdAndUpdate({ _id: raise._id }, { status: 'Pending', raised_count: (raise.raised_count + 1) }, { new: true });
   }
   if (!raise) {
-    raise = await RaiseUsers.create({ streamId: streamId, shopId: shopId, tempID: temp._id });
+    raise = await RaiseUsers.create({ streamId: streamId, shopId: shopId, tempID: temp._id, });
   }
 
   raise.status = "Pending"
   raise.raised_count = raise.raised_count + 1;
+  raise.sortData = moment();
+  raise.sort = 1;
   raise.dateISO = moment();
   raise.save();
 

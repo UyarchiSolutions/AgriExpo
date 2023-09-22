@@ -1471,7 +1471,7 @@ const create_stream_one = async (req) => {
 
   let totalMinutes = numberOfParticipants + no_of_host + Duration;
   let agoraID = await agoraToken.token_assign(totalMinutes, '', 'agri');
-  console.log(agoraID)
+  // console.log(agoraID)
   // UsageAppID
   let datess = new Date().setTime(new Date(startTime).getTime() + slot.Duration * 60 * 1000);
   let value;
@@ -13629,10 +13629,21 @@ const get_previes_post = async (req) => {
         from: 'streamingorderproducts',
         localField: '_id',
         foreignField: 'streamPostId',
-        // pipeline: [
-        //   { $group: { _id: null, purchase_quantity: { $sum: "$purchase_quantity" } } }
-        // ],
+        pipeline: [
+          { $group: { _id: null, purchase_quantity: { $sum: "$purchase_quantity" } } }
+        ],
         as: 'streamingorderproducts',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$streamingorderproducts',
+      },
+    },
+    {
+      $addFields: {
+        purchase_quantity: { $ifNull: ['$streamingorderproducts.purchase_quantity', 0] },
       },
     },
     { $limit: 1 }
