@@ -229,6 +229,12 @@ const raiseUserschema = mongoose.Schema({
   },
   dateISO: {
     type: Number,
+  },
+  sort: {
+    type: Number,
+  },
+  sortData: {
+    type: Number,
   }
 },
   { timestamps: true }

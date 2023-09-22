@@ -155,7 +155,8 @@ const streamplanschema = mongoose.Schema({
   },
   transaction: {
     type: String,
-  }
+  },
+
 });
 
 const Streamplan = mongoose.model('streamplan', streamplanschema);
@@ -305,6 +306,18 @@ const streamPostschema = mongoose.Schema({
   },
   longitude: {
     type: Number,
+  },
+  purchase_limit: {
+    type: String,
+  },
+  max_purchase_value: {
+    type: String,
+  },
+  pruductreturnble: {
+    type: String,
+  },
+  return_policy: {
+    type: String,
   }
 });
 
@@ -516,10 +529,13 @@ const streamRequestschema = mongoose.Schema({
   updatedBy_id: {
     type: String,
   },
-  completed_stream:{
+  completed_stream: {
     type: String,
   },
-  completed_stream_by:{
+  completed_stream_by: {
+    type: String,
+  },
+  broucher: {
     type: String,
   }
 });

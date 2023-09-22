@@ -82,6 +82,7 @@ exports.success_recive = function (request, response) {
 
 const update_ccavenue_payment = async (result, encryption) => {
     // purchasePlan
+    console.log(result, 867890876)
     console.log(result.order_id, 867890876)
     const find = await ccavenue_paymnet.findOne({ order_id: result.order_id });
     if (!find) {

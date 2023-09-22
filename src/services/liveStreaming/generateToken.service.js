@@ -1793,6 +1793,7 @@ const pending_request_switch = async (req, raiseid) => {
   stream.current_raise = null;
   stream.save();
   raise.status = 'end';
+  raise.sort = 0;
   raise.save();
   req.io.emit(raise._id + '_status', { message: "end" });
   return raise;
@@ -1832,12 +1833,15 @@ const get_raise_hands = async (req) => {
             $project: {
               _id: 1,
               SName: "$shops.SName",
+              tradeName: "$shops.tradeName",
               mobile: "$shops.mobile",
               address: "$shops.address",
               country: "$shops.country",
               state: "$shops.state",
               companyName: "$shops.companyName",
               designation: "$shops.designation",
+              email: "$shops.email",
+              address: "$shops.address",
               streamId: 1,
               shopId: 1,
               tempID: 1,
@@ -1846,7 +1850,9 @@ const get_raise_hands = async (req) => {
               raised_count: 1,
               already_joined: 1,
               updatedAt: 1,
-              dateISO: 1
+              dateISO: 1,
+              sortData: 1,
+              sort: 1
             }
           }
         ],
@@ -1942,11 +1948,13 @@ const raise_request = async (req) => {
     raise = await RaiseUsers.findByIdAndUpdate({ _id: raise._id }, { status: 'Pending', raised_count: (raise.raised_count + 1) }, { new: true });
   }
   if (!raise) {
-    raise = await RaiseUsers.create({ streamId: streamId, shopId: shopId, tempID: temp._id });
+    raise = await RaiseUsers.create({ streamId: streamId, shopId: shopId, tempID: temp._id, });
   }
 
   raise.status = "Pending"
   raise.raised_count = raise.raised_count + 1;
+  raise.sortData = moment();
+  raise.sort = 1;
   raise.dateISO = moment();
   raise.save();
 
@@ -1970,12 +1978,15 @@ const raise_request = async (req) => {
       $project: {
         _id: 1,
         SName: "$shops.SName",
+        tradeName: "$shops.tradeName",
         mobile: "$shops.mobile",
         address: "$shops.address",
         country: "$shops.country",
         state: "$shops.state",
         companyName: "$shops.companyName",
         designation: "$shops.designation",
+        email: "$shops.email",
+        address: "$shops.address",
         streamId: 1,
         shopId: 1,
         tempID: 1,
@@ -1984,12 +1995,16 @@ const raise_request = async (req) => {
         raised_count: 1,
         already_joined: 1,
         updatedAt: 1,
-        dateISO: 1
+        dateISO: 1,
+        sortData: 1,
+        sort: 1
       }
     }
   ])
   raise[0].status = 'Pending';
   raise[0].dateISO = moment();
+  raise[0].sortData = moment();
+  raise[0].sort = 1;
   req.io.emit(streamId + '_raise_hands_request', raise[0]);
   return raise;
 }
@@ -2005,6 +2020,7 @@ const approve_request = async (req) => {
   stream.current_raise = raise._id;
   stream.save();
   raise.status = 'approved';
+  raise.sort = 2;
   raise.save();
   req.io.emit(raise._id + '_status', { message: "approved" });
   return raise;
@@ -2020,6 +2036,7 @@ const pending_request = async (req) => {
   stream.current_raise = null;
   stream.save();
   raise.status = 'end';
+  raise.sort = 0;
   raise.save();
   req.io.emit(raise._id + '_status', { message: "end" });
   req.io.emit(stream._id + '_raise_hands_request', raise);
@@ -2035,6 +2052,7 @@ const reject_request = async (req) => {
   let stream = await Streamrequest.findById(raise.streamId);
   stream.current_raise = null;
   stream.save();
+  raise.sort = 0;
   raise.status = 'rejected';
   raise.save();
   req.io.emit(raise._id + '_status', { message: "rejected" });
@@ -2105,7 +2123,9 @@ const jion_now_live = async (req) => {
         already_joined: 1,
         updatedAt: 1,
         createdAt: 1,
-        dateISO: 1
+        dateISO: 1,
+        sortData: 1,
+        sort: 1
       }
     }
   ])
