@@ -1471,7 +1471,7 @@ const create_stream_one = async (req) => {
 
   let totalMinutes = numberOfParticipants + no_of_host + Duration;
   let agoraID = await agoraToken.token_assign(totalMinutes, '', 'agri');
-  // console.log(agoraID)
+  console.log(agoraID)
   // UsageAppID
   let datess = new Date().setTime(new Date(startTime).getTime() + slot.Duration * 60 * 1000);
   let value;
@@ -8385,8 +8385,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-        ? 'RAC'
-        : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -8395,8 +8395,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+            ? 'RAC'
+            : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -12866,7 +12866,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => {};
+const get_video_link = async (req) => { };
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
@@ -13620,8 +13620,29 @@ const notify_me_toggle = async (req) => {
 
 const get_previes_post = async (req) => {
   console.log(req.query.id);
-  const prev = await StreamPost.findOne({ productId: req.query.id, suppierId: req.userId }).sort({ DateIso: -1 });
-
+  // const prev = await StreamPost.findOne({ productId: req.query.id, suppierId: req.userId }).sort({ DateIso: -1 });
+  let prev = await StreamPost.aggregate([
+    { $sort: { DateIso: -1 } },
+    { $match: { $and: [{ productId: { $eq: req.query.id } }, { suppierId: { $eq: req.userId } }] } },
+    {
+      $lookup: {
+        from: 'streamingorderproducts',
+        localField: '_id',
+        foreignField: 'streamPostId',
+        // pipeline: [
+        //   { $group: { _id: null, purchase_quantity: { $sum: "$purchase_quantity" } } }
+        // ],
+        as: 'streamingorderproducts',
+      },
+    },
+    { $limit: 1 }
+  ])
+  if (prev.length != 0) {
+    prev = prev[0];
+  }
+  else {
+    prev = null;
+  }
   return prev;
 };
 
@@ -13736,7 +13757,7 @@ const get_Saved_Product = async (userId) => {
         created: 1,
         StreamDetails: '$Stream',
         ProdctDetails: '$streamPost.product',
-        StreamPost:"$streamPost"
+        StreamPost: "$streamPost"
       },
     },
   ]);
