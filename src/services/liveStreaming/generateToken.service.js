@@ -1990,13 +1990,15 @@ const raise_request = async (req) => {
         already_joined: 1,
         updatedAt: 1,
         dateISO: 1,
-        sortData:1,
-        sort:1
+        sortData: 1,
+        sort: 1
       }
     }
   ])
   raise[0].status = 'Pending';
   raise[0].dateISO = moment();
+  raise[0].sortData = moment();
+  raise[0].sort = 1;
   req.io.emit(streamId + '_raise_hands_request', raise[0]);
   return raise;
 }
@@ -2116,8 +2118,8 @@ const jion_now_live = async (req) => {
         updatedAt: 1,
         createdAt: 1,
         dateISO: 1,
-        sortData:1,
-        sort:1
+        sortData: 1,
+        sort: 1
       }
     }
   ])
