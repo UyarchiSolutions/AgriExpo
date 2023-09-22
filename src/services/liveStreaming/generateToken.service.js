@@ -1793,6 +1793,7 @@ const pending_request_switch = async (req, raiseid) => {
   stream.current_raise = null;
   stream.save();
   raise.status = 'end';
+  raise.sort = 0;
   raise.save();
   req.io.emit(raise._id + '_status', { message: "end" });
   return raise;
@@ -1846,7 +1847,9 @@ const get_raise_hands = async (req) => {
               raised_count: 1,
               already_joined: 1,
               updatedAt: 1,
-              dateISO: 1
+              dateISO: 1,
+              sortData: 1,
+              sort: 1
             }
           }
         ],
@@ -2022,6 +2025,7 @@ const pending_request = async (req) => {
   stream.current_raise = null;
   stream.save();
   raise.status = 'end';
+  raise.sort = 0;
   raise.save();
   req.io.emit(raise._id + '_status', { message: "end" });
   req.io.emit(stream._id + '_raise_hands_request', raise);
@@ -2037,6 +2041,7 @@ const reject_request = async (req) => {
   let stream = await Streamrequest.findById(raise.streamId);
   stream.current_raise = null;
   stream.save();
+  raise.sort = 0;
   raise.status = 'rejected';
   raise.save();
   req.io.emit(raise._id + '_status', { message: "rejected" });
