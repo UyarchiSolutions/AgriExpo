@@ -2010,6 +2010,7 @@ const approve_request = async (req) => {
   stream.current_raise = raise._id;
   stream.save();
   raise.status = 'approved';
+  raise.sort = 2;
   raise.save();
   req.io.emit(raise._id + '_status', { message: "approved" });
   return raise;
