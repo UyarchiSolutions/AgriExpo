@@ -164,7 +164,7 @@ const getPurchasedPlanById = catchAsync(async (req, res) => {
 });
 
 const getPurchasedPlanPayment = catchAsync(async (req, res) => {
-  const data = await purchasePlan.getPurchasedPlanPayment();
+  const data = await purchasePlan.getPurchasedPlanPayment(req.query);
   res.send(data);
 });
 
@@ -208,6 +208,17 @@ const updateAdPlanBtId = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getPayment_Details_ByPlan = catchAsync(async (req, res) => {
+  const data = await purchasePlan.getPayment_Details_ByPlan(req.params.id);
+  res.send(data);
+});
+
+const getMyPurchasedPlan = catchAsync(async (req, res) => {
+  let userId = req.userId;
+  const data = await purchasePlan.getMyPurchasedPlan(userId);
+  res.send(data);
+});
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -244,4 +255,6 @@ module.exports = {
   createAdPlan,
   getAll_Ad_Planes,
   updateAdPlanBtId,
+  getPayment_Details_ByPlan,
+  getMyPurchasedPlan,
 };

@@ -453,7 +453,7 @@ const get_all_purchasePlans = async (req) => {
         expireDate: 1,
         no_of_host: 1,
         planId: 1,
-        transaction: 1
+        transaction: 1,
       },
     },
   ]);
@@ -476,7 +476,7 @@ const Purchased_Message = async (Name, plan, mobile) => {
 };
 
 const create_PurchasePlan_EXpo = async (planId, userId, ccavenue) => {
-  console.log(ccavenue, 98765789)
+  console.log(ccavenue, 98765789);
   let findUser = await Seller.findById(userId);
   if (!findUser) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
@@ -511,7 +511,7 @@ const create_PurchasePlan_EXpo = async (planId, userId, ccavenue) => {
     ccavenue: ccavenue,
     transaction: findPlan.transaction,
   };
-  console.log(data)
+  console.log(data);
   const creations = await purchasePlan.create(data);
   await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
   return creations;
@@ -583,6 +583,7 @@ const updatePurchasedPlanById = async (id, body) => {
 
 const get_All_Planes = async (page) => {
   let values = await purchasePlan.aggregate([
+    { $sort: { createdAt: -1 } },
     { $match: { active: true } },
     { $lookup: { from: 'sellers', localField: 'suppierId', foreignField: '_id', as: 'suppliers' } },
     { $unwind: '$suppliers' },
@@ -651,6 +652,7 @@ const get_All_Planes = async (page) => {
         TelName: 1,
         Tele_Caller: 1,
         Type: 1,
+        paymentLink: 1,
       },
     },
     { $skip: 10 * page },
@@ -1462,13 +1464,44 @@ const getPurchasedPlanById = async (id) => {
   return values;
 };
 
-const getPurchasedPlanPayment = async () => {
+const getPurchasedPlanPayment = async (query) => {
+  // console.log(query);
+  let statusMatch = { status: { $in: ['Approved', 'Activated', 'Deactivated'] } };
+  let PaymentStatusMatch = { active: true };
+  let discountMatch = { active: true };
+  let exhibitorMatch = { active: true };
+  let TypeMatch = { active: true };
+
+  if (query.status != '' && query.status != null && query.status != 'null') {
+    statusMatch = { status: query.status };
+  }
+
+  if (query.payment != '' && query.payment != null && query.payment != 'null') {
+    PaymentStatusMatch = { PayementStatus: query.payment };
+  }
+
+  if (query.discount != '' && query.discount != null && query.discount != 'null') {
+    if (query.discount == 'yes') {
+      discountMatch = { Discount: { $gt: 0 } };
+    } else {
+      discountMatch = { Discount: { $eq: 0 } };
+    }
+  }
+
+  if (query.key != '' && query.key != null && query.key != 'null') {
+    exhibitorMatch = {
+      $or: [
+        { exhibitorName: { $regex: query.key, $options: 'i' } },
+        { exhibitorNumber: { $regex: query.key, $options: 'i' } },
+      ],
+    };
+  }
+
+  if (query.type != '' && query.type != null && query.type != 'null') {
+    TypeMatch = { Type: query.type };
+  }
+
   let values = await purchasePlan.aggregate([
-    {
-      $match: {
-        status: { $in: ['Approved', 'Activated', 'Deactivated'] },
-      },
-    },
     {
       $lookup: {
         from: 'sellers',
@@ -1500,23 +1533,61 @@ const getPurchasedPlanPayment = async () => {
     },
     { $addFields: { Price: { $toInt: '$Price' } } },
     {
+      $lookup: {
+        from: 'ccavanuepayments',
+        localField: 'ccavenue',
+        foreignField: '_id',
+        as: 'ccavanue',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$ccavanue',
+      },
+    },
+    { $addFields: { onlinePrice: { $ifNull: [{ $floor: { $toDouble: '$ccavanue.response.amount' } }, 0] } } },
+    {
       $project: {
         _id: 1,
         planName: 1,
         active: 1,
         Price: { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
         exhibitorName: '$Sellers.tradeName',
-        paidAmount: { $ifNull: ['$Payment.Amount', 0] },
+        exhibitorNumber: { $convert: { input: '$Sellers.mobileNumber', to: 'string' } },
+        number: '$Sellers.mobileNumber',
+        exhibitorId: '$Sellers._id',
+        paidAmount1: { $ifNull: ['$Payment.Amount', 0] },
+        paidAmount: { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
         PendingAmount: {
           $ifNull: [
-            { $subtract: [{ $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] }, '$Payment.Amount'] },
+            {
+              $subtract: [
+                { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+                { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
+              ],
+            },
             { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
           ],
         },
-        Type: 1,
+        Type: { $ifNull: ['$Type', 'Online'] },
         status: 1,
         Discount: { $ifNull: ['$Discount', 0] },
-        PayementStatus: 1,
+        PayementStatus: {
+          $cond: {
+            if: {
+              $eq: ['$ccavanue.response.order_status', 'Success'],
+            },
+            then: 'FullyPaid',
+            else: '$PayementStatus',
+          },
+        },
+        ccavanue: '$ccavanue',
+      },
+    },
+    {
+      $match: {
+        $and: [PaymentStatusMatch, discountMatch, exhibitorMatch, statusMatch, TypeMatch],
       },
     },
   ]);
@@ -1551,7 +1622,7 @@ const create_PlanPayment = async (body) => {
   let data = { ...body, billId: billId };
   let paid = await purchasePlan.findByIdAndUpdate({ _id: PlanId }, { PaidAmount: ToBePaid }, { new: true });
   if (PlanPrice > 0) {
-    if (PlanPrice == paid.PaidAmount ? paid.PaidAmount : 0) {
+    if (PlanPrice == paid.PaidAmount) {
       paid.PayementStatus = 'FullyPaid';
     } else {
       paid.PayementStatus = 'PartiallyPaid';
@@ -1671,6 +1742,128 @@ const updateAdPlanBtId = async (id, body) => {
   return value;
 };
 
+const getPayment_Details_ByPlan = async (planId) => {
+  let values = await purchasePlan.aggregate([
+    {
+      $match: {
+        _id: planId,
+      },
+    },
+    {
+      $lookup: {
+        from: 'ccavanuepayments',
+        localField: 'ccavenue',
+        foreignField: '_id',
+        as: 'payment',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$payment',
+      },
+    },
+  ]);
+  return values;
+};
+
+const getMyPurchasedPlan = async (userId) => {
+  let values = await purchasePlan.aggregate([
+    {
+      $match: {
+        suppierId: userId,
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'Sellers',
+      },
+    },
+    {
+      $unwind: {
+        path: '$Sellers',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'agriplanpayments',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $group: { _id: null, Amount: { $sum: '$Amount' } } }],
+        as: 'Payment',
+      },
+    },
+    {
+      $unwind: {
+        path: '$Payment',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    { $addFields: { Price: { $toInt: '$Price' } } },
+    {
+      $lookup: {
+        from: 'ccavanuepayments',
+        localField: 'ccavenue',
+        foreignField: '_id',
+        as: 'ccavanue',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$ccavanue',
+      },
+    },
+    { $addFields: { onlinePrice: { $ifNull: [{ $floor: { $toDouble: '$ccavanue.response.amount' } }, 0] } } },
+    {
+      $project: {
+        _id: 1,
+        planName: 1,
+        active: 1,
+        RevisedAmount: 1,
+        Discount: 1,
+        planAmount: '$Price',
+        Price: { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+        exhibitorName: '$Sellers.tradeName',
+        exhibitorNumber: { $convert: { input: '$Sellers.mobileNumber', to: 'string' } },
+        number: '$Sellers.mobileNumber',
+        exhibitorId: '$Sellers._id',
+        paidAmount1: { $ifNull: ['$Payment.Amount', 0] },
+        paidAmount: { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
+        PendingAmount: {
+          $ifNull: [
+            {
+              $subtract: [
+                { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+                { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
+              ],
+            },
+            { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+          ],
+        },
+        Type: { $ifNull: ['$Type', 'Online'] },
+        status: 1,
+        Discount: { $ifNull: ['$Discount', 0] },
+        PayementStatus: {
+          $cond: {
+            if: {
+              $eq: ['$ccavanue.response.order_status', 'Success'],
+            },
+            then: 'FullyPaid',
+            else: '$PayementStatus',
+          },
+        },
+        ccavanue: '$ccavanue',
+      },
+    },
+  ]);
+  return values;
+};
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -1707,4 +1900,6 @@ module.exports = {
   createAdPlan,
   getAll_Ad_Planes,
   updateAdPlanBtId,
+  getPayment_Details_ByPlan,
+  getMyPurchasedPlan,
 };

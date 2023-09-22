@@ -48,4 +48,6 @@ router.route('/getAll/Expo/Ad').get(purchasePlan.getAllAds);
 router.route('/create/AdPlan').post(purchasePlan.createAdPlan);
 router.route('/getAll/Ad_Planes').get(purchasePlan.getAll_Ad_Planes);
 router.route('/updateAd/PlanBtId/:id').put(purchasePlan.updateAdPlanBtId);
+router.route('/getPayment/Details/ByPlan/:id').get(purchasePlan.getPayment_Details_ByPlan);
+router.route('/getMyPurchased/Plan').get(SellerAuth, purchasePlan.getMyPurchasedPlan);
 module.exports = router;

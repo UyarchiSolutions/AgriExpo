@@ -234,7 +234,10 @@ const purchasePlanSchema = mongoose.Schema(
     },
     transaction: {
       type: String,
-    }
+    },
+    paymentLink: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
@@ -373,7 +376,7 @@ const AdPlanSchema = new mongoose.Schema(
     },
     ccavanue: {
       type: String,
-    }
+    },
   },
   { timestamps: true }
 );
