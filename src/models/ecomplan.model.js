@@ -156,12 +156,7 @@ const streamplanschema = mongoose.Schema({
   transaction: {
     type: String,
   },
-  purchase_limit: {
-    type: String,
-  },
-  max_purchase_value: {
-    type: String,
-  }
+
 });
 
 const Streamplan = mongoose.model('streamplan', streamplanschema);
@@ -311,6 +306,18 @@ const streamPostschema = mongoose.Schema({
   },
   longitude: {
     type: Number,
+  },
+  purchase_limit: {
+    type: String,
+  },
+  max_purchase_value: {
+    type: String,
+  },
+  pruductreturnble: {
+    type: String,
+  },
+  return_policy: {
+    type: String,
   }
 });
 
