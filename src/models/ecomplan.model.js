@@ -155,6 +155,12 @@ const streamplanschema = mongoose.Schema({
   },
   transaction: {
     type: String,
+  },
+  purchase_limit: {
+    type: String,
+  },
+  max_purchase_value: {
+    type: String,
   }
 });
 
