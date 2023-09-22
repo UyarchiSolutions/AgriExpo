@@ -1989,7 +1989,9 @@ const raise_request = async (req) => {
         raised_count: 1,
         already_joined: 1,
         updatedAt: 1,
-        dateISO: 1
+        dateISO: 1,
+        sortData:1,
+        sort:1
       }
     }
   ])
@@ -2113,7 +2115,9 @@ const jion_now_live = async (req) => {
         already_joined: 1,
         updatedAt: 1,
         createdAt: 1,
-        dateISO: 1
+        dateISO: 1,
+        sortData:1,
+        sort:1
       }
     }
   ])
