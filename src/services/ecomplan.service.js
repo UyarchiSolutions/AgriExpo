@@ -13088,7 +13088,7 @@ const post_payment_details = async (req) => {
       }
     }
   ])
-
+  console.log(streampost)
   if (streampost.length == 0) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'post Not Found');
   }
