@@ -12764,15 +12764,15 @@ const get_stream_post_after_live_stream = async (req) => {
                     as: 'products',
                   },
                 },
+                { $unwind: '$products' },
                 {
                   $lookup: {
                     from: 'streampostprices',
-                    localField: 'streampostId',
-                    foreignField: '_id',
+                    localField: '_id',
+                    foreignField: 'streampostId',
                     as: 'streampostprices',
                   },
                 },
-                { $unwind: '$products' },
               ],
               as: 'streamposts',
             },
