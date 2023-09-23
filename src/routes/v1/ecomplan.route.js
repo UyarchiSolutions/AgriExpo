@@ -60,6 +60,7 @@ router.route('/get/stream/post/view').get(Ecomcontroller.get_post_view);
 
 router.route('/post/price/set').post(SellerAuth, Ecomcontroller.update_post_price);
 router.route('/post/price/set/admin').post(authorization, Ecomcontroller.update_post_price_admin);
+router.route('/post/payment/details').post(SellerAuth, Ecomcontroller.post_payment_details);
 
 
 

@@ -592,6 +592,11 @@ const update_post_price_admin = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const post_payment_details = catchAsync(async (req, res) => {
+  const data = await Ecomserive.post_payment_details(req);
+  res.send(data);
+});
+
 const updatePlanById = catchAsync(async (req, res) => {
   const data = await Ecomserive.updatePlanById(req.params.id, req.body);
   res.send(data);
@@ -782,6 +787,7 @@ module.exports = {
   end_stream,
   get_post_view,
   update_post_price,
+  post_payment_details,
 
   go_live_stream_host,
   get_watch_live_steams,
