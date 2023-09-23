@@ -293,6 +293,23 @@ const PlanPaymentSchema = new mongoose.Schema(
     billId: {
       type: String,
     },
+    status: {
+      type: String,
+      default: 'Pending',
+    },
+    link_status: {
+      type: String,
+      default: 'Pending'
+    },
+    link: {
+      type: String,
+    },
+    orderId: {
+      type: String,
+    },
+    type: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
