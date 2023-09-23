@@ -881,13 +881,13 @@ const streampostpriceschema = new mongoose.Schema(
       default: v4,
     },
     marketPlace: {
-      type: String,
+      type: Number,
     },
     offerPrice: {
-      type: String,
+      type: Number,
     },
     postLiveStreamingPirce: {
-      type: Boolean,
+      type: Number,
     },
     streampostId: {
       type: String,
