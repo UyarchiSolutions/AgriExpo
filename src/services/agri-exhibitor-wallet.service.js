@@ -8,6 +8,7 @@ const createWallet = async (body, userId) => {
   let values = await Wallet.create(data);
   return values;
 };
+
 const createEnquiry = async (body, userId) => {
   const date = moment().format('DD-MM-YYYY');
   let findOrders = await Enquiry.find().count();
@@ -30,7 +31,20 @@ const createEnquiry = async (body, userId) => {
   const creation = await Enquiry.create(values);
   return creation;
 };
+
+const getWallets = async (userId) => {
+  let values = await Wallet.aggregate([
+    {
+      $match: {
+        userId: userId,
+      },
+    },
+  ]);
+  return values;
+};
+
 module.exports = {
   createWallet,
   createEnquiry,
+  getWallets,
 };
