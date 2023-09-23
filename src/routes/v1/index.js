@@ -118,6 +118,7 @@ const SlotBookingRoute = require('./Slotbooking.route');
 const AdvertismentRoute = require('./Advertisment.route');
 const PrivateChatRoute = require('./PrivateChat.route');
 const ccavenue = require('./ccavenue.route');
+const AgriWallet = require('./agri-exhibitor-wallet.route');
 
 const defaultRoutes = [
   {
@@ -127,6 +128,10 @@ const defaultRoutes = [
   {
     path: '/purchaseplan',
     route: purchasePlan,
+  },
+  {
+    path: '/agriExhibitorWallet',
+    route: AgriWallet,
   },
   {
     path: '/slotbooking',
@@ -583,7 +588,6 @@ const defaultRoutes = [
     path: '/ecomplan',
     route: EcomPlan,
   },
-
 
   // {
   //   path: '/sales',
