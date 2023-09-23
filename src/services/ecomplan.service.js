@@ -14116,5 +14116,6 @@ module.exports = {
   // purchese plan
   purchesPlane_exhibitor,
   get_Saved_Product,
-  update_post_price_admin
+  update_post_price_admin,
+  post_payment_details
 };
