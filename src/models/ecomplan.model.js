@@ -894,7 +894,13 @@ const streampostpriceschema = new mongoose.Schema(
     },
     streamId: {
       type: String,
-    }
+    },
+    incrementalLots: {
+      type: Number,
+    },
+    minLots: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );

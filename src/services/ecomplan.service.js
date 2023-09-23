@@ -203,7 +203,15 @@ const create_post = async (req, images) => {
   });
   await Dates.create_date(value);
   if (req.body.afterStreaming == 'yes') {
-    await Streampostprice.create({ marketPlace: req.body.marketPlace, offerPrice: req.body.offerPrice, postLiveStreamingPirce: req.body.postLiveStreamingPirce, streampostId: value._id })
+    await Streampostprice.create(
+      {
+        marketPlace: req.body.marketPlace,
+        offerPrice: req.body.offerPrice,
+        postLiveStreamingPirce: req.body.postLiveStreamingPirce,
+        streampostId: value._id,
+        minLots: req.body.minLots == null ? 0 : req.body.minLots,
+        incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots
+      })
   }
   return value;
 };
@@ -12910,6 +12918,32 @@ const get_post_view = async (req) => {
   return value[0];
 };
 
+const update_post_price = async (req) => {
+  req.body.post
+  let userId = req.userId;
+  let streampost = await StreamPost.findById(req.body.post);
+  if (streampost.suppierId != userId) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Bad Request');
+  }
+
+  if (streampost.afterStreaming == 'yes') {
+    streampost.marketPlace = req.body.marketPlace;
+    streampost.postLiveStreamingPirce = req.body.postLiveStreamingPirce;
+    streampost.minLots = req.body.minLots;
+    streampost.incrementalLots = req.body.incrementalLots;
+    streampost.save();
+    await Streampostprice.create({
+      marketPlace: req.body.marketPlace,
+      postLiveStreamingPirce: req.body.postLiveStreamingPirce,
+      streampostId: streampost._id,
+      minLots: req.body.minLots == null ? 0 : req.body.minLots,
+      incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots
+    })
+  }
+
+  return value;
+}
+
 const deletePlanById = async (id) => {
   let plan = await Streamplan.findById(id);
   if (!plan) {
@@ -13891,6 +13925,7 @@ module.exports = {
   getall_homeage_streams,
   get_watch_live_steams_current,
   get_post_view,
+  update_post_price,
   on_going_stream,
   updatePlanById,
   getPlanById,
