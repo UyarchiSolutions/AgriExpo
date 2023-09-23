@@ -59,6 +59,7 @@ router.route('/get/all/post/pagenation').get(SellerAuth, Ecomcontroller.get_all_
 router.route('/get/stream/post/view').get(Ecomcontroller.get_post_view);
 
 router.route('/post/price/set').post(SellerAuth, Ecomcontroller.update_post_price);
+router.route('/post/price/set/admin').post(authorization, Ecomcontroller.update_post_price_admin);
 
 
 

@@ -587,6 +587,10 @@ const update_post_price = catchAsync(async (req, res) => {
   const data = await Ecomserive.update_post_price(req);
   res.send(data);
 });
+const update_post_price_admin = catchAsync(async (req, res) => {
+  const data = await Ecomserive.update_post_price_admin(req);
+  res.send(data);
+});
 
 const updatePlanById = catchAsync(async (req, res) => {
   const data = await Ecomserive.updatePlanById(req.params.id, req.body);
@@ -869,6 +873,7 @@ module.exports = {
   get_previes_post,
   get_address_log,
   get_all_post_transation,
+  update_post_price_admin,
 
   // pruchese plan
   purchesPlane_exhibitor,

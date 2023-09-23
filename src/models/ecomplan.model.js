@@ -901,6 +901,9 @@ const streampostpriceschema = new mongoose.Schema(
     minLots: {
       type: Number,
     },
+    createdBy: {
+      type: String,
+    }
   },
   { timestamps: true }
 );

@@ -210,7 +210,8 @@ const create_post = async (req, images) => {
         postLiveStreamingPirce: req.body.postLiveStreamingPirce,
         streampostId: value._id,
         minLots: req.body.minLots == null ? 0 : req.body.minLots,
-        incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots
+        incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
+        createdBy: req.userId
       })
   }
   return value;
@@ -12937,11 +12938,38 @@ const update_post_price = async (req) => {
       postLiveStreamingPirce: req.body.postLiveStreamingPirce,
       streampostId: streampost._id,
       minLots: req.body.minLots == null ? 0 : req.body.minLots,
-      incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots
+      incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
+      createdBy: userId
     })
   }
 
-  return value;
+  return streampost;
+}
+const update_post_price_admin = async (req) => {
+  req.body.post
+  let userId = req.userId;
+  let streampost = await StreamPost.findById(req.body.post);
+  if (streampost.suppierId != userId) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Bad Request');
+  }
+
+  if (streampost.afterStreaming == 'yes') {
+    streampost.marketPlace = req.body.marketPlace;
+    streampost.postLiveStreamingPirce = req.body.postLiveStreamingPirce;
+    streampost.minLots = req.body.minLots;
+    streampost.incrementalLots = req.body.incrementalLots;
+    streampost.save();
+    await Streampostprice.create({
+      marketPlace: req.body.marketPlace,
+      postLiveStreamingPirce: req.body.postLiveStreamingPirce,
+      streampostId: streampost._id,
+      minLots: req.body.minLots == null ? 0 : req.body.minLots,
+      incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
+      createdBy: userId
+    })
+  }
+
+  return streampost;
 }
 
 const deletePlanById = async (id) => {
@@ -13961,4 +13989,5 @@ module.exports = {
   // purchese plan
   purchesPlane_exhibitor,
   get_Saved_Product,
+  update_post_price_admin
 };
