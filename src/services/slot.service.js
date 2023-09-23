@@ -506,6 +506,53 @@ const getStreamBySlots = async (id) => {
   return { values, slot };
 };
 
+const getSlots_Details_Streaming = async (slotId) => {
+  const currentUnixTimestamp = moment().valueOf();
+
+  let values = await Streamrequest.aggregate([
+    {
+      $match: {
+        slotId: slotId,
+      },
+    },
+    {
+      $addFields: {
+        isBetweenTime: {
+          $and: [{ $gte: ['$startTime', currentUnixTimestamp] }, { $lt: ['$streamEnd_Time', currentUnixTimestamp] }],
+        },
+      },
+    },
+    {
+      $addFields: {
+        PendingStatus: { $and: [{ $gte: ['$startTime', currentUnixTimestamp] }] },
+      },
+    },
+    {
+      $addFields: {
+        StreamStatus: {
+          $cond: {
+            if: { $eq: ['$isBetweenTime', true] },
+            then: 'Onlive',
+            else: 'Completed',
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        PendingStatus: {
+          $cond: {
+            if: { $eq: ['$PendingStatus', true] },
+            then: 'Pending',
+            else: '$StreamStatus',
+          },
+        },
+      },
+    },
+  ]);
+  return values;
+};
+
 module.exports = {
   createSlot,
   Fetch_Slot,
@@ -517,4 +564,5 @@ module.exports = {
   getSlots_by_SlotInfo,
   getSlots_Duraions,
   getStreamBySlots,
+  getSlots_Details_Streaming,
 };

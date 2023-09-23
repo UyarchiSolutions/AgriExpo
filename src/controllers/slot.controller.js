@@ -54,6 +54,10 @@ const getStreamBySlots = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getSlots_Details_Streaming = catchAsync(async (req, res) => {
+  const data = await SlotService.getSlots_Details_Streaming(req.params.id);
+  res.send(data);
+});
 
 module.exports = {
   SlotCreation,
@@ -66,4 +70,5 @@ module.exports = {
   getSlots_by_SlotInfo,
   getSlots_Duraions,
   getStreamBySlots,
+  getSlots_Details_Streaming,
 };
