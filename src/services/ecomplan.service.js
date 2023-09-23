@@ -12770,6 +12770,41 @@ const get_stream_post_after_live_stream = async (req) => {
                     from: 'streampostprices',
                     localField: '_id',
                     foreignField: 'streampostId',
+                    pipeline: [
+                      {
+                        $lookup: {
+                          from: 'b2bshopclones',
+                          localField: 'createdBy',
+                          foreignField: '_id',
+                          as: 'b2bshopclones',
+                        },
+                      },
+                      {
+                        $unwind: {
+                          preserveNullAndEmptyArrays: true,
+                          path: '$b2bshopclones',
+                        },
+                      },
+                      {
+                        $lookup: {
+                          from: 'sellers',
+                          localField: 'createdBy',
+                          foreignField: '_id',
+                          as: 'sellers',
+                        },
+                      },
+                      {
+                        $unwind: {
+                          preserveNullAndEmptyArrays: true,
+                          path: '$sellers',
+                        },
+                      },
+                      {
+                        $addFields: {
+                          createduser: { $ifNull: ['$b2bshopclones.SName', "$sellers.companyName"] },
+                        },
+                      },
+                    ],
                     as: 'streampostprices',
                   },
                 },
