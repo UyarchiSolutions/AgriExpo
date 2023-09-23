@@ -12801,7 +12801,7 @@ const get_stream_post_after_live_stream = async (req) => {
                       },
                       {
                         $addFields: {
-                          createduser: { $ifNull: ['$b2bshopclones.SName', "$sellers.companyName"] },
+                          createduser: { $ifNull: ['$b2bshopclones.SName', "$sellers.tradeName"] },
                         },
                       },
                     ],
