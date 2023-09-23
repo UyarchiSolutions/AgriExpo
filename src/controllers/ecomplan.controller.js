@@ -56,7 +56,6 @@ const create_post = catchAsync(async (req, res) => {
       });
     }
   }
-  //console.log(images);
   const value = await Ecomserive.create_post(req, images);
   res.send(value);
 });

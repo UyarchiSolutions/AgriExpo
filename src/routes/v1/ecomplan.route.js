@@ -20,6 +20,7 @@ const storage = multer.memoryStorage({
   },
 });
 const upload = multer({ storage }).single('teaser');
+const galleryImages = multer({ storage }).single('image');
 const upload_image = multer({ storage }).single('image');
 const upload_broucher = multer({ storage }).single('broucher');
 const uploadBroucher = multer({ storage }).single('brouchers');
@@ -58,9 +59,7 @@ router.route('/get/all/post/pagenation').get(SellerAuth, Ecomcontroller.get_all_
 router.route('/get/stream/post/view').get(Ecomcontroller.get_post_view);
 
 router.route('/get/one/post').get(SellerAuth, Ecomcontroller.get_one_post);
-router
-  .route('/update/one/post')
-  .put(SellerAuth, uploadimage.fields([{ name: 'galleryImages' }]), Ecomcontroller.update_one_post);
+router.route('/update/one/post').put(SellerAuth, uploadimage.fields([{ name: 'galleryImages' }]), Ecomcontroller.update_one_post);
 router.route('/delete/one/post').delete(SellerAuth, Ecomcontroller.delete_one_post);
 router.route('/remove/one/post').put(SellerAuth, Ecomcontroller.remove_one_post);
 

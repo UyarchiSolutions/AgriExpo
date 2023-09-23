@@ -872,6 +872,34 @@ const NotifySchema = new mongoose.Schema(
 
 const Notify = mongoose.model('Notify', NotifySchema);
 
+
+
+const streampostpriceschema = new mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    marketPlace: {
+      type: String,
+    },
+    offerPrice: {
+      type: String,
+    },
+    postLiveStreamingPirce: {
+      type: Boolean,
+    },
+    streampostId: {
+      type: String,
+    },
+    streamId: {
+      type: String,
+    }
+  },
+  { timestamps: true }
+);
+
+const Streampostprice = mongoose.model('streampostprice', streampostpriceschema);
 module.exports = {
   Streamplan,
   StreamPost,
@@ -885,4 +913,5 @@ module.exports = {
   Instestedproduct,
   Savedproduct,
   Notify,
+  Streampostprice
 };

@@ -12,6 +12,7 @@ const {
   Instestedproduct,
   Savedproduct,
   Notify,
+  Streampostprice
 } = require('../models/ecomplan.model');
 const { Slot } = require('../models/slot.model');
 const axios = require('axios'); //
@@ -189,7 +190,6 @@ const delete_one_Plans = async (req) => {
 };
 
 const create_post = async (req, images) => {
-  // //console.log(req.userId, "asdas", { ...req.body, ...{ suppierId: req.userId, images: images } })
   if (images.length == 0 && (req.body.old_accept == 'true' || req.body.old_accept == true)) {
     let old_post = await StreamPost.findById(req.body.old_post);
     if (old_post) {
@@ -202,6 +202,9 @@ const create_post = async (req, images) => {
     ...{ suppierId: req.userId, images: images, pendingQTY: req.body.quantity },
   });
   await Dates.create_date(value);
+  if (req.body.bookingAmount == 'yes') {
+    await Streampostprice.create({ marketPlace: req.body.marketPlace, offerPrice: req.body.offerPrice, postLiveStreamingPirce: req.body.postLiveStreamingPirce, streampostId: value._id })
+  }
   return value;
 };
 const create_teaser_upload = async (req, images) => {
@@ -1533,11 +1536,6 @@ const find_and_update_one = async (req) => {
 };
 
 const create_stream_one_image = async (req, type) => {
-  // if (req.file != null) {
-  //   await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, { image: 'images/stream/' + req.file.filename });
-  //   return { image: 'success' };
-  // }
-  // return { image: 'faild' };
   if (req.file != null) {
     const s3 = new AWS.S3({
       accessKeyId: 'AKIA3323XNN7Y2RU77UG',
@@ -12789,6 +12787,7 @@ const get_stream_post_after_live_stream = async (req) => {
               minutes: '$streamposts.minutes',
               second: '$streamposts.second',
               videoTime: '$streamposts.videoTime',
+              bookingAmount: "$streamposts.bookingAmount",
             },
           },
           // {
