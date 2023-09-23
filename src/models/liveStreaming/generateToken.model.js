@@ -140,6 +140,12 @@ const tempToken = mongoose.Schema({
   raise_hands: {
     type: Boolean,
     default: true
+  },
+  lot: {
+    type: String,
+  },
+  long: {
+    type: String,
   }
 });
 
