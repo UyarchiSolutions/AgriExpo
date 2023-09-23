@@ -32,13 +32,19 @@ const EnquirySchema = new mongoose.Schema(
       type: String,
       default: v4,
     },
-    Question: {
+    Name: {
       type: String,
     },
-    Answer: {
+    email: {
       type: String,
     },
     userId: {
+      type: String,
+    },
+    mobileNumber: {
+      type: Number,
+    },
+    Description: {
       type: String,
     },
     active: {

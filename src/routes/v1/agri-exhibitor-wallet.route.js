@@ -6,4 +6,5 @@ const shopverify = require('../../controllers/shoptokenverify.controller');
 const WalletController = require('../../controllers/agri-exhibitor-wallet.controller');
 router.route('/').post(SellerAuth, WalletController.createWallet);
 router.route('/Enquiry').post(shopverify, WalletController.createEnquiry);
+router.route('/getWallets').get(SellerAuth, WalletController.getWallets);
 module.exports = router;
