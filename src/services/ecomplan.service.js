@@ -202,7 +202,7 @@ const create_post = async (req, images) => {
     ...{ suppierId: req.userId, images: images, pendingQTY: req.body.quantity },
   });
   await Dates.create_date(value);
-  if (req.body.bookingAmount == 'yes') {
+  if (req.body.afterStreaming == 'yes') {
     await Streampostprice.create({ marketPlace: req.body.marketPlace, offerPrice: req.body.offerPrice, postLiveStreamingPirce: req.body.postLiveStreamingPirce, streampostId: value._id })
   }
   return value;
@@ -9046,6 +9046,7 @@ const get_completed_stream_buyer = async (req) => {
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
               bookingAmount: '$streamposts.bookingAmount',
+              afterStreaming: "$streamposts.afterStreaming",
               streamPostId: '$streamposts._id',
               allowAdd_to_cart: { $gte: ['$streamposts.pendingQTY', '$streamposts.minLots'] },
               suppierId: 1,
