@@ -13085,7 +13085,6 @@ const post_payment_details = async (req) => {
         incrementalLots: 1,
         afterStreaming: 1,
         suppierId: 1
-
       }
     }
   ])
@@ -13097,7 +13096,7 @@ const post_payment_details = async (req) => {
   if (streampost[0].suppierId == req.userId) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Bad Request');
   }
- return streampost[0];
+  return streampost[0];
 }
 
 const deletePlanById = async (id) => {
