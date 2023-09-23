@@ -12789,6 +12789,7 @@ const get_stream_post_after_live_stream = async (req) => {
               second: '$streamposts.second',
               videoTime: '$streamposts.videoTime',
               bookingAmount: "$streamposts.bookingAmount",
+              afterStreaming: "$streamposts.afterStreaming",
             },
           },
           // {
