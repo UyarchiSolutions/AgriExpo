@@ -3315,7 +3315,7 @@ const go_live_stream_host = async (req, userId) => {
         current_raise: 1,
         allot_host_1: 1,
         transaction: 1,
-        broucher:1
+        broucher: 1
       },
     },
   ]);
@@ -3950,6 +3950,7 @@ const get_watch_live_steams_upcoming_byid = async (req) => {
         teaser: 1,
         primarycommunication: 1,
         secondarycommunication: 1,
+        broucher:1
       },
     },
   ]);
