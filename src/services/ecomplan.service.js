@@ -3315,6 +3315,7 @@ const go_live_stream_host = async (req, userId) => {
         current_raise: 1,
         allot_host_1: 1,
         transaction: 1,
+        broucher:1
       },
     },
   ]);
@@ -12987,6 +12988,7 @@ const update_post_price = async (req) => {
       createdBy: userId
     })
   }
+  streampost
 
   return streampost;
 }
@@ -13015,6 +13017,88 @@ const update_post_price_admin = async (req) => {
   }
 
   return streampost;
+}
+const post_payment_details = async (req) => {
+
+  let streampost = await StreamPost.aggregate([
+    { $match: { $and: [{ _id: req.query.id }] } },
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'productId',
+        foreignField: '_id',
+        as: 'products',
+      },
+    },
+    { $unwind: '$products' },
+    {
+      $lookup: {
+        from: 'streampostprices',
+        localField: '_id',
+        foreignField: 'streampostId',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'b2bshopclones',
+              localField: 'createdBy',
+              foreignField: '_id',
+              as: 'b2bshopclones',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$b2bshopclones',
+            },
+          },
+          {
+            $lookup: {
+              from: 'sellers',
+              localField: 'createdBy',
+              foreignField: '_id',
+              as: 'sellers',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$sellers',
+            },
+          },
+          {
+            $addFields: {
+              createduser: { $ifNull: ['$b2bshopclones.SName', "$sellers.tradeName"] },
+            },
+          },
+        ],
+        as: 'streampostprices',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        productTitle: '$products.productTitle',
+        streampostprices: '$streampostprices',
+        unit: 1,
+        quantity: 1,
+        marketPlace: 1,
+        offerPrice: 1,
+        minLots: 1,
+        incrementalLots: 1,
+        afterStreaming: 1,
+        suppierId: 1
+      }
+    }
+  ])
+  // console.log(streampost)
+  if (streampost.length == 0) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'post Not Found');
+  }
+
+  if (streampost[0].suppierId != req.userId) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Bad Request');
+  }
+  return streampost[0];
 }
 
 const deletePlanById = async (id) => {
@@ -14034,5 +14118,6 @@ module.exports = {
   // purchese plan
   purchesPlane_exhibitor,
   get_Saved_Product,
-  update_post_price_admin
+  update_post_price_admin,
+  post_payment_details
 };
