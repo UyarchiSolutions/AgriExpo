@@ -3315,6 +3315,7 @@ const go_live_stream_host = async (req, userId) => {
         current_raise: 1,
         allot_host_1: 1,
         transaction: 1,
+        broucher:1
       },
     },
   ]);
@@ -12987,6 +12988,7 @@ const update_post_price = async (req) => {
       createdBy: userId
     })
   }
+  streampost
 
   return streampost;
 }
