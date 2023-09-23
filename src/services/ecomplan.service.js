@@ -12764,6 +12764,14 @@ const get_stream_post_after_live_stream = async (req) => {
                     as: 'products',
                   },
                 },
+                {
+                  $lookup: {
+                    from: 'streampostprices',
+                    localField: 'streampostId',
+                    foreignField: '_id',
+                    as: 'streampostprices',
+                  },
+                },
                 { $unwind: '$products' },
               ],
               as: 'streamposts',
@@ -12799,6 +12807,9 @@ const get_stream_post_after_live_stream = async (req) => {
               videoTime: '$streamposts.videoTime',
               bookingAmount: "$streamposts.bookingAmount",
               afterStreaming: "$streamposts.afterStreaming",
+              streampostId: "$streamposts._id",
+              streampostprices: "$streamposts.streampostprices",
+
             },
           },
           // {
@@ -12926,7 +12937,6 @@ const update_post_price = async (req) => {
   if (streampost.suppierId != userId) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Bad Request');
   }
-
   if (streampost.afterStreaming == 'yes') {
     streampost.marketPlace = req.body.marketPlace;
     streampost.postLiveStreamingPirce = req.body.postLiveStreamingPirce;
