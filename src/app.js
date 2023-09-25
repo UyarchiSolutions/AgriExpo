@@ -184,6 +184,11 @@ app.get('/about', function (req, res) {
 app.post('/success', function (req, res) {
   ccavReqHandler.success_recive(req, res);
 });
+app.post('/payment/success', function (req, res) {
+  ccavReqHandler.payment_success(req, res);
+});
+
+
 app.post('/ccavRequestHandler', function (request, response) {
   console.log("sadas")
   ccavReqHandler.postReq(request, response);

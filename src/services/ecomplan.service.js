@@ -3950,7 +3950,7 @@ const get_watch_live_steams_upcoming_byid = async (req) => {
         teaser: 1,
         primarycommunication: 1,
         secondarycommunication: 1,
-        broucher:1
+        broucher: 1
       },
     },
   ]);
@@ -13861,7 +13861,7 @@ const get_address_log = async (req) => {
 
 const purchesPlane_exhibitor = async (req, res) => {
   const { amount, plan, redirct } = req.body;
-  let paynow = await ccavenue.exhibitor_purchese_plan(amount, redirct);
+  let paynow = await ccavenue.exhibitor_purchese_plan(amount, 'https://agriexpo.click/success');
   console.log(paynow.payment.id, paynow.payment._id);
   let purchase = await purchese_plan.create_PurchasePlan_EXpo(plan, req.userId, paynow.payment.id);
   return paynow;

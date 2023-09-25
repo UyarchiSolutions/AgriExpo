@@ -1974,7 +1974,7 @@ const paynow_payment = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Purchase link Expired');
   }
 
-  let paynow = await ccavenue.exhibitor_purchese_plan(link.amount, '');
+  let paynow = await ccavenue.exhibitor_purchese_plan(link.amount, "https://agriexpo.click/payment/success");
   link.ccavanue = paynow.payment._id;
   link.save();
 

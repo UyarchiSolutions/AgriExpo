@@ -121,7 +121,7 @@ const exhibitor_purchese_plan = async (amount, redirct) => {
         order_id: orderId,
         currency: "INR",
         amount: amount,
-        redirect_url: "https://agriexpo.click/success",
+        redirect_url: redirct,
         cancel_url: "https://agriexpo.click/success",
         language: "EN",
         billing_name: "Peter",
