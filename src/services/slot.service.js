@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Slot, Slotseperation } = require('../models/slot.model');
+const { Slot, Slotseperation, Event } = require('../models/slot.model');
 const ApiError = require('../utils/ApiError');
 const moment = require('moment');
 const { purchasePlan } = require('../models/purchasePlan.model');
@@ -553,6 +553,11 @@ const getSlots_Details_Streaming = async (slotId) => {
   return values;
 };
 
+const createEvents = async (body) => {
+  let values = await Event.create(body);
+  return values;
+};
+
 module.exports = {
   createSlot,
   Fetch_Slot,
@@ -565,4 +570,5 @@ module.exports = {
   getSlots_Duraions,
   getStreamBySlots,
   getSlots_Details_Streaming,
+  createEvents,
 };

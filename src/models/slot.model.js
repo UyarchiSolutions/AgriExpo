@@ -72,4 +72,29 @@ const SlotseperationSchema = mongoose.Schema(
 
 const Slotseperation = mongoose.model('Slotseperation', SlotseperationSchema);
 
-module.exports = { Slot, Slotseperation };
+const EventSchema = mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    date: {
+      type: String,
+    },
+    From: {
+      type: String,
+    },
+    to: {
+      type: String,
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  { timestamps: true }
+);
+
+const Event = mongoose.model('agriEvent', EventSchema);
+
+module.exports = { Slot, Slotseperation, Event };
