@@ -9118,7 +9118,7 @@ const get_completed_stream_buyer = async (req) => {
     {
       $project: {
         _id: 1,
-        supplierName: '$suppliers.contactName',
+        supplierName: '$suppliers.tradeName',
         active: 1,
         archive: 1,
         post: 1,
