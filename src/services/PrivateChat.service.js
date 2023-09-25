@@ -6,7 +6,21 @@ const moment = require('moment');
 const { Shop, AttendanceClone, AttendanceClonenew } = require('../models/b2b.ShopClone.model');
 const jwt = require('jsonwebtoken');
 const config = require('../config/config');
-
+const {
+    Streamplan,
+    StreamPost,
+    Streamrequest,
+    StreamrequestPost,
+    StreamPreRegister,
+    streamPlanlink,
+    Slab,
+    shopNotification,
+    PlanSlot,
+    Instestedproduct,
+    Savedproduct,
+    Notify,
+    Streampostprice,
+  } = require('../models/ecomplan.model');
 
 const intraction_exhibitor = async (req) => {
     const { channel } = req.body;
@@ -24,6 +38,13 @@ const recived_message = async (data, io, header) => {
     const intr = await Interaction.findById(data.chat)
     const payload = jwt.verify(header.token, config.jwt.secret);
     const userss = await Shop.findOne({ _id: payload._id, active: true });
+    let streamName='';
+    if(data.stream !=null){
+        let stream=await Streamrequest.findById(data.stream);
+        if(stream){
+            streamName=stream.streamName;
+        }
+    }
     if (intr) {
         if (userss) {
             let shopId = payload._id;
@@ -33,6 +54,8 @@ const recived_message = async (data, io, header) => {
                 sender: shopId,
                 channel: data.chat,
                 msg: data.msg,
+                streamId:data.stream,
+                streamName:streamName,
                 sendBy: "visitor",
             })
             intr.last_modify = moment();

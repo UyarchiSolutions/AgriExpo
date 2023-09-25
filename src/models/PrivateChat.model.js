@@ -37,7 +37,13 @@ const PrivateChatSchema = new mongoose.Schema(
     },
     sendBy: {
       type: String,
-    }
+    },
+    streamId: {
+      type: String,
+    },
+    streamName: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
@@ -61,8 +67,8 @@ const CommunicationSchema = new mongoose.Schema(
       default: true,
     },
     last_modify: {
-      type: Date
-    }
+      type: Date,
+    },
   },
   { timestamps: true }
 );
