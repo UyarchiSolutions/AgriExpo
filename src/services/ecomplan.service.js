@@ -12,7 +12,7 @@ const {
   Instestedproduct,
   Savedproduct,
   Notify,
-  Streampostprice
+  Streampostprice,
 } = require('../models/ecomplan.model');
 const { Slot } = require('../models/slot.model');
 const axios = require('axios'); //
@@ -35,6 +35,8 @@ const S3video = require('./S3video.service');
 const { Seller } = require('../models/seller.models');
 const ccavenue = require('./ccavenue.service');
 const purchese_plan = require('./purchasePlan.service');
+const { Usermessage, Interaction } = require('../models/PrivateChat.model');
+
 const create_Plans = async (req) => {
   const { slotInfo } = req.body;
   const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal' } });
@@ -203,16 +205,15 @@ const create_post = async (req, images) => {
   });
   await Dates.create_date(value);
   if (req.body.afterStreaming == 'yes') {
-    await Streampostprice.create(
-      {
-        marketPlace: req.body.marketPlace,
-        offerPrice: req.body.offerPrice,
-        postLiveStreamingPirce: req.body.postLiveStreamingPirce,
-        streampostId: value._id,
-        minLots: req.body.minLots == null ? 0 : req.body.minLots,
-        incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
-        createdBy: req.userId
-      })
+    await Streampostprice.create({
+      marketPlace: req.body.marketPlace,
+      offerPrice: req.body.offerPrice,
+      postLiveStreamingPirce: req.body.postLiveStreamingPirce,
+      streampostId: value._id,
+      minLots: req.body.minLots == null ? 0 : req.body.minLots,
+      incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
+      createdBy: req.userId,
+    });
   }
   return value;
 };
@@ -3315,7 +3316,7 @@ const go_live_stream_host = async (req, userId) => {
         current_raise: 1,
         allot_host_1: 1,
         transaction: 1,
-        broucher: 1
+        broucher: 1,
       },
     },
   ]);
@@ -3950,7 +3951,7 @@ const get_watch_live_steams_upcoming_byid = async (req) => {
         teaser: 1,
         primarycommunication: 1,
         secondarycommunication: 1,
-        broucher: 1
+        broucher: 1,
       },
     },
   ]);
@@ -6494,7 +6495,7 @@ const on_going_stream = async (req) => {
 
 const getall_homeage_streams = async (req) => {
   let interested = await Streamrequest.aggregate([
-    { $match: { $and: [{ adminApprove: { $eq: 'Approved' } }, { status: { $ne: 'Removed' } },] } },
+    { $match: { $and: [{ adminApprove: { $eq: 'Approved' } }, { status: { $ne: 'Removed' } }] } },
     {
       $lookup: {
         from: 'joinedusers',
@@ -8394,8 +8395,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+        ? 'RAC'
+        : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -8404,8 +8405,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-            ? 'RAC'
-            : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -8989,6 +8990,16 @@ const update_slab = async (req) => {
 };
 
 const get_completed_stream_buyer = async (req) => {
+  let stream = await Streamrequest.findById(req.query.id);
+  if (!stream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
+  }
+  const channel = stream.suppierId;
+  let shopId = req.shopId;
+  let intraction = await Interaction.findOne({ exhibitorId: channel, visitorId: shopId });
+  if (!intraction) {
+    intraction = await Interaction.create({ exhibitorId: channel, visitorId: shopId });
+  }
   const value = await Streamrequest.aggregate([
     { $match: { $and: [{ _id: { $eq: req.query.id } }] } },
     {
@@ -9057,7 +9068,7 @@ const get_completed_stream_buyer = async (req) => {
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
               bookingAmount: '$streamposts.bookingAmount',
-              afterStreaming: "$streamposts.afterStreaming",
+              afterStreaming: '$streamposts.afterStreaming',
               streamPostId: '$streamposts._id',
               allowAdd_to_cart: { $gte: ['$streamposts.pendingQTY', '$streamposts.minLots'] },
               suppierId: 1,
@@ -9079,6 +9090,16 @@ const get_completed_stream_buyer = async (req) => {
       },
     },
     { $unwind: '$suppliers' },
+    {
+      $lookup: {
+        from: 'userinteractions',
+        localField: 'suppierId',
+        foreignField: 'exhibitorId',
+        pipeline: [{ $match: { $and: [{ visitorId: { $eq: shopId } }] } }],
+        as: 'userinteractions',
+      },
+    },
+    { $unwind: '$userinteractions' },
     // {
     //   $lookup: {
     //     from: 'temptokens',
@@ -9128,6 +9149,7 @@ const get_completed_stream_buyer = async (req) => {
         // temptokens: '$temptokens',
         showLink: 1,
         selectvideo: 1,
+        userinteractions:1
       },
     },
   ]);
@@ -12803,7 +12825,7 @@ const get_stream_post_after_live_stream = async (req) => {
                       },
                       {
                         $addFields: {
-                          createduser: { $ifNull: ['$b2bshopclones.SName', "$sellers.tradeName"] },
+                          createduser: { $ifNull: ['$b2bshopclones.SName', '$sellers.tradeName'] },
                         },
                       },
                     ],
@@ -12842,11 +12864,10 @@ const get_stream_post_after_live_stream = async (req) => {
               minutes: '$streamposts.minutes',
               second: '$streamposts.second',
               videoTime: '$streamposts.videoTime',
-              bookingAmount: "$streamposts.bookingAmount",
-              afterStreaming: "$streamposts.afterStreaming",
-              streampostId: "$streamposts._id",
-              streampostprices: "$streamposts.streampostprices",
-
+              bookingAmount: '$streamposts.bookingAmount',
+              afterStreaming: '$streamposts.afterStreaming',
+              streampostId: '$streamposts._id',
+              streampostprices: '$streamposts.streampostprices',
             },
           },
           // {
@@ -12924,7 +12945,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => { };
+const get_video_link = async (req) => {};
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
@@ -12968,7 +12989,7 @@ const get_post_view = async (req) => {
 };
 
 const update_post_price = async (req) => {
-  req.body.post
+  req.body.post;
   let userId = req.userId;
   let streampost = await StreamPost.findById(req.body.post);
   if (streampost.suppierId != userId) {
@@ -12986,15 +13007,15 @@ const update_post_price = async (req) => {
       streampostId: streampost._id,
       minLots: req.body.minLots == null ? 0 : req.body.minLots,
       incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
-      createdBy: userId
-    })
+      createdBy: userId,
+    });
   }
-  streampost
+  streampost;
 
   return streampost;
-}
+};
 const update_post_price_admin = async (req) => {
-  req.body.post
+  req.body.post;
   let userId = req.userId;
   let streampost = await StreamPost.findById(req.body.post);
   if (streampost.suppierId != userId) {
@@ -13013,14 +13034,13 @@ const update_post_price_admin = async (req) => {
       streampostId: streampost._id,
       minLots: req.body.minLots == null ? 0 : req.body.minLots,
       incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
-      createdBy: userId
-    })
+      createdBy: userId,
+    });
   }
 
   return streampost;
-}
+};
 const post_payment_details = async (req) => {
-
   let streampost = await StreamPost.aggregate([
     { $match: { $and: [{ _id: req.query.id }] } },
     {
@@ -13068,7 +13088,7 @@ const post_payment_details = async (req) => {
           },
           {
             $addFields: {
-              createduser: { $ifNull: ['$b2bshopclones.SName', "$sellers.tradeName"] },
+              createduser: { $ifNull: ['$b2bshopclones.SName', '$sellers.tradeName'] },
             },
           },
         ],
@@ -13087,10 +13107,10 @@ const post_payment_details = async (req) => {
         minLots: 1,
         incrementalLots: 1,
         afterStreaming: 1,
-        suppierId: 1
-      }
-    }
-  ])
+        suppierId: 1,
+      },
+    },
+  ]);
   // console.log(streampost)
   if (streampost.length == 0) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'post Not Found');
@@ -13100,7 +13120,7 @@ const post_payment_details = async (req) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Bad Request');
   }
   return streampost[0];
-}
+};
 
 const deletePlanById = async (id) => {
   let plan = await Streamplan.findById(id);
@@ -13822,9 +13842,7 @@ const get_previes_post = async (req) => {
         from: 'streamingorderproducts',
         localField: '_id',
         foreignField: 'streamPostId',
-        pipeline: [
-          { $group: { _id: null, purchase_quantity: { $sum: "$purchase_quantity" } } }
-        ],
+        pipeline: [{ $group: { _id: null, purchase_quantity: { $sum: '$purchase_quantity' } } }],
         as: 'streamingorderproducts',
       },
     },
@@ -13839,12 +13857,11 @@ const get_previes_post = async (req) => {
         purchase_quantity: { $ifNull: ['$streamingorderproducts.purchase_quantity', 0] },
       },
     },
-    { $limit: 1 }
-  ])
+    { $limit: 1 },
+  ]);
   if (prev.length != 0) {
     prev = prev[0];
-  }
-  else {
+  } else {
     prev = null;
   }
   return prev;
@@ -13958,7 +13975,7 @@ const get_Saved_Product = async (userId) => {
         created: 1,
         StreamDetails: '$Stream',
         ProdctDetails: '$streamPost.product',
-        StreamPost: "$streamPost"
+        StreamPost: '$streamPost',
       },
     },
   ]);
@@ -14117,5 +14134,5 @@ module.exports = {
   purchesPlane_exhibitor,
   get_Saved_Product,
   update_post_price_admin,
-  post_payment_details
+  post_payment_details,
 };

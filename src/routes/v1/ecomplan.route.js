@@ -137,7 +137,7 @@ router.route('/get/stream/all/alert').get(SellerAuth, Ecomcontroller.get_stream_
 router.route('/get/stream/cancel/admin').get(Ecomcontroller.get_cancel_stream);
 router.route('/get/admin/completed/stream').get(Ecomcontroller.get_completed_stream);
 router.route('/get/admin/completed/stream/byid').get(Ecomcontroller.get_completed_stream_byid);
-router.route('/get/buyer/completed/stream/byid').get(Ecomcontroller.get_completed_stream_buyer);
+router.route('/get/buyer/completed/stream/byid').get(shopverify,Ecomcontroller.get_completed_stream_buyer);
 
 // manage slab
 router
