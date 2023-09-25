@@ -18,6 +18,7 @@ const {
 
 } = require('../models/ecomplan.model');
 const { Seller } = require('../models/seller.models');
+const ccavenue = require('./ccavenue.service');
 
 const create_purchase_plan = async (req) => {
   let orders;
@@ -1959,6 +1960,28 @@ const get_payment_link = async (req) => {
   return link;
 }
 
+const paynow_payment = async (req) => {
+  let link = await PurchaseLink.findById(req.body.id);
+  if (!link) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'purchase not found');
+  }
+  let time = new Date().getTime();
+
+  if (link.link_Valid < time) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Purchase link Expired');
+  }
+  if (link.status != "Generated") {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Purchase link Expired');
+  }
+
+  let paynow = await ccavenue.exhibitor_purchese_plan(link.amount, redirct);
+  link.ccavanue = paynow.payment._id;
+  link.save();
+
+  return paynow;
+
+}
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -1998,5 +2021,6 @@ module.exports = {
   getPayment_Details_ByPlan,
   getMyPurchasedPlan,
   plan_payment_link_generate,
-  get_payment_link
+  get_payment_link,
+  paynow_payment
 };

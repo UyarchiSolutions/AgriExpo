@@ -225,7 +225,11 @@ const plan_payment_link_generate = catchAsync(async (req, res) => {
 });
 const get_payment_link = catchAsync(async (req, res) => {
   const data = await purchasePlan.get_payment_link(req);
-  let time = new Date().getTime();
+  res.send(data);
+});
+
+const paynow_payment= catchAsync(async (req, res) => {
+  const data = await purchasePlan.paynow_payment(req);
   res.send(data);
 });
 
@@ -268,5 +272,6 @@ module.exports = {
   getPayment_Details_ByPlan,
   getMyPurchasedPlan,
   plan_payment_link_generate,
-  get_payment_link
+  get_payment_link,
+  paynow_payment
 };

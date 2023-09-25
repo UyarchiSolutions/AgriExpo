@@ -13864,10 +13864,7 @@ const purchesPlane_exhibitor = async (req, res) => {
   let paynow = await ccavenue.exhibitor_purchese_plan(amount, redirct);
   console.log(paynow.payment.id, paynow.payment._id);
   let purchase = await purchese_plan.create_PurchasePlan_EXpo(plan, req.userId, paynow.payment.id);
-  // console.log(purchase)
-
   return paynow;
-  // await ccavenue.pay_nowredirect_url(paynow.formbody, res)
 };
 
 const get_Saved_Product = async (userId) => {
