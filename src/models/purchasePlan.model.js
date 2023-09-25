@@ -310,10 +310,15 @@ const PlanPaymentSchema = new mongoose.Schema(
     type: {
       type: String,
     },
+    ccavanue: {
+      type: String,
+    },
+    paymetvalid: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );
-
 const PlanPayment = mongoose.model('agriplanPayment', PlanPaymentSchema);
 
 const ExpoAdSchema = new mongoose.Schema(
@@ -400,4 +405,39 @@ const AdPlanSchema = new mongoose.Schema(
 
 const AdPlan = mongoose.model('ExpoAdPlan', AdPlanSchema);
 
-module.exports = { purchasePlan, PlanPayment, ExpoAd, AdPlan };
+
+
+const Paymentlinkchema = new mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    purchasePlan: {
+      type: String,
+    },
+    link_Valid: {
+      type: Number,
+    },
+    amount: {
+      type: Number,
+    },
+    ccavanue: {
+      type: String,
+    },
+    generatedBy: {
+      type: String,
+    },
+    status: {
+      type: String,
+      default: 'Pending'
+    }
+  },
+  { timestamps: true }
+);
+
+const PurchaseLink = mongoose.model('paymentlink', Paymentlinkchema);
+
+
+
+module.exports = { purchasePlan, PlanPayment, ExpoAd, AdPlan, PurchaseLink, PurchaseLink };

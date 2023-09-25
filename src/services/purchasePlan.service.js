@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const bcrypt = require('bcryptjs');
 const ApiError = require('../utils/ApiError');
 const moment = require('moment');
-const { purchasePlan, PlanPayment, ExpoAd, AdPlan } = require('../models/purchasePlan.model');
+const { purchasePlan, PlanPayment, ExpoAd, AdPlan, PurchaseLink } = require('../models/purchasePlan.model');
 const paymentgatway = require('./paymentgatway.service');
 const Dates = require('./Date.serive');
 const AWS = require('aws-sdk');
@@ -15,8 +15,10 @@ const {
   StreamrequestPost,
   StreamPreRegister,
   streamPlanlink,
+
 } = require('../models/ecomplan.model');
 const { Seller } = require('../models/seller.models');
+const ccavenue = require('./ccavenue.service');
 
 const create_purchase_plan = async (req) => {
   let orders;
@@ -1866,6 +1868,120 @@ const getMyPurchasedPlan = async (userId) => {
   return values;
 };
 
+const plan_payment_link_generate = async (req) => {
+
+  let userId = req.userId;
+  let purchase = req.body.plan;
+  let purchasePlandetails = await purchasePlan.aggregate([
+    { $match: { $and: [{ _id: { $eq: purchase } }] } },
+    {
+      $lookup: {
+        from: 'agriplanpayments',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $group: { _id: null, Amount: { $sum: '$Amount' } } }],
+        as: 'Payment',
+      },
+    },
+    {
+      $unwind: {
+        path: '$Payment',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    { $addFields: { Price: { $toInt: '$Price' } } },
+    {
+      $project: {
+        _id: 1,
+        planName: 1,
+        active: 1,
+        Price: { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+        exhibitorName: '$Sellers.tradeName',
+        exhibitorNumber: { $convert: { input: '$Sellers.mobileNumber', to: 'string' } },
+        number: '$Sellers.mobileNumber',
+        exhibitorId: '$Sellers._id',
+        paidAmount1: { $ifNull: ['$Payment.Amount', 0] },
+        paidAmount: { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
+        PendingAmount: {
+          $ifNull: [
+            {
+              $subtract: [
+                { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+                { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
+              ],
+            },
+            { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+          ],
+        },
+        Type: { $ifNull: ['$Type', 'Online'] },
+        status: 1,
+        Discount: { $ifNull: ['$Discount', 0] },
+      },
+    },
+  ]);
+  if (purchasePlandetails.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'purchase not found');
+  }
+
+
+  let purchaseDetails = purchasePlandetails[0];
+  let link_Valid = moment().add(15, 'minutes')
+  let data = {
+    amount: purchaseDetails.PendingAmount,
+    link_Valid: link_Valid,
+    purchasePlan: purchaseDetails._id,
+    generatedBy: userId,
+    status: "Generated"
+  }
+  let link = await PurchaseLink_genete(data)
+
+  return { purchaseDetails, link };
+}
+
+const PurchaseLink_genete = async (data) => {
+  let link = await PurchaseLink.create(data);
+  return link;
+}
+
+const get_payment_link = async (req) => {
+  let link = await PurchaseLink.findById(req.params.id);
+  if (!link) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'purchase not found');
+  }
+  let time = new Date().getTime();
+
+  if (link.link_Valid < time) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Purchase link Expired');
+  }
+  if (link.status != "Generated") {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Purchase link Expired');
+  }
+
+  return link;
+}
+
+const paynow_payment = async (req) => {
+  let link = await PurchaseLink.findById(req.body.id);
+  if (!link) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'purchase not found');
+  }
+  let time = new Date().getTime();
+
+  if (link.link_Valid < time) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Purchase link Expired');
+  }
+  if (link.status != "Generated") {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Purchase link Expired');
+  }
+
+  let paynow = await ccavenue.exhibitor_purchese_plan(link.amount, "https://agriexpo.click/payment/success");
+  link.ccavanue = paynow.payment._id;
+  link.save();
+
+  return paynow;
+
+}
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -1904,4 +2020,7 @@ module.exports = {
   updateAdPlanBtId,
   getPayment_Details_ByPlan,
   getMyPurchasedPlan,
+  plan_payment_link_generate,
+  get_payment_link,
+  paynow_payment
 };

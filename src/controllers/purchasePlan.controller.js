@@ -219,6 +219,20 @@ const getMyPurchasedPlan = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const plan_payment_link_generate = catchAsync(async (req, res) => {
+  const data = await purchasePlan.plan_payment_link_generate(req);
+  res.send(data);
+});
+const get_payment_link = catchAsync(async (req, res) => {
+  const data = await purchasePlan.get_payment_link(req);
+  res.send(data);
+});
+
+const paynow_payment= catchAsync(async (req, res) => {
+  const data = await purchasePlan.paynow_payment(req);
+  res.send(data);
+});
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -257,4 +271,7 @@ module.exports = {
   updateAdPlanBtId,
   getPayment_Details_ByPlan,
   getMyPurchasedPlan,
+  plan_payment_link_generate,
+  get_payment_link,
+  paynow_payment
 };

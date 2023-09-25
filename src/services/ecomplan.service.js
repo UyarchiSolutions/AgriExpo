@@ -3315,7 +3315,7 @@ const go_live_stream_host = async (req, userId) => {
         current_raise: 1,
         allot_host_1: 1,
         transaction: 1,
-        broucher:1
+        broucher: 1
       },
     },
   ]);
@@ -3950,6 +3950,7 @@ const get_watch_live_steams_upcoming_byid = async (req) => {
         teaser: 1,
         primarycommunication: 1,
         secondarycommunication: 1,
+        broucher: 1
       },
     },
   ]);
@@ -13860,13 +13861,10 @@ const get_address_log = async (req) => {
 
 const purchesPlane_exhibitor = async (req, res) => {
   const { amount, plan, redirct } = req.body;
-  let paynow = await ccavenue.exhibitor_purchese_plan(amount, redirct);
+  let paynow = await ccavenue.exhibitor_purchese_plan(amount, 'https://agriexpo.click/success');
   console.log(paynow.payment.id, paynow.payment._id);
   let purchase = await purchese_plan.create_PurchasePlan_EXpo(plan, req.userId, paynow.payment.id);
-  // console.log(purchase)
-
   return paynow;
-  // await ccavenue.pay_nowredirect_url(paynow.formbody, res)
 };
 
 const get_Saved_Product = async (userId) => {
