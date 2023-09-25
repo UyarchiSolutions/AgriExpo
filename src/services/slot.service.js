@@ -558,6 +558,17 @@ const createEvents = async (body) => {
   return values;
 };
 
+const getEvents = async () => {
+  let values = await Event.aggregate([
+    {
+      $match: {
+        active: true,
+      },
+    },
+  ]);
+  return values;
+};
+
 module.exports = {
   createSlot,
   Fetch_Slot,
@@ -571,4 +582,5 @@ module.exports = {
   getStreamBySlots,
   getSlots_Details_Streaming,
   createEvents,
+  getEvents,
 };
