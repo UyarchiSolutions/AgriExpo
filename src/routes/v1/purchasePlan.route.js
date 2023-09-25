@@ -5,6 +5,7 @@ const { SetPass, SellerAuth } = require('../../controllers/sellerAuth.controller
 const PlanImage = require('../../middlewares/plan');
 const router = express.Router();
 const multer = require('multer');
+const authorization = require('../../controllers/tokenVerify.controller');
 
 const storage = multer.memoryStorage({
   destination: function (req, res, callback) {
@@ -50,4 +51,13 @@ router.route('/getAll/Ad_Planes').get(purchasePlan.getAll_Ad_Planes);
 router.route('/updateAd/PlanBtId/:id').put(purchasePlan.updateAdPlanBtId);
 router.route('/getPayment/Details/ByPlan/:id').get(purchasePlan.getPayment_Details_ByPlan);
 router.route('/getMyPurchased/Plan').get(SellerAuth, purchasePlan.getMyPurchasedPlan);
+
+
+
+
+router.route('/plan/payment/link/generate').post(purchasePlan.plan_payment_link_generate);
+router.route('/get/payment/link/:id').get(purchasePlan.get_payment_link);
+
+
+
 module.exports = router;
