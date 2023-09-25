@@ -9149,7 +9149,7 @@ const get_completed_stream_buyer = async (req) => {
         // temptokens: '$temptokens',
         showLink: 1,
         selectvideo: 1,
-        userinteractions:1
+        userinteractions:"$userinteractions"
       },
     },
   ]);
