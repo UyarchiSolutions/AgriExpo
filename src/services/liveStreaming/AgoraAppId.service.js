@@ -46,6 +46,29 @@ const get_all_token = async (req) => {
   return { value: appId, next: next.length != 0 };
 
 }
+
+const get_all_token_check = async (req) => {
+  let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
+  let appId = await AgoraAppId.aggregate([
+    {
+      $skip: 20 * parseInt(page),
+    },
+    {
+      $limit: 20,
+    },
+  ])
+  let next = await AgoraAppId.aggregate([
+    {
+      $skip: 20 * (parseInt(page) + 1),
+    },
+    {
+      $limit: 20,
+    },
+  ])
+
+  return { value: appId, next: next.length != 0 };
+
+}
 const { Country, State, City } = require('country-state-city');
 
 const get_country_list = async (req) => {
@@ -413,6 +436,22 @@ const get_test_details_test = async (req) => {
   return { test, agoraToken }
 }
 
+const update_check_appid = async (req, data) => {
+  let test = await TestAgora.findById(req.query.id);
+  if (!test) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Testing not found');
+  }
+  let agoraToken = await AgoraAppId.findById(test.tokenId);
+  if (!agoraToken) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Agora App id not found');
+
+  }
+  agoraToken.verifyStatus = data;
+  agoraToken.verifiedBy = req.userId;
+  agoraToken.save();
+  return agoraToken;
+}
+
 
 
 module.exports = {
@@ -428,5 +467,7 @@ module.exports = {
   test_appid,
   recording_stop,
   recording_start,
-  get_test_details_test
+  get_test_details_test,
+  get_all_token_check,
+  update_check_appid
 };

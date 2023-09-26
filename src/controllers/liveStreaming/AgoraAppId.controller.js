@@ -16,6 +16,12 @@ const get_all_token = catchAsync(async (req, res) => {
   const data = await AgoraAppId.get_all_token(req);
   res.status(httpStatus.CREATED).send(data);
 });
+
+const get_all_token_check = catchAsync(async (req, res) => {
+  const data = await AgoraAppId.get_all_token_check(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
 const get_country_list = catchAsync(async (req, res) => {
   const data = await AgoraAppId.get_country_list(req);
   res.status(httpStatus.CREATED).send(data);
@@ -60,6 +66,19 @@ const recording_stop = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(data);
 });
 
+const update_check_appid_working = catchAsync(async (req, res) => {
+  const data = await AgoraAppId.update_check_appid(req, 'working');
+  res.status(httpStatus.CREATED).send(data);
+});
+
+const update_check_appid_faild = catchAsync(async (req, res) => {
+  const data = await AgoraAppId.update_check_appid(req, 'faild');
+  res.status(httpStatus.CREATED).send(data);
+});
+
+
+
+
 module.exports = {
   InsertAppId,
   InsertAget_app_id,
@@ -73,4 +92,7 @@ module.exports = {
   get_test_details_test,
   recording_stop,
   recording_start,
+  get_all_token_check,
+  update_check_appid_working,
+  update_check_appid_faild
 };
