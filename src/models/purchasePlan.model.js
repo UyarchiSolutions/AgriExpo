@@ -238,6 +238,21 @@ const purchasePlanSchema = mongoose.Schema(
     paymentLink: {
       type: String,
     },
+    offer_price: {
+      type: Number,
+    },
+    stream_validity: {
+      type: String,
+    },
+    Interest_View_Count: {
+      type: String,
+    },
+    No_of_Limitations: {
+      type: Number,
+    },
+    Service_Charges: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );
