@@ -206,7 +206,7 @@ const test_appid = async (req) => {
   let appId = await AgoraAppId.findById(id)
   const uid = await generateUid();
   const role = req.body.isPublisher ? Agora.RtcRole.PUBLISHER : Agora.RtcRole.SUBSCRIBER;
-  const currentTimestamp = moment().add(100, 'seconds');
+  const currentTimestamp = moment().add(100, 'minutes');
   const expirationTimestamp = currentTimestamp / 1000
   const token = await geenerate_rtc_token(id, uid, role, expirationTimestamp, appId._id);
   let test = await TestAgora.create(
@@ -397,6 +397,14 @@ const recording_stop = async (req) => {
 };
 
 
+const get_test_details_test = async (req) => {
+  let test = await TestAgora.findById(req.query.id);
+  let agoraToken = await AgoraAppId.findById(test.tokenId);
+
+
+  return { test, agoraToken }
+}
+
 module.exports = {
   InsertAppId,
   InsertAget_app_id,
@@ -409,5 +417,6 @@ module.exports = {
   get_token_usage_demo,
   test_appid,
   recording_stop,
-  recording_start
+  recording_start,
+  get_test_details_test
 };

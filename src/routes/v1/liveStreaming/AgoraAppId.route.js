@@ -18,6 +18,7 @@ router.get('/get/token/usage/agri', AgoraAppId.get_token_usage_agri);
 router.get('/get/token/usage/demo', AgoraAppId.get_token_usage_demo);
 
 router.route('/test/appid',).get(AgoraAppId.test_appid);
+router.route('/test/appid/details',).get(AgoraAppId.get_test_details_test);
 
 
 module.exports = router;
