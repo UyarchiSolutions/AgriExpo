@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Slot, Slotseperation } = require('../models/slot.model');
+const { Slot, Slotseperation, Event } = require('../models/slot.model');
 const ApiError = require('../utils/ApiError');
 const moment = require('moment');
 const { purchasePlan } = require('../models/purchasePlan.model');
@@ -506,6 +506,69 @@ const getStreamBySlots = async (id) => {
   return { values, slot };
 };
 
+const getSlots_Details_Streaming = async (slotId) => {
+  const currentUnixTimestamp = moment().valueOf();
+
+  let values = await Streamrequest.aggregate([
+    {
+      $match: {
+        slotId: slotId,
+      },
+    },
+    {
+      $addFields: {
+        isBetweenTime: {
+          $and: [{ $gte: ['$startTime', currentUnixTimestamp] }, { $lt: ['$streamEnd_Time', currentUnixTimestamp] }],
+        },
+      },
+    },
+    {
+      $addFields: {
+        PendingStatus: { $and: [{ $gte: ['$startTime', currentUnixTimestamp] }] },
+      },
+    },
+    {
+      $addFields: {
+        StreamStatus: {
+          $cond: {
+            if: { $eq: ['$isBetweenTime', true] },
+            then: 'Onlive',
+            else: 'Completed',
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        PendingStatus: {
+          $cond: {
+            if: { $eq: ['$PendingStatus', true] },
+            then: 'Pending',
+            else: '$StreamStatus',
+          },
+        },
+      },
+    },
+  ]);
+  return values;
+};
+
+const createEvents = async (body) => {
+  let values = await Event.create(body);
+  return values;
+};
+
+const getEvents = async () => {
+  let values = await Event.aggregate([
+    {
+      $match: {
+        active: true,
+      },
+    },
+  ]);
+  return values;
+};
+
 module.exports = {
   createSlot,
   Fetch_Slot,
@@ -517,4 +580,7 @@ module.exports = {
   getSlots_by_SlotInfo,
   getSlots_Duraions,
   getStreamBySlots,
+  getSlots_Details_Streaming,
+  createEvents,
+  getEvents,
 };

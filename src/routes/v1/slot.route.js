@@ -10,4 +10,6 @@ router.route('/getDetails/slots').post(SellerAuth, SlotController.getSlotsWitdSo
 router.route('/getSlots/by/SlotInfo').get(SlotController.getSlots_by_SlotInfo);
 router.route('/getSlots/Duraions').get(SlotController.getSlots_Duraions);
 router.route('/getStreamBySlots/:id').get(SlotController.getStreamBySlots);
+router.route('/getSlots/Details/Streaming/:id').get(SlotController.getSlots_Details_Streaming);
+router.route('/createEvents').post(SlotController.createEvents).get(SlotController.getEvents);
 module.exports = router;
