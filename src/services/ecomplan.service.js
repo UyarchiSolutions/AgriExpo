@@ -38,9 +38,12 @@ const purchese_plan = require('./purchasePlan.service');
 const { Usermessage, Interaction } = require('../models/PrivateChat.model');
 
 const create_Plans = async (req) => {
-  const { slotInfo } = req.body;
-  const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal' } });
-
+  const { slotInfo,stream_validity } = req.body;
+  let validity 
+  if(!stream_validity){
+     validity = moment().add('days',parseInt(stream_validity));
+  }
+  const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal',stream_validity:validity } });
   slotInfo.forEach(async (e) => {
     let datas = { slotType: e.slotType, Duration: e.Duration, No_Of_Slot: e.No_Of_Slot, streamPlanId: value._id };
     console.log(datas);

@@ -156,7 +156,21 @@ const streamplanschema = mongoose.Schema({
   transaction: {
     type: String,
   },
-
+  offer_price: {
+    type: Number,
+  },
+  stream_validity: {
+    type: String,
+  },
+  Interest_View_Count: {
+    type: String,
+  },
+  No_of_Limitations: {
+    type: Number,
+  },
+  Service_Charges: {
+    type: Number,
+  },
 });
 
 const Streamplan = mongoose.model('streamplan', streamplanschema);
@@ -318,7 +332,7 @@ const streamPostschema = mongoose.Schema({
   },
   return_policy: {
     type: String,
-  }
+  },
 });
 
 const StreamPost = mongoose.model('Streampost', streamPostschema);
@@ -537,7 +551,7 @@ const streamRequestschema = mongoose.Schema({
   },
   broucher: {
     type: String,
-  }
+  },
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);
@@ -872,8 +886,6 @@ const NotifySchema = new mongoose.Schema(
 
 const Notify = mongoose.model('Notify', NotifySchema);
 
-
-
 const streampostpriceschema = new mongoose.Schema(
   {
     _id: {
@@ -903,7 +915,7 @@ const streampostpriceschema = new mongoose.Schema(
     },
     createdBy: {
       type: String,
-    }
+    },
   },
   { timestamps: true }
 );
@@ -922,5 +934,5 @@ module.exports = {
   Instestedproduct,
   Savedproduct,
   Notify,
-  Streampostprice
+  Streampostprice,
 };
