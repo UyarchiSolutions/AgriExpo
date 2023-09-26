@@ -5,6 +5,7 @@ const { toJSON, paginate } = require('../plugins');
 const { roles } = require('../../config/roles');
 const { StringDecoder } = require('string_decoder');
 const { v4 } = require('uuid');
+const { timeStamp } = require('console');
 
 
 const agoraAppIdschema = mongoose.Schema({
@@ -53,30 +54,6 @@ const agoraAppIdschema = mongoose.Schema({
         type: Number,
         default: 0
     },
-    testToken: {
-        type: String,
-    },
-    testUD: {
-        type: Number,
-    },
-    cloud_testToken: {
-        type: String,
-    },
-    cloud_testUD: {
-        type: Number,
-    },
-    endTime: {
-        type: Number,
-    },
-    completed: {
-        type: String,
-    },
-    resourceId: {
-        type: String,
-    },
-    sid: {
-        type: String,
-    },
     type: {
         type: String,
         default: "demo"
@@ -116,4 +93,67 @@ const UsageAppIDschema = mongoose.Schema({
 });
 
 const UsageAppID = mongoose.model('appidusage', UsageAppIDschema);
-module.exports = { AgoraAppId, UsageAppID };
+
+
+
+const TestAgoraschema = mongoose.Schema({
+    _id: {
+        type: String,
+        default: v4,
+    },
+    dateISO: {
+        type: Number,
+    },
+    testToken: {
+        type: String,
+    },
+    status: {
+        type: String,
+        default: "pending"
+    },
+    testUD: {
+        type: Number,
+    },
+    cloud_testToken: {
+        type: String,
+    },
+    cloud_testUD: {
+        type: Number,
+    },
+    endTime: {
+        type: Number,
+    },
+    completed: {
+        type: String,
+    },
+    recordLink: {
+        type: String,
+    },
+    recordLink_mp4: {
+        type: String,
+    },
+    recordLinks: {
+        type: Array,
+    },
+    resourceId: {
+        type: String,
+    },
+    sid: {
+        type: String,
+    },
+    tokenId: {
+        type: String,
+    },
+    test_by: {
+        type: String,
+    },
+    store: {
+        type: String,
+    },
+
+},
+    { timestamps: true }
+);
+
+const TestAgora = mongoose.model('testagoraappid', TestAgoraschema);
+module.exports = { AgoraAppId, UsageAppID, TestAgora };

@@ -1,9 +1,9 @@
 const httpStatus = require('http-status');
 const ApiError = require('../../utils/ApiError');
 const moment = require('moment');
-const { AgoraAppId, UsageAppID } = require('../../models/liveStreaming/AgoraAppId.model');
+const { AgoraAppId, UsageAppID, TestAgora } = require('../../models/liveStreaming/AgoraAppId.model');
 const Agora = require('agora-access-token');
-
+const axios = require('axios');
 
 const InsertAppId = async (req) => {
 
@@ -206,13 +206,21 @@ const test_appid = async (req) => {
   let appId = await AgoraAppId.findById(id)
   const uid = await generateUid();
   const role = req.body.isPublisher ? Agora.RtcRole.PUBLISHER : Agora.RtcRole.SUBSCRIBER;
-  const currentTimestamp = moment().add(30, 'seconds');
+  const currentTimestamp = moment().add(100, 'minutes');
   const expirationTimestamp = currentTimestamp / 1000
   const token = await geenerate_rtc_token(id, uid, role, expirationTimestamp, appId._id);
-  appId.testToken = token;
-  appId.testUD = uid;
-  appId.endTime = currentTimestamp;
-  return appId;
+  let test = await TestAgora.create(
+    {
+      testToken: token,
+      testUD: uid,
+      endTime: currentTimestamp,
+      test_by: req.userId,
+      tokenId: id
+    }
+  )
+  await start_cloud_record(expirationTimestamp, id, appId, test._id)
+
+  return test;
 }
 const geenerate_rtc_token = async (chennel, uid, role, expirationTimestamp, agoraID) => {
   let agoraToken = await AgoraAppId.findById(agoraID)
@@ -220,11 +228,182 @@ const geenerate_rtc_token = async (chennel, uid, role, expirationTimestamp, agor
 };
 
 
-const start_cloud_record = async () => {
+const start_cloud_record = async (expirationTimestamp, chennel, appId, testId) => {
+  const uid = await generateUid();
   const role = Agora.RtcRole.SUBSCRIBER;
+  const token = await geenerate_rtc_token(chennel, uid, role, expirationTimestamp, appId._id);
+
+  let test = await TestAgora.findByIdAndUpdate({ _id: testId }, { cloud_testToken: token, cloud_testUD: uid, store: testId.replace(/[^a-zA-Z0-9]/g, '',), status: "created" })
+
+  await agora_acquire(test._id, test.tokenId)
 }
 
+const agora_acquire = async (id, agroaID) => {
+  let temtoken = id;
+  let agoraToken = await AgoraAppId.findById(agroaID);
+  let test = await TestAgora.findById(id);
+  const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString('base64')}`;
+  await axios.post(
+    `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/acquire`,
+    {
+      cname: test.tokenId,
+      uid: test.testUD.toString(),
+      clientRequest: {
+        resourceExpiredHour: 24,
+        scene: 0,
+      },
+    },
+    { headers: { Authorization } }
+  ).then((res) => {
+    test.resourceId = res.data.resourceId;
+    test.status = 'acquire';
+    test.save();
+  }).catch(async (error) => {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Error: ' + error.message);
+  });
 
+
+};
+
+
+
+const recording_start = async (req) => {
+  let test = await TestAgora.findById(req.query.id);
+  if (test) {
+    let agoraToken = await AgoraAppId.findById(test.tokenId);
+    const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
+      'base64'
+    )}`;
+    if (test.status == 'acquire') {
+      const resource = test.resourceId;
+      //console.log(resource)
+      //console.log(token)
+      const mode = 'mix';
+      const start = await axios.post(
+        `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/mode/${mode}/start`,
+        {
+          cname: test.tokenId,
+          uid: test.cloud_testUD.toString(),
+          clientRequest: {
+            token: test.cloud_testToken,
+            recordingConfig: {
+              maxIdleTime: 30,
+              streamTypes: 2,
+              channelType: 1,
+              videoStreamType: 0,
+              transcodingConfig: {
+                height: 640,
+                width: 1080,
+                bitrate: 1000,
+                fps: 15,
+                mixedVideoLayout: 1,
+                backgroundColor: '#FFFFFF',
+              },
+            },
+            recordingFileConfig: {
+              avFileType: ['hls', 'mp4'],
+            },
+            storageConfig: {
+              vendor: 1,
+              region: 14,
+              bucket: 'streamingupload',
+              accessKey: 'AKIA3323XNN7Y2RU77UG',
+              secretKey: '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',
+              fileNamePrefix: [store.store, token.cloud_testUD.toString()],
+            },
+          },
+        },
+        { headers: { Authorization } }
+      ).then((res) => {
+        test.resourceId = res.data.resourceId;
+        test.sid = res.data.sid;
+        test.status = 'start';
+        test.save();
+        setTimeout(async () => {
+          await recording_query(test._id);
+        }, 3000);
+        return start.data;
+      }).catch((err) => {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Start: ' + err.message);
+      })
+    }
+    else {
+      return { message: 'Already Started' };
+    }
+  }
+  else {
+    return { message: 'Already Started' };
+  }
+};
+const recording_query = async (id) => {
+  let test = await TestAgora.findById(id);
+  let agoraToken = await AgoraAppId.findById(test.tokenId);
+  const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString('base64')}`;
+  const resource = test.resourceId;
+  const sid = test.sid;
+  const mode = 'mix';
+  let query = await axios.get(
+    `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
+    { headers: { Authorization } }
+  ).then((res) => {
+    if (res.data.serverResponse.fileList.length > 0) {
+      test.recordLink = res.data.serverResponse.fileList[0].fileName;
+      test.recordLinks = res.data.serverResponse.fileList;
+      let m3u8 = res.data.serverResponse.fileList[0].fileName;
+      if (m3u8 != null) {
+        let mp4 = m3u8.replace('.m3u8', '_0.mp4')
+        test.recordLink_mp4 = mp4;
+      }
+      test.status = 'query';
+      test.save();
+    }
+
+    return res.data;
+  }).catch((err) => {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Query: ' + err.message);
+  });
+
+  return query;
+};
+
+
+const recording_stop = async (req) => {
+  const mode = 'mix';
+  let test = await TestAgora.findById(req.query.id);
+  let agoraToken = await AgoraAppId.findById(test.tokenId);
+  test.status = "stop";
+  test.save();
+  const resource = test.resourceId;
+  const sid = test.sid;
+  const stop = await axios.post(
+    `https://api.agora.io/v1/apps/${agoraToken.appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
+    {
+      cname: test.tokenId,
+      uid: test.testUD.toString(),
+      clientRequest: {},
+    },
+    {
+      headers: {
+        Authorization,
+      },
+    }
+  ).then((res) => {
+    return res.data;
+  }).catch((err) => {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Stop:' + err.message);
+  });
+
+  return stop
+};
+
+
+const get_test_details_test = async (req) => {
+  let test = await TestAgora.findById(req.query.id);
+  let agoraToken = await AgoraAppId.findById(test.tokenId);
+
+
+  return { test, agoraToken }
+}
 
 module.exports = {
   InsertAppId,
@@ -236,5 +415,8 @@ module.exports = {
   token_assign,
   get_token_usage_agri,
   get_token_usage_demo,
-  test_appid
+  test_appid,
+  recording_stop,
+  recording_start,
+  get_test_details_test
 };
