@@ -309,7 +309,7 @@ const recording_start = async (req) => {
               bucket: 'streamingupload',
               accessKey: 'AKIA3323XNN7Y2RU77UG',
               secretKey: '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',
-              fileNamePrefix: [store.store, token.cloud_testUD.toString()],
+              fileNamePrefix: [test.store, test.cloud_testUD.toString()],
             },
           },
         },
@@ -404,6 +404,8 @@ const get_test_details_test = async (req) => {
 
   return { test, agoraToken }
 }
+
+
 
 module.exports = {
   InsertAppId,
