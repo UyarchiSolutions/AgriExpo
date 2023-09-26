@@ -41,7 +41,7 @@ const create_Plans = async (req) => {
   const { slotInfo,stream_validity } = req.body;
   let validity 
   if(!stream_validity){
-     validity = moment().add('days',parseInt(stream_validity));
+     validity = moment().add(parseInt(stream_validity),'d');
   }
   const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal',stream_validity:validity } });
   slotInfo.forEach(async (e) => {
