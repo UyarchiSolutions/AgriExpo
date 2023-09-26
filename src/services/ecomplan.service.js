@@ -8382,7 +8382,6 @@ const regisetr_strean_instrest = async (req) => {
   let findresult = await StreamPreRegister.findOne({ shopId: req.shopId, streamId: req.body.streamId });
   let count = await StreamPreRegister.find({ streamId: req.body.streamId, status: 'Registered' }).count();
   let participents = await Streamrequest.findById(req.body.streamId);
-  // //console.log(count, 231231, participents.noOfParticipants > count, participents.noOfParticipants)
   if (!findresult) {
     findresult = await StreamPreRegister.create({
       shopId: req.shopId,
@@ -8478,10 +8477,7 @@ const unregisetr_strean_instrest = async (req) => {
     }
   }
   await single_stream_details(req);
-  let update = await StreamPreRegister.find({ streamId: participents._id, eligible: false })
-    .sort({ DateIso: -1 })
-    .limit(participents.noOfParticipants / 2);
-  //console.log(update);
+  let update = await StreamPreRegister.find({ streamId: participents._id, eligible: false }).sort({ DateIso: -1 }).limit(participents.noOfParticipants / 2);
   update.forEach(async (e) => {
     e.viewstatus = 'RAC';
     e.save();
@@ -8492,7 +8488,6 @@ const unregisetr_strean_instrest = async (req) => {
 const single_stream_details = async (req) => {
   setTimeout(async () => {
     let count = await StreamPreRegister.find({ streamId: req.body.streamId, status: 'Registered' }).count();
-    //console.log(count);
     req.io.emit(req.body.streamId + '_userjoined', { count: count, streamId: req.body.streamId });
   }, 300);
 };
