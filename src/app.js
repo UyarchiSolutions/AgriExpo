@@ -137,6 +137,11 @@ io.sockets.on('connection', async (socket) => {
   socket.on('privateChat', async (data) => {
     await privatechat.recived_message(data, io, socket.handshake.auth)
   });
+
+  socket.on('privateChatexp', async (data) => {
+    await privatechat.recived_message_exp(data, io, socket.handshake.auth)
+  });
+
   socket.on('same_user_jion_exhibitor', async (data) => {
     await privatechat.same_user_jion_exhibitor(data, io, socket.handshake.auth)
   });

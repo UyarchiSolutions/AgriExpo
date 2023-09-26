@@ -64,6 +64,36 @@ const recived_message = async (data, io, header) => {
   }
 };
 
+const recived_message_exp = async (data, io, header) => {
+  const intr = await Interaction.findById(data.chat);
+  const payload = jwt.verify(header.token, config.jwt.secret);
+  const userss = await Seller.findOne({ _id: payload._id, active: true });
+  // let streamName = '';
+  // if (data.stream != null) {
+  //   let stream = await Streamrequest.findById(data.stream);
+  //   if (stream) {
+  //     streamName = stream.streamName;
+  //   }
+  // }
+  if (intr) {
+    if (userss) {
+      let shopId = payload._id;
+      let msg = await Usermessage.create({
+        exhibitorId: intr.exhibitorId,
+        visitorId: intr.visitorId,
+        sender: shopId,
+        channel: data.chat,
+        msg: data.msg,
+        sendBy: 'exhibitor',
+      });
+      intr.last_modify = moment();
+      intr.save();
+      io.sockets.emit(data.chat, msg);
+    }
+  }
+};
+
+
 const same_user_jion_exhibitor = async (data, io, header) => {
   // console.log(data,header);
   const payload = jwt.verify(header.token, config.jwt.secret);
@@ -96,7 +126,7 @@ const get_old_chat = async (req) => {
 
 const getMmesages = async (req) => {
   let exhibitorId = req.userId;
-  let values = await Usermessage.aggregate([
+  let values = await Interaction.aggregate([
     {
       $match: {
         exhibitorId: exhibitorId,
@@ -119,6 +149,36 @@ const getMmesages = async (req) => {
         path: '$visitors',
       },
     },
+    {
+      $lookup: {
+        from: 'usermessages',
+        localField: '_id',
+        foreignField: 'channel',
+        pipeline: [
+          { $sort: { createdAt: -1 } },
+          { $limit: 1 }
+        ],
+        as: 'usermessages',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$usermessages',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        exhibitorId: 1,
+        visitorId: 1,
+        last_modify: 1,
+        SName: "$visitors.SName",
+        userinteractions: "$usermessages.msg",
+        latestMesaage: "$usermessages.createdAt"
+      }
+    },
+    { $sort: { latestMesaage: -1 } }
   ]);
   return values;
 };
@@ -129,4 +189,5 @@ module.exports = {
   get_old_chat,
   same_user_jion_exhibitor,
   getMmesages,
+  recived_message_exp
 };
