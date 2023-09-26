@@ -206,7 +206,7 @@ const test_appid = async (req) => {
   let appId = await AgoraAppId.findById(id)
   const uid = await generateUid();
   const role = req.body.isPublisher ? Agora.RtcRole.PUBLISHER : Agora.RtcRole.SUBSCRIBER;
-  const currentTimestamp = moment().add(100, 'minutes');
+  const currentTimestamp = moment().add(35, 'seconds');
   const expirationTimestamp = currentTimestamp / 1000
   const token = await geenerate_rtc_token(id, uid, role, expirationTimestamp, appId._id);
   let test = await TestAgora.create(
@@ -247,7 +247,7 @@ const agora_acquire = async (id, agroaID) => {
     `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/acquire`,
     {
       cname: test.tokenId,
-      uid: test.testUD.toString(),
+      uid: test.cloud_testUD.toString(),
       clientRequest: {
         resourceExpiredHour: 24,
         scene: 0,
@@ -269,6 +269,7 @@ const agora_acquire = async (id, agroaID) => {
 
 const recording_start = async (req) => {
   let test = await TestAgora.findById(req.query.id);
+  console.log(test)
   if (test) {
     let agoraToken = await AgoraAppId.findById(test.tokenId);
     const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
@@ -279,6 +280,7 @@ const recording_start = async (req) => {
       //console.log(resource)
       //console.log(token)
       const mode = 'mix';
+      console.log(`https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/mode/${mode}/start`, 9876578)
       const start = await axios.post(
         `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/mode/${mode}/start`,
         {
@@ -309,23 +311,28 @@ const recording_start = async (req) => {
               bucket: 'streamingupload',
               accessKey: 'AKIA3323XNN7Y2RU77UG',
               secretKey: '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',
-              fileNamePrefix: [test.store, test.cloud_testUD.toString()],
+              fileNamePrefix: ['test', test.store, test.cloud_testUD.toString()],
             },
           },
         },
         { headers: { Authorization } }
-      ).then((res) => {
-        test.resourceId = res.data.resourceId;
-        test.sid = res.data.sid;
-        test.status = 'start';
-        test.save();
-        setTimeout(async () => {
-          await recording_query(test._id);
-        }, 3000);
-        return start.data;
-      }).catch((err) => {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Start: ' + err.message);
-      })
+      )
+        .then((res) => {
+          test.resourceId = res.data.resourceId;
+          test.sid = res.data.sid;
+          test.status = 'start';
+          test.save();
+          setTimeout(async () => {
+            await recording_query(test._id);
+          }, 3000);
+
+          return { message: "started" }
+        }).catch((err) => {
+          throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Start: ' + err.message);
+        })
+
+
+      return start;
     }
     else {
       return { message: 'Already Started' };
@@ -352,7 +359,7 @@ const recording_query = async (id) => {
       let m3u8 = res.data.serverResponse.fileList[0].fileName;
       if (m3u8 != null) {
         let mp4 = m3u8.replace('.m3u8', '_0.mp4')
-        test.recordLink_mp4 = mp4;
+        test.recordLink_mp4 = "https://streamingupload.s3.ap-south-1.amazonaws.com/" + mp4;
       }
       test.status = 'query';
       test.save();
@@ -373,13 +380,14 @@ const recording_stop = async (req) => {
   let agoraToken = await AgoraAppId.findById(test.tokenId);
   test.status = "stop";
   test.save();
+  const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString('base64')}`;
   const resource = test.resourceId;
   const sid = test.sid;
   const stop = await axios.post(
     `https://api.agora.io/v1/apps/${agoraToken.appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
     {
       cname: test.tokenId,
-      uid: test.testUD.toString(),
+      uid: test.cloud_testUD.toString(),
       clientRequest: {},
     },
     {
