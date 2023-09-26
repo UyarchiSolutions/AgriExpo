@@ -40,7 +40,7 @@ const { Usermessage, Interaction } = require('../models/PrivateChat.model');
 const create_Plans = async (req) => {
   const { slotInfo,stream_validity } = req.body;
   let validity 
-  if(!stream_validity){
+  if(stream_validity){
      validity = moment().add(parseInt(stream_validity),'d');
   }
   const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal',stream_validity:validity } });
@@ -49,9 +49,8 @@ const create_Plans = async (req) => {
     console.log(datas);
     await PlanSlot.create(datas);
   });
-
   await Dates.create_date(value);
-  return value;
+  return req.body;
 };
 
 const create_Plans_addon = async (req) => {
