@@ -20,5 +20,7 @@ router.get('/get/token/usage/demo', AgoraAppId.get_token_usage_demo);
 router.route('/test/appid',).get(AgoraAppId.test_appid);
 router.route('/test/appid/details',).get(AgoraAppId.get_test_details_test);
 
+router.route('/test/appid/start',).get(AgoraAppId.recording_start);
+router.route('/test/appid/stop',).get(AgoraAppId.recording_stop);
 
 module.exports = router;

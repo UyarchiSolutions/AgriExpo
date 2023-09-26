@@ -49,6 +49,17 @@ const get_test_details_test = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(data);
 });
 
+
+const recording_start = catchAsync(async (req, res) => {
+  const data = await AgoraAppId.recording_start(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
+const recording_stop = catchAsync(async (req, res) => {
+  const data = await AgoraAppId.recording_stop(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
 module.exports = {
   InsertAppId,
   InsertAget_app_id,
@@ -59,5 +70,7 @@ module.exports = {
   get_token_usage_demo,
   get_token_usage_agri,
   test_appid,
-  get_test_details_test
+  get_test_details_test,
+  recording_stop,
+  recording_start,
 };
