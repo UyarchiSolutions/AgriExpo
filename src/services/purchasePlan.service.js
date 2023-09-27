@@ -523,6 +523,12 @@ const create_PurchasePlan_EXpo = async (planId, userId, ccavenue) => {
     suppierId: userId,
     ccavenue: ccavenue,
     transaction: findPlan.transaction,
+    offer_price: plan.offer_price,
+    stream_validity: plan.stream_validity,
+    Interest_View_Count: plan.Interest_View_Count,
+    No_of_Limitations: plan.No_of_Limitations,
+    Service_Charges: plan.Service_Charges,
+    TimeType: plan.TimeType,
   };
   console.log(data);
   const creations = await purchasePlan.create(data);
@@ -563,6 +569,12 @@ const create_PurchasePlan_EXpo_Admin = async (body, userId) => {
     planId: body.planId,
     suppierId: userId,
     transaction: findPlan.transaction,
+    offer_price: plan.offer_price,
+    stream_validity: plan.stream_validity,
+    Interest_View_Count: plan.Interest_View_Count,
+    No_of_Limitations: plan.No_of_Limitations,
+    Service_Charges: plan.Service_Charges,
+    TimeType: plan.TimeType,
   };
   const creations = await purchasePlan.create(data);
   await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
