@@ -8,4 +8,7 @@ router.route('/intraction/exp').post(shopverify, PrivateChat.intraction_exhibito
 router.route('/get/old/chat').get(shopverify, PrivateChat.get_old_chat);
 router.route('/getMmesages').get(SellerAuth, PrivateChat.getMmesages);
 
+
+router.route('/get/old/chat/exhibitor').get(SellerAuth, PrivateChat.get_old_chat);
+
 module.exports = router;
