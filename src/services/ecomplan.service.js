@@ -1482,8 +1482,12 @@ const create_stream_one = async (req) => {
   let totalMinutes = numberOfParticipants + no_of_host + Duration;
   let agoraID = await agoraToken.token_assign(totalMinutes, '', 'agri');
 
-  
+
   let datess = new Date().setTime(new Date(startTime).getTime() + slot.Duration * 60 * 1000);
+  let expiretime = datess;
+  if (plan.completedStream == 'yes') {
+    expiretime = moment(1695817800000).add(plan.stream_validity, plan.TimeType);
+  }
   let value;
   if (agoraID.element != null && agoraID.element != '' && agoraID.element != undefined) {
     value = await Streamrequest.create({
@@ -1507,6 +1511,11 @@ const create_stream_one = async (req) => {
         agoraID: agoraID.element._id,
         totalMinues: totalMinutes,
         chat_need: plan.chat_Option,
+        completedStream: plan.completedStream,
+        streamExpire: expiretime,
+        Service_Charges: plan.Service_Charges == null ? 0 : plan.Service_Charges,
+        Interest_View_Count: plan.Interest_View_Count == null ? 0 : plan.Interest_View_Count,
+        No_of_Limitations: plan.No_of_Limitations,
       },
     });
     await UsageAppID.findByIdAndUpdate({ _id: agoraID.vals._id }, { streamID: value._id }, { new: true });
