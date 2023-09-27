@@ -2,6 +2,7 @@ const express = require('express');
 const SellerController = require('../../controllers/seller.controller');
 const router = express.Router();
 const { SetPass, SellerAuth } = require('../../controllers/sellerAuth.controller');
+const shopverify = require('../../controllers/shoptokenverify.controller');
 
 router.route('/register/seller').post(SellerController.createSeller);
 router.route('/verifyotp/seller').post(SellerController.verifyOTP);
@@ -40,4 +41,8 @@ router.route('/:id').get(SellerController.GetSellerById).put(SellerController.Up
 router.route('/getSellers/With/Paginations/:page').get(SellerController.getSellers_With_Paginations);
 router.route('/DisableSeller/:id/:type').get(SellerController.DisableSeller);
 router.route('/get/all/').get(SellerController.getAllSeller);
+router.route('/create/Dispatch/Location').post(shopverify, SellerController.createDispatchLocation);
+router.route('/update/Dispatch/Location/:id').put(SellerController.updateDispatchLocation);
+router.route('/getDispatch/Locations').get(shopverify, SellerController.getDispatchLocations);
+router.route('/DeleteLocation/:id').delete(SellerController.DeleteLocation);
 module.exports = router;

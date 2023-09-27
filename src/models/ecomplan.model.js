@@ -160,7 +160,7 @@ const streamplanschema = mongoose.Schema({
     type: Number,
   },
   stream_validity: {
-    type: String,
+    type: Number,
   },
   Interest_View_Count: {
     type: String,
@@ -170,6 +170,9 @@ const streamplanschema = mongoose.Schema({
   },
   Service_Charges: {
     type: Number,
+  },
+  TimeType: {
+    type: String,
   },
 });
 

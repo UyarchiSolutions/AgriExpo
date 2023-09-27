@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Seller } = require('../models/seller.models');
+const { Seller, VisitorDispatch } = require('../models/seller.models');
 const ApiError = require('../utils/ApiError');
 const { OTP, sellerOTP } = require('../models/saveOtp.model');
 const sentOTP = require('../config/seller.config');
@@ -263,10 +263,9 @@ const delete_hosts = async (req) => {
   if (host.mainSeller != req.userId) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Sellar Not Found');
   }
-  await Seller.findByIdAndDelete(host._id)
-  return { message: "delete Success" };
+  await Seller.findByIdAndDelete(host._id);
+  return { message: 'delete Success' };
 };
-
 
 const get_single_host = async (req) => {
   let host = await Seller.findById(req.query.id);
@@ -518,6 +517,41 @@ const getAllSeller = async () => {
   return values;
 };
 
+const createDispatchLocation = async (body, userId) => {
+  let data = { ...body, ...{ userId: userId } };
+  let values = await VisitorDispatch.create(data);
+  return values;
+};
+
+const updateDispatchLocation = async (id, body) => {
+  let dispatch = await VisitorDispatch.findById(id);
+  if (!dispatch) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Not Found');
+  }
+  dispatch = await VisitorDispatch.findByIdAndUpdate({ _id: id }, body, { new: true });
+  return dispatch;
+};
+
+const getDispatchLocations = async (userId) => {
+  let values = await VisitorDispatch.aggregate([
+    {
+      $match: {
+        userId: userId,
+      },
+    },
+  ]);
+  return values;
+};
+
+const DeleteLocation = async (id) => {
+  let dispatch = await VisitorDispatch.findById(id);
+  if (!dispatch) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Not Found');
+  }
+  await dispatch.remove();
+  return { Message: 'Deleted' };
+};
+
 module.exports = {
   createSeller,
   verifyOTP,
@@ -547,4 +581,8 @@ module.exports = {
   DisableSeller,
   sendOTP_continue,
   getAllSeller,
+  createDispatchLocation,
+  updateDispatchLocation,
+  getDispatchLocations,
+  DeleteLocation,
 };

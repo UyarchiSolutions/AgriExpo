@@ -219,4 +219,38 @@ VisitorSchema.pre('save', async function (next) {
 });
 const Visitor = mongoose.model('visitors', VisitorSchema);
 
-module.exports = { Seller, Visitor };
+const VisitorDispatchLocation = mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    location_name: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
+    pincode: {
+      type: Number,
+    },
+    state: {
+      type: String,
+    },
+    city: {
+      type: String,
+    },
+    userId: {
+      type: String,
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  { timestamps: true }
+);
+
+const VisitorDispatch = mongoose.model('VisitorDispatchLocation', VisitorDispatchLocation);
+
+module.exports = { Seller, Visitor, VisitorDispatch };

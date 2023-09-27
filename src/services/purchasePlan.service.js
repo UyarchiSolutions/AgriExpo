@@ -15,7 +15,6 @@ const {
   StreamrequestPost,
   StreamPreRegister,
   streamPlanlink,
-
 } = require('../models/ecomplan.model');
 const { Seller } = require('../models/seller.models');
 const ccavenue = require('./ccavenue.service');
@@ -63,11 +62,12 @@ const create_purchase_plan = async (req) => {
         streamvalidity: plan.streamvalidity,
         no_of_host: plan.no_of_host,
         RaiseHands: plan.RaiseHands,
-        offer_price:plan.offer_price,
-        stream_validity:plan.stream_validity,
-        Interest_View_Count:plan.Interest_View_Count,
-        No_of_Limitations:plan.No_of_Limitations,
-        Service_Charges:plan.Service_Charges,
+        offer_price: plan.offer_price,
+        stream_validity: plan.stream_validity,
+        Interest_View_Count: plan.Interest_View_Count,
+        No_of_Limitations: plan.No_of_Limitations,
+        Service_Charges: plan.Service_Charges,
+        TimeType: plan.TimeType,
       };
       let con = await purchasePlan.create({ ...datas, ...req.body.PaymentDatails });
       await Dates.create_date(con);
@@ -1011,7 +1011,7 @@ const getPlanes_Request_Streams = async (userId) => {
         NormalSlots: { $ifNull: [{ $size: '$BookedSlotsNormal' }, 0] },
         PeakSlots: { $ifNull: [{ $size: '$BookedSlotsPeak' }, 0] },
         ExclusiveSlots: { $ifNull: [{ $size: '$BookedSlotsExclusive' }, 0] },
-        transaction: 1
+        transaction: 1,
       },
     },
     {
@@ -1033,7 +1033,7 @@ const getPlanes_Request_Streams = async (userId) => {
             { $eq: ['$Exclusive', '$ExclusiveSlots'] },
           ],
         },
-        transaction: 1
+        transaction: 1,
       },
     },
     {
@@ -1874,7 +1874,6 @@ const getMyPurchasedPlan = async (userId) => {
 };
 
 const plan_payment_link_generate = async (req) => {
-
   let userId = req.userId;
   let purchase = req.body.plan;
   let purchasePlandetails = await purchasePlan.aggregate([
@@ -1928,25 +1927,24 @@ const plan_payment_link_generate = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'purchase not found');
   }
 
-
   let purchaseDetails = purchasePlandetails[0];
-  let link_Valid = moment().add(15, 'minutes')
+  let link_Valid = moment().add(15, 'minutes');
   let data = {
     amount: purchaseDetails.PendingAmount,
     link_Valid: link_Valid,
     purchasePlan: purchaseDetails._id,
     generatedBy: userId,
-    status: "Generated"
-  }
-  let link = await PurchaseLink_genete(data)
+    status: 'Generated',
+  };
+  let link = await PurchaseLink_genete(data);
 
   return { purchaseDetails, link };
-}
+};
 
 const PurchaseLink_genete = async (data) => {
   let link = await PurchaseLink.create(data);
   return link;
-}
+};
 
 const get_payment_link = async (req) => {
   let link = await PurchaseLink.findById(req.params.id);
@@ -1958,12 +1956,12 @@ const get_payment_link = async (req) => {
   if (link.link_Valid < time) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Purchase link Expired');
   }
-  if (link.status != "Generated") {
+  if (link.status != 'Generated') {
     throw new ApiError(httpStatus.NOT_FOUND, 'Purchase link Expired');
   }
 
   return link;
-}
+};
 
 const paynow_payment = async (req) => {
   let link = await PurchaseLink.findById(req.body.id);
@@ -1975,17 +1973,16 @@ const paynow_payment = async (req) => {
   if (link.link_Valid < time) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Purchase link Expired');
   }
-  if (link.status != "Generated") {
+  if (link.status != 'Generated') {
     throw new ApiError(httpStatus.NOT_FOUND, 'Purchase link Expired');
   }
 
-  let paynow = await ccavenue.exhibitor_purchese_plan(link.amount, "https://agriexpo.click/payment/success");
+  let paynow = await ccavenue.exhibitor_purchese_plan(link.amount, 'https://agriexpo.click/payment/success');
   link.ccavanue = paynow.payment._id;
   link.save();
 
   return paynow;
-
-}
+};
 
 module.exports = {
   create_purchase_plan,
@@ -2027,5 +2024,5 @@ module.exports = {
   getMyPurchasedPlan,
   plan_payment_link_generate,
   get_payment_link,
-  paynow_payment
+  paynow_payment,
 };

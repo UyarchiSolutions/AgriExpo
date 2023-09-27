@@ -140,6 +140,26 @@ const getAllSeller = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const createDispatchLocation = catchAsync(async (req, res) => {
+  const data = await SellerService.createDispatchLocation(req.body, req.shopId);
+  res.send(data);
+});
+
+const updateDispatchLocation = catchAsync(async (req, res) => {
+  const data = await SellerService.updateDispatchLocation(req.params.id, req.body);
+  res.send(data);
+});
+
+const getDispatchLocations = catchAsync(async (req, res) => {
+  const data = await SellerService.getDispatchLocations(req.shopId);
+  res.send(data);
+});
+
+const DeleteLocation = catchAsync(async (req, res) => {
+  const data = await SellerService.DeleteLocation(req.params.id);
+  res.send(data);
+});
+
 module.exports = {
   createSeller,
   verifyOTP,
@@ -169,4 +189,8 @@ module.exports = {
   DisableSeller,
   sendOTP_continue,
   getAllSeller,
+  createDispatchLocation,
+  updateDispatchLocation,
+  getDispatchLocations,
+  DeleteLocation,
 };
