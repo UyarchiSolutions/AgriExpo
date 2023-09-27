@@ -2553,7 +2553,7 @@ const get_all_streams = async (req) => {
     },
     {
       $addFields: {
-        streamExpire: { $lt: ['$streamExpire', date_now] },
+        streamExpire: { $gt: ['$streamExpire', date_now] },
       },
     },
     {
