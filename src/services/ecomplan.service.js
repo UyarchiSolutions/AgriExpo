@@ -296,10 +296,10 @@ const get_all_post_transation = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Plan Not Found');
   }
   let transaction = 'null';
-  if (purchsae.transaction == 'With Transaction') {
+  if (purchsae.transaction == 'With') {
     transaction = 'With';
   }
-  if (purchsae.transaction == 'Without Transaction') {
+  if (purchsae.transaction == 'Without') {
     transaction = 'Without';
   }
   const value = await StreamPost.aggregate([
