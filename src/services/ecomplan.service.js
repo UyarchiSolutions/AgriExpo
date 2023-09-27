@@ -2303,7 +2303,7 @@ const only_chat_get = async (req) => {
 
 const get_all_streams = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
-  //console.log(req.userId);
+
   var date_now = new Date().getTime();
   let statusFilter = { active: true };
   if (req.query.status == 'All') {
@@ -2549,6 +2549,11 @@ const get_all_streams = async (req) => {
     {
       $addFields: {
         chat_permissions: { $eq: ['$allot_chat', 'my self'] },
+      },
+    },
+    {
+      $addFields: {
+        streamExpire: { $lt: ['$streamExpire', date_now] },
       },
     },
     {
