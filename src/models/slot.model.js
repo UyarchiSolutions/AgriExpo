@@ -87,7 +87,7 @@ const EventSchema = mongoose.Schema(
     to: {
       type: String,
     },
-    EventName:{
+    EventName: {
       type: String,
     },
     active: {
