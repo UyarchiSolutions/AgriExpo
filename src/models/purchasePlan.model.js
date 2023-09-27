@@ -253,6 +253,9 @@ const purchasePlanSchema = mongoose.Schema(
     Service_Charges: {
       type: Number,
     },
+    TimeType: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
