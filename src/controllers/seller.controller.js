@@ -140,6 +140,11 @@ const getAllSeller = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const createDispatchLocation = catchAsync(async (req, res) => {
+  const data = await SellerService.createDispatchLocation(req.body, req.shopId);
+  res.send(data);
+});
+
 module.exports = {
   createSeller,
   verifyOTP,
@@ -169,4 +174,5 @@ module.exports = {
   DisableSeller,
   sendOTP_continue,
   getAllSeller,
+  createDispatchLocation,
 };

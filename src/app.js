@@ -16,12 +16,12 @@ const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 const cookieparser = require('cookie-parser');
 const app = express();
-const bodyParser = require("body-parser");
+const bodyParser = require('body-parser');
 const routes_v2 = require('./routes/v1/liveStreaming');
 const logger = require('./config/logger');
-const chetModule = require("./services/liveStreaming/chat.service")
-const privatechat = require("./services/PrivateChat.service")
-const socketService = require("./services/liveStreaming/socket.service")
+const chetModule = require('./services/liveStreaming/chat.service');
+const privatechat = require('./services/PrivateChat.service');
+const socketService = require('./services/liveStreaming/socket.service');
 const moment = require('moment');
 const UAParser = require('ua-parser-js');
 // app.use(session( { secret:'hello world',
@@ -48,55 +48,53 @@ server.listen(config.port, () => {
   // //console.log(moment(1674035400000).add(40, 'minutes').format('hh:mm:ss a'));
 });
 
-
 io.sockets.on('connection', async (socket) => {
   socket.on('groupchat', async (data) => {
-    await chetModule.chat_room_create(data, io)
+    await chetModule.chat_room_create(data, io);
   });
 
   socket.on('groupchatsubhost', async (data) => {
     //console.log("hello", data)
-    await chetModule.chat_room_create_subhost(data, io)
+    await chetModule.chat_room_create_subhost(data, io);
   });
   socket.on('groupchathost', async (data) => {
-    await chetModule.chat_room_create_host(data, io)
+    await chetModule.chat_room_create_host(data, io);
   });
   socket.on('livetraking', async (data) => {
     //console.log(data)
     io.sockets.emit('livetraking', data);
   });
   socket.on('toggle_controls', async (data) => {
-    await chetModule.change_controls(data, io)
+    await chetModule.change_controls(data, io);
   });
 
   socket.on('post_start_end', async (data) => {
-    await socketService.startStop_post(data, io)
+    await socketService.startStop_post(data, io);
   });
   socket.on('leave_subhost', async (data) => {
-    await socketService.leave_subhost(data, io)
+    await socketService.leave_subhost(data, io);
   });
   socket.on('allow_subhost', async (data) => {
-    await socketService.admin_allow_controls(data, io)
+    await socketService.admin_allow_controls(data, io);
   });
 
   socket.on('livejoin_count', async (roomName) => {
     socket.join(roomName);
-    socket.on(roomName + "_room_jion", (streamId) => {
+    socket.on(roomName + '_room_jion', (streamId) => {
       let room = io.sockets.adapter.rooms.get(streamId);
       let numUsersInRoom = room ? room.size : 0;
-      console.log(numUsersInRoom, 788)
-      console.log(io.sockets.adapter.rooms.get(streamId))
+      console.log(numUsersInRoom, 788);
+      console.log(io.sockets.adapter.rooms.get(streamId));
       // io.sockets.emit(streamId + '_userCountUpdate', numUsersInRoom);
       socket.broadcast.emit(streamId + '_userCountUpdate', numUsersInRoom);
       socket.on('disconnect', () => {
-        console.log(streamId, 2312312987)
+        console.log(streamId, 2312312987);
         room = io.sockets.adapter.rooms.get(streamId);
         numUsersInRoom = room ? room.size : 0;
-        console.log(numUsersInRoom, 788)
-        console.log(io.sockets.adapter.rooms.get(streamId))
+        console.log(numUsersInRoom, 788);
+        console.log(io.sockets.adapter.rooms.get(streamId));
         socket.broadcast.emit(streamId + '_userCountUpdate', numUsersInRoom);
       });
-
     });
   });
 
@@ -104,41 +102,41 @@ io.sockets.on('connection', async (socket) => {
     //console.log('message: ' + msg);
   });
   socket.on('host_controll_audio', async (data) => {
-    await socketService.host_controll_audio(data, io)
+    await socketService.host_controll_audio(data, io);
   });
 
   socket.on('host_controll_video', async (data) => {
-    await socketService.host_controll_video(data, io)
+    await socketService.host_controll_video(data, io);
   });
   socket.on('host_controll_all', async (data) => {
-    await socketService.host_controll_all(data, io)
+    await socketService.host_controll_all(data, io);
   });
   socket.on('stream_view_change', async (data) => {
-    await socketService.stream_view_change(data, io)
+    await socketService.stream_view_change(data, io);
   });
   socket.on('romove_message', async (data) => {
-    await socketService.romove_message(data, io)
+    await socketService.romove_message(data, io);
   });
   socket.on('ban_user_chat', async (data) => {
-    await socketService.ban_user_chat(data, io)
+    await socketService.ban_user_chat(data, io);
   });
   socket.on('groupchathost_demo', async (data) => {
-    await chetModule.chat_room_create_host_demo(data, io)
+    await chetModule.chat_room_create_host_demo(data, io);
   });
   socket.on('groupchathost_demo_buyer', async (data) => {
-    await chetModule.chat_room_create_host_demo_sub(data, io)
+    await chetModule.chat_room_create_host_demo_sub(data, io);
   });
   socket.on('liveleave', async (data) => {
-    await chetModule.livejoined_now(data, io, 'leave')
+    await chetModule.livejoined_now(data, io, 'leave');
   });
   socket.on('livejoined', async (data) => {
-    await chetModule.livejoined_now(data, io, 'join')
+    await chetModule.livejoined_now(data, io, 'join');
   });
   socket.on('privateChat', async (data) => {
-    await privatechat.recived_message(data, io, socket.handshake.auth)
+    await privatechat.recived_message(data, io, socket.handshake.auth);
   });
   socket.on('same_user_jion_exhibitor', async (data) => {
-    await privatechat.same_user_jion_exhibitor(data, io, socket.handshake.auth)
+    await privatechat.same_user_jion_exhibitor(data, io, socket.handshake.auth);
   });
   socket.on('joinRoom', (room) => {
     //console.log(room)
@@ -147,7 +145,6 @@ io.sockets.on('connection', async (socket) => {
     //console.log(socket.id,2136712)
     socket.to(room).emit('userJoined', socket.id);
     //console.log(socket.rooms)
-
   });
 
   socket.on('disconnecting', () => {
@@ -161,7 +158,6 @@ io.sockets.on('connection', async (socket) => {
       socket.to(room).emit('userDisconnected', socket.id);
     });
   });
-
 });
 
 app.use(function (req, res, next) {
@@ -171,7 +167,6 @@ app.use(function (req, res, next) {
 
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 
-
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
@@ -179,7 +174,7 @@ if (config.env !== 'test') {
 const ccavReqHandler = require('./ccavRequestHandler.js');
 
 app.get('/about', function (req, res) {
-  res.render('dataFrom.html', { name: "bharathi" });
+  res.render('dataFrom.html', { name: 'bharathi' });
 });
 app.post('/success', function (req, res) {
   ccavReqHandler.success_recive(req, res);
@@ -188,9 +183,8 @@ app.post('/payment/success', function (req, res) {
   ccavReqHandler.payment_success(req, res);
 });
 
-
 app.post('/ccavRequestHandler', function (request, response) {
-  console.log("sadas")
+  console.log('sadas');
   ccavReqHandler.postReq(request, response);
 });
 // set security HTTP headers
@@ -220,11 +214,12 @@ app.options('*', cors());
 //summa
 // jwt authentication
 app.use(passport.initialize());
-passport.use('jwt', jwtStrategy)
-  ;
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+passport.use('jwt', jwtStrategy);
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 
 app.use(bodyParser.json());
 
@@ -260,11 +255,10 @@ const deviceDetais = async (req, res, next) => {
   // //console.log(deviceInfo)
   req.deviceInfo = deviceInfo;
   return next();
-}
+};
 
 app.use('/v1', deviceDetais, routes);
 app.use('/v2', deviceDetais, routes_v2);
-
 
 //default routes
 

@@ -171,6 +171,9 @@ const streamplanschema = mongoose.Schema({
   Service_Charges: {
     type: Number,
   },
+  TimeType: {
+    type: String,
+  },
 });
 
 const Streamplan = mongoose.model('streamplan', streamplanschema);

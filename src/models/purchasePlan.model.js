@@ -314,7 +314,7 @@ const PlanPaymentSchema = new mongoose.Schema(
     },
     link_status: {
       type: String,
-      default: 'Pending'
+      default: 'Pending',
     },
     link: {
       type: String,
@@ -420,8 +420,6 @@ const AdPlanSchema = new mongoose.Schema(
 
 const AdPlan = mongoose.model('ExpoAdPlan', AdPlanSchema);
 
-
-
 const Paymentlinkchema = new mongoose.Schema(
   {
     _id: {
@@ -445,14 +443,12 @@ const Paymentlinkchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      default: 'Pending'
-    }
+      default: 'Pending',
+    },
   },
   { timestamps: true }
 );
 
 const PurchaseLink = mongoose.model('paymentlink', Paymentlinkchema);
-
-
 
 module.exports = { purchasePlan, PlanPayment, ExpoAd, AdPlan, PurchaseLink, PurchaseLink };
