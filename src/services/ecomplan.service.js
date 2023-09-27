@@ -38,12 +38,12 @@ const purchese_plan = require('./purchasePlan.service');
 const { Usermessage, Interaction } = require('../models/PrivateChat.model');
 
 const create_Plans = async (req) => {
-  const { slotInfo,stream_validity } = req.body;
-  const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal'} });
+  const { slotInfo, stream_validity } = req.body;
+  const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal' } });
   slotInfo.forEach(async (e) => {
     let datas = { slotType: e.slotType, Duration: e.Duration, No_Of_Slot: e.No_Of_Slot, streamPlanId: value._id };
     console.log(datas);
-    await PlanSlot.create(datas); 
+    await PlanSlot.create(datas);
   });
   await Dates.create_date(value);
   return req.body;
@@ -1469,7 +1469,6 @@ const remove_one_post = async (req) => {
 };
 
 const create_stream_one = async (req) => {
-  //console.log(req.body);
   let slot = await Slot.findById(req.body.slot);
   let data = slot.date;
   let time = slot.startFormat;
@@ -1482,8 +1481,8 @@ const create_stream_one = async (req) => {
 
   let totalMinutes = numberOfParticipants + no_of_host + Duration;
   let agoraID = await agoraToken.token_assign(totalMinutes, '', 'agri');
-  // console.log(agoraID)
-  // UsageAppID
+
+  
   let datess = new Date().setTime(new Date(startTime).getTime() + slot.Duration * 60 * 1000);
   let value;
   if (agoraID.element != null && agoraID.element != '' && agoraID.element != undefined) {
@@ -8392,8 +8391,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-        ? 'RAC'
-        : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -8402,8 +8401,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+            ? 'RAC'
+            : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -9142,7 +9141,7 @@ const get_completed_stream_buyer = async (req) => {
         // temptokens: '$temptokens',
         showLink: 1,
         selectvideo: 1,
-        userinteractions:"$userinteractions._id"
+        userinteractions: "$userinteractions._id"
       },
     },
   ]);
@@ -12938,7 +12937,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => {};
+const get_video_link = async (req) => { };
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)

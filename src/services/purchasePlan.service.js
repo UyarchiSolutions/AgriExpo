@@ -122,6 +122,12 @@ const create_purchase_plan_private = async (req) => {
         streamvalidity: plan.streamvalidity,
         no_of_host: plan.no_of_host,
         RaiseHands: plan.RaiseHands,
+        offer_price: plan.offer_price,
+        stream_validity: plan.stream_validity,
+        Interest_View_Count: plan.Interest_View_Count,
+        No_of_Limitations: plan.No_of_Limitations,
+        Service_Charges: plan.Service_Charges,
+        TimeType: plan.TimeType,
       };
       let con = await purchasePlan.create({ ...datas, ...req.body.PaymentDatails });
       await Dates.create_date(con);
