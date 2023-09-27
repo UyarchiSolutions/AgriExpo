@@ -57,6 +57,13 @@ const agoraAppIdschema = mongoose.Schema({
     type: {
         type: String,
         default: "demo"
+    },
+    verifyStatus: {
+        type: String,
+        default: "pending"
+    },
+    verifiedBy: {
+        type: String,
     }
 });
 
