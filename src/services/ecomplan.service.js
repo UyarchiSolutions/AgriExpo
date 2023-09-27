@@ -5105,6 +5105,8 @@ const get_watch_live_steams_completed = async (req) => {
           { status: { $ne: 'Cancelled' } },
           { show_completd: { $eq: true } },
           { status: { $ne: 'Removed' } },
+          { completedStream: { $eq: "yes" } },
+          { streamExpire: { $gt: date_now } }
         ],
       },
     },
@@ -5337,7 +5339,7 @@ const get_watch_live_steams_completed = async (req) => {
   ]);
   let total = await Streamrequest.aggregate([
     { $sort: { startTime: 1 } },
-    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }, { show_completd: { $eq: true } }] } },
+    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }, { show_completd: { $eq: true } }, { completedStream: { $eq: "yes" } }, { streamExpire: { $gt: date_now } }] } },
     {
       $lookup: {
         from: 'joinedusers',
