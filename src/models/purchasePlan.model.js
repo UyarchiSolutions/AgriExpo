@@ -242,7 +242,7 @@ const purchasePlanSchema = mongoose.Schema(
       type: Number,
     },
     stream_validity: {
-      type: String,
+      type: Number,
     },
     Interest_View_Count: {
       type: String,
