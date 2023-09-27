@@ -44,4 +44,5 @@ router.route('/get/all/').get(SellerController.getAllSeller);
 router.route('/create/Dispatch/Location').post(shopverify, SellerController.createDispatchLocation);
 router.route('/update/Dispatch/Location/:id').put(SellerController.updateDispatchLocation);
 router.route('/getDispatch/Locations').get(shopverify, SellerController.getDispatchLocations);
+router.route('/DeleteLocation/:id').delete(SellerController.DeleteLocation);
 module.exports = router;

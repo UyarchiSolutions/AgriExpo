@@ -543,6 +543,15 @@ const getDispatchLocations = async (userId) => {
   return values;
 };
 
+const DeleteLocation = async (id) => {
+  let dispatch = await VisitorDispatch.findById(id);
+  if (!dispatch) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Not Found');
+  }
+  await dispatch.remove();
+  return { Message: 'Deleted' };
+};
+
 module.exports = {
   createSeller,
   verifyOTP,
@@ -575,4 +584,5 @@ module.exports = {
   createDispatchLocation,
   updateDispatchLocation,
   getDispatchLocations,
+  DeleteLocation,
 };

@@ -155,6 +155,11 @@ const getDispatchLocations = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const DeleteLocation = catchAsync(async (req, res) => {
+  const data = await SellerService.DeleteLocation(req.params.id);
+  res.send(data);
+});
+
 module.exports = {
   createSeller,
   verifyOTP,
@@ -187,4 +192,5 @@ module.exports = {
   createDispatchLocation,
   updateDispatchLocation,
   getDispatchLocations,
+  DeleteLocation,
 };
