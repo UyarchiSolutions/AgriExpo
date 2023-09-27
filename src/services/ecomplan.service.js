@@ -2617,7 +2617,8 @@ const get_all_streams = async (req) => {
         show_completd: 1,
         streamExpire: 1,
         Service_Charges: 1,
-        completedStream: 1
+        completedStream: 1,
+        streamEnd_Time:1
       },
     },
 
