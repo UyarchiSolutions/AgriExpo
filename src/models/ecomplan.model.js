@@ -565,10 +565,10 @@ const streamRequestschema = mongoose.Schema({
     type: Number,
   },
   Interest_View_Count: {
-    type: Number,
+    type: String,
   },
   No_of_Limitations: {
-    type: String,
+    type: Number,
   },
 });
 
