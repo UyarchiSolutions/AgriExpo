@@ -6749,6 +6749,8 @@ const getall_homeage_streams = async (req) => {
           { status: { $ne: 'Cancelled' } },
           { show_completd: { $eq: true } },
           { status: { $ne: 'Removed' } },
+          { completedStream: { $eq: "yes" } },
+          { streamExpire: { $gt: date_now } }
         ],
       },
     },
@@ -6989,6 +6991,8 @@ const getall_homeage_streams = async (req) => {
           { adminApprove: { $eq: 'Approved' } },
           { status: { $ne: 'Cancelled' } },
           { show_completd: { $eq: true } },
+          { completedStream: { $eq: "yes" } },
+          { streamExpire: { $gt: date_now } }
         ],
       },
     },
