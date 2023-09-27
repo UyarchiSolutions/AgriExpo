@@ -523,6 +523,26 @@ const createDispatchLocation = async (body, userId) => {
   return values;
 };
 
+const updateDispatchLocation = async (id, body) => {
+  let dispatch = await VisitorDispatch.findById(id);
+  if (!dispatch) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Not Found');
+  }
+  dispatch = await VisitorDispatch.findByIdAndUpdate({ _id: id }, body, { new: true });
+  return dispatch;
+};
+
+const getDispatchLocations = async (userId) => {
+  let values = await VisitorDispatch.aggregate([
+    {
+      $match: {
+        userId: userId,
+      },
+    },
+  ]);
+  return values;
+};
+
 module.exports = {
   createSeller,
   verifyOTP,
@@ -553,4 +573,6 @@ module.exports = {
   sendOTP_continue,
   getAllSeller,
   createDispatchLocation,
+  updateDispatchLocation,
+  getDispatchLocations,
 };

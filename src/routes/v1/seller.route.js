@@ -42,4 +42,6 @@ router.route('/getSellers/With/Paginations/:page').get(SellerController.getSelle
 router.route('/DisableSeller/:id/:type').get(SellerController.DisableSeller);
 router.route('/get/all/').get(SellerController.getAllSeller);
 router.route('/create/Dispatch/Location').post(shopverify, SellerController.createDispatchLocation);
+router.route('/update/Dispatch/Location/:id').put(SellerController.updateDispatchLocation);
+router.route('/getDispatch/Locations').get(shopverify, SellerController.getDispatchLocations);
 module.exports = router;
