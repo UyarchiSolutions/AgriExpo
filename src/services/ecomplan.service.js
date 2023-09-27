@@ -1515,7 +1515,7 @@ const create_stream_one = async (req) => {
         streamExpire: expiretime,
         Service_Charges: plan.Service_Charges == null ? 0 : plan.Service_Charges,
         Interest_View_Count: plan.Interest_View_Count,
-        No_of_Limitations: plan.No_of_Limitations== null ? 0 : plan.No_of_Limitations,
+        No_of_Limitations: plan.No_of_Limitations == null ? 0 : plan.No_of_Limitations,
       },
     });
     await UsageAppID.findByIdAndUpdate({ _id: agoraID.vals._id }, { streamID: value._id }, { new: true });
@@ -2610,6 +2610,9 @@ const get_all_streams = async (req) => {
         originalDate: 1,
         stream_expired: 1,
         show_completd: 1,
+        streamExpire: 1,
+        Service_Charges: 1,
+        completedStream: 1
       },
     },
 
