@@ -1486,7 +1486,7 @@ const create_stream_one = async (req) => {
   let datess = new Date().setTime(new Date(startTime).getTime() + slot.Duration * 60 * 1000);
   let expiretime = datess;
   if (plan.completedStream == 'yes') {
-    expiretime = moment(datess.getTime()).add(plan.stream_validity, plan.TimeType);
+    expiretime = moment(datess).add(plan.stream_validity, plan.TimeType);
   }
   let value;
   if (agoraID.element != null && agoraID.element != '' && agoraID.element != undefined) {
