@@ -523,12 +523,12 @@ const create_PurchasePlan_EXpo = async (planId, userId, ccavenue) => {
     suppierId: userId,
     ccavenue: ccavenue,
     transaction: findPlan.transaction,
-    offer_price: plan.offer_price,
-    stream_validity: plan.stream_validity,
-    Interest_View_Count: plan.Interest_View_Count,
-    No_of_Limitations: plan.No_of_Limitations,
-    Service_Charges: plan.Service_Charges,
-    TimeType: plan.TimeType,
+    offer_price: findPlan.offer_price,
+    stream_validity: findPlan.stream_validity,
+    Interest_View_Count: findPlan.Interest_View_Count,
+    No_of_Limitations: findPlan.No_of_Limitations,
+    Service_Charges: findPlan.Service_Charges,
+    TimeType: findPlan.TimeType,
   };
   console.log(data);
   const creations = await purchasePlan.create(data);
@@ -569,12 +569,12 @@ const create_PurchasePlan_EXpo_Admin = async (body, userId) => {
     planId: body.planId,
     suppierId: userId,
     transaction: findPlan.transaction,
-    offer_price: plan.offer_price,
-    stream_validity: plan.stream_validity,
-    Interest_View_Count: plan.Interest_View_Count,
-    No_of_Limitations: plan.No_of_Limitations,
-    Service_Charges: plan.Service_Charges,
-    TimeType: plan.TimeType,
+    offer_price: findPlan.offer_price,
+    stream_validity: findPlan.stream_validity,
+    Interest_View_Count: findPlan.Interest_View_Count,
+    No_of_Limitations: findPlan.No_of_Limitations,
+    Service_Charges: findPlan.Service_Charges,
+    TimeType: findPlan.TimeType,
   };
   const creations = await purchasePlan.create(data);
   await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
