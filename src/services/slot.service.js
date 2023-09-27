@@ -558,7 +558,7 @@ const createEvents = async (body) => {
   arr.forEach(async (e) => {
     await Event.create(e);
   });
-  return { message: 'Slot Created' };
+  return { message: 'Event Created' };
 };
 
 const getEvents = async () => {
