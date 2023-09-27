@@ -87,6 +87,9 @@ const EventSchema = mongoose.Schema(
     to: {
       type: String,
     },
+    EventName:{
+      type: String,
+    },
     active: {
       type: Boolean,
       default: true,
