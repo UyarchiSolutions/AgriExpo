@@ -1994,8 +1994,10 @@ const get_payment_link = async (req) => {
       },
     },
   ])
-
-  return link;
+  if (link.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'purchase not found');
+  }
+  return link[0];
 };
 
 const paynow_payment = async (req) => {
