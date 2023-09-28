@@ -59,6 +59,38 @@ const verifyOTP = async (req) => {
   return seller;
 };
 
+const verifyOTP_Delete_Account = async (req) => {
+  let body = req.body;
+  const mobileNumber = body.mobileNumber;
+  const otp = body.otp;
+  let findOTP = await sellerOTP
+    .findOne({
+      mobileNumber: mobileNumber,
+      OTP: otp,
+      // create: { $gte: moment(new Date().getTime() - 15 * 60 * 1000) },
+      active: true,
+    })
+    .sort({ create: -1 });
+
+  if (!findOTP) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid OTP');
+  }
+  const findotp = {
+    create: moment(new Date()).subtract(1, 'minutes'),
+  };
+
+  const createTimestampString = findOTP.create;
+  const createTimestamp = moment(createTimestampString);
+
+  if (createTimestamp.isBefore(findotp.create)) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'OTP Expired');
+  }
+  findOTP.active = false;
+  findOTP.save();
+  let seller = await Seller.findByIdAndUpdate({ _id: findOTP.userId }, { active: true }, { new: true });
+  return { messages: 'Account has been Deleted' };
+};
+
 const setPassword = async (req) => {
   let body = req.body;
   let sellerId = req.userId;
@@ -585,4 +617,5 @@ module.exports = {
   updateDispatchLocation,
   getDispatchLocations,
   DeleteLocation,
+  verifyOTP_Delete_Account,
 };

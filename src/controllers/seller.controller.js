@@ -160,6 +160,11 @@ const DeleteLocation = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const verifyOTP_Delete_Account = catchAsync(async (req, res) => {
+  const data = await SellerService.verifyOTP_Delete_Account(req);
+  res.send(data);
+});
+
 module.exports = {
   createSeller,
   verifyOTP,
@@ -193,4 +198,5 @@ module.exports = {
   updateDispatchLocation,
   getDispatchLocations,
   DeleteLocation,
+  verifyOTP_Delete_Account,
 };
