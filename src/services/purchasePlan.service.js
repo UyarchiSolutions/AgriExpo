@@ -2026,7 +2026,7 @@ const get_payment_link = async (req) => {
     },
     {
       $addFields: {
-        paymentInfo: {},
+        paymentInfo: null,
       },
     },
   ])
