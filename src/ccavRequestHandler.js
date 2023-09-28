@@ -140,8 +140,10 @@ const update_ccavenue_payment = async (result, encryption) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'pursace Plan  not found');
     }
     else {
+        await create_PlanPayment(plan._id, result, find._id)
         plan.status = 'Activated';
         plan.save();
+
         plan.slotInfo.forEach(async (e) => {
             // suppierId
             await Slotseperation.create({
@@ -159,7 +161,7 @@ const update_ccavenue_payment = async (result, encryption) => {
     return find;
 }
 
-const create_PlanPayment = async (PlanId, body) => {
+const create_PlanPayment = async (PlanId, body, ccavenue) => {
     let Plan = await purchasePlan.findById(PlanId);
     if (!Plan) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Plan not found');
@@ -167,7 +169,7 @@ const create_PlanPayment = async (PlanId, body) => {
     let discound = Plan.Discount ? Plan.Discount : 0;
     let PlanPrice = parseInt(Plan.Price) - discound;
     let PaidAmount = Plan.PaidAmount ? Plan.PaidAmount : 0;
-    let ToBePaid = PaidAmount + body.Amount;
+    let ToBePaid = PaidAmount + body.amount;
     let finding = await PlanPayment.find().count();
     let center = '';
     if (finding < 9) {
@@ -183,7 +185,7 @@ const create_PlanPayment = async (PlanId, body) => {
         center = '0';
     }
     let billId = 'BID' + center + finding + 1;
-    let data = { ...body, billId: billId };
+    let data = { billId: billId, paymentType: "ccavenue", Amount: body.amount, ccavenue: body, PaymentMode: body.payment_mode, platform: body.payment_mode, ccavenueID: ccavenue };
     let paid = await purchasePlan.findByIdAndUpdate({ _id: PlanId }, { PaidAmount: ToBePaid }, { new: true });
     if (PlanPrice > 0) {
         if (PlanPrice == paid.PaidAmount ? paid.PaidAmount : 0) {
