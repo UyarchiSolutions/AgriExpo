@@ -182,9 +182,9 @@ const create_PlanPayment = async (PlanId, body, ccavenue) => {
     let PlanPrice = parseInt(Plan.Price) - discound;
     let PaidAmount = Plan.PaidAmount ? Plan.PaidAmount : 0;
     let ToBePaid = PaidAmount + body.amount;
-    console.log(ToBePaid, body.amount)
+    console.log(ToBePaid, body)
     ToBePaid = ToBePaid == null ? 0 : ToBePaid
-    console.log(PaidAmount,ToBePaid)
+    console.log(PaidAmount, ToBePaid)
     let finding = await PlanPayment.find().count();
     let center = '';
     if (finding < 9) {
@@ -200,7 +200,7 @@ const create_PlanPayment = async (PlanId, body, ccavenue) => {
         center = '0';
     }
     let billId = 'BID' + center + finding + 1;
-    let data = { billId: billId, paymentType: "ccavenue", Amount: body.amount, ccavenue: body, PaymentMode: body.payment_mode, platform: body.payment_mode, ccavenueID: ccavenue };
+    let data = { billId: billId, paymentType: "ccavenue", Amount: body.amount, ccavenue: body, PaymentMode: body.payment_mode, platform: body.payment_mode, ccavenueID: ccavenue, PlanId: PlanId };
     let paid = await purchasePlan.findByIdAndUpdate({ _id: PlanId }, { PaidAmount: ToBePaid }, { new: true });
     if (PlanPrice > 0) {
         if (PlanPrice == paid.PaidAmount ? paid.PaidAmount : 0) {
