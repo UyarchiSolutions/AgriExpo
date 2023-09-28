@@ -35,15 +35,15 @@ const createSlot = async (body) => {
 };
 
 const find_exist_slot = async (start, end) => {
-  // let condition_1 = { $and: [{ start: { $lt: start } }, { end: { $gte: end } }] };
-  // let condition_2 = { $and: [{ start: { $gte: start } }, { end: { $lte: end } }] };
-  // let condition_3 = { $and: [{ start: { $lte: start } }, { start: { $gt: end } }] };
-  // let condition_4 = { $and: [{ end: { $gt: start } }, { end: { $lt: end } }] };
+  let condition_1 = { $and: [{ start: { $lt: start } }, { end: { $gte: end } }] };
+  let condition_2 = { $and: [{ start: { $gte: start } }, { end: { $lte: end } }] };
+  let condition_3 = { $and: [{ start: { $lte: start } }, { start: { $gt: end } }] };
+  let condition_4 = { $and: [{ end: { $gt: start } }, { end: { $lt: end } }] };
 
-  let condition_1 = { $and: [{ $lt: ['$start', start] }] };
-  let condition_2 = { $and: [{ $lte: ['$start', start] }, { $gte: ['$end', end] }] };
-  let condition_3 = { $and: [{ $lte: ['$start', start] }, { $gt: ['$start', end] }] };
-  let condition_4 = { $and: [{ $gt: ['$end', start] }, { $lt: ['$end', end] }] };
+  // let condition_1 = { $and: [{ $lt: ['$start', start] }] };
+  // let condition_2 = { $and: [{ $lte: ['$start', start] }, { $gte: ['$end', end] }] };
+  // let condition_3 = { $and: [{ $lte: ['$start', start] }, { $gt: ['$start', end] }] };
+  // let condition_4 = { $and: [{ $gt: ['$end', start] }, { $lt: ['$end', end] }] };
   let slotmatch = await Slot.aggregate([
     { $match: { $or: [condition_1, condition_2, condition_3, condition_4] } },
     {
