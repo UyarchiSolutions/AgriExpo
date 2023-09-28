@@ -183,6 +183,7 @@ const create_PlanPayment = async (PlanId, body, ccavenue) => {
     let PaidAmount = Plan.PaidAmount ? Plan.PaidAmount : 0;
     let ToBePaid = PaidAmount + body.amount;
     ToBePaid = ToBePaid == null ? 0 : ToBePaid
+    console.log(PaidAmount,ToBePaid)
     let finding = await PlanPayment.find().count();
     let center = '';
     if (finding < 9) {
