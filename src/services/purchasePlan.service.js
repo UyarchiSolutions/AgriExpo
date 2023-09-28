@@ -1977,6 +1977,55 @@ const get_payment_link = async (req) => {
   if (link.status != 'Generated') {
     throw new ApiError(httpStatus.NOT_FOUND, 'Purchase link Expired');
   }
+
+  let purchasePlandetails = await purchasePlan.aggregate([
+    { $match: { $and: [{ _id: { $eq: link.purchasePlan } }] } },
+    {
+      $lookup: {
+        from: 'agriplanpayments',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $group: { _id: null, Amount: { $sum: '$Amount' } } }],
+        as: 'Payment',
+      },
+    },
+    {
+      $unwind: {
+        path: '$Payment',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    { $addFields: { Price: { $toInt: '$Price' } } },
+    {
+      $project: {
+        _id: 1,
+        planName: 1,
+        active: 1,
+        purchasePrice: "$Price",
+        Price: { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+        paidAmount1: { $ifNull: ['$Payment.Amount', 0] },
+        paidAmount: { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
+        PendingAmount: {
+          $ifNull: [
+            {
+              $subtract: [
+                { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+                { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
+              ],
+            },
+            { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+          ],
+        },
+        Type: { $ifNull: ['$Type', 'Online'] },
+        status: 1,
+        Discount: { $ifNull: ['$Discount', 0] },
+      },
+    },
+  ]);
+  if (purchasePlandetails.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'purchase not found');
+  }
+  let purchaseDetails = purchasePlandetails[0];
   link = await PurchaseLink.aggregate([
     { $match: { $and: [{ _id: { $eq: req.params.id } }] } },
     {
@@ -1984,6 +2033,37 @@ const get_payment_link = async (req) => {
         from: 'purchasedplans',
         localField: 'purchasePlan',
         foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'sellers',
+              localField: 'suppierId',
+              foreignField: '_id',
+              as: 'sellers',
+            },
+          },
+          {
+            $unwind: {
+              path: '$sellers',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $addFields: {
+              mobileNumber: "$sellers.mobileNumber",
+            },
+          },
+          {
+            $addFields: {
+              tradeName: "$sellers.tradeName",
+            },
+          },
+          {
+            $addFields: {
+              email: "$sellers.email",
+            },
+          },
+        ],
         as: 'purchasedplans',
       },
     },
@@ -1993,10 +2073,23 @@ const get_payment_link = async (req) => {
         preserveNullAndEmptyArrays: true,
       },
     },
+    {
+      $addFields: {
+        paymentInfo: null,
+      },
+    },
   ])
+
+
+
+
+  console.log(purchaseDetails, link.purchasePlan)
+
+
   if (link.length == 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'purchase not found');
   }
+  link[0].paymentInfo = purchaseDetails;
   return link[0];
 };
 
