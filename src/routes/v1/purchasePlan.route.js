@@ -59,4 +59,7 @@ router.route('/plan/payment/link/generate').post(purchasePlan.plan_payment_link_
 router.route('/get/payment/link/:id').get(purchasePlan.get_payment_link);
 router.route('/paynow').post(purchasePlan.paynow_payment);
 
+router.route('/get/purchase/links').get(purchasePlan.get_purchase_links);
+
+
 module.exports = router;

@@ -2114,6 +2114,36 @@ const paynow_payment = async (req) => {
   return paynow;
 };
 
+const get_purchase_links = async (req) => {
+  var nowDate = new Date().getTime();
+  let purchasePlandetails = await purchasePlan.aggregate([
+    { $match: { $and: [{ _id: { $eq: req.query.id } }] } },
+    {
+      $lookup: {
+        from: 'paymentlinks',
+        localField: 'purchasePlan',
+        foreignField: '_id',
+        as: 'Payment',
+      },
+    },
+    {
+      $addFields: {
+        status: {
+          $cond: {
+            if: { $lt: ['$link_Valid', nowDate] },
+            then: 'Expired',
+            else: '$status',
+          },
+        },
+      },
+    },
+  ]);
+  if (purchasePlandetails.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'purchase not found');
+  }
+  return purchasePlandetails[0];
+}
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -2155,4 +2185,5 @@ module.exports = {
   plan_payment_link_generate,
   get_payment_link,
   paynow_payment,
+  get_purchase_links
 };
