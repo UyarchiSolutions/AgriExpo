@@ -1573,7 +1573,6 @@ const getPurchasedPlanPayment = async (query) => {
         path: '$ccavanue',
       },
     },
-    { $addFields: { onlinePrice: { $ifNull: [{ $floor: { $toDouble: '$ccavanue.response.amount' } }, 0] } } },
     {
       $project: {
         _id: 1,
@@ -1585,13 +1584,13 @@ const getPurchasedPlanPayment = async (query) => {
         number: '$Sellers.mobileNumber',
         exhibitorId: '$Sellers._id',
         paidAmount1: { $ifNull: ['$Payment.Amount', 0] },
-        paidAmount: { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
+        paidAmount: { $ifNull: ['$Payment.Amount', 0] },
         PendingAmount: {
           $ifNull: [
             {
               $subtract: [
                 { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
-                { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
+                { $ifNull: ['$Payment.Amount', 0] }
               ],
             },
             { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
@@ -2107,12 +2106,12 @@ const paynow_payment = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Purchase link Expired');
   }
   let plan = await purchasePlan.findById(link.purchasePlan);
-  let paynow = await ccavenue.exhibitor_purchese_plan(link.amount, 'https://agriexpo.click/payment/success',link._id);
+  let paynow = await ccavenue.exhibitor_purchese_plan(link.amount, 'https://agriexpo.click/payment/success', link._id);
   link.ccavanue = paynow.payment._id;
   link.save();
   plan.ccavenue = paynow.payment._id;
   plan.save();
-  
+
   return paynow;
 };
 
