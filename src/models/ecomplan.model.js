@@ -555,6 +555,21 @@ const streamRequestschema = mongoose.Schema({
   broucher: {
     type: String,
   },
+  completedStream: {
+    type: String,
+  },
+  streamExpire: {
+    type: Number,
+  },
+  Service_Charges: {
+    type: Number,
+  },
+  Interest_View_Count: {
+    type: String,
+  },
+  No_of_Limitations: {
+    type: Number,
+  },
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);

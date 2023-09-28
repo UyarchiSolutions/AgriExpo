@@ -38,12 +38,12 @@ const purchese_plan = require('./purchasePlan.service');
 const { Usermessage, Interaction } = require('../models/PrivateChat.model');
 
 const create_Plans = async (req) => {
-  const { slotInfo,stream_validity } = req.body;
-  const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal'} });
+  const { slotInfo, stream_validity } = req.body;
+  const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal' } });
   slotInfo.forEach(async (e) => {
     let datas = { slotType: e.slotType, Duration: e.Duration, No_Of_Slot: e.No_Of_Slot, streamPlanId: value._id };
     console.log(datas);
-    await PlanSlot.create(datas); 
+    await PlanSlot.create(datas);
   });
   await Dates.create_date(value);
   return req.body;
@@ -292,10 +292,10 @@ const get_all_post_transation = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Plan Not Found');
   }
   let transaction = 'null';
-  if (purchsae.transaction == 'With Transaction') {
+  if (purchsae.transaction == 'With') {
     transaction = 'With';
   }
-  if (purchsae.transaction == 'Without Transaction') {
+  if (purchsae.transaction == 'Without') {
     transaction = 'Without';
   }
   const value = await StreamPost.aggregate([
@@ -1469,7 +1469,6 @@ const remove_one_post = async (req) => {
 };
 
 const create_stream_one = async (req) => {
-  //console.log(req.body);
   let slot = await Slot.findById(req.body.slot);
   let data = slot.date;
   let time = slot.startFormat;
@@ -1482,9 +1481,13 @@ const create_stream_one = async (req) => {
 
   let totalMinutes = numberOfParticipants + no_of_host + Duration;
   let agoraID = await agoraToken.token_assign(totalMinutes, '', 'agri');
-  // console.log(agoraID)
-  // UsageAppID
+
+
   let datess = new Date().setTime(new Date(startTime).getTime() + slot.Duration * 60 * 1000);
+  let expiretime = datess;
+  if (plan.completedStream == 'yes') {
+    expiretime = moment(datess).add(plan.stream_validity, plan.TimeType);
+  }
   let value;
   if (agoraID.element != null && agoraID.element != '' && agoraID.element != undefined) {
     value = await Streamrequest.create({
@@ -1508,6 +1511,11 @@ const create_stream_one = async (req) => {
         agoraID: agoraID.element._id,
         totalMinues: totalMinutes,
         chat_need: plan.chat_Option,
+        completedStream: plan.completedStream,
+        streamExpire: expiretime,
+        Service_Charges: plan.Service_Charges == null ? 0 : plan.Service_Charges,
+        Interest_View_Count: plan.Interest_View_Count,
+        No_of_Limitations: plan.No_of_Limitations == null ? 0 : plan.No_of_Limitations,
       },
     });
     await UsageAppID.findByIdAndUpdate({ _id: agoraID.vals._id }, { streamID: value._id }, { new: true });
@@ -2295,7 +2303,7 @@ const only_chat_get = async (req) => {
 
 const get_all_streams = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
-  //console.log(req.userId);
+
   var date_now = new Date().getTime();
   let statusFilter = { active: true };
   if (req.query.status == 'All') {
@@ -2544,6 +2552,11 @@ const get_all_streams = async (req) => {
       },
     },
     {
+      $addFields: {
+        streamExpire: { $gt: ['$streamExpire', date_now] },
+      },
+    },
+    {
       $project: {
         purchasedplans: '$purchasedplans',
         _id: 1,
@@ -2602,6 +2615,10 @@ const get_all_streams = async (req) => {
         originalDate: 1,
         stream_expired: 1,
         show_completd: 1,
+        streamExpire: 1,
+        Service_Charges: 1,
+        completedStream: 1,
+        streamEnd_Time:1
       },
     },
 
@@ -5097,6 +5114,8 @@ const get_watch_live_steams_completed = async (req) => {
           { status: { $ne: 'Cancelled' } },
           { show_completd: { $eq: true } },
           { status: { $ne: 'Removed' } },
+          { completedStream: { $eq: "yes" } },
+          { streamExpire: { $gt: date_now } }
         ],
       },
     },
@@ -5329,7 +5348,7 @@ const get_watch_live_steams_completed = async (req) => {
   ]);
   let total = await Streamrequest.aggregate([
     { $sort: { startTime: 1 } },
-    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }, { show_completd: { $eq: true } }] } },
+    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }, { show_completd: { $eq: true } }, { completedStream: { $eq: "yes" } }, { streamExpire: { $gt: date_now } }] } },
     {
       $lookup: {
         from: 'joinedusers',
@@ -6741,6 +6760,8 @@ const getall_homeage_streams = async (req) => {
           { status: { $ne: 'Cancelled' } },
           { show_completd: { $eq: true } },
           { status: { $ne: 'Removed' } },
+          { completedStream: { $eq: "yes" } },
+          { streamExpire: { $gt: date_now } }
         ],
       },
     },
@@ -6981,6 +7002,8 @@ const getall_homeage_streams = async (req) => {
           { adminApprove: { $eq: 'Approved' } },
           { status: { $ne: 'Cancelled' } },
           { show_completd: { $eq: true } },
+          { completedStream: { $eq: "yes" } },
+          { streamExpire: { $gt: date_now } }
         ],
       },
     },
@@ -8392,8 +8415,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-        ? 'RAC'
-        : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -8402,8 +8425,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+            ? 'RAC'
+            : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -9142,7 +9165,7 @@ const get_completed_stream_buyer = async (req) => {
         // temptokens: '$temptokens',
         showLink: 1,
         selectvideo: 1,
-        userinteractions:"$userinteractions._id"
+        userinteractions: "$userinteractions._id"
       },
     },
   ]);
@@ -12938,7 +12961,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => {};
+const get_video_link = async (req) => { };
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
