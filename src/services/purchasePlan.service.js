@@ -1946,7 +1946,7 @@ const plan_payment_link_generate = async (req) => {
   }
 
   let purchaseDetails = purchasePlandetails[0];
-  let link_Valid = moment().add(15, 'minutes');
+  let link_Valid = moment().add(300, 'minutes');
   let data = {
     amount: purchaseDetails.PendingAmount,
     link_Valid: link_Valid,
@@ -1977,8 +1977,27 @@ const get_payment_link = async (req) => {
   if (link.status != 'Generated') {
     throw new ApiError(httpStatus.NOT_FOUND, 'Purchase link Expired');
   }
-
-  return link;
+  link = await PurchaseLink.aggregate([
+    { $match: { $and: [{ _id: { $eq: req.params.id } }] } },
+    {
+      $lookup: {
+        from: 'purchasedplans',
+        localField: 'purchasePlan',
+        foreignField: '_id',
+        as: 'purchasedplans',
+      },
+    },
+    {
+      $unwind: {
+        path: '$purchasedplans',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+  ])
+  if (link.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'purchase not found');
+  }
+  return link[0];
 };
 
 const paynow_payment = async (req) => {
