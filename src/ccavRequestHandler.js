@@ -4,7 +4,7 @@ var http = require('http'),
     qs = require('querystring');
 
 const { ccavenue_paymnet } = require("./models/ccavenue.model")
-const { purchasePlan, PlanPayment } = require("./models/purchasePlan.model")
+const { purchasePlan, PlanPayment, PurchaseLink } = require("./models/purchasePlan.model")
 const ApiError = require('./utils/ApiError');
 const httpStatus = require('http-status');
 const { Slotseperation } = require('./models/slot.model');
@@ -168,6 +168,12 @@ const update_ccavenue_payment_link = async (result, encryption) => {
         plan.status = 'Activated';
         plan.save();
     }
+    let link = await PurchaseLink.findById(find.paymentLink);
+    if (!link) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Payment Link not found');
+    }
+    link.status = "Paid";
+    link.save();
     return find;
 }
 
@@ -182,9 +188,7 @@ const create_PlanPayment = async (PlanId, body, ccavenue) => {
     let PlanPrice = parseInt(Plan.Price) - discound;
     let PaidAmount = Plan.PaidAmount ? Plan.PaidAmount : 0;
     let ToBePaid = PaidAmount + body.amount;
-    console.log(ToBePaid, body)
     ToBePaid = ToBePaid == null ? 0 : ToBePaid
-    console.log(PaidAmount, ToBePaid)
     let finding = await PlanPayment.find().count();
     let center = '';
     if (finding < 9) {
