@@ -304,6 +304,9 @@ const shopSchema = mongoose.Schema({
   customer_final_TIME: {
     type: Number,
   },
+  AgriImage: {
+    type: String,
+  },
   editeStatus: { type: String, default: 'Pending' },
 });
 
