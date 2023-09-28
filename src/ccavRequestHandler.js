@@ -79,7 +79,7 @@ exports.success_recive = function (request, response) {
     });
 };
 
-const payment_success = function (request, response) {
+exports.payment_success = function (request, response) {
     var ccavEncResponse = '',
         ccavResponse = '',
         workingKey = '1AC82EC283C6AE1561C420D21169F52F',	//Put in the 32-Bit Key provided by CCAvenue.
@@ -212,6 +212,3 @@ const create_PlanPayment = async (PlanId, body, ccavenue) => {
 };
 
 
-exports = {
-    payment_success
-}
