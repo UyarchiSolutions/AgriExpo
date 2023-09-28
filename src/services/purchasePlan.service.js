@@ -2121,22 +2121,25 @@ const get_purchase_links = async (req) => {
     {
       $lookup: {
         from: 'paymentlinks',
-        localField: 'purchasePlan',
-        foreignField: '_id',
-        as: 'Payment',
-      },
-    },
-    {
-      $addFields: {
-        status: {
-          $cond: {
-            if: { $lt: ['$link_Valid', nowDate] },
-            then: 'Expired',
-            else: '$status',
+        localField: '_id',
+        foreignField: 'purchasePlan',
+        pipeline: [
+          {
+            $addFields: {
+              status: {
+                $cond: {
+                  if: { $lt: ['$link_Valid', nowDate] },
+                  then: 'Expired',
+                  else: '$status',
+                },
+              },
+            },
           },
-        },
+        ],
+        as: 'paymentlinks',
       },
     },
+
   ]);
   if (purchasePlandetails.length == 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'purchase not found');

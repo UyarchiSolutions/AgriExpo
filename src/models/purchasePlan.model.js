@@ -334,6 +334,16 @@ const PlanPaymentSchema = new mongoose.Schema(
     paymetvalid: {
       type: Number,
     },
+    paymentType: {
+      type: String,
+      default: "online"
+    },
+    ccavenue: {
+      type: Object
+    },
+    ccavenueID: {
+      type: String,
+    }
   },
   { timestamps: true }
 );
