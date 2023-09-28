@@ -105,21 +105,10 @@ const payment_success = function (request, response) {
         console.log(result)
     });
     request.on('end', async function () {
-        // var pData = '';
-        // pData = '<table border=1 cellspacing=2 cellpadding=2><tr><td>'
-        // pData = pData + ccavResponse.replace(/=/gi, '</td><td>')
-        // pData = pData.replace(/&/gi, '</td></tr><tr><td>')
-        // pData = pData + '</td></tr></table>'
-        // htmlcode = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Response Handler</title></head><body><center><font size="4" color="blue"><b>Response Page</b></font><br>' + pData + '</center><br></body></html>';
-        // // response.writeHeader(200, { "Content-Type": "text/html" });
-        // // response.write(htmlcode);
-        // // response.end();
-        // response.render("payment-success.html", { data: ccavResponse });
-        // orders = await update_ccavenue_payment(result, encryption)
-        // const redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/payment-success/' + orders._id;
+        orders = await update_ccavenue_payment_link(result, encryption)
+        const redirectUrl = 'https://exhibitor.agriexpo.live/paymentsuccess/' + orders._id;
         response.redirect(301, redirectUrl);
 
-        // response.redirect(result.merchant_param1 + "/" + result.order_id)
     });
 };
 
@@ -156,10 +145,33 @@ const update_ccavenue_payment = async (result, encryption) => {
             });
         });
     }
-
-
     return find;
 }
+
+const update_ccavenue_payment_link = async (result, encryption) => {
+    const find = await ccavenue_paymnet.findOne({ order_id: result.order_id });
+    if (!find) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'pursace not found');
+    }
+    else {
+        find.response_enq = encryption;
+        find.response = result;
+        find.save();
+    }
+
+    let plan = await purchasePlan.findOne({ ccavenue: find._id })
+    if (!plan) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'pursace Plan  not found');
+    }
+    else {
+        await create_PlanPayment(plan._id, result, find._id)
+        plan.status = 'Activated';
+        plan.save();
+    }
+    return find;
+}
+
+
 
 const create_PlanPayment = async (PlanId, body, ccavenue) => {
     let Plan = await purchasePlan.findById(PlanId);
