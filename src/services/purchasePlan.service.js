@@ -1946,7 +1946,7 @@ const plan_payment_link_generate = async (req) => {
   }
 
   let purchaseDetails = purchasePlandetails[0];
-  let link_Valid = moment().add(15, 'minutes');
+  let link_Valid = moment().add(300, 'minutes');
   let data = {
     amount: purchaseDetails.PendingAmount,
     link_Valid: link_Valid,
