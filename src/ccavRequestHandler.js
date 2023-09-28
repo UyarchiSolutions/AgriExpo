@@ -184,8 +184,6 @@ const create_PlanPayment = async (PlanId, body, ccavenue) => {
     if (finding < 9999 && finding >= 999) {
         center = '0';
     }
-    payment_mode
-    card_name
     let billId = 'BID' + center + finding + 1;
     let data = { billId: billId, paymentType: "ccavenue", ccavenue: body, PaymentMode: body.payment_mode, platform: body.payment_mode, ccavenueID: ccavenue };
     let paid = await purchasePlan.findByIdAndUpdate({ _id: PlanId }, { PaidAmount: ToBePaid }, { new: true });
