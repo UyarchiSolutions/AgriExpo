@@ -45,4 +45,5 @@ router.route('/create/Dispatch/Location').post(shopverify, SellerController.crea
 router.route('/update/Dispatch/Location/:id').put(SellerController.updateDispatchLocation);
 router.route('/getDispatch/Locations').get(shopverify, SellerController.getDispatchLocations);
 router.route('/DeleteLocation/:id').delete(SellerController.DeleteLocation);
+router.route('/verifyOTP/Delete/Account').post(SellerController.verifyOTP_Delete_Account)
 module.exports = router;

@@ -603,6 +603,11 @@ const DisableVisitors = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const AgriImageUpload = catchAsync(async (req, res) => {
+  const data = await b2bCloneService.AgriImageUpload(req);
+  res.send(data);
+});
+
 module.exports = {
   createB2bShopClone,
   getAllB2BshopClone,
@@ -679,4 +684,5 @@ module.exports = {
   getSalesExecutives,
   getVisitors_With_Page,
   DisableVisitors,
+  AgriImageUpload,
 };

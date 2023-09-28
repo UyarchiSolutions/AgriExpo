@@ -10,6 +10,7 @@ const moment = require('moment');
 const { verfiy } = require('../config/registerOTP.Verify');
 const { ShopList } = require('../models/product.model');
 const Ward = require('../models/ward.model');
+const AWS = require('aws-sdk');
 // Shop Clone Serive
 const axios = require('axios');
 
@@ -5735,6 +5736,34 @@ const DisableVisitors = async (id, type) => {
   return values;
 };
 
+const AgriImageUpload = async (req) => {
+  const visitorId = req.shopId;
+  let findShop = await Shop.findById(visitorId);
+  if (!findShop) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Visitors Not Available');
+  }
+  console.log(findShop);
+  const s3 = new AWS.S3({
+    accessKeyId: 'AKIA3323XNN7Y2RU77UG',
+    secretAccessKey: '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',
+    region: 'ap-south-1',
+  });
+  let params = {
+    Bucket: 'realestatevideoupload',
+    Key: req.file.originalname,
+    Body: req.file.buffer,
+  };
+  return new Promise((resolve) => {
+    s3.upload(params, async (err, data) => {
+      if (err) {
+        //console.log(err);
+      }
+      findShop = await Shop.findByIdAndUpdate({ _id: visitorId }, { AgriImage: data.Location }, { new: true });
+      resolve({ status: 'success', findShop });
+    });
+  });
+};
+
 module.exports = {
   createShopClone,
   getAllShopClone,
@@ -5810,4 +5839,5 @@ module.exports = {
   getSalesExecutives,
   getVisitors_With_Page,
   DisableVisitors,
+  AgriImageUpload,
 };

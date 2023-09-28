@@ -6,6 +6,15 @@ const authorization = require('../../controllers/tokenVerify.controller');
 const router = express.Router();
 const supplierAuth = require('../../controllers/supplierAppAuth.controller');
 const shopverify = require('../../controllers/shoptokenverify.controller');
+const multer = require('multer');
+
+const storage = multer.memoryStorage({
+  destination: function (req, res, callback) {
+    callback(null, '');
+  },
+});
+
+const upload = multer({ storage }).single('AgriImage');
 
 // Shop Clone
 router.get('/filter/shopName/Contact/:key', b2bShopCloneController.filterShopwithNameAndContact);
@@ -130,4 +139,5 @@ router.route('/getSales/Executives').get(b2bShopCloneController.getSalesExecutiv
 // aggre expo
 router.route('/agree/expo/:page/:type').get(b2bShopCloneController.getVisitors_With_Page);
 router.route('/agree/Visitors/Disable/:id/:type').get(b2bShopCloneController.DisableVisitors);
+router.route('/agree/Visitors/ImageUpload').post(shopverify, upload, b2bShopCloneController.AgriImageUpload);
 module.exports = router;
