@@ -2001,6 +2001,7 @@ const get_payment_link = async (req) => {
         _id: 1,
         planName: 1,
         active: 1,
+        purchasePrice: "$Price",
         Price: { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
         paidAmount1: { $ifNull: ['$Payment.Amount', 0] },
         paidAmount: { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
