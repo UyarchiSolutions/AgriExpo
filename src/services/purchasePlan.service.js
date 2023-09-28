@@ -1977,6 +1977,23 @@ const get_payment_link = async (req) => {
   if (link.status != 'Generated') {
     throw new ApiError(httpStatus.NOT_FOUND, 'Purchase link Expired');
   }
+  link = await PurchaseLink.aggregate([
+    { $match: { $and: [{ _id: { $eq: req.params.id } }] } },
+    {
+      $lookup: {
+        from: 'purchasedplans',
+        localField: 'purchasePlan',
+        foreignField: '_id',
+        as: 'purchasedplans',
+      },
+    },
+    {
+      $unwind: {
+        path: '$purchasedplans',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+  ])
 
   return link;
 };
