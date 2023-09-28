@@ -115,6 +115,9 @@ const ccavenueSchema = mongoose.Schema({
     },
     response_enq: {
         type: String,
+    },
+    paymentLink: {
+        type: String,
     }
 },
     { timestamps: true }
