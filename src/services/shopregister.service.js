@@ -35,7 +35,7 @@ const NewRegister_Shop = async (body) => {
   const creations = await Shop.create(body);
   const otp = await sentOTP(mobileNumber, creations);
   console.log(otp);
-  return { message: 'OTP Send Success',creations };
+  return { message: 'OTP Send Success', creations };
 };
 
 const forget_password = async (body) => {
@@ -93,6 +93,33 @@ const verify_otp = async (body) => {
   await Shop.findByIdAndUpdate({ _id: findOTP.userId }, { registered: true }, { new: true });
   return shop;
 };
+
+const verify_otpDelete_Account = async (body) => {
+  const mobileNumber = body.mobile;
+  const otp = body.otp;
+  let findOTP = await OTP.findOne({
+    mobileNumber: mobileNumber,
+    OTP: otp,
+    active: true,
+  });
+  console.log(findOTP)
+  if (!findOTP) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Invalid OTP');
+  }
+  const findotp = {
+    create: moment(new Date()).subtract(1, 'minutes'),
+  };
+  const createTimestampString = findOTP.create;
+  const createTimestamp = moment(createTimestampString);
+
+  if (createTimestamp.isBefore(findotp.create)) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'OTP Expired');
+  }
+  let shop = await Shop.findByIdAndUpdate({ _id: findOTP.userId }, { active: true }, { new: true });
+  await Shop.findByIdAndUpdate({ _id: findOTP.userId }, { registered: true }, { new: true });
+  return { message: ' Your was account deleted' };
+};
+
 const set_password = async (body) => {
   const salt = await bcrypt.genSalt(10);
   let { password, shopId } = body;
@@ -2587,4 +2614,5 @@ module.exports = {
   get_Streaming_orders,
   get_Streaming_ordersByStream,
   get_Streaming_ordersByOrder,
+  verify_otpDelete_Account,
 };
