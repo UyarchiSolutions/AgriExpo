@@ -65,7 +65,7 @@ const agoraAppIdschema = mongoose.Schema({
     verifiedBy: {
         type: String,
     }
-});
+}, { timeStamp: true });
 
 const AgoraAppId = mongoose.model('AgoraAppId', agoraAppIdschema);
 

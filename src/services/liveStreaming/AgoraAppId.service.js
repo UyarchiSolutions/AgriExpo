@@ -47,6 +47,32 @@ const get_all_token = async (req) => {
 
 }
 
+const get_all_token_my = async (req) => {
+  let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
+  let appId = await AgoraAppId.aggregate([
+    { $match: { $and: [{ userId: { $eq: req.userId } }] } },
+    {
+      $skip: 20 * parseInt(page),
+    },
+    {
+      $limit: 20,
+    },
+  ])
+  let next = await AgoraAppId.aggregate([
+    { $match: { $and: [{ userId: { $eq: req.userId } }] } },
+    {
+      $skip: 20 * (parseInt(page) + 1),
+    },
+    {
+      $limit: 20,
+    },
+  ])
+
+  return { value: appId, next: next.length != 0 };
+
+}
+
+
 const get_all_token_check = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
   let appId = await AgoraAppId.aggregate([
@@ -471,5 +497,6 @@ module.exports = {
   recording_start,
   get_test_details_test,
   get_all_token_check,
-  update_check_appid
+  update_check_appid,
+  get_all_token_my
 };

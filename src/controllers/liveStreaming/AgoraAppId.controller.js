@@ -17,6 +17,12 @@ const get_all_token = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(data);
 });
 
+const get_all_token_my= catchAsync(async (req, res) => {
+  const data = await AgoraAppId.get_all_token_my(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
+
 const get_all_token_check = catchAsync(async (req, res) => {
   const data = await AgoraAppId.get_all_token_check(req);
   res.status(httpStatus.CREATED).send(data);
@@ -94,5 +100,6 @@ module.exports = {
   recording_start,
   get_all_token_check,
   update_check_appid_working,
-  update_check_appid_faild
+  update_check_appid_faild,
+  get_all_token_my
 };
