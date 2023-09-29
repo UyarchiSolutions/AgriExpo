@@ -307,6 +307,9 @@ const shopSchema = mongoose.Schema({
   AgriImage: {
     type: String,
   },
+  category: {
+    type: Array,
+  },
   editeStatus: { type: String, default: 'Pending' },
 });
 
