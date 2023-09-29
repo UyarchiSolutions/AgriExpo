@@ -95,6 +95,7 @@ router.route('/subhost/assign/streams').get(SellerAuth, Ecomcontroller.get_subho
 router.route('/allot/stream/subhost').put(SellerAuth, Ecomcontroller.allot_stream_subhost);
 router.route('/cancel/stream').put(SellerAuth, Ecomcontroller.cancel_stream);
 router.route('/remove/stream').put(SellerAuth, Ecomcontroller.remove_stream);
+router.route('/remove/stream/admin').put(authorization, Ecomcontroller.remove_stream_admin);
 router.route('/cancel/stream/admin').put(Ecomcontroller.cancel_stream);
 router.route('/steam/end/now').put(Ecomcontroller.end_stream);
 
@@ -137,7 +138,7 @@ router.route('/get/stream/all/alert').get(SellerAuth, Ecomcontroller.get_stream_
 router.route('/get/stream/cancel/admin').get(Ecomcontroller.get_cancel_stream);
 router.route('/get/admin/completed/stream').get(Ecomcontroller.get_completed_stream);
 router.route('/get/admin/completed/stream/byid').get(Ecomcontroller.get_completed_stream_byid);
-router.route('/get/buyer/completed/stream/byid').get(shopverify,Ecomcontroller.get_completed_stream_buyer);
+router.route('/get/buyer/completed/stream/byid').get(shopverify, Ecomcontroller.get_completed_stream_buyer);
 
 // manage slab
 router

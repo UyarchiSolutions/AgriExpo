@@ -258,6 +258,13 @@ const remove_stream = catchAsync(async (req, res) => {
   const value = await Ecomserive.remove_stream(req);
   res.send(value);
 });
+
+const remove_stream_admin= catchAsync(async (req, res) => {
+  //console.log('sdas');
+  const value = await Ecomserive.remove_stream_admin(req);
+  res.send(value);
+});
+
 const end_stream = catchAsync(async (req, res) => {
   //console.log('sdas');
   const value = await Ecomserive.end_stream(req);
@@ -883,5 +890,6 @@ module.exports = {
 
   // pruchese plan
   purchesPlane_exhibitor,
-  get_Saved_Product
+  get_Saved_Product,
+  remove_stream_admin
 };

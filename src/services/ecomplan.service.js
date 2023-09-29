@@ -2188,6 +2188,22 @@ const remove_stream = async (req) => {
   assginStream.forEach(async (a) => {
     await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Removed' }, { new: true });
   });
+  value.removedBy = 'My self';
+  value.removedBy_id = req.userId;
+  value.save();
+  return value;
+};
+
+
+const remove_stream_admin = async (req) => {
+  let value = await Streamrequest.findByIdAndUpdate({ _id: req.body.id }, { status: 'Removed' }, { new: true });
+  let assginStream = await StreamrequestPost.find({ streamRequest: req.body.id });
+  assginStream.forEach(async (a) => {
+    await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Removed' }, { new: true });
+  });
+  value.removedBy = 'Admin';
+  value.removedBy_id = req.userId;
+  value.save();
   return value;
 };
 
@@ -14147,4 +14163,5 @@ module.exports = {
   get_Saved_Product,
   update_post_price_admin,
   post_payment_details,
+  remove_stream_admin
 };
