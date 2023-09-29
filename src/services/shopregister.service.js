@@ -35,7 +35,7 @@ const NewRegister_Shop = async (body) => {
   const creations = await Shop.create(body);
   const otp = await sentOTP(mobileNumber, creations);
   console.log(otp);
-  return { message: 'OTP Send Success' };
+  return { message: 'OTP Send Success',creations };
 };
 
 const forget_password = async (body) => {
