@@ -13034,10 +13034,6 @@ const update_post_price_admin = async (req) => {
   req.body.post;
   let userId = req.userId;
   let streampost = await StreamPost.findById(req.body.post);
-  if (streampost.suppierId != userId) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Bad Request');
-  }
-
   if (streampost.afterStreaming == 'yes') {
     streampost.marketPlace = req.body.marketPlace;
     streampost.postLiveStreamingPirce = req.body.postLiveStreamingPirce;
