@@ -174,6 +174,9 @@ const streamplanschema = mongoose.Schema({
   TimeType: {
     type: String,
   },
+  raisehandcontrol: {
+    type: String,
+  }
 });
 
 const Streamplan = mongoose.model('streamplan', streamplanschema);
