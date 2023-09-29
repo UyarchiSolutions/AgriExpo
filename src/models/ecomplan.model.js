@@ -570,6 +570,12 @@ const streamRequestschema = mongoose.Schema({
   No_of_Limitations: {
     type: Number,
   },
+  removedBy: {
+    type: String,
+  },
+  removedBy_id: {
+    type: String,
+  }
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);

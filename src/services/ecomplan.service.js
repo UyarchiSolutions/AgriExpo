@@ -2188,6 +2188,22 @@ const remove_stream = async (req) => {
   assginStream.forEach(async (a) => {
     await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Removed' }, { new: true });
   });
+  value.removedBy = 'My self';
+  value.removedBy_id = req.userId;
+  value.save();
+  return value;
+};
+
+
+const remove_stream_admin = async (req) => {
+  let value = await Streamrequest.findByIdAndUpdate({ _id: req.body.id }, { status: 'Removed' }, { new: true });
+  let assginStream = await StreamrequestPost.find({ streamRequest: req.body.id });
+  assginStream.forEach(async (a) => {
+    await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Removed' }, { new: true });
+  });
+  value.removedBy = 'Admin';
+  value.removedBy_id = req.userId;
+  value.save();
   return value;
 };
 
@@ -10030,7 +10046,6 @@ const get_completed_stream_completed = async (req) => {
     if (date.length == 2) {
       dateMatch = { $and: [{ streamingDate: { $gte: date[0] } }, { streamingDate: { $lte: date[1] } }] };
     }
-    // //console.log(date, dateMatch)
   }
   const value = await Streamrequest.aggregate([
     { $match: { $and: [dateMatch, { streamEnd_Time: { $lte: date_now } }, { status: { $ne: 'Cancelled' } }] } },
@@ -10248,6 +10263,11 @@ const get_completed_stream_completed = async (req) => {
       },
     },
     {
+      $addFields: {
+        streamExpire: { $gt: ['$streamExpire', date_now] },
+      },
+    },
+    {
       $project: {
         _id: 1,
         supplierName: '$sellers.contactName',
@@ -10287,6 +10307,9 @@ const get_completed_stream_completed = async (req) => {
         allot_host_3: 1,
         allot_chat: 1,
         temptokens: '$temptokens',
+        streamExpire: 1,
+        completedStream: 1
+
       },
     },
     { $sort: { DateIso: -1 } },
@@ -10582,7 +10605,281 @@ const get_completed_stream_expired = async (req) => {
 };
 
 const get_completed_stream_removed = async (req) => {
-  return { message: true };
+  let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
+  var date_now = new Date().getTime();
+  let filterdate = req.query.date;
+  dateMatch = { active: true };
+  if (filterdate != null && filterdate != '' && filterdate != 'null') {
+    let date = filterdate.split(',');
+    if (date.length == 2) {
+      dateMatch = { $and: [{ streamingDate: { $gte: date[0] } }, { streamingDate: { $lte: date[1] } }] };
+    }
+  }
+  const value = await Streamrequest.aggregate([
+    { $match: { $and: [dateMatch, { streamEnd_Time: { $lte: date_now } }, { status: { $eq: 'Removed' } }] } },
+    { $sort: { DateIso: 1 } },
+    {
+      $lookup: {
+        from: 'streamrequestposts',
+        localField: '_id',
+        foreignField: 'streamRequest',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'streamposts',
+              localField: 'postId',
+              foreignField: '_id',
+              pipeline: [
+                {
+                  $lookup: {
+                    from: 'products',
+                    localField: 'productId',
+                    foreignField: '_id',
+                    as: 'products',
+                  },
+                },
+                { $unwind: '$products' },
+                {
+                  $project: {
+                    _id: 1,
+                    productTitle: '$products.productTitle',
+                    productId: 1,
+                    categoryId: 1,
+                    quantity: 1,
+                    marketPlace: 1,
+                    offerPrice: 1,
+                    postLiveStreamingPirce: 1,
+                    validity: 1,
+                    minLots: 1,
+                    incrementalLots: 1,
+                    suppierId: 1,
+                    DateIso: 1,
+                    created: 1,
+                  },
+                },
+              ],
+              as: 'streamposts',
+            },
+          },
+          { $unwind: '$streamposts' },
+          {
+            $project: {
+              _id: 1,
+              productTitle: '$streamposts.productTitle',
+              productId: '$streamposts.productId',
+              quantity: '$streamposts.quantity',
+              marketPlace: '$streamposts.marketPlace',
+              offerPrice: '$streamposts.offerPrice',
+              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
+              validity: '$streamposts.validity',
+              minLots: '$streamposts.minLots',
+              incrementalLots: '$streamposts.incrementalLots',
+            },
+          },
+        ],
+        as: 'streamrequestposts',
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'sellers',
+      },
+    },
+    { $unwind: '$sellers' },
+    {
+      $lookup: {
+        from: 'streampreregisters',
+        localField: '_id',
+        foreignField: 'streamId',
+        pipeline: [{ $match: { status: { $eq: 'Registered' } } }, { $group: { _id: null, count: { $sum: 1 } } }],
+        as: 'streampreregisters',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$streampreregisters',
+      },
+    },
+    {
+      $addFields: {
+        registeredUsers: { $ifNull: ['$streampreregisters.count', 0] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'purchasedplans',
+        localField: 'planId',
+        foreignField: '_id',
+        as: 'purchasedplans',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$purchasedplans',
+      },
+    },
+    {
+      $addFields: {
+        max_post_per_stream: { $ifNull: ['$purchasedplans.max_post_per_stream', 0] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'allot_chat',
+        foreignField: '_id',
+        as: 'allot_chat_lookup',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$allot_chat_lookup',
+      },
+    },
+    {
+      $addFields: {
+        allot_chat_name: { $ifNull: ['$allot_chat_lookup.contactName', null] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'allot_host_1',
+        foreignField: '_id',
+        as: 'allot_host_1_lookup',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$allot_host_1_lookup',
+      },
+    },
+    {
+      $addFields: {
+        allot_host_1_name: { $ifNull: ['$allot_host_1_lookup.contactName', null] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'allot_host_2',
+        foreignField: '_id',
+        as: 'allot_host_2_lookup',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$allot_host_2_lookup',
+      },
+    },
+    {
+      $addFields: {
+        allot_host_2_name: { $ifNull: ['$allot_host_2_lookup.contactName', null] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'allot_host_3',
+        foreignField: '_id',
+        as: 'allot_host_3_lookup',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$allot_host_3_lookup',
+      },
+    },
+    {
+      $addFields: {
+        allot_host_3_name: { $ifNull: ['$allot_host_3_lookup.contactName', null] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'purchasedplans',
+        localField: 'planId',
+        foreignField: '_id',
+        as: 'purchasedplans',
+      },
+    },
+    {
+      $unwind: '$purchasedplans',
+    },
+    {
+      $lookup: {
+        from: 'temptokens',
+        localField: '_id',
+        foreignField: 'streamId',
+        pipeline: [{ $match: { $and: [{ type: { $eq: 'host' } }] } }],
+        as: 'temptokens',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$temptokens',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        supplierName: '$sellers.contactName',
+        active: 1,
+        archive: 1,
+        post: 1,
+        communicationMode: 1,
+        sepTwo: 1,
+        bookingAmount: 1,
+        streamingDate: 1,
+        streamingTime: 1,
+        discription: 1,
+        streamName: 1,
+        suppierId: 1,
+        postCount: 1,
+        DateIso: 1,
+        created: 1,
+        planId: 1,
+        streamrequestposts: '$streamrequestposts',
+        adminApprove: 1,
+        tokenGeneration: 1,
+        tokenDetails: 1,
+        Duration: 1,
+        startTime: 1,
+        endTime: 1,
+        registeredUsers: 1,
+        noOfParticipants: 1,
+        max_post_per_stream: 1,
+        status: 1,
+        allot_chat_name: 1,
+        allot_host_1_name: 1,
+        allot_host_2_name: 1,
+        allot_host_3_name: 1,
+        no_of_host: '$purchasedplans.no_of_host',
+        allot_host_1: 1,
+        allot_host_2: 1,
+        allot_host_3: 1,
+        allot_chat: 1,
+        temptokens: '$temptokens',
+      },
+    },
+    { $sort: { DateIso: -1 } },
+    { $skip: 10 * page },
+    { $limit: 10 },
+  ]);
+  const total = await Streamrequest.aggregate([
+    { $match: { $and: [dateMatch, { endTime: { $lte: date_now } }, { status: { $eq: 'Removed' } }] } },
+  ]);
+  return { value, total: total.length };
 };
 
 const get_completed_stream_cancelled = async (req) => {
@@ -13034,10 +13331,6 @@ const update_post_price_admin = async (req) => {
   req.body.post;
   let userId = req.userId;
   let streampost = await StreamPost.findById(req.body.post);
-  if (streampost.suppierId != userId) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Bad Request');
-  }
-
   if (streampost.afterStreaming == 'yes') {
     streampost.marketPlace = req.body.marketPlace;
     streampost.postLiveStreamingPirce = req.body.postLiveStreamingPirce;
@@ -14151,4 +14444,5 @@ module.exports = {
   get_Saved_Product,
   update_post_price_admin,
   post_payment_details,
+  remove_stream_admin
 };
