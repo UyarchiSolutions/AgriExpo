@@ -531,7 +531,7 @@ const create_PurchasePlan_EXpo = async (planId, userId, ccavenue) => {
     No_of_Limitations: findPlan.No_of_Limitations,
     Service_Charges: findPlan.Service_Charges,
     TimeType: findPlan.TimeType,
-    raisehandcontrol: plan.raisehandcontrol
+    raisehandcontrol: findPlan.raisehandcontrol
   };
   console.log(data);
   const creations = await purchasePlan.create(data);
@@ -578,7 +578,7 @@ const create_PurchasePlan_EXpo_Admin = async (body, userId) => {
     No_of_Limitations: findPlan.No_of_Limitations,
     Service_Charges: findPlan.Service_Charges,
     TimeType: findPlan.TimeType,
-    raisehandcontrol: plan.raisehandcontrol
+    raisehandcontrol: findPlan.raisehandcontrol
   };
   const creations = await purchasePlan.create(data);
   await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
