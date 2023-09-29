@@ -116,6 +116,7 @@ const generateToken_sub_record = async (channel, isPublisher, req, hostIdss, exp
 };
 
 const generateToken_sub = async (req) => {
+  let body = req.body
   const channel = req.query.id;
   let str = await Streamrequest.findById(channel);
   let users = await Joinusers.find({ streamId: channel }).count();
@@ -135,7 +136,7 @@ const generateToken_sub = async (req) => {
     const expirationTimestamp =
       new Date(new Date(currentTimestamp.format('YYYY-MM-DD') + ' ' + currentTimestamp.format('HH:mm:ss'))).getTime() / 1000;
     let value = await tempTokenModel.create({
-      ...req.body,
+      ...body,
       ...{
         hostId: str.tokenDetails,
         type: 'sub',
