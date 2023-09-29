@@ -27,6 +27,11 @@ const verify_otp = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(otp);
 });
 
+const verify_otpDelete_Account = catchAsync(async (req, res) => {
+  const otp = await registerShop.verify_otpDelete_Account(req.body);
+  res.status(httpStatus.CREATED).send(otp);
+});
+
 const set_password = catchAsync(async (req, res) => {
   const password = await registerShop.set_password(req.body);
   res.status(httpStatus.CREATED).send(password);
@@ -237,4 +242,5 @@ module.exports = {
   get_Streaming_orders,
   get_Streaming_ordersByStream,
   get_Streaming_ordersByOrder,
+  verify_otpDelete_Account,
 };
