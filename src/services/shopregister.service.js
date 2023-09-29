@@ -148,7 +148,7 @@ const change_password = async (body, shopId) => {
 const login_now = async (body) => {
   const salt = await bcrypt.genSalt(10);
   const { mobile, password } = body;
-  let userName = await Shop.findOne({ mobile: mobile });
+  let userName = await Shop.findOne({ mobile: mobile,active:true });
   if (!userName) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Shop Not Found');
   }
