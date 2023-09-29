@@ -14,11 +14,11 @@ const createSlot = async (body) => {
   const startFormat = moment(`${date}T${chooseTime}`).format('HH:mm');
   const endFormat = moment(Start).add(Duration, 'minutes').format('HH:mm');
   const findExist = await Slot.findOne({ date: date, startFormat: startFormat, endFormat: endFormat });
-  if (findExist) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'This Slot Already Available');
-  }
-  const existSlot = await find_exist_slot(Start, end);
-  console.log(existSlot);
+  // if (findExist) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, 'This Slot Already Available');
+  // }
+  // const existSlot = await find_exist_slot(Start, end);
+  // console.log(existSlot);
   const data = {
     chooseTime: isoDateTime,
     start: Start,
