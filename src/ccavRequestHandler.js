@@ -4,7 +4,7 @@ var http = require('http'),
     qs = require('querystring');
 
 const { ccavenue_paymnet } = require("./models/ccavenue.model")
-const { purchasePlan, PlanPayment } = require("./models/purchasePlan.model")
+const { purchasePlan, PlanPayment, PurchaseLink } = require("./models/purchasePlan.model")
 const ApiError = require('./utils/ApiError');
 const httpStatus = require('http-status');
 const { Slotseperation } = require('./models/slot.model');
@@ -79,7 +79,7 @@ exports.success_recive = function (request, response) {
     });
 };
 
-const payment_success = function (request, response) {
+exports.payment_success = function (request, response) {
     var ccavEncResponse = '',
         ccavResponse = '',
         workingKey = '1AC82EC283C6AE1561C420D21169F52F',	//Put in the 32-Bit Key provided by CCAvenue.
@@ -105,21 +105,10 @@ const payment_success = function (request, response) {
         console.log(result)
     });
     request.on('end', async function () {
-        // var pData = '';
-        // pData = '<table border=1 cellspacing=2 cellpadding=2><tr><td>'
-        // pData = pData + ccavResponse.replace(/=/gi, '</td><td>')
-        // pData = pData.replace(/&/gi, '</td></tr><tr><td>')
-        // pData = pData + '</td></tr></table>'
-        // htmlcode = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Response Handler</title></head><body><center><font size="4" color="blue"><b>Response Page</b></font><br>' + pData + '</center><br></body></html>';
-        // // response.writeHeader(200, { "Content-Type": "text/html" });
-        // // response.write(htmlcode);
-        // // response.end();
-        // response.render("payment-success.html", { data: ccavResponse });
-        // orders = await update_ccavenue_payment(result, encryption)
-        // const redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/payment-success/' + orders._id;
+        orders = await update_ccavenue_payment_link(result, encryption)
+        const redirectUrl = 'https://exhibitor.agriexpo.live/paymentsuccess/' + orders._id;
         response.redirect(301, redirectUrl);
 
-        // response.redirect(result.merchant_param1 + "/" + result.order_id)
     });
 };
 
@@ -156,10 +145,39 @@ const update_ccavenue_payment = async (result, encryption) => {
             });
         });
     }
-
-
     return find;
 }
+
+const update_ccavenue_payment_link = async (result, encryption) => {
+    const find = await ccavenue_paymnet.findOne({ order_id: result.order_id });
+    if (!find) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'pursace not found');
+    }
+    else {
+        find.response_enq = encryption;
+        find.response = result;
+        find.save();
+    }
+    console.log(find)
+    let plan = await purchasePlan.findOne({ ccavenue: find._id })
+    if (!plan) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'pursace Plan  not found');
+    }
+    else {
+        await create_PlanPayment(plan._id, result, find._id)
+        plan.status = 'Activated';
+        plan.save();
+    }
+    let link = await PurchaseLink.findById(find.paymentLink);
+    if (!link) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Payment Link not found');
+    }
+    link.status = "Paid";
+    link.save();
+    return find;
+}
+
+
 
 const create_PlanPayment = async (PlanId, body, ccavenue) => {
     let Plan = await purchasePlan.findById(PlanId);
@@ -170,6 +188,7 @@ const create_PlanPayment = async (PlanId, body, ccavenue) => {
     let PlanPrice = parseInt(Plan.Price) - discound;
     let PaidAmount = Plan.PaidAmount ? Plan.PaidAmount : 0;
     let ToBePaid = PaidAmount + body.amount;
+    ToBePaid = ToBePaid == null ? 0 : ToBePaid
     let finding = await PlanPayment.find().count();
     let center = '';
     if (finding < 9) {
@@ -185,7 +204,7 @@ const create_PlanPayment = async (PlanId, body, ccavenue) => {
         center = '0';
     }
     let billId = 'BID' + center + finding + 1;
-    let data = { billId: billId, paymentType: "ccavenue", Amount: body.amount, ccavenue: body, PaymentMode: body.payment_mode, platform: body.payment_mode, ccavenueID: ccavenue };
+    let data = { billId: billId, paymentType: "ccavenue", Amount: body.amount, ccavenue: body, PaymentMode: body.payment_mode, platform: body.payment_mode, ccavenueID: ccavenue, PlanId: PlanId };
     let paid = await purchasePlan.findByIdAndUpdate({ _id: PlanId }, { PaidAmount: ToBePaid }, { new: true });
     if (PlanPrice > 0) {
         if (PlanPrice == paid.PaidAmount ? paid.PaidAmount : 0) {
@@ -200,6 +219,3 @@ const create_PlanPayment = async (PlanId, body, ccavenue) => {
 };
 
 
-exports = {
-    payment_success
-}

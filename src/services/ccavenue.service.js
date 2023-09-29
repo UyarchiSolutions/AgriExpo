@@ -108,7 +108,7 @@ const pay_now_encript_value = async (req) => {
 }
 
 
-const exhibitor_purchese_plan = async (amount, redirct) => {
+const exhibitor_purchese_plan = async (amount, redirct, paymentLink) => {
     var body = '',
         workingKey = '1AC82EC283C6AE1561C420D21169F52F',	//Put in the 32-Bit key shared by CCAvenues.
         accessCode = 'AVUK05KI18AW28KUWA',				//Put in the Access Code shared by CCAvenues.
@@ -152,6 +152,7 @@ const exhibitor_purchese_plan = async (amount, redirct) => {
     const bufferData = Buffer.from(queryString, 'utf-8');
     encRequest = ccav.encrypt(bufferData, workingKey);
     data.encRequest = encRequest;
+    data.paymentLink = paymentLink
     const payment = await create_plan_paymant(data)
     data.merchant_param1 = payment._id;
     formbody = '<form id="nonseamless" method="post" name="redirect" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction"/> <input type="hidden" id="encRequest" name="encRequest" value="' + encRequest + '"><input type="hidden" name="access_code" id="access_code" value="' + accessCode + '"><button>pay</button><script language="javascript">document.redirect.submit();</script></form>';
