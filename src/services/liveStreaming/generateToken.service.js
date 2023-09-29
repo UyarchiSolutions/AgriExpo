@@ -1923,6 +1923,15 @@ const get_raise_hands_admin = async (req) => {
         as: 'raiseusers',
       },
     },
+    {
+      $lookup: {
+        from: 'purchasedplans',
+        localField: 'planId',
+        foreignField: '_id',
+        as: 'purchasedplans',
+      },
+    },
+    { $unwind: '$purchasedplans' },
 
   ])
   if (find.length == 0) {
