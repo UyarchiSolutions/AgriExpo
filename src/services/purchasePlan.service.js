@@ -68,6 +68,7 @@ const create_purchase_plan = async (req) => {
         No_of_Limitations: plan.No_of_Limitations,
         Service_Charges: plan.Service_Charges,
         TimeType: plan.TimeType,
+        raisehandcontrol: plan.raisehandcontrol
       };
       let con = await purchasePlan.create({ ...datas, ...req.body.PaymentDatails });
       await Dates.create_date(con);
@@ -128,6 +129,7 @@ const create_purchase_plan_private = async (req) => {
         No_of_Limitations: plan.No_of_Limitations,
         Service_Charges: plan.Service_Charges,
         TimeType: plan.TimeType,
+        raisehandcontrol: plan.raisehandcontrol
       };
       let con = await purchasePlan.create({ ...datas, ...req.body.PaymentDatails });
       await Dates.create_date(con);
@@ -529,6 +531,7 @@ const create_PurchasePlan_EXpo = async (planId, userId, ccavenue) => {
     No_of_Limitations: findPlan.No_of_Limitations,
     Service_Charges: findPlan.Service_Charges,
     TimeType: findPlan.TimeType,
+    raisehandcontrol: plan.raisehandcontrol
   };
   console.log(data);
   const creations = await purchasePlan.create(data);
@@ -575,6 +578,7 @@ const create_PurchasePlan_EXpo_Admin = async (body, userId) => {
     No_of_Limitations: findPlan.No_of_Limitations,
     Service_Charges: findPlan.Service_Charges,
     TimeType: findPlan.TimeType,
+    raisehandcontrol: plan.raisehandcontrol
   };
   const creations = await purchasePlan.create(data);
   await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);

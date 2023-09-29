@@ -256,6 +256,9 @@ const purchasePlanSchema = mongoose.Schema(
     TimeType: {
       type: String,
     },
+    raisehandcontrol: {
+      type: String,
+    }
   },
   { timestamps: true }
 );
