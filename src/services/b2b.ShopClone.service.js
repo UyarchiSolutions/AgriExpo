@@ -5737,8 +5737,7 @@ const DisableVisitors = async (id, type) => {
 };
 
 const AgriImageUpload = async (req) => {
-  const visitorId = req.shopId;
-  let findShop = await Shop.findById(visitorId);
+  let findShop = await Shop.findById(req.body.id);
   if (!findShop) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Visitors Not Available');
   }
@@ -5758,7 +5757,7 @@ const AgriImageUpload = async (req) => {
       if (err) {
         //console.log(err);
       }
-      findShop = await Shop.findByIdAndUpdate({ _id: visitorId }, { AgriImage: data.Location }, { new: true });
+      findShop = await Shop.findByIdAndUpdate({ _id: req.body.id }, { AgriImage: data.Location }, { new: true });
       resolve({ status: 'success', findShop });
     });
   });
