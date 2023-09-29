@@ -116,7 +116,7 @@ const verify_otpDelete_Account = async (body) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'OTP Expired');
   }
   let shop = await Shop.findByIdAndUpdate({ _id: findOTP.userId }, { active: true }, { new: true });
-  await Shop.findByIdAndUpdate({ _id: findOTP.userId }, { registered: true }, { new: true });
+  await Shop.findByIdAndUpdate({ _id: findOTP.userId }, { registered: false, active:false }, { new: true });
   return { message: ' Your was account deleted' };
 };
 
