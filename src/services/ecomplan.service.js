@@ -10870,7 +10870,7 @@ const get_completed_stream_removed = async (req) => {
     { $limit: 10 },
   ]);
   const total = await Streamrequest.aggregate([
-    { $match: { $and: [dateMatch, { endTime: { $lte: date_now } }, { status: { $rq: 'Removed' } }] } },
+    { $match: { $and: [dateMatch, { endTime: { $lte: date_now } }, { status: { $eq: 'Removed' } }] } },
   ]);
   return { value, total: total.length };
 };
