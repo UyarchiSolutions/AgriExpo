@@ -10046,7 +10046,6 @@ const get_completed_stream_completed = async (req) => {
     if (date.length == 2) {
       dateMatch = { $and: [{ streamingDate: { $gte: date[0] } }, { streamingDate: { $lte: date[1] } }] };
     }
-    // //console.log(date, dateMatch)
   }
   const value = await Streamrequest.aggregate([
     { $match: { $and: [dateMatch, { streamEnd_Time: { $lte: date_now } }, { status: { $ne: 'Cancelled' } }] } },
@@ -10264,6 +10263,11 @@ const get_completed_stream_completed = async (req) => {
       },
     },
     {
+      $addFields: {
+        streamExpire: { $gt: ['$streamExpire', date_now] },
+      },
+    },
+    {
       $project: {
         _id: 1,
         supplierName: '$sellers.contactName',
@@ -10303,6 +10307,9 @@ const get_completed_stream_completed = async (req) => {
         allot_host_3: 1,
         allot_chat: 1,
         temptokens: '$temptokens',
+        streamExpire: 1,
+        completedStream: 1
+
       },
     },
     { $sort: { DateIso: -1 } },
