@@ -139,5 +139,5 @@ router.route('/getSales/Executives').get(b2bShopCloneController.getSalesExecutiv
 // aggre expo
 router.route('/agree/expo/:page/:type').get(b2bShopCloneController.getVisitors_With_Page);
 router.route('/agree/Visitors/Disable/:id/:type').get(b2bShopCloneController.DisableVisitors);
-router.route('/agree/Visitors/ImageUpload').post(shopverify, upload, b2bShopCloneController.AgriImageUpload);
+router.route('/agree/Visitors/ImageUpload').post(upload, b2bShopCloneController.AgriImageUpload);
 module.exports = router;
