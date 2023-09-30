@@ -239,6 +239,7 @@ const get_myDetails = async (req) => {
         state: 1,
         city: 1,
         intrested_In: 1,
+        AgriImage:1,
       },
     },
   ]);
