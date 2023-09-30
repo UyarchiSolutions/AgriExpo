@@ -62,11 +62,11 @@ const verifyOTP = async (req) => {
 const verifyOTP_Delete_Account = async (req) => {
   let body = req.body;
   const mobileNumber = body.mobileNumber;
-  const otp = body.otp;
+  const otp =  body.otp;
   let findOTP = await sellerOTP
     .findOne({
       mobileNumber: mobileNumber,
-      OTP: otp,
+      OTP: parseInt(otp),
       // create: { $gte: moment(new Date().getTime() - 15 * 60 * 1000) },
       active: true,
     })
