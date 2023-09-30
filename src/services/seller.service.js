@@ -526,8 +526,8 @@ const update_my_profile = async (req) => {
 };
 
 const getSellers_With_Paginations = async (page) => {
-  const values = await Seller.aggregate([{ $match: { sellerType: 'MainSeller' } }, { $skip: 10 * page }, { $limit: 10 }]);
-  let next = await Seller.aggregate([{ $match: { sellerType: 'MainSeller' } }, { $skip: 10 * (page + 1) }, { $limit: 10 }]);
+  const values = await Seller.aggregate([{ $skip: 10 * page }, { $limit: 10 }]);
+  let next = await Seller.aggregate([{ $skip: 10 * (page + 1) }, { $limit: 10 }]);
   return { values: values, next: next.length != 0 };
 };
 
