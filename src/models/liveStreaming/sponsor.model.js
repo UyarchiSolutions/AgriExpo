@@ -43,7 +43,7 @@ const Sponsorschema = mongoose.Schema(
       type: String,
     },
     category: {
-      type: String,
+      type: Array,
     },
     address: {
       type: String,
