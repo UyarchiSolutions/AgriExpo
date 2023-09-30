@@ -87,7 +87,7 @@ const verifyOTP_Delete_Account = async (req) => {
   }
   findOTP.active = false;
   findOTP.save();
-  let seller = await Seller.findByIdAndUpdate({ _id: findOTP.userId }, { active: true }, { new: true });
+  let seller = await Seller.findByIdAndUpdate({ _id: findOTP.userId }, { active: false }, { new: true });
   return { messages: 'Account has been Deleted' };
 };
 
