@@ -28,7 +28,11 @@ const register_shop = async (body) => {
 
 const NewRegister_Shop = async (body) => {
   const mobileNumber = body.mobile;
-  let shop = await Shop.findOne({ mobile: mobileNumber });
+  let disableCheck = await Shop.findOne({ mobile: mobileNumber, active: true });
+  if (disableCheck) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Your Account Has Been De-Activated Please Cantact Event Manager');
+  }
+  let shop = await Shop.findOne({ mobile: mobileNumber, active: true, registered: true });
   if (shop) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Shop-Already-Register');
   }
@@ -102,7 +106,7 @@ const verify_otpDelete_Account = async (body) => {
     OTP: otp,
     active: true,
   });
-  console.log(findOTP)
+  console.log(findOTP);
   if (!findOTP) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Invalid OTP');
   }
@@ -116,7 +120,7 @@ const verify_otpDelete_Account = async (body) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'OTP Expired');
   }
   let shop = await Shop.findByIdAndUpdate({ _id: findOTP.userId }, { active: true }, { new: true });
-  await Shop.findByIdAndUpdate({ _id: findOTP.userId }, { registered: false, active:false }, { new: true });
+  await Shop.findByIdAndUpdate({ _id: findOTP.userId }, { active: false }, { new: true });
   return { message: ' Your was account deleted' };
 };
 
@@ -148,9 +152,13 @@ const change_password = async (body, shopId) => {
 const login_now = async (body) => {
   const salt = await bcrypt.genSalt(10);
   const { mobile, password } = body;
-  let userName = await Shop.findOne({ mobile: mobile,active:true });
+  let userName = await Shop.findOne({ mobile: mobile });
   if (!userName) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Shop Not Found');
+  }
+  let disableCheck = await Shop.findOne({ mobile: mobile, active: false });
+  if (disableCheck) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Your Account Has Been De-Activated, Please Contact Event Manager');
   }
   userName = await Shop.findOne({ mobile: mobile, registered: true });
   if (!userName) {
