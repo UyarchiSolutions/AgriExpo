@@ -44,7 +44,19 @@ const gePartnersAll = async (req) => {
   return { values, next: next.length != 0 };
 };
 
+const updatePartnersById = async (req) => {
+  let id = req.params.id;
+  let body = req.body;
+  let findExist = await Partner.findById(id);
+  if (!findExist) {
+    throw new ApiErrir(httpStatus.BAD_REQUEST, 'Partner Not Available');
+  }
+  findExist = await Partner.findByIdAndUpdate({ _id: id }, body, { new: true });
+  return findExist;
+};
+
 module.exports = {
   createPartner,
   gePartnersAll,
+  updatePartnersById,
 };

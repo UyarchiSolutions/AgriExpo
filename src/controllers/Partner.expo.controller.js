@@ -14,7 +14,14 @@ const gePartnersAll = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const updatePartnersById = catchAsync(async (req, res) => {
+  const data = await PartnerService.updatePartnersById(req);
+  res.send(data);
+});
+
 module.exports = {
   createPartner,
   gePartnersAll,
+  updatePartnersById,
+  updatePartnersById,
 };
