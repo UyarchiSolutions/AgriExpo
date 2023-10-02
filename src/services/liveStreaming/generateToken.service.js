@@ -1833,6 +1833,7 @@ const get_raise_hands = async (req) => {
             $project: {
               _id: 1,
               SName: "$shops.SName",
+              AgriImage: "$shops.AgriImage",
               tradeName: "$shops.tradeName",
               mobile: "$shops.mobile",
               address: "$shops.address",
