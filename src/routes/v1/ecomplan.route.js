@@ -147,6 +147,7 @@ router
   .get(Ecomcontroller.get_by_slab)
   .put(Ecomcontroller.update_slab);
 router.route('/slab/getall').get(Ecomcontroller.getallslab);
+router.route('/slab/getall/all').get(SellerAuth, Ecomcontroller.getallslab_all);
 
 // after Completed Stream Supplier Flow
 

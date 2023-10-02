@@ -439,6 +439,13 @@ const getallslab = catchAsync(async (req, res) => {
   res.send(value);
 });
 
+
+const getallslab_all= catchAsync(async (req, res) => {
+  const value = await Ecomserive.getallslab_all(req);
+  res.send(value);
+});
+
+
 const update_slab = catchAsync(async (req, res) => {
   const value = await Ecomserive.update_slab(req);
   res.send(value);
@@ -820,6 +827,7 @@ module.exports = {
   get_by_slab,
   update_slab,
   getallslab,
+  getallslab_all,
   getStock_Manager,
   getPosted_Details_By_Stream,
   fetchStream_Details_ById,

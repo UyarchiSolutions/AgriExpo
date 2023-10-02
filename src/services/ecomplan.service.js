@@ -9018,6 +9018,12 @@ const getallslab = async (req) => {
 
   return value;
 };
+
+const getallslab_all = async (req) => {
+  const value = await Slab.aggregate([{ $sort: { formAmount: -1 } }]);
+  return value;
+};
+
 const update_slab = async (req) => {
   let value = await Slab.findByIdAndUpdate({ _id: req.query.id }, req.body, { new: true });
   return value;
@@ -14365,6 +14371,7 @@ module.exports = {
   get_by_slab,
   update_slab,
   getallslab,
+  getallslab_all,
 
   get_completed_stream_upcommming,
   get_completed_stream_live,
