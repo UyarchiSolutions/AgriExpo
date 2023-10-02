@@ -9,6 +9,12 @@ const createPartner = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const gePartnersAll = catchAsync(async (req, res) => {
+  const data = await PartnerService.gePartnersAll(req);
+  res.send(data);
+});
+
 module.exports = {
   createPartner,
+  gePartnersAll,
 };

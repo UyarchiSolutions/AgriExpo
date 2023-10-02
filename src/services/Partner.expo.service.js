@@ -23,6 +23,28 @@ const createPartner = async (req) => {
   return value;
 };
 
+const gePartnersAll = async (req) => {
+  let page = req.params.page;
+  let values = await Partner.aggregate([
+    {
+      $skip: 10 * page,
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+  let next = await Partner.aggregate([
+    {
+      $skip: 10 * (page + 1),
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+  return { values, next: next.length != 0 };
+};
+
 module.exports = {
   createPartner,
+  gePartnersAll,
 };
