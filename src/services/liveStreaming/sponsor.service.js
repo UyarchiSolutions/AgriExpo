@@ -23,7 +23,15 @@ const get_Sponsor = async (page) => {
       $limit: 10,
     },
   ]);
-  return values;
+  const next = await Sponsor.aggregate([
+    {
+      $skip: 10 * (page + 1),
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+  return { values, next: next.length != 0 };
 };
 
 const updateSponsorById = async (id, body) => {
