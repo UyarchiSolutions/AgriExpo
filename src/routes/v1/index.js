@@ -119,6 +119,7 @@ const AdvertismentRoute = require('./Advertisment.route');
 const PrivateChatRoute = require('./PrivateChat.route');
 const ccavenue = require('./ccavenue.route');
 const AgriWallet = require('./agri-exhibitor-wallet.route');
+const ExpoPartner = require('./Partner.expo.router');
 
 const defaultRoutes = [
   {
@@ -156,6 +157,10 @@ const defaultRoutes = [
   {
     path: '/seller',
     route: SellerRoute,
+  },
+  {
+    path: '/ExpoPartner',
+    route: ExpoPartner,
   },
   {
     path: '/subhost',
