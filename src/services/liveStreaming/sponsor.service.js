@@ -7,7 +7,7 @@ const sponsor_registretion = async (req) => {
   let body = req.body;
   let findByMobile = await Sponsor.findOne({ mobileNumber: body.mobileNumber });
   if (!findByMobile) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile Number Already Exists');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile Number Already Exist');
   }
   body = { ...body, ...{ dateISO: moment() } };
   let insert = await Sponsor.create(body);
