@@ -5,6 +5,10 @@ const { Sponsor } = require('../../models/liveStreaming/sponsor.model');
 
 const sponsor_registretion = async (req) => {
   let body = req.body;
+  let findByMobile = await Sponsor.findOne({ mobileNumber: body.mobileNumber });
+  if (!findByMobile) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile Number Already Exists');
+  }
   body = { ...body, ...{ dateISO: moment() } };
   let insert = await Sponsor.create(body);
   return insert;
