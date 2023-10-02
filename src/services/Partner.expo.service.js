@@ -8,10 +8,10 @@ const createPartner = async (req) => {
   let value = await Partner.findOne({ $or: [{ email: body.email }, { mobileNumber: body.mobileNumber }] });
   if (value) {
     if (value.email == body.email) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'Email Already Exists');
+      throw new ApiError(httpStatus.NOT_FOUND, 'Email Already Exist');
     }
     if (value.mobileNumber == body.mobileNumber) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'Phone Number Exists');
+      throw new ApiError(httpStatus.NOT_FOUND, 'Phone Number Exist');
     }
   } else {
     //   value = await Seller.create({ ...body, ...{ mainSeller: 'admin', sellerType: 'MainSeller', sellerRole: 'admin' } });
