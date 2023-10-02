@@ -5,7 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const PartnerService = require('../services/Partner.expo.service');
 
 const createPartner = catchAsync(async (req, res) => {
-  const data = await PartnerService.createPartner(req.body);
+  const data = await PartnerService.createPartner(req);
   res.send(data);
 });
 
