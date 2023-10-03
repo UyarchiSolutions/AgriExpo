@@ -301,7 +301,7 @@ const partnerPlanSchema = new mongoose.Schema(
       type: String,
     },
   },
-  { new: true }
+  { timestamps: true }
 );
 
 const PartnerPlan = mongoose.model('expopartnerplan', partnerPlanSchema);
