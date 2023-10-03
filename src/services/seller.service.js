@@ -112,7 +112,7 @@ const forgotPass = async (req) => {
   if ((body.reg = true)) {
     value = await Seller.findOne({ mobileNumber: body.mobileNumber });
     if (!value) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'Not Registered');
+      throw new ApiError(httpStatus.NOT_FOUND, ' MobileNumber Not Registered');
     }
   } else {
     value = await Seller.findOne({ mobileNumber: body.mobileNumber, registered: true });
