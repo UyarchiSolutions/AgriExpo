@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const bcrypt = require('bcryptjs');
 const ApiError = require('../utils/ApiError');
-const { Partner } = require('../models/Partner-expo-model');
+const { Partner, PartnerPlan } = require('../models/Partner-expo-model');
 
 const createPartner = async (req) => {
   let body = req.body;
@@ -55,8 +55,38 @@ const updatePartnersById = async (req) => {
   return findExist;
 };
 
+// planes
+
+const createPlanes = async (req) => {
+  let creations = await PartnerPlan.create(req.body);
+  return creations;
+};
+
+const gePartnersPlanesAll = async (req) => {
+  let page = req.params.page;
+  let values = await PartnerPlan.aggregate([
+    {
+      $skip: 10 * page,
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+  let next = await PartnerPlan.aggregate([
+    {
+      $skip: 10 * (page + 1),
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+  return { values, next: next.length != 0 };
+};
+
 module.exports = {
   createPartner,
   gePartnersAll,
   updatePartnersById,
+  createPlanes,
+  gePartnersPlanesAll,
 };
