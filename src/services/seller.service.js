@@ -62,7 +62,7 @@ const verifyOTP = async (req) => {
 const verifyOTP_Delete_Account = async (req) => {
   let body = req.body;
   const mobileNumber = body.mobileNumber;
-  const otp =  body.otp;
+  const otp = body.otp;
   let findOTP = await sellerOTP
     .findOne({
       mobileNumber: mobileNumber,
@@ -108,9 +108,9 @@ const setPassword = async (req) => {
 
 const forgotPass = async (req) => {
   let body = req.body;
-
   let value = await Seller.findOne({ mobileNumber: body.mobileNumber, registered: true });
-  if(!body.reg == true){
+  if (body.reg == true) {
+  } else {
     if (!value) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Not Registered');
     }
