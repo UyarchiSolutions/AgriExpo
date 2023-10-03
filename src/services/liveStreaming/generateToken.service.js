@@ -323,10 +323,9 @@ const recording_start = async (req, id) => {
     const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
       'base64'
     )}`;
+    let nowDate = moment().format('DDMMYYYY');
     if (token.recoredStart == 'acquire') {
       const resource = token.resourceId;
-      //console.log(resource)
-      //console.log(token)
       const mode = 'mix';
       const start = await axios.post(
         `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/mode/${mode}/start`,
@@ -336,7 +335,7 @@ const recording_start = async (req, id) => {
           clientRequest: {
             token: token.token,
             recordingConfig: {
-              maxIdleTime: 30,
+              maxIdleTime: 15,
               streamTypes: 2,
               channelType: 1,
               videoStreamType: 0,
@@ -358,7 +357,7 @@ const recording_start = async (req, id) => {
               bucket: 'streamingupload',
               accessKey: 'AKIA3323XNN7Y2RU77UG',
               secretKey: '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',
-              fileNamePrefix: [token.store, token.Uid.toString()],
+              fileNamePrefix: [nowDate.toString(), token.store, token.Uid.toString()],
             },
           },
         },
@@ -418,12 +417,14 @@ const recording_stop = async (req) => {
     )}`;
     if (token.recoredStart == 'query') {
       const resource = token.resourceId;
+      const sid = token.sid;
       const mode = 'mix';
+
       const stop = await axios.post(
         `https://api.agora.io/v1/apps/${agoraToken.appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
         {
-          cname: test.tokenId,
-          uid: test.cloud_testUD.toString(),
+          cname: token.chennel,
+          uid: token.Uid.toString(),
           clientRequest: {},
         },
         {
@@ -434,10 +435,17 @@ const recording_stop = async (req) => {
       ).then((res) => {
         return res.data;
       }).catch((err) => {
+
         throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Stop:' + err.message);
       });
 
       token.recoredStart = 'stop';
+      if (stop.data.serverResponse.fileList.length == 2) {
+        token.videoLink = stop.data.serverResponse.fileList[0].fileName;
+        token.videoLink_array = stop.data.serverResponse.fileList;
+        let m3u8 = stop.data.serverResponse.fileList[0].fileName;
+        token.videoLink_mp4 = m3u8;
+      }
       token.save();
       return stop;
     }
