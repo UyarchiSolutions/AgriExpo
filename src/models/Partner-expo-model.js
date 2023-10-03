@@ -293,6 +293,12 @@ const partnerPlanSchema = new mongoose.Schema({
   no_of_stream: {
     type: String,
   },
+  duration_per_Stream: {
+    type: String,
+  },
+  timeType_minutes: {
+    type: String,
+  },
 });
 
 const PartnerPlan = mongoose.model('expopartnerplan', partnerPlanSchema);
