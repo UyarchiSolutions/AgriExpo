@@ -409,7 +409,7 @@ const recording_query = async (req, id, agoraToken) => {
 };
 
 const recording_stop = async (req) => {
-  let token = await tempTokenModel.findOne({ chennel: id, type: 'CloudRecording', recoredStart: { $eq: "query" } });
+  let token = await tempTokenModel.findOne({ chennel: req.query.id, type: 'CloudRecording', recoredStart: { $eq: "query" } }).sort({ created: -1 });
   if (token) {
     let str = await Streamrequest.findById(token.streamId);
     let agoraToken = await AgoraAppId.findById(str.agoraID);
