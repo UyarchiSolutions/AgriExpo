@@ -2311,11 +2311,12 @@ const end_stream = async (req) => {
   assginStream.forEach(async (a) => {
     await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Completed' }, { new: true });
   });
+  console.log(value,23213)
   const mode = 'mix';
   let token = await tempTokenModel.findOne({ chennel: req.query.id, type: 'CloudRecording', recoredStart: { $eq: 'query' } }).sort({ created: -1 });
   if (token != null) {
     let agoraToken = await AgoraAppId.findById(value.agroaID);
-    console.log(agoraToken)
+    console.log(agoraToken,23142)
     const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString('base64')}`;
     const resource = token.resourceId;
     const sid = token.sid;
