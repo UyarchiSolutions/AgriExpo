@@ -24,10 +24,16 @@ const createPlanes = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const gePartnersPlanesAll = catchAsync(async (req, res) => {
+  const data = await PartnerService.gePartnersPlanesAll(req);
+  res.send(data);
+});
+
 module.exports = {
   createPartner,
   gePartnersAll,
   updatePartnersById,
   updatePartnersById,
   createPlanes,
+  gePartnersPlanesAll,
 };

@@ -62,9 +62,31 @@ const createPlanes = async (req) => {
   return creations;
 };
 
+const gePartnersPlanesAll = async (req) => {
+  let page = req.params.page;
+  let values = await PartnerPlan.aggregate([
+    {
+      $skip: 10 * page,
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+  let next = await PartnerPlan.aggregate([
+    {
+      $skip: 10 * (page + 1),
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+  return { values, next: next.length != 0 };
+};
+
 module.exports = {
   createPartner,
   gePartnersAll,
   updatePartnersById,
   createPlanes,
+  gePartnersPlanesAll,
 };
