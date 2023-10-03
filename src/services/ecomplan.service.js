@@ -2315,6 +2315,7 @@ const end_stream = async (req) => {
   let token = await tempTokenModel.findOne({ chennel: req.query.id, type: 'CloudRecording', recoredStart: { $eq: 'query' } }).sort({ created: -1 });
   if (token != null) {
     let agoraToken = await AgoraAppId.findById(value.agroaID);
+    console.log(agoraToken)
     const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString('base64')}`;
     const resource = token.resourceId;
     const sid = token.sid;
