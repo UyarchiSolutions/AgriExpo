@@ -2323,8 +2323,8 @@ const end_stream = async (req) => {
     const stop = await axios.post(
       `https://api.agora.io/v1/apps/${agoraToken.appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
       {
-        cname: test.tokenId,
-        uid: test.cloud_testUD.toString(),
+        cname: token.chennel,
+        uid: token.Uid.toString(),
         clientRequest: {},
       },
       {
