@@ -440,6 +440,12 @@ const recording_stop = async (req) => {
       });
 
       token.recoredStart = 'stop';
+      if (stop.data.serverResponse.fileList.length == 2) {
+        token.videoLink = stop.data.serverResponse.fileList[0].fileName;
+        token.videoLink_array = stop.data.serverResponse.fileList;
+        let m3u8 = stop.data.serverResponse.fileList[0].fileName;
+        token.videoLink_mp4 = m3u8;
+      }
       token.save();
       return stop;
     }
