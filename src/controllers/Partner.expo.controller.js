@@ -29,6 +29,11 @@ const gePartnersPlanesAll = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const updatePartnerPlanesById = catchAsync(async (req, res) => {
+  const data = await PartnerService.updatePartnerPlanesById(req);
+  res.send(data);
+});
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -36,4 +41,5 @@ module.exports = {
   updatePartnersById,
   createPlanes,
   gePartnersPlanesAll,
+  updatePartnerPlanesById,
 };
