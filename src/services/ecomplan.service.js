@@ -2316,8 +2316,6 @@ const end_stream = async (req) => {
   if (token != null) {
     let agoraToken = await AgoraAppId.findById(value.agroaID);
     const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString('base64')}`;
-    token.recoredStart = 'stop';
-    token.save();
     const resource = token.resourceId;
     const sid = token.sid;
     const stop = await axios.post(
@@ -2337,6 +2335,8 @@ const end_stream = async (req) => {
     }).catch((err) => {
       throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Stop:' + err.message);
     });
+    token.recoredStart = 'stop';
+    token.save();
     return stop;
   }
   return { value: true };
