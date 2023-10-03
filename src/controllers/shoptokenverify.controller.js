@@ -19,7 +19,7 @@ const authorization = async (req, res, next) => {
       return res.send(httpStatus.UNAUTHORIZED, 'Shop Not Found');
     }
     req.shopId = payload._id;
-    console.log(req.shopId,"askdjfskdjdfh")
+    // console.log(req.shopId,"askdjfskdjdfh")
     req.shop = userss;
 
     return next();

@@ -313,7 +313,7 @@ const agora_acquire = async (req, id, agroaID) => {
 
 const recording_start = async (req, id) => {
   // let temtoken = id;
-  let token = await tempTokenModel.findOne({ chennel: id, type: 'CloudRecording', recoredStart: { $eq: "acquire" } });
+  let token = await tempTokenModel.findOne({ chennel: id, type: 'CloudRecording', recoredStart: { $eq: "acquire" } }).sort({ created: -1 });
 
   // let temtoken=req.body.id;
   // let token = await tempTokenModel.findById(temtoken);
