@@ -357,7 +357,7 @@ const recording_start = async (req, id) => {
               bucket: 'streamingupload',
               accessKey: 'AKIA3323XNN7Y2RU77UG',
               secretKey: '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',
-              fileNamePrefix: [nowDate,token.store, token.Uid.toString()],
+              fileNamePrefix: [nowDate, token.store, token.Uid.toString()],
             },
           },
         },
@@ -417,7 +417,9 @@ const recording_stop = async (req) => {
     )}`;
     if (token.recoredStart == 'query') {
       const resource = token.resourceId;
+      const sid = token.sid;
       const mode = 'mix';
+
       const stop = await axios.post(
         `https://api.agora.io/v1/apps/${agoraToken.appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
         {
