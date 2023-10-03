@@ -323,7 +323,7 @@ const recording_start = async (req, id) => {
     const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
       'base64'
     )}`;
-    let nowDate = moment().format('YYYY-MM-DD');
+    let nowDate = moment().format('DDMMYYYY');
     if (token.recoredStart == 'acquire') {
       const resource = token.resourceId;
       const mode = 'mix';
@@ -435,6 +435,7 @@ const recording_stop = async (req) => {
       ).then((res) => {
         return res.data;
       }).catch((err) => {
+
         throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Stop:' + err.message);
       });
 
