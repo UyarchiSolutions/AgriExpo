@@ -312,11 +312,8 @@ const agora_acquire = async (req, id, agroaID) => {
 };
 
 const recording_start = async (req, id) => {
-  // let temtoken = id;
   let token = await tempTokenModel.findOne({ chennel: id, type: 'CloudRecording', recoredStart: { $eq: "acquire" } }).sort({ created: -1 });
-
-  // let temtoken=req.body.id;
-  // let token = await tempTokenModel.findById(temtoken);
+  console.log(token)
   if (token) {
     let str = await Streamrequest.findById(token.streamId);
     let agoraToken = await AgoraAppId.findById(str.agoraID);
@@ -386,14 +383,21 @@ const recording_query = async (req, id, agoraToken) => {
   )}`;
   let temtoken = id;
   let token = await tempTokenModel.findById(temtoken);
+  if (!token) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
+  }
   const resource = token.resourceId;
   const sid = token.sid;
   const mode = 'mix';
   const query = await axios.get(
     `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
     { headers: { Authorization } }
-  );
-  if (query.data.serverResponse.fileList.length > 0) {
+  ).then((res) => {
+    return res;
+  }).catch((err) => {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Query:' + err.message);
+  });;
+  if (query.data.serverResponse.fileList.length != 0) {
     token.videoLink = query.data.serverResponse.fileList[0].fileName;
     token.videoLink_array = query.data.serverResponse.fileList;
     let m3u8 = query.data.serverResponse.fileList[0].fileName;
@@ -1247,7 +1251,7 @@ const production_supplier_token_cloudrecording = async (req, id, agroaID) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
   }
   // console.log(stream);
-  value = await tempTokenModel.findOne({ chennel: streamId, type: 'CloudRecording', recoredStart: { $in: ["query", 'start'] } });
+  value = await tempTokenModel.findOne({ chennel: streamId, type: 'CloudRecording', recoredStart: { $in: ["query", 'start',] } });
   if (!value) {
     const uid = await generateUid();
     const role = Agora.RtcRole.SUBSCRIBER;
