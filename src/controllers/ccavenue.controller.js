@@ -36,11 +36,17 @@ const nearby_value = catchAsync(async (req, res) => {
     res.send(category)
 });
 
+const get_paymant_success_response = catchAsync(async (req, res) => {
+    const category = await ccavenue.get_paymant_success_response(req.shopId, req.body, res);
+    res.send(category)
+});
+
 
 
 module.exports = {
     get_paymnent_url,
     pay_now_encript_value,
     nearby_value,
-    exhibitor_purchese_plan
+    exhibitor_purchese_plan,
+    get_paymant_success_response
 }

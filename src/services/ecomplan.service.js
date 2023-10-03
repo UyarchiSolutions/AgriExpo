@@ -30,7 +30,7 @@ const { Shop } = require('../models/b2b.ShopClone.model');
 
 const agoraToken = require('./liveStreaming/AgoraAppId.service');
 const Axios = require('axios');
-const { UsageAppID } = require('../models/liveStreaming/AgoraAppId.model');
+const { UsageAppID, AgoraAppId } = require('../models/liveStreaming/AgoraAppId.model');
 const S3video = require('./S3video.service');
 const { Seller } = require('../models/seller.models');
 const ccavenue = require('./ccavenue.service');
@@ -479,6 +479,19 @@ const get_all_Post_with_page_live = async (req) => {
         postCount: '$streamrequestposts.postCount',
         tokenGeneration: '$streamrequestposts.tokenGeneration',
         unit: 1,
+        dispatchLocation: 1,
+        purchase_limit: 1,
+        max_purchase_value: 1,
+        pruductreturnble: 1,
+        return_policy: 1,
+        latitude: 1,
+        longitude: 1,
+        booking_percentage: 1,
+        booking_charge: 1,
+        transaction: 1,
+        pack_discription: 1,
+        define_UNIT: 1,
+        define_QTY: 1,
       },
     },
     { $skip: 10 * page },
@@ -646,6 +659,19 @@ const get_all_Post_with_page_completed = async (req) => {
         allot_host_2: '$streamrequestposts.allot_host_2',
         allot_host_3: '$streamrequestposts.allot_host_3',
         unit: 1,
+        dispatchLocation: 1,
+        purchase_limit: 1,
+        max_purchase_value: 1,
+        pruductreturnble: 1,
+        return_policy: 1,
+        latitude: 1,
+        longitude: 1,
+        booking_percentage: 1,
+        booking_charge: 1,
+        transaction: 1,
+        pack_discription: 1,
+        define_UNIT: 1,
+        define_QTY: 1,
       },
     },
     { $skip: 10 * page },
@@ -784,6 +810,19 @@ const get_all_Post_with_page_exhausted = async (req) => {
         bookingAmount: 1,
         afterStreaming: 1,
         unit: 1,
+        dispatchLocation: 1,
+        purchase_limit: 1,
+        max_purchase_value: 1,
+        pruductreturnble: 1,
+        return_policy: 1,
+        latitude: 1,
+        longitude: 1,
+        booking_percentage: 1,
+        booking_charge: 1,
+        transaction: 1,
+        pack_discription: 1,
+        define_UNIT: 1,
+        define_QTY: 1,
       },
     },
     { $sort: { DateIso: -1 } },
@@ -920,6 +959,19 @@ const get_all_Post_with_page_removed = async (req) => {
         postCount: '$streamrequestposts.postCount',
         tokenGeneration: '$streamrequestposts.tokenGeneration',
         unit: 1,
+        dispatchLocation: 1,
+        purchase_limit: 1,
+        max_purchase_value: 1,
+        pruductreturnble: 1,
+        return_policy: 1,
+        latitude: 1,
+        longitude: 1,
+        booking_percentage: 1,
+        booking_charge: 1,
+        transaction: 1,
+        pack_discription: 1,
+        define_UNIT: 1,
+        define_QTY: 1,
       },
     },
     { $sort: { DateIso: -1 } },
@@ -1101,6 +1153,19 @@ const get_all_Post_with_page_all = async (req, status) => {
         postCount: '$streamrequestposts.postCount',
         tokenGeneration: '$streamrequestposts.tokenGeneration',
         unit: 1,
+        dispatchLocation: 1,
+        purchase_limit: 1,
+        max_purchase_value: 1,
+        pruductreturnble: 1,
+        return_policy: 1,
+        latitude: 1,
+        longitude: 1,
+        booking_percentage: 1,
+        booking_charge: 1,
+        transaction: 1,
+        pack_discription: 1,
+        define_UNIT: 1,
+        define_QTY: 1,
       },
     },
     { $sort: { DateIso: -1 } },
@@ -1125,7 +1190,6 @@ const get_all_Post_with_page = async (req, status) => {
   if (filterdate != null && filterdate != '' && filterdate != 'null') {
     let date = filterdate.split(',');
     if (date.length == 2) {
-      //console.log();
       dateMatch = {
         $and: [
           { DateIso: { $gte: new Date(date[0] + ' 0:0:0').getTime() } },
@@ -1133,9 +1197,7 @@ const get_all_Post_with_page = async (req, status) => {
         ],
       };
     }
-    //console.log(date, dateMatch);
   }
-  //console.log(dateMatch);
 
   const value = await StreamPost.aggregate([
     // {
@@ -1251,6 +1313,19 @@ const get_all_Post_with_page = async (req, status) => {
         postCount: '$streamrequestposts.postCount',
         tokenGeneration: '$streamrequestposts.tokenGeneration',
         unit: 1,
+        dispatchLocation: 1,
+        purchase_limit: 1,
+        max_purchase_value: 1,
+        pruductreturnble: 1,
+        return_policy: 1,
+        latitude: 1,
+        longitude: 1,
+        booking_percentage: 1,
+        booking_charge: 1,
+        transaction: 1,
+        pack_discription: 1,
+        define_UNIT: 1,
+        define_QTY: 1,
       },
     },
     { $sort: { DateIso: -1 } },
@@ -1385,6 +1460,19 @@ const get_all_Post_with_page_assigned = async (req) => {
         postCount: '$streamrequestposts.postCount',
         tokenGeneration: '$streamrequestposts.tokenGeneration',
         unit: 1,
+        dispatchLocation: 1,
+        purchase_limit: 1,
+        max_purchase_value: 1,
+        pruductreturnble: 1,
+        return_policy: 1,
+        latitude: 1,
+        longitude: 1,
+        booking_percentage: 1,
+        booking_charge: 1,
+        transaction: 1,
+        pack_discription: 1,
+        define_UNIT: 1,
+        define_QTY: 1,
       },
     },
     { $sort: { DateIso: -1 } },
@@ -2223,21 +2311,17 @@ const end_stream = async (req) => {
   assginStream.forEach(async (a) => {
     await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Completed' }, { new: true });
   });
+  console.log(value, 23213)
   const mode = 'mix';
-  // value = await tempTokenModel.findOne({ chennel: streamId, type: 'CloudRecording', recoredStart: { $ne: "stop" } });
-  let token = await tempTokenModel.findOne({ chennel: req.query.id, type: 'CloudRecording', recoredStart: { $ne: 'stop' } });
+  let token = await tempTokenModel.findOne({ chennel: req.query.id, type: 'CloudRecording', recoredStart: { $eq: 'query' } }).sort({ created: -1 });
   if (token != null) {
-    let agoraToken = await AgoraAppId.findById(value.agroaID);
+    let agoraToken = await AgoraAppId.findById(value.agoraID);
+    console.log(agoraToken, 23142)
     const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString('base64')}`;
-    token.recoredStart = 'stop';
-    token.save();
     const resource = token.resourceId;
     const sid = token.sid;
     const stop = await axios.post(
-      `https://api.agora.io/v1/apps/${agoraToken.appID.replace(
-        /\s/g,
-        ''
-      )}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
+      `https://api.agora.io/v1/apps/${agoraToken.appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
       {
         cname: token.chennel,
         uid: token.Uid.toString(),
@@ -2248,7 +2332,14 @@ const end_stream = async (req) => {
           Authorization,
         },
       }
-    );
+    ).then((res) => {
+      return res.data;
+    }).catch((err) => {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Stop:' + err.message);
+    });
+    token.recoredStart = 'stop';
+    token.save();
+    return stop;
   }
   return { value: true };
 };

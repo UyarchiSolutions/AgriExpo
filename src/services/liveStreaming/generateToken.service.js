@@ -409,28 +409,45 @@ const recording_query = async (req, id, agoraToken) => {
 };
 
 const recording_stop = async (req) => {
-  // const mode = 'mix';
-  // let token = await tempTokenModel.findById(req.body.id);
-  // token.recoredStart = "stop";
-  // token.save();
-  // const resource = token.resourceId;
-  // const sid = token.sid;
-  // const stop = await axios.post(
-  //   `https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
-  //   {
-  //     cname: token.chennel,
-  //     uid: token.Uid.toString(),
-  //     clientRequest: {},
-  //   },
-  //   {
-  //     headers: {
-  //       Authorization,
-  //     },
-  //   }
-  // );
+  let token = await tempTokenModel.findOne({ chennel: req.body.stream, type: 'CloudRecording', recoredStart: { $eq: "query" } }).sort({ created: -1 });
+  if (token) {
+    let str = await Streamrequest.findById(token.streamId);
+    let agoraToken = await AgoraAppId.findById(str.agoraID);
+    const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
+      'base64'
+    )}`;
+    if (token.recoredStart == 'query') {
+      const resource = token.resourceId;
+      const mode = 'mix';
+      const stop = await axios.post(
+        `https://api.agora.io/v1/apps/${agoraToken.appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
+        {
+          cname: test.tokenId,
+          uid: test.cloud_testUD.toString(),
+          clientRequest: {},
+        },
+        {
+          headers: {
+            Authorization,
+          },
+        }
+      ).then((res) => {
+        return res.data;
+      }).catch((err) => {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Stop:' + err.message);
+      });
 
-  // return stop.data;
-  return { message: 'asdhajs' };
+      token.recoredStart = 'stop';
+      token.save();
+      return stop;
+    }
+    else {
+      return { message: 'Already Stoped' };
+    }
+  }
+  else {
+    return { message: 'Clound not Found' };
+  }
 };
 const recording_updateLayout = async (req) => {
   const acquire = await axios.post(

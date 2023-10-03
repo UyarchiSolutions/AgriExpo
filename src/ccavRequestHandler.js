@@ -79,6 +79,7 @@ exports.success_recive = function (request, response) {
     });
 };
 
+
 exports.payment_success = function (request, response) {
     var ccavEncResponse = '',
         ccavResponse = '',
@@ -106,7 +107,7 @@ exports.payment_success = function (request, response) {
     });
     request.on('end', async function () {
         orders = await update_ccavenue_payment_link(result, encryption)
-        const redirectUrl = 'https://exhibitor.agriexpo.live/paymentsuccess/' + orders._id;
+        const redirectUrl = 'https://exhibitor.agriexpo.live/payment/success/' + orders._id;
         response.redirect(301, redirectUrl);
 
     });

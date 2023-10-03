@@ -258,6 +258,17 @@ const redirect_payment_gateway = async (html, res) => {
     res.write(html)
     res.end()
 }
+
+
+
+const get_paymant_success_response = async (req) => {
+    let payment = await ccavenue_paymnet.findById(req.params.id);
+    if (!payment) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Payment not found');
+    }
+    return payment;
+}
+
 module.exports = {
     get_paymnent_url,
     pay_now_encript_value,
@@ -265,7 +276,8 @@ module.exports = {
     pay_nowredirect_url,
     redirect_payment_gateway,
     exhibitor_purchese_plan,
-    create_plan_paymant
+    create_plan_paymant,
+    get_paymant_success_response
 }
 
 
