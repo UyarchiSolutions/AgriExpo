@@ -335,7 +335,7 @@ const recording_start = async (req, id) => {
           clientRequest: {
             token: token.token,
             recordingConfig: {
-              maxIdleTime: 30,
+              maxIdleTime: 15,
               streamTypes: 2,
               channelType: 1,
               videoStreamType: 0,
