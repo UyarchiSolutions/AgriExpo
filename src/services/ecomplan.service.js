@@ -30,7 +30,7 @@ const { Shop } = require('../models/b2b.ShopClone.model');
 
 const agoraToken = require('./liveStreaming/AgoraAppId.service');
 const Axios = require('axios');
-const { UsageAppID } = require('../models/liveStreaming/AgoraAppId.model');
+const { UsageAppID, AgoraAppId } = require('../models/liveStreaming/AgoraAppId.model');
 const S3video = require('./S3video.service');
 const { Seller } = require('../models/seller.models');
 const ccavenue = require('./ccavenue.service');
@@ -2312,8 +2312,7 @@ const end_stream = async (req) => {
     await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Completed' }, { new: true });
   });
   const mode = 'mix';
-  // value = await tempTokenModel.findOne({ chennel: streamId, type: 'CloudRecording', recoredStart: { $ne: "stop" } });
-  let token = await tempTokenModel.findOne({ chennel: req.query.id, type: 'CloudRecording', recoredStart: { $ne: 'stop' } });
+  let token = await tempTokenModel.findOne({ chennel: req.query.id, type: 'CloudRecording', recoredStart: { $eq: 'query' } }).sort({ created: -1 });
   if (token != null) {
     let agoraToken = await AgoraAppId.findById(value.agroaID);
     const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString('base64')}`;
@@ -2322,13 +2321,10 @@ const end_stream = async (req) => {
     const resource = token.resourceId;
     const sid = token.sid;
     const stop = await axios.post(
-      `https://api.agora.io/v1/apps/${agoraToken.appID.replace(
-        /\s/g,
-        ''
-      )}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
+      `https://api.agora.io/v1/apps/${agoraToken.appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
       {
-        cname: token.chennel,
-        uid: token.Uid.toString(),
+        cname: test.tokenId,
+        uid: test.cloud_testUD.toString(),
         clientRequest: {},
       },
       {
@@ -2336,7 +2332,12 @@ const end_stream = async (req) => {
           Authorization,
         },
       }
-    );
+    ).then((res) => {
+      return res.data;
+    }).catch((err) => {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Stop:' + err.message);
+    });
+    return stop;
   }
   return { value: true };
 };
