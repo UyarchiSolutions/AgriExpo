@@ -108,8 +108,14 @@ const setPassword = async (req) => {
 
 const forgotPass = async (req) => {
   let body = req.body;
+  let value;
   if ((body.reg = true)) {
-    let value = await Seller.findOne({ mobileNumber: body.mobileNumber, registered: true });
+    value = await Seller.findOne({ mobileNumber: body.mobileNumber });
+    if (!value) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Not Registered');
+    }
+  } else {
+    value = await Seller.findOne({ mobileNumber: body.mobileNumber, registered: true });
     if (!value) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Not Registered');
     }
