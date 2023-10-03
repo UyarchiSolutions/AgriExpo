@@ -48,10 +48,13 @@ const forget_password = async (body) => {
   if (!shop) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Shop-Not-found');
   }
-  shop = await Shop.findOne({ mobile: mobileNumber, registered: { $eq: true } });
-  if (!shop) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Shop-Not-registered');
+  if (body.reg == true) {
+    shop = await Shop.findOne({ mobile: mobileNumber, registered: { $eq: true } });
+    if (!shop) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Shop-Not-registered');
+    }
   }
+
   await OTP.updateMany({ mobileNumber: mobileNumber, active: true }, { $set: { active: false } });
   const otp = await sentOTP(mobileNumber, shop);
   //console.log(otp);
