@@ -68,6 +68,9 @@ const agoraAppIdschema = mongoose.Schema({
     },
     verifiedBy: {
         type: String,
+    },
+    verifiedTime: {
+        type: Number,
     }
 }, { timeStamp: true });
 

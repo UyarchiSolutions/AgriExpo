@@ -505,6 +505,8 @@ const update_check_appid = async (req, data) => {
   }
   agoraToken.verifyStatus = data;
   agoraToken.verifiedBy = req.userId;
+  agoraToken.verifiedTime = moment()
+
   agoraToken.save();
   return agoraToken;
 }
