@@ -94,6 +94,11 @@ const updatePartnerPlanesById = async (req) => {
   return findExist;
 };
 
+const getPartnersAll = async () => {
+  let val = await Partner.find();
+  return val;
+};
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -101,4 +106,5 @@ module.exports = {
   createPlanes,
   gePartnersPlanesAll,
   updatePartnerPlanesById,
+  getPartnersAll,
 };
