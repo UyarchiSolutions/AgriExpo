@@ -30,7 +30,7 @@ const get_all_token = async (req) => {
   statuFilter = { active: true }
   if (req.query.status != null && req.query.status != '' && req.query.status != undefined) {
     if (req.query.status != 'all') {
-      statuFilter = { active: { $eq: req.query.status } }
+      statuFilter = { verifyStatus: { $eq: req.query.status } }
     }
   }
   let appId = await AgoraAppId.aggregate([
