@@ -99,7 +99,7 @@ const getPartnersAll = async () => {
   return val;
 };
 const getPartnersPlanesAll = async () => {
-  let val = await PartPartnerPlanner.find();
+  let val = await PartnerPlan.find();
   return val;
 };
 
