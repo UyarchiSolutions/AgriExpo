@@ -37,7 +37,7 @@ const nearby_value = catchAsync(async (req, res) => {
 });
 
 const get_paymant_success_response = catchAsync(async (req, res) => {
-    const category = await ccavenue.get_paymant_success_response(req.shopId, req.body, res);
+    const category = await ccavenue.get_paymant_success_response(req);
     res.send(category)
 });
 
