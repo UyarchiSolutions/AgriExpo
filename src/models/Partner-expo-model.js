@@ -301,7 +301,7 @@ const partnerPlanSchema = new mongoose.Schema(
       type: String,
     },
     partner_price: {
-      type: String,
+      type: Number,
     },
   },
   { timestamps: true }
@@ -309,7 +309,36 @@ const partnerPlanSchema = new mongoose.Schema(
 
 const PartnerPlan = mongoose.model('expopartnerplan', partnerPlanSchema);
 
+const PlanAllocationSchema = mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    partnerId: {
+      type: String,
+    },
+    planId: {
+      type: String,
+    },
+    price: {
+      type: Number,
+    },
+    no_of_subscription: {
+      type: Number,
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  { timestamps: true }
+);
+
+const PlanAllocation = mongoose.model('partneplanAllocation', PlanAllocationSchema);
+
 module.exports = {
   Partner,
   PartnerPlan,
+  PlanAllocation,
 };
