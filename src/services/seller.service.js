@@ -113,7 +113,7 @@ const forgotPass = async (req) => {
   }
   if (body.reg == true) {
   } else {
-    if (value.register == false) {
+    if (value.registered == false) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Not Registered');
     }
   }
