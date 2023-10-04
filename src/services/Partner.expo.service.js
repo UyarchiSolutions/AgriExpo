@@ -105,7 +105,7 @@ const getPartnersPlanesAll = async () => {
 
 const PlanAllocatioin = async (req) => {
   const { partner, plans } = req.body;
-  plans.foreach(async (e) => {
+  plans.forEach(async (e) => {
     let data = {
       partnerId: partner,
       planId: e.plan,
