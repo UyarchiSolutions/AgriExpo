@@ -13516,6 +13516,7 @@ const post_payment_details = async (req) => {
         incrementalLots: 1,
         afterStreaming: 1,
         suppierId: 1,
+        streamName:1,
       },
     },
   ]);
