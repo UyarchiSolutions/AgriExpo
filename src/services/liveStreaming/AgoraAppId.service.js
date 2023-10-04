@@ -101,7 +101,7 @@ const get_all_token_my = async (req) => {
 
 const get_all_token_check = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
-  await AgoraAppId.updateMany({ verifyStatus: { $eq: null } }, { $set: { verifyStatus: "Pending" } })
+  // await AgoraAppId.updateMany({ verifyStatus: { $eq: null } }, { $set: { verifyStatus: "Pending" } })
   let appId = await AgoraAppId.aggregate([
     { $match: { $and: [{ verifyStatus: { $in: [null, 'Pending'] } }] } },
     {
