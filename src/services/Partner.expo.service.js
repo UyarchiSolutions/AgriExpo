@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const bcrypt = require('bcryptjs');
 const ApiError = require('../utils/ApiError');
-const { Partner, PartnerPlan } = require('../models/Partner-expo-model');
+const { Partner, PartnerPlan, PlanAllocation } = require('../models/Partner-expo-model');
 
 const createPartner = async (req) => {
   let body = req.body;
@@ -88,7 +88,7 @@ const updatePartnerPlanesById = async (req) => {
   let body = req.body;
   let findExist = await PartnerPlan.findById(id);
   if (!findExist) {
-    throw new ApiErrir(httpStatus.BAD_REQUEST, 'Plan Not Available');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
   }
   findExist = await PartnerPlan.findByIdAndUpdate({ _id: id }, body, { new: true });
   return findExist;
@@ -103,6 +103,20 @@ const getPartnersPlanesAll = async () => {
   return val;
 };
 
+const PlanAllocatioin = async (req) => {
+  const { partner, plans } = req.body;
+  plans.foreach(async (e) => {
+    let data = {
+      partnerId: partner,
+      planId: e.plan,
+      price: e.price,
+      no_of_subscription: e.no_of_sub,
+    };
+    await PlanAllocation.create(data);
+  });
+  return { message: 'Planes Allocated to Partner' };
+};
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -112,4 +126,5 @@ module.exports = {
   updatePartnerPlanesById,
   getPartnersAll,
   getPartnersPlanesAll,
+  PlanAllocatioin,
 };

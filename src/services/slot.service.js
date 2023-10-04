@@ -562,7 +562,7 @@ const getSlots_Details_Streaming = async (slotId) => {
 const createEvents = async (body) => {
   let { arr, EventName } = body;
   arr.forEach(async (e) => {
-    let data = {...e,...{EventName: EventName}}
+    let data = { ...e, ...{ EventName: EventName } };
     await Event.create(data);
   });
   return { message: 'Event Created' };

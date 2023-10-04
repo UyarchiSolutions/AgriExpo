@@ -44,6 +44,11 @@ const getPartnersPlanesAll = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const PlanAllocatioin = catchAsync(async (req, res) => {
+  const data = await PartnerService.PlanAllocatioin(req);
+  res.send(data);
+});
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -54,4 +59,5 @@ module.exports = {
   updatePartnerPlanesById,
   getPartnersAll,
   getPartnersPlanesAll,
+  PlanAllocatioin,
 };
