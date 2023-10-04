@@ -13456,6 +13456,20 @@ const post_payment_details = async (req) => {
         from:"streamrequestposts",
         localField:"_id",
         foreignField:"postId",
+        pipeline:[
+          { $lookup: {
+          from:"streamrequests",
+          localField:"streamRequest",
+          foreignField:"_id",
+          as:"streams"
+        } 
+      },
+      {
+        $unwind:{preserveNullAndEmptyArrays:true,
+        path:"$streams"
+      }
+      }
+    ],
         as:"post",
       }
     },
