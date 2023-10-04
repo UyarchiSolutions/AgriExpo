@@ -13,6 +13,10 @@ const agoraAppIdschema = mongoose.Schema({
         type: String,
         default: v4,
     },
+    active: {
+        type: Boolean,
+        default: true
+    },
     dateISO: {
         type: Number,
     },
