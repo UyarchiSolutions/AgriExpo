@@ -34,6 +34,21 @@ const updatePartnerPlanesById = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getPartnersAll = catchAsync(async (req, res) => {
+  const data = await PartnerService.getPartnersAll();
+  res.send(data);
+});
+
+const getPartnersPlanesAll = catchAsync(async (req, res) => {
+  const data = await PartnerService.getPartnersPlanesAll();
+  res.send(data);
+});
+
+const PlanAllocatioin = catchAsync(async (req, res) => {
+  const data = await PartnerService.PlanAllocatioin(req);
+  res.send(data);
+});
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -42,4 +57,7 @@ module.exports = {
   createPlanes,
   gePartnersPlanesAll,
   updatePartnerPlanesById,
+  getPartnersAll,
+  getPartnersPlanesAll,
+  PlanAllocatioin,
 };

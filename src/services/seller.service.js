@@ -9,14 +9,13 @@ const moment = require('moment');
 const { Streamplan, StreamPost, Streamrequest, StreamrequestPost, StreamPreRegister } = require('../models/ecomplan.model');
 const createSeller = async (req) => {
   let body = req.body;
-  let value = await Seller.findOne({ $or: [{ email: body.email }, { mobileNumber: body.mobileNumber }] });
+  let value = await Seller.findOne({ mobileNumber: body.mobileNumber });
 
   if (value) {
-    if (value.email == body.email) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'Email Already Exists');
-    }
     if (value.mobileNumber == body.mobileNumber) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'Phone Number Exists');
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile number Already Exist');
+    } else if (value.email == body.email) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'EMail Already exist');
     }
   } else {
     value = await Seller.create({ ...body, ...{ mainSeller: 'admin', sellerType: 'MainSeller', sellerRole: 'admin' } });
@@ -62,7 +61,7 @@ const verifyOTP = async (req) => {
 const verifyOTP_Delete_Account = async (req) => {
   let body = req.body;
   const mobileNumber = body.mobileNumber;
-  const otp =  body.otp;
+  const otp = body.otp;
   let findOTP = await sellerOTP
     .findOne({
       mobileNumber: mobileNumber,
@@ -109,9 +108,12 @@ const setPassword = async (req) => {
 const forgotPass = async (req) => {
   let body = req.body;
   let value = await Seller.findOne({ mobileNumber: body.mobileNumber });
-  if(body.reg == true){
-  }else{
-     if (value.register == false) {
+  if (!value) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Not Registered');
+  }
+  if (body.reg == true) {
+  } else {
+    if (value.registered == false) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Not Registered');
     }
   }
@@ -146,7 +148,7 @@ const loginseller = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'User Disabled');
   }
   if (!userName.registered) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Seller Not Registered');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Exhibitor Not Registered');
   }
   if (!(await userName.isPasswordMatch(password))) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Password');

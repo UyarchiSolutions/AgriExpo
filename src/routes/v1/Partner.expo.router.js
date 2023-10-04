@@ -10,4 +10,7 @@ router.route('/:id').put(PartnerController.updatePartnersById);
 router.route('/plane/creation').post(PartnerController.createPlanes);
 router.route('/gePartners/Planes/All/:page').get(PartnerController.gePartnersPlanesAll);
 router.route('/updatePartnerPlanes/:id').put(PartnerController.updatePartnerPlanesById);
+router.route('/getPartnersAll').get(PartnerController.getPartnersAll);
+router.route('/getPartners/PlanesAll').get(PartnerController.getPartnersPlanesAll);
+router.route('/Plan/Allocatioin').post(PartnerController.PlanAllocatioin);
 module.exports = router;

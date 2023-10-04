@@ -13452,6 +13452,34 @@ const post_payment_details = async (req) => {
   let streampost = await StreamPost.aggregate([
     { $match: { $and: [{ _id: req.query.id }] } },
     {
+      $lookup:{
+        from:"streamrequestposts",
+        localField:"_id",
+        foreignField:"postId",
+        pipeline:[
+          { $lookup: {
+          from:"streamrequests",
+          localField:"streamRequest",
+          foreignField:"_id",
+          as:"streams"
+        } 
+      },
+      {
+        $unwind:{preserveNullAndEmptyArrays:true,
+        path:"$streams"
+      }
+      }
+    ],
+        as:"post",
+      }
+    },
+    {
+      $unwind:{
+        preserveNullAndEmptyArrays:true,
+        path:"$post"
+      }
+    },
+    {
       $lookup: {
         from: 'products',
         localField: 'productId',
@@ -13516,6 +13544,9 @@ const post_payment_details = async (req) => {
         incrementalLots: 1,
         afterStreaming: 1,
         suppierId: 1,
+        streamName:1,
+        post:"$post",
+        createdAt:1,
       },
     },
   ]);
