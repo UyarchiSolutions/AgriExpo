@@ -9,16 +9,13 @@ const moment = require('moment');
 const { Streamplan, StreamPost, Streamrequest, StreamrequestPost, StreamPreRegister } = require('../models/ecomplan.model');
 const createSeller = async (req) => {
   let body = req.body;
-  let value = await Seller.findOne({ $or: [{ email: body.email }, { mobileNumber: body.mobileNumber }] });
+  let value = await Seller.findOne({ mobileNumber: body.mobileNumber });
 
   if (value) {
-    if (body.email != '' || body.email != null) {
-      if (value.email == body.email) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Email Already Exists');
-      }
-    }
-    if (value.mobileNumber == body.mobileNumber) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'Phone Number Exists');
+    if (value.email == body.email) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile number Already Exist');
+    } else if (value.email == body.email) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'EMail Already exist');
     }
   } else {
     value = await Seller.create({ ...body, ...{ mainSeller: 'admin', sellerType: 'MainSeller', sellerRole: 'admin' } });
