@@ -300,6 +300,9 @@ const partnerPlanSchema = new mongoose.Schema(
     timeType_minutes: {
       type: String,
     },
+    partner_price:{
+      type: String,
+    }
   },
   { timestamps: true }
 );
