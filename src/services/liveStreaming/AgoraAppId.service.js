@@ -34,6 +34,7 @@ const get_all_token = async (req) => {
     }
   }
   let appId = await AgoraAppId.aggregate([
+    { $match: { $and: [statuFilter] } },
     {
       $lookup: {
         from: 'b2busers',
@@ -61,6 +62,7 @@ const get_all_token = async (req) => {
     },
   ])
   let next = await AgoraAppId.aggregate([
+    { $match: { $and: [statuFilter] } },
     {
       $skip: 20 * (parseInt(page) + 1),
     },
