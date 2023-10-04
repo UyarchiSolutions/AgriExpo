@@ -12,7 +12,7 @@ const createSeller = async (req) => {
   let value = await Seller.findOne({ mobileNumber: body.mobileNumber });
 
   if (value) {
-    if (value.email == body.email) {
+    if (value.mobileNumber == body.mobileNumber) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile number Already Exist');
     } else if (value.email == body.email) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'EMail Already exist');
