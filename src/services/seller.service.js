@@ -109,6 +109,9 @@ const setPassword = async (req) => {
 const forgotPass = async (req) => {
   let body = req.body;
   let value = await Seller.findOne({ mobileNumber: body.mobileNumber });
+  if(!value){
+    throw new ApiError(httpStatus.BAD_REQUEST,"Not Registered");
+  }
   if(body.reg == true){
   }else{
      if (value.register == false) {
@@ -146,7 +149,7 @@ const loginseller = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'User Disabled');
   }
   if (!userName.registered) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Seller Not Registered');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Exhibitor Not Registered');
   }
   if (!(await userName.isPasswordMatch(password))) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Password');
