@@ -12,8 +12,10 @@ const createSeller = async (req) => {
   let value = await Seller.findOne({ $or: [{ email: body.email }, { mobileNumber: body.mobileNumber }] });
 
   if (value) {
-    if (value.email == body.email) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'Email Already Exists');
+    if (body.email != '' || body.email != null) {
+      if (value.email == body.email) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Email Already Exists');
+      }
     }
     if (value.mobileNumber == body.mobileNumber) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Phone Number Exists');
@@ -62,7 +64,7 @@ const verifyOTP = async (req) => {
 const verifyOTP_Delete_Account = async (req) => {
   let body = req.body;
   const mobileNumber = body.mobileNumber;
-  const otp =  body.otp;
+  const otp = body.otp;
   let findOTP = await sellerOTP
     .findOne({
       mobileNumber: mobileNumber,
@@ -109,12 +111,12 @@ const setPassword = async (req) => {
 const forgotPass = async (req) => {
   let body = req.body;
   let value = await Seller.findOne({ mobileNumber: body.mobileNumber });
-  if(!value){
-    throw new ApiError(httpStatus.BAD_REQUEST,"Not Registered");
+  if (!value) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Not Registered');
   }
-  if(body.reg == true){
-  }else{
-     if (value.register == false) {
+  if (body.reg == true) {
+  } else {
+    if (value.register == false) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Not Registered');
     }
   }
