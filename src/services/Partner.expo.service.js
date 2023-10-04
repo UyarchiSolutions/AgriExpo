@@ -98,6 +98,10 @@ const getPartnersAll = async () => {
   let val = await Partner.find();
   return val;
 };
+const getPartnersPlanesAll = async () => {
+  let val = await PartPartnerPlanner.find();
+  return val;
+};
 
 module.exports = {
   createPartner,
@@ -107,4 +111,5 @@ module.exports = {
   gePartnersPlanesAll,
   updatePartnerPlanesById,
   getPartnersAll,
+  getPartnersPlanesAll,
 };

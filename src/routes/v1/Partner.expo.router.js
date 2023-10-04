@@ -11,4 +11,5 @@ router.route('/plane/creation').post(PartnerController.createPlanes);
 router.route('/gePartners/Planes/All/:page').get(PartnerController.gePartnersPlanesAll);
 router.route('/updatePartnerPlanes/:id').put(PartnerController.updatePartnerPlanesById);
 router.route('/getPartnersAll').get(PartnerController.getPartnersAll);
+router.route('/getPartners/PlanesAll').get(PartnerController.getPartnersPlanesAll);
 module.exports = router;
