@@ -258,9 +258,6 @@ const redirect_payment_gateway = async (html, res) => {
     res.write(html)
     res.end()
 }
-
-
-
 const get_paymant_success_response = async (req) => {
     let payment = await ccavenue_paymnet.findById(req.params.id);
     if (!payment) {

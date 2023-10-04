@@ -73,12 +73,12 @@ const recording_stop = catchAsync(async (req, res) => {
 });
 
 const update_check_appid_working = catchAsync(async (req, res) => {
-  const data = await AgoraAppId.update_check_appid(req, 'working');
+  const data = await AgoraAppId.update_check_appid(req, 'Working');
   res.status(httpStatus.CREATED).send(data);
 });
 
 const update_check_appid_faild = catchAsync(async (req, res) => {
-  const data = await AgoraAppId.update_check_appid(req, 'faild');
+  const data = await AgoraAppId.update_check_appid(req, 'Rejected');
   res.status(httpStatus.CREATED).send(data);
 });
 
