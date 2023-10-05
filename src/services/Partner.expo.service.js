@@ -128,9 +128,12 @@ const getAllAllocated_Planes = async (req) => {
         as: 'partner',
       },
     },
+
     {
-      preserveNullAndEmptyArrays:true,
-      path:"$partner"
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$partner',
+      },
     },
     {
       $lookup: {
@@ -141,8 +144,10 @@ const getAllAllocated_Planes = async (req) => {
       },
     },
     {
-      preserveNullAndEmptyArrays:true,
-      path:"$planes"
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$planes',
+      },
     },
     {
       $skip: 10 * page,
