@@ -13420,6 +13420,8 @@ const update_post_price = async (req) => {
       minLots: req.body.minLots == null ? 0 : req.body.minLots,
       incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
       createdBy: userId,
+      purchased_qty:req.body.purchased_qty,
+      edited_qty:req.body.edited_qty
     });
   }
   streampost;
@@ -13547,6 +13549,7 @@ const post_payment_details = async (req) => {
         streamName:1,
         post:"$post",
         createdAt:1,
+
       },
     },
   ]);
