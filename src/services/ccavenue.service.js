@@ -259,11 +259,126 @@ const redirect_payment_gateway = async (html, res) => {
     res.end()
 }
 const get_paymant_success_response = async (req) => {
-    let payment = await ccavenue_paymnet.findById(req.params.id);
-    if (!payment) {
+    let id = req.params.id;
+    let payment = await ccavenue_paymnet.aggregate([
+        { $match: { $and: [{ _id: { $eq: id } }] } },
+        {
+            $lookup: {
+                from: 'paymentlinks',
+                localField: 'paymentLink',
+                foreignField: '_id',
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: 'purchasedplans',
+                            localField: 'purchasePlan',
+                            foreignField: '_id',
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: 'sellers',
+                                        localField: 'suppierId',
+                                        foreignField: '_id',
+                                        as: 'sellers',
+                                    },
+                                },
+                                {
+                                    $unwind: '$sellers',
+                                },
+
+                                {
+                                    $project: {
+                                        "numberOfStreamused": 1,
+                                        "planType": 1,
+                                        "streamvalidity": 1,
+                                        "slotInfo": 1,
+                                        "status": 1,
+                                        "PayementStatus": 1,
+                                        "PaidAmount": 1,
+                                        "planName": 1,
+                                        "numberOfParticipants": 1,
+                                        "Teaser": 1,
+                                        "completedStream": 1,
+                                        "Pdf": 1,
+                                        "image": 1,
+                                        "description": 1,
+                                        "RaiseHands": 1,
+                                        "Special_Notification": 1,
+                                        "chat_Option": 1,
+                                        "Price": 1,
+                                        "PostCount": 1,
+                                        "no_of_host": 1,
+                                        "DateIso": 1,
+                                        "planId": 1,
+                                        "transaction": 1,
+                                        "offer_price": 1,
+                                        "stream_validity": 1,
+                                        "Interest_View_Count": 1,
+                                        "Service_Charges": 1,
+                                        "TimeType": 1,
+                                        "raisehandcontrol": 1,
+                                        "Discount": 1,
+                                        "Referral": 1,
+                                        "RevisedAmount": 1,
+                                        "Type": 1,
+                                        "paymentLink": 1,
+                                        "approvalDate": 1,
+                                        mobileNumber: "$sellers.mobileNumber",
+                                        email: "$sellers.email",
+                                        tradeName: "$sellers.tradeName",
+                                    }
+                                }
+                            ],
+                            as: 'purchasedplans',
+                        },
+                    },
+                    {
+                        $unwind: '$purchasedplans',
+                    },
+                ],
+                as: 'paymentlinks',
+            },
+        },
+        {
+            $unwind: '$paymentlinks',
+        },
+        {
+            $project: {
+                "_id": 1,
+                "order_id": 1,
+                "currency": 1,
+                "amount": 1,
+                "language": 1,
+                "billing_name": 1,
+                "billing_address": 1,
+                "billing_city": 1,
+                "billing_state": 1,
+                "billing_zip": 1,
+                "billing_country": 1,
+                "billing_tel": 1,
+                "billing_email": 1,
+                "delivery_address": 1,
+                "delivery_city": 1,
+                "delivery_state": 1,
+                "delivery_zip": 1,
+                "delivery_country": 1,
+                "delivery_tel": 1,
+                "promo_code": 1,
+                "paymentLink": 1,
+                "createdAt": 1,
+                "updatedAt": 1,
+                response: 1,
+                purchasedplans: "$paymentlinks.purchasedplans",
+                mobileNumber: "$paymentlinks.purchasedplans.mobileNumber",
+                email: "$paymentlinks.purchasedplans.email",
+                tradeName: "$paymentlinks.purchasedplans.tradeName",
+            }
+        }
+    ])
+    if (payment.length == 0) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Payment not found');
     }
-    return payment;
+    return payment[0];
 }
 
 module.exports = {
