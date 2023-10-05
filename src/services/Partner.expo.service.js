@@ -172,7 +172,7 @@ const updateAllocationById = async (req) => {
   if (!value) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Not Found');
   }
-  value = await PlanAllocation.findByIdAndUpdate({ _id: value._id }, body, { new: true });
+  value = await PlanAllocation.findByIdAndUpdate({ _id: value._id }, req.body, { new: true });
   return value;
 };
 
