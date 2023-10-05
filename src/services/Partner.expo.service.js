@@ -276,7 +276,7 @@ const getPaymentDetails = async (id) => {
     },
     {
       $lookup: {
-        from: 'partneplanAllocation',
+        from: 'partneplanallocations',
         localField: 'PlanId',
         foreignField: '_id',
         as: 'plan',
