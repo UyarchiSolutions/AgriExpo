@@ -121,6 +121,30 @@ const getAllAllocated_Planes = async (req) => {
   let page = req.params.page;
   let values = await PlanAllocation.aggregate([
     {
+      $lookup: {
+        from: 'expopartners',
+        localField: 'partnerId',
+        foreignField: '_id',
+        as: 'partner',
+      },
+    },
+    {
+      preserveNullAndEmptyArrays:true,
+      path:"$partner"
+    },
+    {
+      $lookup: {
+        from: 'expopartnerplans',
+        localField: 'planId',
+        foreignField: '_id',
+        as: 'planes',
+      },
+    },
+    {
+      preserveNullAndEmptyArrays:true,
+      path:"$partner"
+    },
+    {
       $skip: 10 * page,
     },
     {
