@@ -117,6 +117,27 @@ const PlanAllocatioin = async (req) => {
   return { message: 'Planes Allocated to Partner' };
 };
 
+const getAllAllocated_Planes = async (req) => {
+  let page = req.params.page;
+  let values = await PlanAllocation.aggregate([
+    {
+      $skip: 10 * page,
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+  let next = await PlanAllocation.aggregate([
+    {
+      $skip: 10 * (page + 1),
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+  return { values, next: next.length != 0 };
+};
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -127,4 +148,5 @@ module.exports = {
   getPartnersAll,
   getPartnersPlanesAll,
   PlanAllocatioin,
+  getAllAllocated_Planes,
 };
