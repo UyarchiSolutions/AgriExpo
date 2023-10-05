@@ -13549,7 +13549,8 @@ const post_payment_details = async (req) => {
         streamName:1,
         post:"$post",
         createdAt:1,
-
+        edited_qty:{$ifNull:["streampostprices.edited_qty",null]},
+        purchased_qty:{$ifNull:["streampostprices.purchased_qty",null]}, 
       },
     },
   ]);
