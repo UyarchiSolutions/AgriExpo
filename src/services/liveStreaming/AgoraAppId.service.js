@@ -26,7 +26,34 @@ const InsertAget_app_id = async (req) => {
 }
 const get_all_token = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
+
+  statuFilter = { active: true }
+  if (req.query.status != null && req.query.status != '' && req.query.status != undefined) {
+    if (req.query.status != 'all') {
+      statuFilter = { verifyStatus: { $eq: req.query.status } }
+    }
+  }
   let appId = await AgoraAppId.aggregate([
+    { $match: { $and: [statuFilter] } },
+    {
+      $lookup: {
+        from: 'b2busers',
+        localField: 'verifiedBy',
+        foreignField: '_id',
+        as: 'b2busers',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$b2busers',
+      },
+    },
+    {
+      $addFields: {
+        verifiedBy: { $ifNull: ['$b2busers.name', null] },
+      },
+    },
     {
       $skip: 20 * parseInt(page),
     },
@@ -35,6 +62,7 @@ const get_all_token = async (req) => {
     },
   ])
   let next = await AgoraAppId.aggregate([
+    { $match: { $and: [statuFilter] } },
     {
       $skip: 20 * (parseInt(page) + 1),
     },
@@ -75,6 +103,7 @@ const get_all_token_my = async (req) => {
 
 const get_all_token_check = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
+  // await AgoraAppId.updateMany({ cloud_KEY: { $ne: null } }, { $set: { verifyStatus: "Pending", active: true } }, { new: true })
   let appId = await AgoraAppId.aggregate([
     { $match: { $and: [{ verifyStatus: { $in: [null, 'Pending'] } }] } },
     {
@@ -476,6 +505,8 @@ const update_check_appid = async (req, data) => {
   }
   agoraToken.verifyStatus = data;
   agoraToken.verifiedBy = req.userId;
+  agoraToken.verifiedTime = moment()
+
   agoraToken.save();
   return agoraToken;
 }

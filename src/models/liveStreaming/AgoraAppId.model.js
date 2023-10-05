@@ -13,6 +13,10 @@ const agoraAppIdschema = mongoose.Schema({
         type: String,
         default: v4,
     },
+    active: {
+        type: Boolean,
+        default: true
+    },
     dateISO: {
         type: Number,
     },
@@ -64,6 +68,9 @@ const agoraAppIdschema = mongoose.Schema({
     },
     verifiedBy: {
         type: String,
+    },
+    verifiedTime: {
+        type: Number,
     }
 }, { timeStamp: true });
 
