@@ -142,7 +142,7 @@ const getAllAllocated_Planes = async (req) => {
     },
     {
       preserveNullAndEmptyArrays:true,
-      path:"$partner"
+      path:"$planes"
     },
     {
       $skip: 10 * page,
