@@ -331,6 +331,13 @@ const PlanAllocationSchema = mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    Type: {
+      type: String,
+    },
+    status: {
+      type: String,
+      default: 'Pending',
+    },
   },
   { timestamps: true }
 );
