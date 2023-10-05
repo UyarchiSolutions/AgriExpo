@@ -167,6 +167,15 @@ const getAllAllocated_Planes = async (req) => {
   return { values, next: next.length != 0 };
 };
 
+const updateAllocationById = async (req) => {
+  let value = await PlanAllocation.findById(req.params.id);
+  if (!value) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Not Found');
+  }
+  value = await PlanAllocation.findByIdAndUpdate({ _id: value._id }, body, { new: true });
+  return value;
+};
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -178,4 +187,5 @@ module.exports = {
   getPartnersPlanesAll,
   PlanAllocatioin,
   getAllAllocated_Planes,
+  updateAllocationById,
 };
