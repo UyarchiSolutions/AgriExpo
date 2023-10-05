@@ -233,7 +233,7 @@ const planPayment = async (body) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Plan not found');
   }
   let discound = Plan.Discount ? Plan.Discount : 0;
-  let PlanPrice = parseInt(Plan.Price) - discound;
+  let PlanPrice = parseInt(Plan.price) - discound;
   let PaidAmount = Plan.PaidAmount ? Plan.PaidAmount : 0;
   let ToBePaid = PaidAmount + body.Amount;
   let finding = await Partnerplanpayment.find().count();
@@ -250,8 +250,10 @@ const planPayment = async (body) => {
   if (finding < 9999 && finding >= 999) {
     center = '0';
   }
-  let billId = 'BID' + (center + finding) +1;
-  let data = { ...body, billId: billId };
+  let billId = 'BID' + center;
+  let Id = `${billId}${finding + 1}`;
+  console.log(Id);
+  let data = { ...body, billId: Id };
   let paid = await PlanAllocation.findByIdAndUpdate({ _id: PlanId }, { PaidAmount: ToBePaid }, { new: true });
   if (PlanPrice > 0) {
     if (PlanPrice == paid.PaidAmount) {
@@ -262,7 +264,7 @@ const planPayment = async (body) => {
     await paid.save();
   }
   const datas = await Partnerplanpayment.create(data);
-  return datas;
+  return data;
 };
 
 module.exports = {
