@@ -70,7 +70,7 @@ const planPayment = catchAsync(async (req, res) => {
 });
 
 const planPaymentDetails = catchAsync(async (req, res) => {
-  const data = await PartnerService.planPaymentDetails(req.params.id);
+  const data = await PartnerService.getPaymentDetails(req.params.id);
   res.send(data);
 });
 
