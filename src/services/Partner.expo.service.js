@@ -250,7 +250,7 @@ const planPayment = async (body) => {
   if (finding < 9999 && finding >= 999) {
     center = '0';
   }
-  let billId = 'BID' + center + finding + 1;
+  let billId = 'BID' + (center + finding) +1;
   let data = { ...body, billId: billId };
   let paid = await PlanAllocation.findByIdAndUpdate({ _id: PlanId }, { PaidAmount: ToBePaid }, { new: true });
   if (PlanPrice > 0) {
