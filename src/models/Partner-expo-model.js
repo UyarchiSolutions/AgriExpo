@@ -340,6 +340,7 @@ const PlanAllocationSchema = mongoose.Schema(
     },
     PayementStatus: {
       type: String,
+      default: 'Pending',
     },
     PaidAmount:{
       type: Number,
