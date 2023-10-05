@@ -90,6 +90,9 @@ const EventSchema = mongoose.Schema(
     EventName: {
       type: String,
     },
+    eventId: {
+      type: String,
+    },
     active: {
       type: Boolean,
       default: true,
@@ -100,4 +103,26 @@ const EventSchema = mongoose.Schema(
 
 const Event = mongoose.model('agriEvent', EventSchema);
 
-module.exports = { Slot, Slotseperation, Event };
+const EventCreationSchema = mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    EventName: {
+      type: String,
+    },
+    arr: {
+      type: Array,
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  { timestamps: true }
+);
+
+const EventCreation = mongoose.model('eventCreation', EventCreationSchema);
+
+module.exports = { Slot, Slotseperation, Event, EventCreation };
