@@ -176,6 +176,56 @@ const updateAllocationById = async (req) => {
   return value;
 };
 
+const plan_payementsDetails = async (req) => {
+  let page = req.params.page;
+  let values = await PlanAllocation.aggregate([
+    {
+      $lookup: {
+        from: 'expopartners',
+        localField: 'partnerId',
+        foreignField: '_id',
+        as: 'partner',
+      },
+    },
+
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$partner',
+      },
+    },
+    {
+      $lookup: {
+        from: 'expopartnerplans',
+        localField: 'planId',
+        foreignField: '_id',
+        as: 'planes',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$planes',
+      },
+    },
+    {
+      $skip: 10 * page,
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+  let next = await PlanAllocation.aggregate([
+    {
+      $skip: 10 * (page + 1),
+    },
+    {
+      $limit: 10,
+    },
+  ]);
+  return { values, next: next.length != 0 };
+};
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -188,4 +238,5 @@ module.exports = {
   PlanAllocatioin,
   getAllAllocated_Planes,
   updateAllocationById,
+  plan_payementsDetails,
 };

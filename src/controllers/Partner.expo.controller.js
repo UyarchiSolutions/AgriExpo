@@ -59,6 +59,11 @@ const updateAllocationById = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const plan_payementsDetails = catchAsync(async (req, res) => {
+  const data = await PartnerService.plan_payementsDetails(req);
+  res.send(data);
+});
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -72,4 +77,5 @@ module.exports = {
   PlanAllocatioin,
   getAllAllocated_Planes,
   updateAllocationById,
+  plan_payementsDetails,
 };
