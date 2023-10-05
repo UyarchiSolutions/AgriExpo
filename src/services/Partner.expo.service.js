@@ -264,7 +264,41 @@ const planPayment = async (body) => {
     await paid.save();
   }
   const datas = await Partnerplanpayment.create(data);
-  return data;
+  return datas;
+};
+
+const getPaymentDetails = async (id) => {
+  let values = await Partnerplanpayment.aggregate([
+    {
+      $match: {
+        PlanId: id,
+      },
+    },
+    {
+      $lookup: {
+        from: 'partneplanAllocation',
+        localField: 'PlanId',
+        foreignField: '_id',
+        as: 'plan',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$plan',
+      },
+    },
+  ]);
+  let findPlan = await PlanAllocation.findById(id);
+  if (!findPlan) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'plan not found');
+  }
+
+  let partner = await Partner.findById(findPlan.partnerId);
+  return {
+    values,
+    partner,
+  };
 };
 
 module.exports = {
@@ -281,4 +315,5 @@ module.exports = {
   updateAllocationById,
   plan_payementsDetails,
   planPayment,
+  getPaymentDetails,
 };

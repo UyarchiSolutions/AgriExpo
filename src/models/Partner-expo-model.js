@@ -342,9 +342,9 @@ const PlanAllocationSchema = mongoose.Schema(
       type: String,
       default: 'Pending',
     },
-    PaidAmount:{
+    PaidAmount: {
       type: Number,
-    }
+    },
   },
   { timestamps: true }
 );

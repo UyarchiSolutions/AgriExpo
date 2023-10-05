@@ -69,6 +69,11 @@ const planPayment = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const planPaymentDetails = catchAsync(async (req, res) => {
+  const data = await PartnerService.planPaymentDetails(req.params.id);
+  res.send(data);
+});
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -84,4 +89,5 @@ module.exports = {
   updateAllocationById,
   plan_payementsDetails,
   planPayment,
+  planPaymentDetails,
 };
