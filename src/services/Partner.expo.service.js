@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const bcrypt = require('bcryptjs');
 const ApiError = require('../utils/ApiError');
-const { Partner, PartnerPlan, PlanAllocation } = require('../models/Partner-expo-model');
+const { Partner, PartnerPlan, PlanAllocation, Partnerplanpayment } = require('../models/Partner-expo-model');
 
 const createPartner = async (req) => {
   let body = req.body;
@@ -226,6 +226,45 @@ const plan_payementsDetails = async (req) => {
   return { values, next: next.length != 0 };
 };
 
+const planPayment = async (body) => {
+  const { PlanId } = body;
+  let Plan = await PlanAllocation.findById(PlanId);
+  if (!Plan) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan not found');
+  }
+  let discound = Plan.Discount ? Plan.Discount : 0;
+  let PlanPrice = parseInt(Plan.Price) - discound;
+  let PaidAmount = Plan.PaidAmount ? Plan.PaidAmount : 0;
+  let ToBePaid = PaidAmount + body.Amount;
+  let finding = await Partnerplanpayment.find().count();
+  let center = '';
+  if (finding < 9) {
+    center = '0000';
+  }
+  if (finding < 99 && finding >= 9) {
+    center = '000';
+  }
+  if (finding < 999 && finding >= 99) {
+    center = '00';
+  }
+  if (finding < 9999 && finding >= 999) {
+    center = '0';
+  }
+  let billId = 'BID' + center + finding + 1;
+  let data = { ...body, billId: billId };
+  let paid = await PlanAllocation.findByIdAndUpdate({ _id: PlanId }, { PaidAmount: ToBePaid }, { new: true });
+  if (PlanPrice > 0) {
+    if (PlanPrice == paid.PaidAmount) {
+      paid.PayementStatus = 'FullyPaid';
+    } else {
+      paid.PayementStatus = 'PartiallyPaid';
+    }
+    await paid.save();
+  }
+  const datas = await Partnerplanpayment.create(data);
+  return datas;
+};
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -239,4 +278,5 @@ module.exports = {
   getAllAllocated_Planes,
   updateAllocationById,
   plan_payementsDetails,
+  planPayment,
 };
