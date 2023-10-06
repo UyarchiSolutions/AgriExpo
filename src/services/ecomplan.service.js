@@ -14521,7 +14521,7 @@ const search_product_list = async (req) => {
               localField: 'streamRequest',
               foreignField: '_id',
               pipeline: [
-                { $match: { $and: [language, { streamExpire: { $gt: date_now } }] } },
+                { $match: { $and: [language, { streamExpire: { $gt: date_now } }, { show_completd: { $eq: true } }] } },
                 {
                   $addFields: {
                     streamType: findstreamType
@@ -14619,7 +14619,7 @@ const search_product_list = async (req) => {
         pack_discription: 1,
         postLiveStreamingPirce: 1,
         pruductreturnble: 1,
-        unit:1,
+        unit: 1,
         productName: "$productName.productTitle",
         productimage: "$productName.image",
         address: "$sellers.address",
