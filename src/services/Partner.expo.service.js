@@ -1,7 +1,8 @@
 const httpStatus = require('http-status');
 const bcrypt = require('bcryptjs');
 const ApiError = require('../utils/ApiError');
-const { Partner, PartnerPlan, PlanAllocation, Partnerplanpayment } = require('../models/Partner-expo-model');
+const { Partner, PartnerPlan, PlanAllocation, Partnerplanpayment, PartnerOTP } = require('../models/Partner-expo-model');
+const otp = require('../config/Partner.config');
 
 const createPartner = async (req) => {
   let body = req.body;
@@ -301,6 +302,66 @@ const getPaymentDetails = async (id) => {
   };
 };
 
+// partner Account Access
+
+const VerifyAccount = async (body) => {
+  const { mobileNumber } = body;
+  let findByMobile = await Partner.findOne({ mobileNumber: parseInt(mobileNumber) });
+  if (!findByMobile) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Your Mobile Number Not Valid');
+  }
+  await otp(mobileNumber, findByMobile, 'reg');
+  return { message: 'OTP Send SuccessFully.' };
+};
+
+const VerifyOTP = async (body) => {
+  const { mobileNumber, OTP } = body;
+  let findOTP = await PartnerOTP.findOne({ mobileNumber: mobileNumber, OTP: OTP, active: true }).sort({ createdDate: -1 });
+  if (!findOTP) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid OTP');
+  }
+  findOTP.active = false;
+  await findOTP.save();
+  return { message: 'OTP Verification Sucess.' };
+};
+
+const setPassword = async (body) => {
+  const { password, mobileNumber } = body;
+  let findBymobile = await Partner.findOne({ mobileNumber: mobileNumber });
+  if (!findBymobile) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Contact Event Manager');
+  }
+  const plaintextPassword = password;
+  bcrypt.genSalt(10, (err, salt) => {
+    if (err) {
+      console.error(err);
+    } else {
+      bcrypt.hash(plaintextPassword, salt, async (err, hash) => {
+        if (err) {
+          console.error(err);
+        } else {
+          console.log(typeof hash);
+          await Partner.findByIdAndUpdate({ _id: findBymobile._id }, { password: hash, verified: true }, { new: true });
+          // return hash;
+        }
+      });
+    }
+  });
+  return { message: 'Password updated successfully' };
+};
+
+const loginPartner = async (body) => {
+  const { mobileNumber, password } = body;
+  let findBymobile = await Partner.findOne({ mobileNumber: mobileNumber });
+  if (!findBymobile) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid User');
+  }
+  if (!(await findBymobile.isPasswordMatch(password))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid Password');
+  }
+  return findBymobile;
+};
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -316,4 +377,8 @@ module.exports = {
   plan_payementsDetails,
   planPayment,
   getPaymentDetails,
+  VerifyAccount,
+  VerifyOTP,
+  setPassword,
+  loginPartner,
 };

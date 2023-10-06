@@ -18,4 +18,8 @@ router.route('/update/AllocationById/:id').put(PartnerController.updateAllocatio
 router.route('/plan/payements/Details/:page').get(PartnerController.plan_payementsDetails);
 router.route('/planPayment').post(PartnerController.planPayment);
 router.route('/plan/Payment/Details/:id').get(PartnerController.planPaymentDetails);
+router.route('/VerifyAccount').post(PartnerController.VerifyAccount);
+router.route('/VerifyOTP').post(PartnerController.VerifyOTP);
+router.route('/setPassword').post(PartnerController.setPassword);
+router.route('/login').post(PartnerController.loginPartner);
 module.exports = router;

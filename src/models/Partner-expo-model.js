@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { v4 } = require('uuid');
+const bcrypt = require('bcrypt');
 
 const PartnerSchema = new mongoose.Schema(
   {
@@ -89,6 +90,10 @@ const PartnerSchema = new mongoose.Schema(
     },
     GST_Number: {
       type: String,
+    },
+    verified: {
+      type: Boolean,
+      default: false,
     },
   },
   {
@@ -439,9 +444,35 @@ const PlanPaymentSchema = mongoose.Schema(
 
 const Partnerplanpayment = mongoose.model('partnerplanpayment', PlanPaymentSchema);
 
+const PartnerOTPSchema = mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    OTP: {
+      type: Number,
+    },
+    mobileNumber: {
+      type: Number,
+    },
+    userId: {
+      type: String,
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  { timestamps: true }
+);
+
+const PartnerOTP = mongoose.model('partnerOTP', PartnerOTPSchema);
+
 module.exports = {
   Partner,
   PartnerPlan,
   PlanAllocation,
   Partnerplanpayment,
+  PartnerOTP,
 };

@@ -205,6 +205,23 @@ const generateAuthTokens_sellerApp = async (user) => {
   };
 };
 
+const generateAuthTokens_PartnerApp = async (user) => {
+  const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'days');
+  const accessToken = generateToken(user._id, user, accessTokenExpires, verifyOTP.ACCESS);
+  const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, 'days');
+  const refreshToken = generateToken(user._id, user, refreshTokenExpires, verifyOTP.REFRESH);
+  return {
+    access: {
+      token: accessToken,
+      expires: accessTokenExpires.toDate(),
+    },
+    refresh: {
+      token: refreshToken,
+      expires: refreshTokenExpires.toDate(),
+    },
+  };
+};
+
 module.exports = {
   generateToken,
   saveToken,
@@ -215,5 +232,6 @@ module.exports = {
   generateAuthTokens_forget,
   generateAuthTokens_shop,
   generateAuthTokens_verifedOTP,
-  generateAuthTokens_sellerApp
+  generateAuthTokens_sellerApp,
+  generateAuthTokens_PartnerApp,
 };
