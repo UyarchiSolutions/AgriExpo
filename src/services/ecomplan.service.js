@@ -14443,28 +14443,16 @@ const search_product_list = async (req) => {
     language = { $or: [{ primarycommunication: { $in: match_lang } }, { secondarycommunication: { $in: match_lang } }] }
   }
   let streamType = { active: true }
-  console.log(req.query.streamtype)
   if (req.query.streamtype != null && req.query.streamtype != '') {
     let streamtype_match = req.query.streamtype ? [].concat(req.query.streamtype) : [];
-    // let upcomming = false;
-    // let completed = false;
-    // let current = false;
-    // if (streamtype_match.findIndex((a) => a == 'Upcomming Stream') != -1) {
-    //   upcomming = true;
-    // }
-    // if (streamtype_match.findIndex((a) => a == 'Live Stream') != -1) {
-    //   current = true;
-    // }
-    // if (streamtype_match.findIndex((a) => a == 'Completed Stream') != -1) {
-    //   completed = true;
-    // }
     streamType = { streamType: { $in: streamtype_match } }
-    // console.log(upcomming)
-    // console.log(current)
-    // console.log(completed)
-    console.log(streamtype_match)
   }
   var date_now = new Date().getTime();
+  let search = { active: true }
+  if (req.query.search != null && req.query.search != '') {
+    search = { productTitle: { $regex: key, $options: 'i' } }
+  }
+
 
   // startTime
   // streamEnd_Time
@@ -14509,6 +14497,25 @@ const search_product_list = async (req) => {
     },
   }
   let product = await StreamPost.aggregate([
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'productId',
+        foreignField: '_id',
+        pipeline: [
+          { $match: { $and: [search] } }
+        ],
+        as: 'productName',
+      },
+    },
+    {
+      $unwind: '$productName',
+    },
+    {
+      $addFields: {
+        productName: "$productName.productTitle"
+      }
+    },
     {
       $lookup: {
         from: 'streamrequestposts',
@@ -14582,17 +14589,7 @@ const search_product_list = async (req) => {
         streamType: '$streamrequestposts.streamrequests.streamType'
       }
     },
-    {
-      $lookup: {
-        from: 'products',
-        localField: 'productId',
-        foreignField: '_id',
-        as: 'productName',
-      },
-    },
-    {
-      $unwind: '$productName',
-    },
+
     {
       $lookup: {
         from: 'sellers',
@@ -14626,7 +14623,7 @@ const search_product_list = async (req) => {
         mobileNumber: "$sellers.mobileNumber",
         tradeName: "$sellers.tradeName",
         companyName: "$sellers.companyName",
-        suppierId:1
+        suppierId: 1
       }
     },
     { $limit: 50 }
