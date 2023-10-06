@@ -331,14 +331,117 @@ const PlanAllocationSchema = mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    Type: {
+      type: String,
+    },
+    status: {
+      type: String,
+      default: 'Pending',
+    },
+    PayementStatus: {
+      type: String,
+      default: 'Pending',
+    },
+    PaidAmount: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );
 
 const PlanAllocation = mongoose.model('partneplanAllocation', PlanAllocationSchema);
 
+const PlanPaymentSchema = mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    PlanId: {
+      type: String,
+    },
+    userId: {
+      type: String,
+    },
+    Amount: {
+      type: Number,
+    },
+    PaymentMode: {
+      type: String,
+    },
+    BankName: {
+      type: String,
+    },
+    utrNo: {
+      type: String,
+    },
+    TransactionId: {
+      type: String,
+    },
+    platform: {
+      type: String,
+    },
+    chequeDD: {
+      type: String,
+    },
+    chequeDD_Date: {
+      type: String,
+    },
+    branchName: {
+      type: String,
+    },
+    To: {
+      type: String,
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+    billId: {
+      type: String,
+    },
+    status: {
+      type: String,
+      default: 'Pending',
+    },
+    link_status: {
+      type: String,
+      default: 'Pending',
+    },
+    link: {
+      type: String,
+    },
+    orderId: {
+      type: String,
+    },
+    type: {
+      type: String,
+    },
+    ccavanue: {
+      type: String,
+    },
+    paymetvalid: {
+      type: Number,
+    },
+    paymentType: {
+      type: String,
+      default: 'online',
+    },
+    ccavenue: {
+      type: Object,
+    },
+    ccavenueID: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
+
+const Partnerplanpayment = mongoose.model('partnerplanpayment', PlanPaymentSchema);
+
 module.exports = {
   Partner,
   PartnerPlan,
   PlanAllocation,
+  Partnerplanpayment,
 };

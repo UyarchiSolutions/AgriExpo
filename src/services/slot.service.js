@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { Slot, Slotseperation, Event } = require('../models/slot.model');
+const { Slot, Slotseperation, Event, EventCreation } = require('../models/slot.model');
 const ApiError = require('../utils/ApiError');
 const moment = require('moment');
 const { purchasePlan } = require('../models/purchasePlan.model');
@@ -561,15 +561,16 @@ const getSlots_Details_Streaming = async (slotId) => {
 
 const createEvents = async (body) => {
   let { arr, EventName } = body;
+  let creations = await EventCreation.create(body);
   arr.forEach(async (e) => {
-    let data = { ...e, ...{ EventName: EventName } };
+    let data = { ...e, ...{ EventName: EventName, eventId: creations._id } };
     await Event.create(data);
   });
-  return { message: 'Event Created' };
+  return creations;
 };
 
 const getEvents = async () => {
-  let values = await Event.aggregate([
+  let values = await EventCreation.aggregate([
     {
       $match: {
         active: true,

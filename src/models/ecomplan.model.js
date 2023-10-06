@@ -176,7 +176,7 @@ const streamplanschema = mongoose.Schema({
   },
   raisehandcontrol: {
     type: String,
-  }
+  },
 });
 
 const Streamplan = mongoose.model('streamplan', streamplanschema);
@@ -578,7 +578,7 @@ const streamRequestschema = mongoose.Schema({
   },
   removedBy_id: {
     type: String,
-  }
+  },
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);
@@ -941,6 +941,12 @@ const streampostpriceschema = new mongoose.Schema(
       type: Number,
     },
     createdBy: {
+      type: String,
+    },
+    edited_qty: {
+      type: String,
+    },
+    purchased_qty: {
       type: String,
     },
   },

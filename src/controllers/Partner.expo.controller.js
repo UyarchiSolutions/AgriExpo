@@ -49,6 +49,31 @@ const PlanAllocatioin = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getAllAllocated_Planes = catchAsync(async (req, res) => {
+  const data = await PartnerService.getAllAllocated_Planes(req);
+  res.send(data);
+});
+
+const updateAllocationById = catchAsync(async (req, res) => {
+  const data = await PartnerService.updateAllocationById(req);
+  res.send(data);
+});
+
+const plan_payementsDetails = catchAsync(async (req, res) => {
+  const data = await PartnerService.plan_payementsDetails(req);
+  res.send(data);
+});
+
+const planPayment = catchAsync(async (req, res) => {
+  const data = await PartnerService.planPayment(req.body);
+  res.send(data);
+});
+
+const planPaymentDetails = catchAsync(async (req, res) => {
+  const data = await PartnerService.getPaymentDetails(req.params.id);
+  res.send(data);
+});
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -60,4 +85,9 @@ module.exports = {
   getPartnersAll,
   getPartnersPlanesAll,
   PlanAllocatioin,
+  getAllAllocated_Planes,
+  updateAllocationById,
+  plan_payementsDetails,
+  planPayment,
+  planPaymentDetails,
 };

@@ -13,4 +13,9 @@ router.route('/updatePartnerPlanes/:id').put(PartnerController.updatePartnerPlan
 router.route('/getPartnersAll').get(PartnerController.getPartnersAll);
 router.route('/getPartners/PlanesAll').get(PartnerController.getPartnersPlanesAll);
 router.route('/Plan/Allocatioin').post(PartnerController.PlanAllocatioin);
+router.route('/getAll/Allocated/Planes/:page').get(PartnerController.getAllAllocated_Planes);
+router.route('/update/AllocationById/:id').put(PartnerController.updateAllocationById);
+router.route('/plan/payements/Details/:page').get(PartnerController.plan_payementsDetails);
+router.route('/planPayment').post(PartnerController.planPayment);
+router.route('/plan/Payment/Details/:id').get(PartnerController.planPaymentDetails);
 module.exports = router;
