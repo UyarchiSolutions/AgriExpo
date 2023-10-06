@@ -14626,6 +14626,7 @@ const search_product_list = async (req) => {
         mobileNumber: "$sellers.mobileNumber",
         tradeName: "$sellers.tradeName",
         companyName: "$sellers.companyName",
+        suppierId:1
       }
     },
     { $limit: 50 }
