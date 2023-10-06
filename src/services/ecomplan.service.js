@@ -14521,7 +14521,7 @@ const search_product_list = async (req) => {
               localField: 'streamRequest',
               foreignField: '_id',
               pipeline: [
-                { $match: { $and: [language, { streamExpire: { $gt: date_now } }, { show_completd: { $eq: true } }] } },
+                { $match: { $and: [language, { streamExpire: { $gt: date_now } }, { $or: [{ show_completd: { $eq: true } }, { streamEnd_Time: { $gte: date_now } }] }] } },
                 {
                   $addFields: {
                     streamType: findstreamType
