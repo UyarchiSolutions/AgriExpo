@@ -14450,7 +14450,7 @@ const search_product_list = async (req) => {
   var date_now = new Date().getTime();
   let search = { active: true }
   if (req.query.search != null && req.query.search != '') {
-    search = { productTitle: { $regex: key, $options: 'i' } }
+    search = { productTitle: { $regex: req.query.search, $options: 'i' } }
   }
 
 
