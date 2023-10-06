@@ -13420,8 +13420,8 @@ const update_post_price = async (req) => {
       minLots: req.body.minLots == null ? 0 : req.body.minLots,
       incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
       createdBy: userId,
-      purchased_qty:req.body.purchased_qty,
-      edited_qty:req.body.edited_qty
+      purchased_qty: req.body.purchased_qty,
+      edited_qty: req.body.edited_qty
     });
   }
   streampost;
@@ -13551,11 +13551,11 @@ const post_payment_details = async (req) => {
         streamName: 1,
         post: "$post",
         createdAt: 1,
-        streamName:1,
-        post:"$post",
-        createdAt:1,
-        edited_qty:{$ifNull:["streampostprices.edited_qty",null]},
-        purchased_qty:{$ifNull:["streampostprices.purchased_qty",null]}, 
+        streamName: 1,
+        post: "$post",
+        createdAt: 1,
+        edited_qty: { $ifNull: ["streampostprices.edited_qty", null] },
+        purchased_qty: { $ifNull: ["streampostprices.purchased_qty", null] },
       },
     },
   ]);
@@ -14620,6 +14620,7 @@ const search_product_list = async (req) => {
         postLiveStreamingPirce: 1,
         pruductreturnble: 1,
         productName: "$productName.productTitle",
+        productimage: "$productName.image",
         address: "$sellers.address",
         mobileNumber: "$sellers.mobileNumber",
         tradeName: "$sellers.tradeName",
