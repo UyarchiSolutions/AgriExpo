@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const bcrypt = require('bcryptjs');
 const ApiError = require('../utils/ApiError');
-const { Partner, PartnerPlan, PlanAllocation, Partnerplanpayment } = require('../models/Partner-expo-model');
+const { Partner, PartnerPlan, PlanAllocation, Partnerplanpayment, PartnerOTP } = require('../models/Partner-expo-model');
 const otp = require('../config/Partner.config');
 const createPartner = async (req) => {
   let body = req.body;
@@ -313,6 +313,17 @@ const VerifyAccount = async (body) => {
   return { message: 'OTP Send SuccessFully.' };
 };
 
+const VerifyOTP = async (body) => {
+  const { mobileNumber, OTP } = body;
+  let findOTP = await PartnerOTP.findOne({ mobileNumber: mobileNumber, OTP: OTP, active: true }).sort({ createdDate: -1 });
+  if (!findOTP) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid OTP');
+  }
+  findOTP.active = false;
+  await findOTP.save()
+  return { message: 'OTP Verification Sucess.' };
+};
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -329,4 +340,5 @@ module.exports = {
   planPayment,
   getPaymentDetails,
   VerifyAccount,
+  VerifyOTP,
 };

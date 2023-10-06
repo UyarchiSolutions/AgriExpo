@@ -79,6 +79,11 @@ const VerifyAccount = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const VerifyOTP = catchAsync(async (req, res) => {
+  const data = await PartnerService.VerifyOTP(req.body);
+  res.send(data);
+});
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -96,4 +101,5 @@ module.exports = {
   planPayment,
   planPaymentDetails,
   VerifyAccount,
+  VerifyOTP,
 };

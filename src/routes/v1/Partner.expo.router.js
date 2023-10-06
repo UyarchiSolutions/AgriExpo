@@ -19,4 +19,5 @@ router.route('/plan/payements/Details/:page').get(PartnerController.plan_payemen
 router.route('/planPayment').post(PartnerController.planPayment);
 router.route('/plan/Payment/Details/:id').get(PartnerController.planPaymentDetails);
 router.route('/VerifyAccount').post(PartnerController.VerifyAccount);
+router.route('/VerifyOTP').post(PartnerController.VerifyOTP);
 module.exports = router;
