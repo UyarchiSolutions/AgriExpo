@@ -234,4 +234,7 @@ router.route('/purchese/plan/exhibitor').post(SellerAuth, Ecomcontroller.purches
 
 router.route('/get_Saved/Product').get(shopverify, Ecomcontroller.get_Saved_Product)
 
+
+
+router.route('/search/product').get(Ecomcontroller.search_product_list)
 module.exports = router;
