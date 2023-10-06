@@ -13420,8 +13420,8 @@ const update_post_price = async (req) => {
       minLots: req.body.minLots == null ? 0 : req.body.minLots,
       incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
       createdBy: userId,
-      purchased_qty:req.body.purchased_qty,
-      edited_qty:req.body.edited_qty
+      purchased_qty: req.body.purchased_qty,
+      edited_qty: req.body.edited_qty
     });
   }
   streampost;
@@ -13454,31 +13454,33 @@ const post_payment_details = async (req) => {
   let streampost = await StreamPost.aggregate([
     { $match: { $and: [{ _id: req.query.id }] } },
     {
-      $lookup:{
-        from:"streamrequestposts",
-        localField:"_id",
-        foreignField:"postId",
-        pipeline:[
-          { $lookup: {
-          from:"streamrequests",
-          localField:"streamRequest",
-          foreignField:"_id",
-          as:"streams"
-        } 
-      },
-      {
-        $unwind:{preserveNullAndEmptyArrays:true,
-        path:"$streams"
-      }
-      }
-    ],
-        as:"post",
+      $lookup: {
+        from: "streamrequestposts",
+        localField: "_id",
+        foreignField: "postId",
+        pipeline: [
+          {
+            $lookup: {
+              from: "streamrequests",
+              localField: "streamRequest",
+              foreignField: "_id",
+              as: "streams"
+            }
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: "$streams"
+            }
+          }
+        ],
+        as: "post",
       }
     },
     {
-      $unwind:{
-        preserveNullAndEmptyArrays:true,
-        path:"$post"
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: "$post"
       }
     },
     {
@@ -13546,11 +13548,14 @@ const post_payment_details = async (req) => {
         incrementalLots: 1,
         afterStreaming: 1,
         suppierId: 1,
-        streamName:1,
-        post:"$post",
-        createdAt:1,
-        edited_qty:{$ifNull:["streampostprices.edited_qty",null]},
-        purchased_qty:{$ifNull:["streampostprices.purchased_qty",null]}, 
+        streamName: 1,
+        post: "$post",
+        createdAt: 1,
+        streamName: 1,
+        post: "$post",
+        createdAt: 1,
+        edited_qty: { $ifNull: ["streampostprices.edited_qty", null] },
+        purchased_qty: { $ifNull: ["streampostprices.purchased_qty", null] },
       },
     },
   ]);
@@ -14425,6 +14430,210 @@ const get_Saved_Product = async (userId) => {
   return values;
 };
 
+
+const search_product_list = async (req) => {
+
+  console.log(moment(1696500000000).format("YYYY-MM-DD hh:mm a"))
+  console.log(moment(1696588200000).format("YYYY-MM-DD hh:mm a"))
+  let language = { active: true }
+  if (req.query.language != null && req.query.language != '') {
+    console.log("sds")
+    let match_lang = req.query.language ? [].concat(req.query.language) : [];
+    console.log(match_lang)
+    language = { $or: [{ primarycommunication: { $in: match_lang } }, { secondarycommunication: { $in: match_lang } }] }
+  }
+  let streamType = { active: true }
+  console.log(req.query.streamtype)
+  if (req.query.streamtype != null && req.query.streamtype != '') {
+    let streamtype_match = req.query.streamtype ? [].concat(req.query.streamtype) : [];
+    // let upcomming = false;
+    // let completed = false;
+    // let current = false;
+    // if (streamtype_match.findIndex((a) => a == 'Upcomming Stream') != -1) {
+    //   upcomming = true;
+    // }
+    // if (streamtype_match.findIndex((a) => a == 'Live Stream') != -1) {
+    //   current = true;
+    // }
+    // if (streamtype_match.findIndex((a) => a == 'Completed Stream') != -1) {
+    //   completed = true;
+    // }
+    streamType = { streamType: { $in: streamtype_match } }
+    // console.log(upcomming)
+    // console.log(current)
+    // console.log(completed)
+    console.log(streamtype_match)
+  }
+  var date_now = new Date().getTime();
+
+  // startTime
+  // streamEnd_Time
+
+  let findstreamType = {
+    $cond: {
+      if: { $and: [{ $gte: ['$startTime', date_now] }] },
+      then: "Upcomming",
+      else: {
+        $cond: {
+          if: { $and: [{ $lte: ['$startTime', date_now] }, { $gte: ['$streamEnd_Time', date_now] }] },
+          then: "Live",
+          else: {
+            $cond: {
+              if: { $and: [{ $lte: ['$streamEnd_Time', date_now] }] },
+              then: "Completed",
+              else: 3,
+            },
+          },
+        },
+      },
+    },
+  }
+
+  let streamingorder = {
+    $cond: {
+      if: { $and: [{ $gte: ['$startTime', date_now] }] },
+      then: 2,
+      else: {
+        $cond: {
+          if: { $and: [{ $lte: ['$startTime', date_now] }, { $gte: ['$streamEnd_Time', date_now] }] },
+          then: 1,
+          else: {
+            $cond: {
+              if: { $and: [{ $lte: ['$streamEnd_Time', date_now] }] },
+              then: 3,
+              else: 4,
+            },
+          },
+        },
+      },
+    },
+  }
+  let product = await StreamPost.aggregate([
+    {
+      $lookup: {
+        from: 'streamrequestposts',
+        localField: '_id',
+        foreignField: 'postId',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'streamrequests',
+              localField: 'streamRequest',
+              foreignField: '_id',
+              pipeline: [
+                { $match: { $and: [language, { streamExpire: { $gt: date_now } }] } },
+                {
+                  $addFields: {
+                    streamType: findstreamType
+                  },
+                },
+                {
+                  $addFields: {
+                    streamorder: streamingorder
+                  },
+                },
+                { $match: { $and: [streamType] } },
+              ],
+              as: 'streamrequests',
+            },
+          },
+          {
+            $unwind: '$streamrequests',
+          },
+        ],
+        as: 'streamrequestposts',
+      },
+    },
+    {
+      $unwind: '$streamrequestposts',
+    },
+    {
+      $addFields: {
+        streamName: '$streamrequestposts.streamrequests.streamName'
+      }
+    },
+    {
+      $addFields: {
+        primarycommunication: '$streamrequestposts.streamrequests.primarycommunication'
+      }
+    },
+    {
+      $addFields: {
+        Location: '$streamrequestposts.streamrequests.Location'
+      }
+    },
+    {
+      $addFields: {
+        startTime: '$streamrequestposts.streamrequests.startTime'
+      }
+    },
+    {
+      $addFields: {
+        streamEnd_Time: '$streamrequestposts.streamrequests.streamEnd_Time'
+      }
+    },
+    {
+      $addFields: {
+        streamorder: '$streamrequestposts.streamrequests.streamorder'
+      }
+    },
+    {
+      $addFields: {
+        streamType: '$streamrequestposts.streamrequests.streamType'
+      }
+    },
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'productId',
+        foreignField: '_id',
+        as: 'productName',
+      },
+    },
+    {
+      $unwind: '$productName',
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'sellers',
+      },
+    },
+    { $unwind: '$sellers' },
+    { $sort: { streamorder: 1 } },
+    {
+      $project: {
+        _id: 1,
+        streamName: 1,
+        primarycommunication: 1,
+        Location: 1,
+        startTime: 1,
+        streamEnd_Time: 1,
+        streamorder: 1,
+        streamType: 1,
+        offerPrice: 1,
+        discription: 1,
+        marketPlace: 1,
+        pack_discription: 1,
+        postLiveStreamingPirce: 1,
+        pruductreturnble: 1,
+        productName: "$productName.productTitle",
+        productimage: "$productName.image",
+        address: "$sellers.address",
+        mobileNumber: "$sellers.mobileNumber",
+        tradeName: "$sellers.tradeName",
+        companyName: "$sellers.companyName",
+      }
+    },
+    { $limit: 50 }
+  ])
+
+  return product;
+
+}
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -14579,5 +14788,6 @@ module.exports = {
   get_Saved_Product,
   update_post_price_admin,
   post_payment_details,
-  remove_stream_admin
+  remove_stream_admin,
+  search_product_list
 };

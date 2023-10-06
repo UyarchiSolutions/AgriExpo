@@ -259,7 +259,7 @@ const remove_stream = catchAsync(async (req, res) => {
   res.send(value);
 });
 
-const remove_stream_admin= catchAsync(async (req, res) => {
+const remove_stream_admin = catchAsync(async (req, res) => {
   //console.log('sdas');
   const value = await Ecomserive.remove_stream_admin(req);
   res.send(value);
@@ -440,7 +440,7 @@ const getallslab = catchAsync(async (req, res) => {
 });
 
 
-const getallslab_all= catchAsync(async (req, res) => {
+const getallslab_all = catchAsync(async (req, res) => {
   const value = await Ecomserive.getallslab_all(req);
   res.send(value);
 });
@@ -752,6 +752,11 @@ const get_Saved_Product = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const search_product_list = catchAsync(async (req, res) => {
+  const data = await Ecomserive.search_product_list(req);
+  res.send(data);
+});
+
 module.exports = {
   create_Plans,
   UploadProof,
@@ -899,5 +904,6 @@ module.exports = {
   // pruchese plan
   purchesPlane_exhibitor,
   get_Saved_Product,
-  remove_stream_admin
+  remove_stream_admin,
+  search_product_list
 };
