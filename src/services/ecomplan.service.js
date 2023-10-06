@@ -14617,7 +14617,7 @@ const search_product_list = async (req) => {
         postLiveStreamingPirce: 1,
         pruductreturnble: 1,
         unit: 1,
-        productName: "$productName.productTitle",
+        productName: 1,
         productimage: "$productName.image",
         address: "$sellers.address",
         mobileNumber: "$sellers.mobileNumber",
