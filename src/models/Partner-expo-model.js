@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { v4 } = require('uuid');
+const bcrypt = require('bcrypt');
 
 const PartnerSchema = new mongoose.Schema(
   {
@@ -89,6 +90,10 @@ const PartnerSchema = new mongoose.Schema(
     },
     GST_Number: {
       type: String,
+    },
+    verified: {
+      type: Boolean,
+      default: false,
     },
   },
   {

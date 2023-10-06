@@ -3,7 +3,7 @@ const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const PartnerService = require('../services/Partner.expo.service');
-
+const TokenService = require('../services/token.service');
 const createPartner = catchAsync(async (req, res) => {
   const data = await PartnerService.createPartner(req);
   res.send(data);
@@ -84,6 +84,17 @@ const VerifyOTP = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const setPassword = catchAsync(async (req, res) => {
+  const data = await PartnerService.setPassword(req.body);
+  res.send(data);
+});
+
+const loginPartner = catchAsync(async (req, res) => {
+  const data = await PartnerService.loginPartner(req.body);
+  const token = await TokenService.generateAuthTokens_PartnerApp(data);
+  res.send({ data, token });
+});
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -102,4 +113,6 @@ module.exports = {
   planPaymentDetails,
   VerifyAccount,
   VerifyOTP,
+  setPassword,
+  loginPartner,
 };

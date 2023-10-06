@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const ApiError = require('../utils/ApiError');
 const { Partner, PartnerPlan, PlanAllocation, Partnerplanpayment, PartnerOTP } = require('../models/Partner-expo-model');
 const otp = require('../config/Partner.config');
+
 const createPartner = async (req) => {
   let body = req.body;
   let value = await Partner.findOne({ $or: [{ email: body.email }, { mobileNumber: body.mobileNumber }] });
@@ -320,8 +321,45 @@ const VerifyOTP = async (body) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid OTP');
   }
   findOTP.active = false;
-  await findOTP.save()
+  await findOTP.save();
   return { message: 'OTP Verification Sucess.' };
+};
+
+const setPassword = async (body) => {
+  const { password, mobileNumber } = body;
+  let findBymobile = await Partner.findOne({ mobileNumber: mobileNumber });
+  if (!findBymobile) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Contact Event Manager');
+  }
+  const plaintextPassword = password;
+  bcrypt.genSalt(10, (err, salt) => {
+    if (err) {
+      console.error(err);
+    } else {
+      bcrypt.hash(plaintextPassword, salt, async (err, hash) => {
+        if (err) {
+          console.error(err);
+        } else {
+          console.log(typeof hash);
+          await Partner.findByIdAndUpdate({ _id: findBymobile._id }, { password: hash, verified: true }, { new: true });
+          // return hash;
+        }
+      });
+    }
+  });
+  return { message: 'Password updated successfully' };
+};
+
+const loginPartner = async (body) => {
+  const { mobileNumber, password } = body;
+  let findBymobile = await Partner.findOne({ mobileNumber: mobileNumber });
+  if (!findBymobile) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid User');
+  }
+  if (!(await findBymobile.isPasswordMatch(password))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid Password');
+  }
+  return findBymobile;
 };
 
 module.exports = {
@@ -341,4 +379,6 @@ module.exports = {
   getPaymentDetails,
   VerifyAccount,
   VerifyOTP,
+  setPassword,
+  loginPartner,
 };

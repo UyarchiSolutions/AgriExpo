@@ -20,4 +20,6 @@ router.route('/planPayment').post(PartnerController.planPayment);
 router.route('/plan/Payment/Details/:id').get(PartnerController.planPaymentDetails);
 router.route('/VerifyAccount').post(PartnerController.VerifyAccount);
 router.route('/VerifyOTP').post(PartnerController.VerifyOTP);
+router.route('/setPassword').post(PartnerController.setPassword);
+router.route('/login').post(PartnerController.loginPartner);
 module.exports = router;
