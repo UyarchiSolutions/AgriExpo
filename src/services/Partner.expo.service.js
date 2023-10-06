@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const bcrypt = require('bcryptjs');
 const ApiError = require('../utils/ApiError');
 const { Partner, PartnerPlan, PlanAllocation, Partnerplanpayment } = require('../models/Partner-expo-model');
-
+const otp = require('../config/Partner.config');
 const createPartner = async (req) => {
   let body = req.body;
   let value = await Partner.findOne({ $or: [{ email: body.email }, { mobileNumber: body.mobileNumber }] });
@@ -301,6 +301,18 @@ const getPaymentDetails = async (id) => {
   };
 };
 
+// partner Account Access
+
+const VerifyAccount = async (body) => {
+  const { mobileNumber } = body;
+  let findByMobile = await Partner.findOne({ mobileNumber: parseInt(mobileNumber) });
+  if (!findByMobile) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Your Mobile Number Not Valid');
+  }
+  await otp(mobileNumber, findByMobile, 'reg');
+  return { message: 'OTP Send SuccessFully.' };
+};
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -316,4 +328,5 @@ module.exports = {
   plan_payementsDetails,
   planPayment,
   getPaymentDetails,
+  VerifyAccount,
 };

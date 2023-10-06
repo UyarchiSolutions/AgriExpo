@@ -74,6 +74,11 @@ const planPaymentDetails = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const VerifyAccount = catchAsync(async (req, res) => {
+  const data = await PartnerService.VerifyAccount(req.body);
+  res.send(data);
+});
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -90,4 +95,5 @@ module.exports = {
   plan_payementsDetails,
   planPayment,
   planPaymentDetails,
+  VerifyAccount,
 };
