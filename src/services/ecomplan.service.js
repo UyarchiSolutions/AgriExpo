@@ -14589,7 +14589,11 @@ const search_product_list = async (req) => {
         streamType: '$streamrequestposts.streamrequests.streamType'
       }
     },
-
+    {
+      $addFields: {
+        streamId: '$streamrequestposts.streamrequests._id'
+      }
+    },
     {
       $lookup: {
         from: 'sellers',
@@ -14623,8 +14627,9 @@ const search_product_list = async (req) => {
         mobileNumber: "$sellers.mobileNumber",
         tradeName: "$sellers.tradeName",
         companyName: "$sellers.companyName",
-        suppierId: 1
-      }
+        suppierId: 1,
+        streamId: 1
+      },
     },
     { $limit: 50 }
   ])
