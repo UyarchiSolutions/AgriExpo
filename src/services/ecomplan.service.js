@@ -14619,6 +14619,7 @@ const search_product_list = async (req) => {
         pack_discription: 1,
         postLiveStreamingPirce: 1,
         pruductreturnble: 1,
+        unit:1,
         productName: "$productName.productTitle",
         productimage: "$productName.image",
         address: "$sellers.address",
