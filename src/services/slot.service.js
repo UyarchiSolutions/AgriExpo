@@ -586,6 +586,43 @@ const getEventsByEventId = async (id) => {
   return values;
 };
 
+const getSlotsByEvent = async (req) => {
+  const { id, date, from, to, type, duration } = req.query;
+  let idMatch = { active: true };
+  let dateMatch = { active: true };
+  let FromMatch = { active: true };
+  let ToMatch = { active: true };
+  let TypeMatch = { active: true };
+  let DurationMatch = { active: true };
+
+  if (id != 'null' && id) {
+    idMatch = { eventId: id };
+  }
+  if (date != 'null' && date) {
+    dateMatch = { date: date };
+  }
+  if (from && from != 'null') {
+    FromMatch = { startFormat: from };
+  }
+  if (to && to != 'null') {
+    ToMatch = { endFormat: to };
+  }
+  if (type && type != 'null') {
+    TypeMatch = { Type: type };
+  }
+
+  if (duration && duration != 'null') {
+    DurationMatch = { Duration: parseInt(duration) };
+  }
+
+  const values = await Slot.aggregate([
+    {
+      $match: { $and: [idMatch, dateMatch, FromMatch, ToMatch, TypeMatch, DurationMatch] },
+    },
+  ]);
+  return values;
+};
+
 module.exports = {
   createSlot,
   Fetch_Slot,
@@ -601,4 +638,5 @@ module.exports = {
   createEvents,
   getEvents,
   getEventsByEventId,
+  getSlotsByEvent,
 };
