@@ -69,6 +69,11 @@ const getEvents = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getEventsByEventId = catchAsync(async (req, res) => {
+  const data = await SlotService.getEventsByEventId(req.params.id);
+  res.send(data);
+});
+
 module.exports = {
   SlotCreation,
   Fetch_Slot,
@@ -83,4 +88,5 @@ module.exports = {
   getSlots_Details_Streaming,
   createEvents,
   getEvents,
+  getEventsByEventId,
 };
