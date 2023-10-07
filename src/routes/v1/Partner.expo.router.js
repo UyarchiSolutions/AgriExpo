@@ -21,5 +21,6 @@ router.route('/plan/Payment/Details/:id').get(PartnerController.planPaymentDetai
 router.route('/VerifyAccount').post(PartnerController.VerifyAccount);
 router.route('/VerifyOTP').post(PartnerController.VerifyOTP);
 router.route('/setPassword').post(PartnerController.setPassword);
+router.route('/forgot').post(PartnerController.forgotPassword);
 router.route('/login').post(PartnerController.loginPartner);
 module.exports = router;

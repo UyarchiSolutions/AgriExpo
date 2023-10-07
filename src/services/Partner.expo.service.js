@@ -314,6 +314,19 @@ const VerifyAccount = async (body) => {
   return { message: 'OTP Send SuccessFully.' };
 };
 
+const forgotPassword = async (body) => {
+  const { mobileNumber } = body;
+  let findByMobile = await Partner.findOne({ mobileNumber: parseInt(mobileNumber) });
+  if (!findByMobile) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Your Mobile Number Not Valid');
+  }
+  if (findByMobile.verified == false) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Your Account Is Not Verified');
+  }
+  await otp(mobileNumber, findByMobile, 'forgot');
+  return { message: 'OTP Send SuccessFully.' };
+};
+
 const VerifyOTP = async (body) => {
   const { mobileNumber, OTP } = body;
   let findOTP = await PartnerOTP.findOne({ mobileNumber: mobileNumber, OTP: OTP, active: true }).sort({ createdDate: -1 });
@@ -381,4 +394,5 @@ module.exports = {
   VerifyOTP,
   setPassword,
   loginPartner,
+  forgotPassword,
 };
