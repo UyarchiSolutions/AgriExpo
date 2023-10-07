@@ -57,6 +57,7 @@ router.route('/get/all/post').get(SellerAuth, Ecomcontroller.get_all_post);
 router.route('/get/all/post/transation').get(SellerAuth, Ecomcontroller.get_all_post_transation);
 router.route('/get/all/post/pagenation').get(SellerAuth, Ecomcontroller.get_all_Post_with_page);
 router.route('/get/stream/post/view').get(Ecomcontroller.get_post_view);
+router.route('/get/post/preview').get(shopverify, Ecomcontroller.get_post_view);
 
 router.route('/post/price/set').post(SellerAuth, Ecomcontroller.update_post_price);
 router.route('/post/price/set/admin').post(authorization, Ecomcontroller.update_post_price_admin);
