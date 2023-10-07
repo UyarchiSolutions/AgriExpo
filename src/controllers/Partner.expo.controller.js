@@ -95,6 +95,11 @@ const loginPartner = catchAsync(async (req, res) => {
   res.send({ data, token });
 });
 
+const forgotPassword = catchAsync(async (req, res) => {
+  const data = await PartnerService.forgotPassword(req.body);
+  res.send(data);
+});
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -115,4 +120,5 @@ module.exports = {
   VerifyOTP,
   setPassword,
   loginPartner,
+  forgotPassword,
 };
