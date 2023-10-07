@@ -28,6 +28,9 @@ const SlotSchema = new mongoose.Schema(
     date: {
       type: String,
     },
+    eventId: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

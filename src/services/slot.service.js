@@ -7,7 +7,7 @@ const { Streamrequest, PlanSlot } = require('../models/ecomplan.model');
 const Seller = require('../models/seller.models');
 
 const createSlot = async (body) => {
-  const { chooseTime, Duration, date, Type } = body;
+  const { chooseTime, Duration, date, Type, eventId } = body;
   const isoDateTime = moment(`${date}T${chooseTime}`).toDate();
   const Start = moment(`${date}T${chooseTime}`).valueOf();
   const end = moment(Start).add(Duration, 'minutes').valueOf();
@@ -28,6 +28,7 @@ const createSlot = async (body) => {
     endFormat: endFormat,
     Duration: Duration,
     date: date,
+    eventId: eventId,
   };
 
   const creation = await Slot.create(data);
