@@ -4085,6 +4085,7 @@ const get_watch_live_steams_upcoming_byid = async (req) => {
   return value[0];
 };
 
+
 const get_watch_live_steams_current = async (req) => {
   var date_now = new Date().getTime();
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
@@ -14443,28 +14444,16 @@ const search_product_list = async (req) => {
     language = { $or: [{ primarycommunication: { $in: match_lang } }, { secondarycommunication: { $in: match_lang } }] }
   }
   let streamType = { active: true }
-  console.log(req.query.streamtype)
   if (req.query.streamtype != null && req.query.streamtype != '') {
     let streamtype_match = req.query.streamtype ? [].concat(req.query.streamtype) : [];
-    // let upcomming = false;
-    // let completed = false;
-    // let current = false;
-    // if (streamtype_match.findIndex((a) => a == 'Upcomming Stream') != -1) {
-    //   upcomming = true;
-    // }
-    // if (streamtype_match.findIndex((a) => a == 'Live Stream') != -1) {
-    //   current = true;
-    // }
-    // if (streamtype_match.findIndex((a) => a == 'Completed Stream') != -1) {
-    //   completed = true;
-    // }
     streamType = { streamType: { $in: streamtype_match } }
-    // console.log(upcomming)
-    // console.log(current)
-    // console.log(completed)
-    console.log(streamtype_match)
   }
   var date_now = new Date().getTime();
+  let search = { active: true }
+  if (req.query.search != null && req.query.search != '') {
+    search = { productTitle: { $regex: req.query.search, $options: 'i' } }
+  }
+
 
   // startTime
   // streamEnd_Time
@@ -14511,6 +14500,25 @@ const search_product_list = async (req) => {
   let product = await StreamPost.aggregate([
     {
       $lookup: {
+        from: 'products',
+        localField: 'productId',
+        foreignField: '_id',
+        pipeline: [
+          { $match: { $and: [search] } }
+        ],
+        as: 'productName',
+      },
+    },
+    {
+      $unwind: '$productName',
+    },
+    {
+      $addFields: {
+        productName: "$productName.productTitle"
+      }
+    },
+    {
+      $lookup: {
         from: 'streamrequestposts',
         localField: '_id',
         foreignField: 'postId',
@@ -14521,7 +14529,7 @@ const search_product_list = async (req) => {
               localField: 'streamRequest',
               foreignField: '_id',
               pipeline: [
-                { $match: { $and: [language, { streamExpire: { $gt: date_now } }] } },
+                { $match: { $and: [language, { streamExpire: { $gt: date_now } }, { $or: [{ show_completd: { $eq: true } }, { streamEnd_Time: { $gte: date_now } }] }] } },
                 {
                   $addFields: {
                     streamType: findstreamType
@@ -14583,15 +14591,9 @@ const search_product_list = async (req) => {
       }
     },
     {
-      $lookup: {
-        from: 'products',
-        localField: 'productId',
-        foreignField: '_id',
-        as: 'productName',
-      },
-    },
-    {
-      $unwind: '$productName',
+      $addFields: {
+        streamId: '$streamrequestposts.streamrequests._id'
+      }
     },
     {
       $lookup: {
@@ -14619,13 +14621,16 @@ const search_product_list = async (req) => {
         pack_discription: 1,
         postLiveStreamingPirce: 1,
         pruductreturnble: 1,
-        productName: "$productName.productTitle",
+        unit: 1,
+        productName: 1,
         productimage: "$productName.image",
         address: "$sellers.address",
         mobileNumber: "$sellers.mobileNumber",
         tradeName: "$sellers.tradeName",
         companyName: "$sellers.companyName",
-      }
+        suppierId: 1,
+        streamId: 1
+      },
     },
     { $limit: 50 }
   ])
