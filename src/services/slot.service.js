@@ -581,6 +581,11 @@ const getEvents = async () => {
   return values;
 };
 
+const getEventsByEventId = async (id) => {
+  let values = await EventCreation.findById(id);
+  return values;
+};
+
 module.exports = {
   createSlot,
   Fetch_Slot,
@@ -595,4 +600,5 @@ module.exports = {
   getSlots_Details_Streaming,
   createEvents,
   getEvents,
+  getEventsByEventId,
 };
