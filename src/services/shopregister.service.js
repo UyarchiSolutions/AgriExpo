@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const { Product } = require('../models/product.model');
 const ApiError = require('../utils/ApiError');
 const moment = require('moment');
-const { Shop, AttendanceClone, AttendanceClonenew } = require('../models/b2b.ShopClone.model');
+const { Shop, AttendanceClone, AttendanceClonenew, Wallet } = require('../models/b2b.ShopClone.model');
 const sentOTP = require('../config/registershop.config');
 const { OTP } = require('../models/saveOtp.model');
 const bcrypt = require('bcryptjs');
@@ -2594,6 +2594,13 @@ const get_my_orders_single = async (req) => {
   return value[0];
 };
 
+const createWallet = async (req) => {
+  let userId = req.shopId;
+  let data = { ...body, ...{ userId: userId } };
+  let creation = await Wallet.create(data);
+  return create;
+};
+
 module.exports = {
   register_shop,
   verify_otp,
@@ -2628,4 +2635,5 @@ module.exports = {
   get_Streaming_ordersByStream,
   get_Streaming_ordersByOrder,
   verify_otpDelete_Account,
+  createWallet,
 };

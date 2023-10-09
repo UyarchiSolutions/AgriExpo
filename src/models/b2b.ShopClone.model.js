@@ -449,4 +449,36 @@ const attendanceSchemaclone = new mongoose.Schema({
 
 const AttendanceClonenew = mongoose.model('AttendanceClonenew', attendanceSchemaclone);
 
-module.exports = { Shop, AttendanceClone, AttendanceClonenew };
+const walletSchema = mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    userId: {
+      type: String,
+    },
+    Amount: {
+      type: Number,
+    },
+    Status: {
+      type: String,
+      default: 'Pending',
+    },
+    PaymentType: {
+      type: String,
+    },
+    PaymentDetails: {
+      type: Object,
+    },
+    active: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
+
+const Wallet = mongoose.model('Wallet', walletSchema);
+
+module.exports = { Shop, AttendanceClone, AttendanceClonenew, Wallet };
