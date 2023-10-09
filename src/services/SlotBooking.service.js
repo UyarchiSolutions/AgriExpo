@@ -93,7 +93,7 @@ const getBooked_Slot_By_Exhibitor = async (userId, planId) => {
           {
             $addFields: {
               slotExpire: {
-                $cond: { if: { $gt: ['$end', date_now] }, then: true, else: false },
+                $cond: { if: { $lt: ['$end', date_now] }, then: true, else: false },
               },
             },
           },
