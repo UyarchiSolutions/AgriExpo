@@ -2155,7 +2155,7 @@ const get_all_admin = async (req) => {
           {
             $project: {
               _id: 1,
-              productTitle: '$streamposts.products.productTitle',
+              productTitle: '$streamposts.productTitle',
               productId: '$streamposts.productId',
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
@@ -2240,7 +2240,7 @@ const get_all_admin = async (req) => {
         chat_need: 1,
         transaction: 1,
         Location: 1,
-        slots:"$slots"
+        slots: "$slots"
       },
     },
 
