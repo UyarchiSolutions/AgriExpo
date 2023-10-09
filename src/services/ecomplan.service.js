@@ -2510,6 +2510,20 @@ const get_all_streams = async (req) => {
 
   const value = await Streamrequest.aggregate([
     {
+      $lookup: {
+        from: 'slots',
+        localField: 'slotId',
+        foreignField: '_id',
+        as: 'slots',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$slots',
+      },
+    },
+    {
       $addFields: {
         originalDate: {
           $add: [{ $toDate: '$startTime' }, { $multiply: [30, 24, 60, 60, 1000] }],
@@ -2575,7 +2589,7 @@ const get_all_streams = async (req) => {
                     dispatchPincode: 1,
                     transaction: 1,
                     dispatchLocation: 1,
-                    unit:1
+                    unit: 1
                   },
                 },
               ],
@@ -2614,7 +2628,7 @@ const get_all_streams = async (req) => {
               transaction: '$streamposts.transaction',
               dispatchLocation: '$streamposts.dispatchLocation',
               unit: '$streamposts.unit',
-              
+
             },
           },
         ],
