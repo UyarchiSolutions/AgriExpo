@@ -1566,7 +1566,6 @@ const create_stream_one = async (req) => {
   if (slot_booking.status == 'Booked') {
     throw new ApiError(httpStatus.NOT_FOUND, 'SLot Alredy Booked');
   }
-  slot_booking = await SlotBooking.findByIdAndUpdate({ _id: slot_booking._id }, { status: 'Booked' }, { new: true });
   let current_deta = new Date().getTime();
   let slot = await Slot.findById(slot_booking.slotId);
   if (slot.end > current_deta) {
@@ -1626,6 +1625,7 @@ const create_stream_one = async (req) => {
       await Dates.create_date(post);
     });
     await Dates.create_date(value);
+    slot_booking = await SlotBooking.findByIdAndUpdate({ _id: slot_booking._id }, { status: 'Booked' }, { new: true });
   } else {
     throw new ApiError(httpStatus.NOT_FOUND, 'App id Not found');
   }
