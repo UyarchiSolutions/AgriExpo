@@ -1760,6 +1760,36 @@ const get_all_stream = async (req) => {
         path: '$slots',
       },
     },
+    // {
+    //   $lookup: {
+    //     from: 'slotbookings',
+    //     localField: 'bookingslotId',
+    //     foreignField: '_id',
+    //     pipeline: [
+    //       {
+    //         $lookup: {
+    //           from: 'slots',
+    //           localField: 'slotId',
+    //           foreignField: '_id',
+    //           as: 'slots',
+    //         },
+    //       },
+    //       {
+    //         $unwind: {
+    //           preserveNullAndEmptyArrays: true,
+    //           path: '$slots',
+    //         },
+    //       },
+    //     ],
+    //     as: 'slotbookings',
+    //   },
+    // },
+    // {
+    //   $unwind: {
+    //     preserveNullAndEmptyArrays: true,
+    //     path: '$slotbookings',
+    //   },
+    // },
     {
       $addFields: {
         Duration: { $ifNull: ['$slots.Duration', ''] },
@@ -2739,7 +2769,8 @@ const get_all_streams = async (req) => {
         streamExpire: 1,
         Service_Charges: 1,
         completedStream: 1,
-        streamEnd_Time: 1
+        streamEnd_Time: 1,
+        transaction: 1,
       },
     },
 
