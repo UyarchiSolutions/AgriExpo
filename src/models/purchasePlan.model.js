@@ -192,7 +192,7 @@ const purchasePlanSchema = mongoose.Schema(
       type: String,
     },
     PostCount: {
-      type: String,
+      type: Number,
     },
     approvalDate: {
       type: Number,
