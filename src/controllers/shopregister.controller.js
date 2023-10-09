@@ -209,6 +209,11 @@ const get_Streaming_ordersByOrder = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const createWallet = catchAsync(async (req, res) => {
+  const data = await registerShop.createWallet;
+  res.send(data);
+});
+
 module.exports = {
   register_shop,
   verify_otp,
@@ -243,4 +248,5 @@ module.exports = {
   get_Streaming_ordersByStream,
   get_Streaming_ordersByOrder,
   verify_otpDelete_Account,
+  createWallet,
 };

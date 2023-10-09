@@ -369,6 +369,7 @@ const setPassword = async (body) => {
       });
     }
   });
+
   return { message: 'Password updated successfully' };
 };
 
@@ -425,7 +426,7 @@ const setPasswordExhibitor = async (body) => {
           console.log(typeof hash);
           await PartnerExhibitor.findByIdAndUpdate(
             { _id: findBymobile._id },
-            { password: hash, verified: true },
+            { password: hash, verified: true, registered: true },
             { new: true }
           );
           // return hash;
@@ -442,7 +443,7 @@ const loginPartnerExhibitor = async (body) => {
   if (!findBymobile) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid User');
   }
-  if (!(await bcrypt.compare(password,findBymobile.password))) {
+  if (!(await bcrypt.compare(password, findBymobile.password))) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid Password');
   }
   return findBymobile;

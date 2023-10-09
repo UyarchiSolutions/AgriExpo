@@ -558,6 +558,10 @@ const PartnerExhibitorSchema = mongoose.Schema(
     GST_Number: {
       type: String,
     },
+    verified: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
