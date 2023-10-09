@@ -228,12 +228,12 @@ const get_payment_link = catchAsync(async (req, res) => {
   res.send(data);
 });
 
-const paynow_payment= catchAsync(async (req, res) => {
+const paynow_payment = catchAsync(async (req, res) => {
   const data = await purchasePlan.paynow_payment(req);
   res.send(data);
 });
 
-const get_purchase_links= catchAsync(async (req, res) => {
+const get_purchase_links = catchAsync(async (req, res) => {
   const data = await purchasePlan.get_purchase_links(req);
   res.send(data);
 });
@@ -279,5 +279,5 @@ module.exports = {
   plan_payment_link_generate,
   get_payment_link,
   paynow_payment,
-  get_purchase_links
+  get_purchase_links,
 };
