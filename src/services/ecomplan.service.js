@@ -2476,6 +2476,7 @@ const get_all_streams = async (req) => {
   if (req.query.status == 'Completed') {
     statusFilter = {
       $and: [
+        { streamExpire: { $gte: date_now_string } },
         { stream_expired: { $eq: false } },
         {
           $or: [
