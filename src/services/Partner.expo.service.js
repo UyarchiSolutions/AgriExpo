@@ -442,7 +442,7 @@ const loginPartnerExhibitor = async (body) => {
   if (!findBymobile) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid User');
   }
-  if (!(await findBymobile.isPasswordMatch(password))) {
+  if (!(await bcrypt.compare(password,findBymobile.password))) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid Password');
   }
   return findBymobile;
