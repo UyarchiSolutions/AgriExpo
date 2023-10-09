@@ -2771,6 +2771,7 @@ const get_all_streams = async (req) => {
         completedStream: 1,
         streamEnd_Time: 1,
         transaction: 1,
+        Location: 1
       },
     },
 
