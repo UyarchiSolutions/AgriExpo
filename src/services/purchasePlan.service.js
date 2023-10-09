@@ -1056,7 +1056,7 @@ const getPlanes_Request_Streams = async (userId) => {
           ],
         },
         transaction: 1,
-        max_post_per_stream: 1
+        PostCount: 1
 
       },
     },
