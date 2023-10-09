@@ -1568,7 +1568,7 @@ const create_stream_one = async (req) => {
   }
   let current_deta = new Date().getTime();
   let slot = await Slot.findById(slot_booking.slotId);
-  if (slot.end > current_deta) {
+  if (slot.end < current_deta) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Slot Time Ended');
   }
   let data = slot.date;
