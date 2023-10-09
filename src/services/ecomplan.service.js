@@ -2502,7 +2502,7 @@ const get_all_streams = async (req) => {
     statusFilter = {
       $and: [
         { tokenGeneration: { $eq: true } },
-        { streamExpire: { $gte: date_now_string } },
+        { streamExpire: { $lte: date_now_string } },
         { status: { $ne: 'Cancelled' } },
       ],
     };
