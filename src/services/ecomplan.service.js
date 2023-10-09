@@ -1854,7 +1854,7 @@ const get_all_stream = async (req) => {
           {
             $project: {
               _id: 1,
-              productTitle: '$streamposts.productTitle',
+              productTitle: '$streamposts.products.productTitle',
               productId: '$streamposts.productId',
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
