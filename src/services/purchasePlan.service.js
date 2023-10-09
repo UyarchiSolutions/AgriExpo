@@ -1034,6 +1034,7 @@ const getPlanes_Request_Streams = async (userId) => {
         PeakSlots: { $ifNull: [{ $size: '$BookedSlotsPeak' }, 0] },
         ExclusiveSlots: { $ifNull: [{ $size: '$BookedSlotsExclusive' }, 0] },
         transaction: 1,
+        PostCount: 1
       },
     },
     {
