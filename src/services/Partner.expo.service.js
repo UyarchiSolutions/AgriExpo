@@ -448,6 +448,15 @@ const loginPartnerExhibitor = async (body) => {
   return findBymobile;
 };
 
+const continueRegistration = async (body) => {
+  let values = await PartnerExhibitor.findOne({ mobileNumber: body.mobileNumber });
+  if (!values) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile number Registered');
+  }
+  await PartnerExhibitorotp(req.body.mobileNumber, values, 'cont');
+  return { message: 'OTP Send Success' };
+};
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -472,4 +481,5 @@ module.exports = {
   VerifyOTPExhibitor,
   setPasswordExhibitor,
   loginPartnerExhibitor,
+  continueRegistration,
 };

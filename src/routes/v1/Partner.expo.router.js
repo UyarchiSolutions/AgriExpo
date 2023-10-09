@@ -27,4 +27,5 @@ router.route('/create/Partner/Exhibitor').post(PartnerController.createPartnerEx
 router.route('/Verify/OTPExhibitor').post(PartnerController.VerifyOTPExhibitor);
 router.route('/setPassword/Exhibitor').post(PartnerController.setPasswordExhibitor);
 router.route('/login/Partner/Exhibitor').post(PartnerController.loginPartnerExhibitor);
+router.route('/continue/Registration').post(PartnerController.continueRegistration);
 module.exports = router;

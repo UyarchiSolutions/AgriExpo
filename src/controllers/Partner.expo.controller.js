@@ -120,6 +120,11 @@ const loginPartnerExhibitor = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const continueRegistration = catchAsync(async (req, res) => {
+  const data = await PartnerService.continueRegistration(req.body);
+  res.send(data);
+});
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -145,4 +150,5 @@ module.exports = {
   VerifyOTPExhibitor,
   setPasswordExhibitor,
   loginPartnerExhibitor,
+  continueRegistration,
 };
