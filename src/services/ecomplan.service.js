@@ -1742,6 +1742,7 @@ const create_stream_two = async (req) => {
 };
 const get_all_stream = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
+  let date_now=new Date().getTime();
   const value = await Streamrequest.aggregate([
     { $match: { $and: [{ suppierId: { $eq: req.userId } }] } },
     { $sort: { DateIso: -1 } },
@@ -1853,22 +1854,34 @@ const get_all_stream = async (req) => {
           {
             $project: {
               _id: 1,
-              images: '$streamposts.images',
+              productTitle: '$streamposts.productTitle',
               productId: '$streamposts.productId',
-              categoryId: '$streamposts.categoryId',
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
               postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
+              validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
+              afterStreaming: '$streamposts.afterStreaming',
+              bookingAmount: '$streamposts.bookingAmount',
               discription: '$streamposts.discription',
+              images: '$streamposts.images',
+              incrementalLots: '$streamposts.incrementalLots',
               location: '$streamposts.location',
-              suppierId: '$streamposts.suppierId',
-              DateIso: '$streamposts.DateIso',
-              created: '$streamposts.created',
+              orderedQTY: '$streamposts.orderedQTY',
+              pendingQTY: '$streamposts.pendingQTY',
+              productId: '$streamposts.productId',
               video: '$streamposts.video',
-              productTitle: '$streamposts.products.productTitle',
+              define_QTY: '$streamposts.define_QTY',
+              define_UNIT: '$streamposts.define_UNIT',
+              booking_charge: '$streamposts.booking_charge',
+              booking_percentage: '$streamposts.booking_percentage',
+              pack_discription: '$streamposts.pack_discription',
+              dispatchPincode: '$streamposts.dispatchPincode',
+              transaction: '$streamposts.transaction',
+              dispatchLocation: '$streamposts.dispatchLocation',
+              unit: '$streamposts.unit'
             },
           },
           // {
@@ -1878,6 +1891,11 @@ const get_all_stream = async (req) => {
           // },
         ],
         as: 'streamrequestposts',
+      },
+    },
+    {
+      $addFields: {
+        streamExpire: { $gt: ['$streamExpire', date_now] },
       },
     },
     { $skip: 10 * page },
@@ -2460,16 +2478,17 @@ const get_all_streams = async (req) => {
   if (req.query.status == 'All') {
     statusFilter = { active: true };
   }
-
+  var date_now_string = new Date().getTime();
   if (req.query.status == 'Completed') {
     statusFilter = {
       $and: [
+        { streamExpire: { $gte: date_now_string } },
         { stream_expired: { $eq: false } },
         {
           $or: [
             { status: { $eq: 'Completed' } },
             {
-              $and: [{ tokenGeneration: { $eq: true } }, { endTime: { $lte: date_now } }, { status: { $ne: 'Cancelled' } }],
+              $and: [{ tokenGeneration: { $eq: true } }, { streamEnd_Time: { $lte: date_now } }, { status: { $ne: 'Cancelled' } }],
             },
           ],
         },
@@ -2485,18 +2504,31 @@ const get_all_streams = async (req) => {
     };
   }
 
-  var date_now_string = new Date();
   if (req.query.status == 'Expired') {
     statusFilter = {
       $and: [
         { tokenGeneration: { $eq: true } },
-        { originalDate: { $lte: date_now_string } },
+        { streamExpire: { $lte: date_now_string } },
         { status: { $ne: 'Cancelled' } },
       ],
     };
   }
 
   const value = await Streamrequest.aggregate([
+    {
+      $lookup: {
+        from: 'slots',
+        localField: 'slotId',
+        foreignField: '_id',
+        as: 'slots',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$slots',
+      },
+    },
     {
       $addFields: {
         originalDate: {
@@ -2563,6 +2595,7 @@ const get_all_streams = async (req) => {
                     dispatchPincode: 1,
                     transaction: 1,
                     dispatchLocation: 1,
+                    unit: 1
                   },
                 },
               ],
@@ -2600,6 +2633,8 @@ const get_all_streams = async (req) => {
               dispatchPincode: '$streamposts.dispatchPincode',
               transaction: '$streamposts.transaction',
               dispatchLocation: '$streamposts.dispatchLocation',
+              unit: '$streamposts.unit',
+
             },
           },
         ],
@@ -2805,7 +2840,8 @@ const get_all_streams = async (req) => {
         completedStream: 1,
         streamEnd_Time: 1,
         transaction: 1,
-        Location: 1
+        Location: 1,
+        slots: "$slots"
       },
     },
 
