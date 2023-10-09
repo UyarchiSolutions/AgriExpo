@@ -14,6 +14,8 @@ const {
   Notify,
   Streampostprice,
 } = require('../models/ecomplan.model');
+const { SlotBooking } = require('../models/SlotBooking.model');
+
 const { Slot } = require('../models/slot.model');
 const axios = require('axios'); //
 const { streamingOrder, streamingorderProduct, streamingorderPayments } = require('../models/liveStreaming/checkout.model');
@@ -1557,10 +1559,20 @@ const remove_one_post = async (req) => {
 };
 
 const create_stream_one = async (req) => {
-  let slot = await Slot.findById(req.body.slot);
+  let slot_booking = await SlotBooking.findById(req.body.slot);
+  if (!slot_booking) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'SLot Booking not found');
+  }
+  if (slot_booking.status == 'Booked') {
+    throw new ApiError(httpStatus.NOT_FOUND, 'SLot Alredy Booked');
+  }
+  let current_deta = new Date().getTime();
+  let slot = await Slot.findById(slot_booking.slotId);
+  if (slot.end < current_deta) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Slot Time Ended');
+  }
   let data = slot.date;
   let time = slot.startFormat;
-  slot = await Slot.findByIdAndUpdate({ _id: slot._id }, { Status: 'Booked' }, { new: true });
   let startTime = new Date(new Date(data + ' ' + time)).getTime();
   let plan = await purchasePlan.findById(req.body.planId);
   let Duration = slot.Duration;
@@ -1613,6 +1625,7 @@ const create_stream_one = async (req) => {
       await Dates.create_date(post);
     });
     await Dates.create_date(value);
+    slot_booking = await SlotBooking.findByIdAndUpdate({ _id: slot_booking._id }, { status: 'Booked' }, { new: true });
   } else {
     throw new ApiError(httpStatus.NOT_FOUND, 'App id Not found');
   }

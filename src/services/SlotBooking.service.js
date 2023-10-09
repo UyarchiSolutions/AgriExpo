@@ -81,12 +81,23 @@ const getBooked_Slot = async (userId, id) => {
 };
 
 const getBooked_Slot_By_Exhibitor = async (userId, planId) => {
+
+  let date_now = new Date().getTime();
   let val = await SlotBooking.aggregate([
-    { $match: { userId: userId, PlanId: planId, Status: { $ne: 'Booked' } } },
+    { $match: { $and: [{ userId: { $eq: userId } }, { PlanId: { $eq: planId } }, { status: { $ne: "Booked" } }] } },
     {
       $lookup: {
         from: 'slots',
         localField: 'slotId',
+        pipeline: [
+          {
+            $addFields: {
+              slotExpire: {
+                $cond: { if: { $lt: ['$end', date_now] }, then: true, else: false },
+              },
+            },
+          },
+        ],
         foreignField: '_id',
         as: 'slots',
       },
@@ -95,6 +106,11 @@ const getBooked_Slot_By_Exhibitor = async (userId, planId) => {
       $unwind: {
         preserveNullAndEmptyArrays: true,
         path: '$slots',
+      },
+    },
+    {
+      $addFields: {
+        slotExpire: "$slots.slotExpire",
       },
     },
   ]);

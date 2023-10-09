@@ -76,7 +76,7 @@ router.route('/create/stream/one').put(SellerAuth, Ecomcontroller.find_and_updat
 router.route('/create/stream/one/image').post(upload_image, Ecomcontroller.create_stream_one_image);
 router.route('/create/stream/one/broucher').post(upload_broucher, Ecomcontroller.create_stream_one_broucher);
 router.route('/create/stream/one/video').post(upload, Ecomcontroller.create_stream_one_video);
-router.route('/create/stream/one/Broucher').post(uploadBroucher, Ecomcontroller.create_stream_one_Broucher);
+// router.route('/create/stream/one/Broucher').post(uploadBroucher, Ecomcontroller.create_stream_one_Broucher);
 router.route('/create/stream/two').post(SellerAuth, Ecomcontroller.create_stream_two);
 router.route('/get/all/stream').get(SellerAuth, Ecomcontroller.get_all_stream);
 router.route('/get/one/stream').get(SellerAuth, Ecomcontroller.get_one_stream);
