@@ -1742,6 +1742,7 @@ const create_stream_two = async (req) => {
 };
 const get_all_stream = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
+  let date_now=new Date().getTime();
   const value = await Streamrequest.aggregate([
     { $match: { $and: [{ suppierId: { $eq: req.userId } }] } },
     { $sort: { DateIso: -1 } },
