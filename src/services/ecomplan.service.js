@@ -1606,6 +1606,7 @@ const create_stream_one = async (req) => {
         endTime: datess,
         streamEnd_Time: datess,
         slotId: slot._id,
+        bookingslotId: slot_booking._id,
         streamingDate: slot.date,
         streamPlanId: plan.planId,
         agoraID: agoraID.element._id,

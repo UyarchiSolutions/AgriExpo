@@ -504,6 +504,9 @@ const streamRequestschema = mongoose.Schema({
   slotId: {
     type: String,
   },
+  bookingslotId: {
+    type: String,
+  },
   Location: {
     type: String,
   },
