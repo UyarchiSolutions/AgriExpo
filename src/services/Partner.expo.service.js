@@ -386,11 +386,8 @@ const loginPartner = async (body) => {
 
 const createPartnerExhibitor = async (req) => {
   let findByMobile = await PartnerExhibitor.findOne({ mobileNumber: req.body.mobileNumber });
-  if (!findByMobile) {
+  if (findByMobile) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile Number Already Exists');
-  }
-  if (findByMobile.email === req.body.email) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'E-mail already exists');
   }
   let creation = await PartnerExhibitor.create(req.body);
   await PartnerExhibitorotp(req.body.mobileNumber, creation, 'reg');
@@ -451,6 +448,15 @@ const loginPartnerExhibitor = async (body) => {
   return findBymobile;
 };
 
+const continueRegistration = async (body) => {
+  let values = await PartnerExhibitor.findOne({ mobileNumber: body.mobileNumber });
+  if (!values) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile number Registered');
+  }
+  await PartnerExhibitorotp(body.mobileNumber, values, 'cont');
+  return { message: 'OTP Send Success' };
+};
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -475,4 +481,5 @@ module.exports = {
   VerifyOTPExhibitor,
   setPasswordExhibitor,
   loginPartnerExhibitor,
+  continueRegistration,
 };
