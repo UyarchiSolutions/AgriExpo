@@ -2497,12 +2497,12 @@ const get_all_streams = async (req) => {
     };
   }
 
-  var date_now_string = new Date();
+  var date_now_string = new Date().getTime();
   if (req.query.status == 'Expired') {
     statusFilter = {
       $and: [
         { tokenGeneration: { $eq: true } },
-        { originalDate: { $lte: date_now_string } },
+        { streamExpire: { $gte: date_now_string } },
         { status: { $ne: 'Cancelled' } },
       ],
     };
