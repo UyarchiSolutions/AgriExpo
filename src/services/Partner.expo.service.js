@@ -389,8 +389,10 @@ const createPartnerExhibitor = async (req) => {
   if (findByMobile) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile Number Already Exists');
   }
-  if (findByMobile.email === req.body.email) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'E-mail already exists');
+  if(findByMobile.email){
+    if (findByMobile.email === req.body.email) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'E-mail already exists');
+    }
   }
   let creation = await PartnerExhibitor.create(req.body);
   await PartnerExhibitorotp(req.body.mobileNumber, creation, 'reg');
