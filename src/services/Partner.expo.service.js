@@ -453,7 +453,7 @@ const continueRegistration = async (body) => {
   if (!values) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile number Registered');
   }
-  await PartnerExhibitorotp(req.body.mobileNumber, values, 'cont');
+  await PartnerExhibitorotp(body.mobileNumber, values, 'cont');
   return { message: 'OTP Send Success' };
 };
 
