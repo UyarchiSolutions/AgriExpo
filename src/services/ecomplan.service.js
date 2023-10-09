@@ -2472,7 +2472,7 @@ const get_all_streams = async (req) => {
   if (req.query.status == 'All') {
     statusFilter = { active: true };
   }
-
+  var date_now_string = new Date().getTime();
   if (req.query.status == 'Completed') {
     statusFilter = {
       $and: [
@@ -2482,7 +2482,7 @@ const get_all_streams = async (req) => {
           $or: [
             { status: { $eq: 'Completed' } },
             {
-              $and: [{ tokenGeneration: { $eq: true } }, { endTime: { $lte: date_now } }, { status: { $ne: 'Cancelled' } }],
+              $and: [{ tokenGeneration: { $eq: true } }, { streamEnd_Time: { $lte: date_now } }, { status: { $ne: 'Cancelled' } }],
             },
           ],
         },
@@ -2498,7 +2498,6 @@ const get_all_streams = async (req) => {
     };
   }
 
-  var date_now_string = new Date().getTime();
   if (req.query.status == 'Expired') {
     statusFilter = {
       $and: [
