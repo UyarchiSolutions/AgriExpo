@@ -1645,7 +1645,7 @@ const production_supplier_token_watchamin = async (req) => {
         uploadLink: 1,
         uploadDate: 1,
         uploadStatus: 1,
-        location: 1,
+        Location: 1,
         transaction: 1
       },
     },
