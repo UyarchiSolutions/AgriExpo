@@ -587,13 +587,14 @@ const getEventsByEventId = async (id) => {
 };
 
 const getSlotsByEvent = async (req) => {
-  const { id, date, from, to, type, duration } = req.query;
+  const { id, date, from, to, type, duration, fromDate, toDate } = req.query;
   let idMatch = { active: true };
   let dateMatch = { active: true };
   let FromMatch = { active: true };
   let ToMatch = { active: true };
   let TypeMatch = { active: true };
   let DurationMatch = { active: true };
+  let DateDurationMatch = { active: true };
 
   if (id != 'null' && id) {
     idMatch = { eventId: id };
@@ -615,9 +616,13 @@ const getSlotsByEvent = async (req) => {
     DurationMatch = { Duration: parseInt(duration) };
   }
 
+  if ((fromDate && fromDate != 'null', toDate && toDate != 'null')) {
+    DateDurationMatch = { date: { $gte: fromDate, $lte: toDate } };
+  }
+
   const values = await Slot.aggregate([
     {
-      $match: { $and: [idMatch, dateMatch, FromMatch, ToMatch, TypeMatch, DurationMatch] },
+      $match: { $and: [idMatch, dateMatch, FromMatch, ToMatch, TypeMatch, DurationMatch, DateDurationMatch] },
     },
   ]);
   return values;
