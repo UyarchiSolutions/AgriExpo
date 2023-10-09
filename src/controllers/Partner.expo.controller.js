@@ -100,6 +100,26 @@ const forgotPassword = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const createPartnerExhibitor = catchAsync(async (req, res) => {
+  const data = await PartnerService.createPartnerExhibitor(req);
+  res.send(data);
+});
+
+const VerifyOTPExhibitor = catchAsync(async (req, res) => {
+  const data = await PartnerService.VerifyOTPExhibitor(req.body);
+  res.send(data);
+});
+
+const setPasswordExhibitor = catchAsync(async (req, res) => {
+  const data = await PartnerService.setPasswordExhibitor(req.body);
+  res.send(data);
+});
+
+const loginPartnerExhibitor = catchAsync(async (req, res) => {
+  const data = await PartnerService.loginPartnerExhibitor(req.body);
+  res.send(data);
+});
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -121,4 +141,8 @@ module.exports = {
   setPassword,
   loginPartner,
   forgotPassword,
+  createPartnerExhibitor,
+  VerifyOTPExhibitor,
+  setPasswordExhibitor,
+  loginPartnerExhibitor,
 };

@@ -23,4 +23,8 @@ router.route('/VerifyOTP').post(PartnerController.VerifyOTP);
 router.route('/setPassword').post(PartnerController.setPassword);
 router.route('/forgot').post(PartnerController.forgotPassword);
 router.route('/login').post(PartnerController.loginPartner);
+router.route('/create/Partner/Exhibitor').post(PartnerController.createPartnerExhibitor);
+router.route('/Verify/OTPExhibitor').post(PartnerController.VerifyOTPExhibitor);
+router.route('/setPassword/Exhibitor').post(PartnerController.setPasswordExhibitor);
+router.route('/login/Partner/Exhibitor').post(PartnerController.loginPartnerExhibitor);
 module.exports = router;

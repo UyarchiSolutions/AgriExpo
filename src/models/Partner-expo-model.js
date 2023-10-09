@@ -469,10 +469,132 @@ const PartnerOTPSchema = mongoose.Schema(
 
 const PartnerOTP = mongoose.model('partnerOTP', PartnerOTPSchema);
 
+const PartnerExhibitorSchema = mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    status: {
+      type: String,
+      default: 'Pending',
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+    archive: {
+      type: Boolean,
+      default: false,
+    },
+    tradeName: {
+      type: String,
+    },
+    businessType: {
+      type: String,
+    },
+    contactName: {
+      type: String,
+    },
+    mobileNumber: {
+      type: Number,
+    },
+    email: {
+      type: String,
+    },
+    category: {
+      type: Array,
+    },
+    address: {
+      type: String,
+    },
+    country: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
+    city: {
+      type: String,
+    },
+    mainSeller: {
+      type: String,
+    },
+    sellerType: {
+      type: String,
+    },
+    sellerRole: {
+      type: Array,
+    },
+    registered: {
+      type: Boolean,
+      default: false,
+    },
+    password: {
+      type: String,
+    },
+    roleNum: {
+      type: Array,
+    },
+    Pincode: {
+      type: Number,
+    },
+    how_did_you_know_us: {
+      type: String,
+    },
+    webSite: {
+      type: String,
+    },
+    Designation: {
+      type: String,
+    },
+    companyName: {
+      type: String,
+    },
+    notifyCount: {
+      type: Number,
+      default: 0,
+    },
+    GST_Number: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
+
+const PartnerExhibitor = mongoose.model('partnerExhibitor', PartnerExhibitorSchema);
+
+const PartnerExhibitorOTPSchema = mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    OTP: {
+      type: Number,
+    },
+    mobileNumber: {
+      type: Number,
+    },
+    userId: {
+      type: String,
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  { timestamps: true }
+);
+
+const PartnerExhibitorOTP = mongoose.model('PartnerExhibitorotp', PartnerExhibitorOTPSchema);
+
 module.exports = {
   Partner,
   PartnerPlan,
   PlanAllocation,
   Partnerplanpayment,
   PartnerOTP,
+  PartnerExhibitor,
+  PartnerExhibitorOTP,
 };

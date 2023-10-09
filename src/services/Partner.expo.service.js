@@ -1,8 +1,17 @@
 const httpStatus = require('http-status');
 const bcrypt = require('bcryptjs');
 const ApiError = require('../utils/ApiError');
-const { Partner, PartnerPlan, PlanAllocation, Partnerplanpayment, PartnerOTP } = require('../models/Partner-expo-model');
+const {
+  Partner,
+  PartnerPlan,
+  PlanAllocation,
+  Partnerplanpayment,
+  PartnerOTP,
+  PartnerExhibitor,
+  PartnerExhibitorOTP,
+} = require('../models/Partner-expo-model');
 const otp = require('../config/Partner.config');
+const PartnerExhibitorotp = require('../config/Partner.exhibitor.config');
 
 const createPartner = async (req) => {
   let body = req.body;
@@ -375,6 +384,73 @@ const loginPartner = async (body) => {
   return findBymobile;
 };
 
+const createPartnerExhibitor = async (req) => {
+  let findByMobile = await PartnerExhibitor.findOne({ mobileNumber: req.body.mobileNumber });
+  if (!findByMobile) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile Number Already Exists');
+  }
+  if (findByMobile.email === req.body.email) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'E-mail already exists');
+  }
+  let creation = await PartnerExhibitor.create(req.body);
+  await PartnerExhibitorotp(req.body.mobileNumber, creation, 'reg');
+  return creation;
+};
+
+const VerifyOTPExhibitor = async (body) => {
+  const { mobileNumber, OTP } = body;
+  let findOTP = await PartnerExhibitorOTP.findOne({ mobileNumber: mobileNumber, OTP: OTP, active: true }).sort({
+    createdDate: -1,
+  });
+  if (!findOTP) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid OTP');
+  }
+  findOTP.active = false;
+  await findOTP.save();
+  return { message: 'OTP Verification Sucess.' };
+};
+
+const setPasswordExhibitor = async (body) => {
+  const { password, mobileNumber } = body;
+  let findBymobile = await PartnerExhibitor.findOne({ mobileNumber: mobileNumber });
+  if (!findBymobile) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Contact Event Manager');
+  }
+  const plaintextPassword = password;
+  bcrypt.genSalt(10, (err, salt) => {
+    if (err) {
+      console.error(err);
+    } else {
+      bcrypt.hash(plaintextPassword, salt, async (err, hash) => {
+        if (err) {
+          console.error(err);
+        } else {
+          console.log(typeof hash);
+          await PartnerExhibitor.findByIdAndUpdate(
+            { _id: findBymobile._id },
+            { password: hash, verified: true },
+            { new: true }
+          );
+          // return hash;
+        }
+      });
+    }
+  });
+  return { message: 'Password updated successfully' };
+};
+
+const loginPartnerExhibitor = async (body) => {
+  const { mobileNumber, password } = body;
+  let findBymobile = await PartnerExhibitor.findOne({ mobileNumber: mobileNumber });
+  if (!findBymobile) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid User');
+  }
+  if (!(await findBymobile.isPasswordMatch(password))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid Password');
+  }
+  return findBymobile;
+};
+
 module.exports = {
   createPartner,
   gePartnersAll,
@@ -395,4 +471,8 @@ module.exports = {
   setPassword,
   loginPartner,
   forgotPassword,
+  createPartnerExhibitor,
+  VerifyOTPExhibitor,
+  setPasswordExhibitor,
+  loginPartnerExhibitor,
 };
