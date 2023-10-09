@@ -386,7 +386,7 @@ const loginPartner = async (body) => {
 
 const createPartnerExhibitor = async (req) => {
   let findByMobile = await PartnerExhibitor.findOne({ mobileNumber: req.body.mobileNumber });
-  if (!findByMobile) {
+  if (findByMobile) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile Number Already Exists');
   }
   if (findByMobile.email === req.body.email) {
