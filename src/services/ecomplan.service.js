@@ -1892,6 +1892,11 @@ const get_all_stream = async (req) => {
         as: 'streamrequestposts',
       },
     },
+    {
+      $addFields: {
+        streamExpire: { $gt: ['$streamExpire', date_now] },
+      },
+    },
     { $skip: 10 * page },
     { $limit: 10 },
   ]);
