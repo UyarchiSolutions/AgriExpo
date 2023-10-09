@@ -14646,7 +14646,7 @@ const search_product_list = async (req) => {
   let findstreamType = {
     $cond: {
       if: { $and: [{ $gte: ['$startTime', date_now] }] },
-      then: "Upcomming",
+      then: "Upcoming",
       else: {
         $cond: {
           if: { $and: [{ $lte: ['$startTime', date_now] }, { $gte: ['$streamEnd_Time', date_now] }] },
