@@ -108,7 +108,7 @@ const pay_now_encript_value = async (req) => {
 }
 
 
-const exhibitor_purchese_plan = async (amount, redirct, paymentLink) => {
+const exhibitor_purchese_plan = async (amount, redirct, paymentLink, price, gst) => {
     var body = '',
         workingKey = '1AC82EC283C6AE1561C420D21169F52F',	//Put in the 32-Bit key shared by CCAvenues.
         accessCode = 'AVUK05KI18AW28KUWA',				//Put in the Access Code shared by CCAvenues.
@@ -146,7 +146,9 @@ const exhibitor_purchese_plan = async (amount, redirct, paymentLink) => {
         merchant_param5: "additional Info.",
         promo_code: "",
         redirct: redirct,
-        my_redirect_url: redirct
+        my_redirect_url: redirct,
+        price: price,
+        gst: gst
     };
     const queryString = objectToQueryString(data);
     const bufferData = Buffer.from(queryString, 'utf-8');
@@ -381,6 +383,117 @@ const get_paymant_success_response = async (req) => {
     return payment[0];
 }
 
+
+const get_paymant_success_response_exp = async (req) => {
+    let id = req.params.id;
+    let payment = await ccavenue_paymnet.aggregate([
+        { $match: { $and: [{ _id: { $eq: id } }] } },
+        {
+            $lookup: {
+                from: 'purchasedplans',
+                localField: '_id',
+                foreignField: 'ccavenue',
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: 'sellers',
+                            localField: 'suppierId',
+                            foreignField: '_id',
+                            as: 'sellers',
+                        },
+                    },
+                    {
+                        $unwind: '$sellers',
+                    },
+
+                    {
+                        $project: {
+                            "numberOfStreamused": 1,
+                            "planType": 1,
+                            "streamvalidity": 1,
+                            "slotInfo": 1,
+                            "status": 1,
+                            "PayementStatus": 1,
+                            "PaidAmount": 1,
+                            "planName": 1,
+                            "numberOfParticipants": 1,
+                            "Teaser": 1,
+                            "completedStream": 1,
+                            "Pdf": 1,
+                            "image": 1,
+                            "description": 1,
+                            "RaiseHands": 1,
+                            "Special_Notification": 1,
+                            "chat_Option": 1,
+                            "Price": 1,
+                            "PostCount": 1,
+                            "no_of_host": 1,
+                            "DateIso": 1,
+                            "planId": 1,
+                            "transaction": 1,
+                            "offer_price": 1,
+                            "stream_validity": 1,
+                            "Interest_View_Count": 1,
+                            "Service_Charges": 1,
+                            "TimeType": 1,
+                            "raisehandcontrol": 1,
+                            "Discount": 1,
+                            "Referral": 1,
+                            "RevisedAmount": 1,
+                            "Type": 1,
+                            "paymentLink": 1,
+                            "approvalDate": 1,
+                            mobileNumber: "$sellers.mobileNumber",
+                            email: "$sellers.email",
+                            tradeName: "$sellers.tradeName",
+                        }
+                    }
+                ],
+                as: 'purchasedplans',
+            },
+        },
+        {
+            $unwind: '$purchasedplans',
+        },
+        {
+            $project: {
+                "_id": 1,
+                "order_id": 1,
+                "currency": 1,
+                "amount": 1,
+                "language": 1,
+                "billing_name": 1,
+                "billing_address": 1,
+                "billing_city": 1,
+                "billing_state": 1,
+                "billing_zip": 1,
+                "billing_country": 1,
+                "billing_tel": 1,
+                "billing_email": 1,
+                "delivery_address": 1,
+                "delivery_city": 1,
+                "delivery_state": 1,
+                "delivery_zip": 1,
+                "delivery_country": 1,
+                "delivery_tel": 1,
+                "promo_code": 1,
+                "paymentLink": 1,
+                "createdAt": 1,
+                "updatedAt": 1,
+                response: 1,
+                purchasedplans: "$purchasedplans",
+                mobileNumber: "$purchasedplans.mobileNumber",
+                email: "$purchasedplans.email",
+                tradeName: "$purchasedplans.tradeName",
+            }
+        }
+    ])
+    if (payment.length == 0) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Payment not found');
+    }
+    return payment[0];
+}
+
 module.exports = {
     get_paymnent_url,
     pay_now_encript_value,
@@ -389,7 +502,8 @@ module.exports = {
     redirect_payment_gateway,
     exhibitor_purchese_plan,
     create_plan_paymant,
-    get_paymant_success_response
+    get_paymant_success_response,
+    get_paymant_success_response_exp
 }
 
 

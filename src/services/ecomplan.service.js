@@ -1742,7 +1742,7 @@ const create_stream_two = async (req) => {
 };
 const get_all_stream = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
-  let date_now=new Date().getTime();
+  let date_now = new Date().getTime();
   const value = await Streamrequest.aggregate([
     { $match: { $and: [{ suppierId: { $eq: req.userId } }] } },
     { $sort: { DateIso: -1 } },
@@ -1854,7 +1854,7 @@ const get_all_stream = async (req) => {
           {
             $project: {
               _id: 1,
-              productTitle: '$streamposts.productTitle',
+              productTitle: '$streamposts.products.productTitle',
               productId: '$streamposts.productId',
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
@@ -2127,6 +2127,24 @@ const get_all_admin = async (req) => {
                     suppierId: 1,
                     DateIso: 1,
                     created: 1,
+                    afterStreaming: 1,
+                    bookingAmount: 1,
+                    discription: 1,
+                    images: 1,
+                    location: 1,
+                    orderedQTY: 1,
+                    pendingQTY: 1,
+                    productId: 1,
+                    video: 1,
+                    define_QTY: 1,
+                    define_UNIT: 1,
+                    booking_charge: 1,
+                    booking_percentage: 1,
+                    pack_discription: 1,
+                    dispatchPincode: 1,
+                    transaction: 1,
+                    dispatchLocation: 1,
+                    unit: 1,
                   },
                 },
               ],
@@ -2146,6 +2164,24 @@ const get_all_admin = async (req) => {
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
+              afterStreaming: '$streamposts.afterStreaming',
+              bookingAmount: '$streamposts.bookingAmount',
+              discription: '$streamposts.discription',
+              images: '$streamposts.images',
+              location: '$streamposts.location',
+              orderedQTY: '$streamposts.orderedQTY',
+              pendingQTY: '$streamposts.pendingQTY',
+              productId: '$streamposts.productId',
+              video: '$streamposts.video',
+              define_QTY: '$streamposts.define_QTY',
+              define_UNIT: '$streamposts.define_UNIT',
+              booking_charge: '$streamposts.booking_charge',
+              booking_percentage: '$streamposts.booking_percentage',
+              pack_discription: '$streamposts.pack_discription',
+              dispatchPincode: '$streamposts.dispatchPincode',
+              transaction: '$streamposts.transaction',
+              dispatchLocation: '$streamposts.dispatchLocation',
+              unit: '$streamposts.unit'
             },
           },
         ],
@@ -2161,6 +2197,20 @@ const get_all_admin = async (req) => {
       },
     },
     { $unwind: '$sellers' },
+    {
+      $lookup: {
+        from: 'slots',
+        localField: 'slotId',
+        foreignField: '_id',
+        as: 'slots',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$slots',
+      },
+    },
     {
       $project: {
         _id: 1,
@@ -2188,6 +2238,9 @@ const get_all_admin = async (req) => {
         secondarycommunication: 1,
         startTime: 1,
         chat_need: 1,
+        transaction: 1,
+        Location: 1,
+        slots: "$slots"
       },
     },
 
@@ -14459,9 +14512,16 @@ const get_address_log = async (req) => {
 
 const purchesPlane_exhibitor = async (req, res) => {
   const { amount, plan, redirct } = req.body;
-  let paynow = await ccavenue.exhibitor_purchese_plan(amount, 'https://agriexpo.click/success');
+  let plandetails = await Streamplan.findById(plan)
+  if (!plandetails) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
+  }
+  let price = plandetails.offer_price;
+  let gst = (price * 18) / 100;
+  let total = price + gst;
+  let paynow = await ccavenue.exhibitor_purchese_plan(total, 'https://agriexpo.click/success', null, price, gst);
   console.log(paynow.payment.id, paynow.payment._id);
-  let purchase = await purchese_plan.create_PurchasePlan_EXpo(plan, req.userId, paynow.payment.id);
+  let purchase = await purchese_plan.create_PurchasePlan_EXpo(plan, req.userId, paynow.payment.id, gst);
   return paynow;
 };
 
@@ -14593,7 +14653,7 @@ const search_product_list = async (req) => {
   let findstreamType = {
     $cond: {
       if: { $and: [{ $gte: ['$startTime', date_now] }] },
-      then: "Upcomming",
+      then: "Upcoming",
       else: {
         $cond: {
           if: { $and: [{ $lte: ['$startTime', date_now] }, { $gte: ['$streamEnd_Time', date_now] }] },

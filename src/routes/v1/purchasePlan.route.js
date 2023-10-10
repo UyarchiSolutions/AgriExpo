@@ -27,6 +27,7 @@ router.route('/purchase/PurchasePlan/expo/admin').post(purchasePlan.create_Purch
 router.route('/fetch/getPurchasedPlan').get(SellerAuth, purchasePlan.getPurchasedPlan);
 router.route('/:id').put(SellerAuth, purchasePlan.updatePurchasedPlan).get(purchasePlan.getPlanyById);
 router.route('/update/:id').put(purchasePlan.updatePurchasedPlanById);
+router.route('/update/purchase/:id').put(purchasePlan.updatePurchase_admin);
 router.route('/get/All/Planes/:page').get(purchasePlan.get_All_Planes);
 router.route('/Change/Purchased/Plan/:id').put(purchasePlan.ChangePurchasedPlan);
 router.route('/UploadProof/plan/:id').put(upload, purchasePlan.UploadProof);
