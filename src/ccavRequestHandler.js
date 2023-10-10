@@ -8,6 +8,9 @@ const { purchasePlan, PlanPayment, PurchaseLink } = require("./models/purchasePl
 const ApiError = require('./utils/ApiError');
 const httpStatus = require('http-status');
 const { Slotseperation } = require('./models/slot.model');
+const { Purchased_Message } = require("./services/purchasePlan.service")
+
+const { Seller } = require("./models/seller.models")
 
 exports.postReq = function (request, response) {
     var body = '',
@@ -72,12 +75,19 @@ exports.success_recive = function (request, response) {
         // // response.end();
         // response.render("payment-success.html", { data: ccavResponse });
         orders = await update_ccavenue_payment(result, encryption)
-        const redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/plan/success/' + orders._id;
-        response.redirect(301, redirectUrl);
+        let redirectUr = "https://exhibitor.agriexpo.live/"
+        if (result.order_status == 'Success') {
+            redirectUr = 'https://exhibitor.agriexpo.live/dashboard/plan/success/' + orders._id;
 
+        }
+        else {
+            redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/plan/cancel/' + orders._id;
+        }
+        response.redirect(301, redirectUrl);
         // response.redirect(result.merchant_param1 + "/" + result.order_id)
     });
 };
+
 
 
 exports.payment_success = function (request, response) {
@@ -107,7 +117,13 @@ exports.payment_success = function (request, response) {
     });
     request.on('end', async function () {
         orders = await update_ccavenue_payment_link(result, encryption)
-        const redirectUrl = 'https://exhibitor.agriexpo.live/paynow/success/' + orders._id;
+        let redirectUr = "https://exhibitor.agriexpo.live/"
+        if (result.order_status == 'Success') {
+            redirectUr = 'https://exhibitor.agriexpo.live/paynow/success/' + orders._id;
+        }
+        else {
+            redirectUrl = 'https://exhibitor.agriexpo.live/paynow/cancel/' + orders._id;
+        }
         response.redirect(301, redirectUrl);
 
     });
@@ -124,28 +140,33 @@ const update_ccavenue_payment = async (result, encryption) => {
         find.response = result;
         find.save();
     }
+    if (result.order_status == 'Success') {
+        let plan = await purchasePlan.findOne({ ccavenue: find._id })
+        if (!plan) {
+            throw new ApiError(httpStatus.NOT_FOUND, 'pursace Plan  not found');
+        }
+        else {
+            await create_PlanPayment(plan._id, result, find._id)
+            plan.status = 'Activated';
+            plan.save();
 
-    let plan = await purchasePlan.findOne({ ccavenue: find._id })
-    if (!plan) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'pursace Plan  not found');
-    }
-    else {
-        await create_PlanPayment(plan._id, result, find._id)
-        plan.status = 'Activated';
-        plan.save();
-
-        plan.slotInfo.forEach(async (e) => {
-            // suppierId
-            await Slotseperation.create({
-                SlotType: e.slotType,
-                Duration: e.Duration,
-                userId: plan.suppierId,
-                Slots: e.No_Of_Slot,
-                PlanId: plan._id,
-                streamPlanId: plan.planId,
+            plan.slotInfo.forEach(async (e) => {
+                // suppierId
+                await Slotseperation.create({
+                    SlotType: e.slotType,
+                    Duration: e.Duration,
+                    userId: plan.suppierId,
+                    Slots: e.No_Of_Slot,
+                    PlanId: plan._id,
+                    streamPlanId: plan.planId,
+                });
             });
-        });
+            let findUser = await Seller.findById(plan.suppierId);
+            await Purchased_Message(findUser.tradeName, plan.planName, findUser.mobileNumber);
+        }
+
     }
+
     return find;
 }
 
@@ -159,23 +180,27 @@ const update_ccavenue_payment_link = async (result, encryption) => {
         find.response = result;
         find.save();
     }
-    console.log(find)
-    let plan = await purchasePlan.findOne({ ccavenue: find._id })
-    if (!plan) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'pursace Plan  not found');
+    if (result.order_status == 'Success') {
+        let plan = await purchasePlan.findOne({ ccavenue: find._id })
+        if (!plan) {
+            throw new ApiError(httpStatus.NOT_FOUND, 'pursace Plan  not found');
+        }
+        else {
+            await create_PlanPayment(plan._id, result, find._id)
+            plan.status = 'Activated';
+            plan.save();
+        }
+        let link = await PurchaseLink.findById(find.paymentLink);
+        if (!link) {
+            throw new ApiError(httpStatus.NOT_FOUND, 'Payment Link not found');
+        }
+        link.status = "Paid";
+        link.save();
+        let findUser = await Seller.findById(plan.suppierId);
+        await Purchased_Message(findUser.tradeName, plan.planName, findUser.mobileNumber);
     }
-    else {
-        await create_PlanPayment(plan._id, result, find._id)
-        plan.status = 'Activated';
-        plan.save();
-    }
-    let link = await PurchaseLink.findById(find.paymentLink);
-    if (!link) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Payment Link not found');
-    }
-    link.status = "Paid";
-    link.save();
     return find;
+
 }
 
 

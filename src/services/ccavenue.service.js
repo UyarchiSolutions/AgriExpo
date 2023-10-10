@@ -122,7 +122,7 @@ const exhibitor_purchese_plan = async (amount, redirct, paymentLink, price, gst)
         currency: "INR",
         amount: amount,
         redirect_url: redirct,
-        cancel_url: "https://agriexpo.click/success",
+        cancel_url: "https://agriexpo.click/plan/cancel",
         language: "EN",
         billing_name: "Peter",
         billing_address: "Santacruz",

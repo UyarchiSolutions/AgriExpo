@@ -1822,7 +1822,7 @@ const get_all_stream = async (req) => {
     },
     {
       $addFields: {
-        max_post_per_stream: { $ifNull: ['$purchasedplans.max_post_per_stream', 0] },
+        postCount: { $ifNull: ['$purchasedplans.PostCount', 0] },
       },
     },
     {
@@ -1882,6 +1882,7 @@ const get_all_stream = async (req) => {
               transaction: '$streamposts.transaction',
               dispatchLocation: '$streamposts.dispatchLocation',
               unit: '$streamposts.unit'
+
             },
           },
           // {
@@ -2740,7 +2741,7 @@ const get_all_streams = async (req) => {
     },
     {
       $addFields: {
-        max_post_per_stream: { $ifNull: ['$purchasedplans.max_post_per_stream', 0] },
+        postCount: { $ifNull: ['$purchasedplans.PostCount', 0] },
       },
     },
     {

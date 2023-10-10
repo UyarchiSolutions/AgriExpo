@@ -537,7 +537,7 @@ const create_PurchasePlan_EXpo = async (planId, userId, ccavenue, gst) => {
   };
   console.log(data);
   const creations = await purchasePlan.create(data);
-  await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
+  // await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
   return creations;
 };
 
@@ -2018,30 +2018,32 @@ const get_payment_link = async (req) => {
         preserveNullAndEmptyArrays: true,
       },
     },
-    { $addFields: { Price: { $toInt: '$Price' } } },
+    { $addFields: { paidAmount: { $ifNull: ['$Payment.Amount', 0] }, } },
     {
       $project: {
         _id: 1,
         planName: 1,
+        Payment: "$Payment",
         active: 1,
-        purchasePrice: "$Price",
-        Price: { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
-        paidAmount1: { $ifNull: ['$Payment.Amount', 0] },
-        paidAmount: { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
-        PendingAmount: {
-          $ifNull: [
-            {
-              $subtract: [
-                { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
-                { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
-              ],
-            },
-            { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
-          ],
-        },
+        Price: "$offer_price",
+        paidAmount: 1,
+        PendingAmount: { $subtract: ['$totalAmount', "$paidAmount"] },
         Type: { $ifNull: ['$Type', 'Online'] },
         status: 1,
-        Discount: { $ifNull: ['$Discount', 0] },
+        PayementStatus: {
+          $cond: {
+            if: {
+              $eq: ['$ccavanue.response.order_status', 'Success'],
+            },
+            then: 'FullyPaid',
+            else: '$PayementStatus',
+          },
+        },
+        ccavanue: '$ccavanue',
+        offer_price: 1,
+        Discount: 1,
+        totalAmount: 1,
+        gst: 1
       },
     },
   ]);
@@ -2214,5 +2216,6 @@ module.exports = {
   plan_payment_link_generate,
   get_payment_link,
   paynow_payment,
-  get_purchase_links
+  get_purchase_links,
+  Purchased_Message
 };
