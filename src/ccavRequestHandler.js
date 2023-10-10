@@ -72,49 +72,13 @@ exports.success_recive = function (request, response) {
         // // response.end();
         // response.render("payment-success.html", { data: ccavResponse });
         orders = await update_ccavenue_payment(result, encryption)
-        const redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/plan/success/' + orders._id;
+        const redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/plan/cancel/' + orders._id;
         response.redirect(301, redirectUrl);
-
         // response.redirect(result.merchant_param1 + "/" + result.order_id)
     });
 };
 
 
-
-exports.success_recive_cancel = function (request, response) {
-    var ccavEncResponse = '',
-        ccavResponse = '',
-        workingKey = '1AC82EC283C6AE1561C420D21169F52F',	//Put in the 32-Bit Key provided by CCAvenue.
-        ccavPOST = '';
-    var result = {};
-    let orders = { _id: null };
-    let encryption;
-    request.on('data', function (data) {
-        ccavEncResponse += data;
-        ccavPOST = qs.parse(ccavEncResponse);
-        console.log(ccavPOST)
-        encryption = ccavPOST.encResp;
-        ccavResponse = ccav.decrypt(encryption, workingKey);
-        console.log(ccavResponse)
-        console.log(ccavPOST.my_redirect_url)
-        var keyValuePairs = ccavResponse.split('&');
-        for (var i = 0; i < keyValuePairs.length; i++) {
-            var pair = keyValuePairs[i].split('=');
-            var key = decodeURIComponent(pair[0]);
-            var value = decodeURIComponent(pair[1] || ''); // Use an empty string if the value is missing
-            result[key] = value;
-        }
-        console.log(result)
-    });
-    request.on('end', async function () {
-        // orders = await update_ccavenue_payment_link(result, encryption)
-        // const redirectUrl = 'https://exhibitor.agriexpo.live/paynow/success/' + orders._id;
-        // response.redirect(301, redirectUrl);
-
-        response.send("sdsd")
-
-    });
-}
 
 exports.payment_success = function (request, response) {
     var ccavEncResponse = '',
@@ -142,9 +106,9 @@ exports.payment_success = function (request, response) {
         console.log(result)
     });
     request.on('end', async function () {
-        // orders = await update_ccavenue_payment_link(result, encryption)
-        // const redirectUrl = 'https://exhibitor.agriexpo.live/paynow/success/' + orders._id;
-        // response.redirect(301, redirectUrl);
+        orders = await update_ccavenue_payment_link(result, encryption)
+        const redirectUrl = 'https://exhibitor.agriexpo.live/paynow/success/' + orders._id;
+        response.redirect(301, redirectUrl);
 
     });
 };
@@ -195,23 +159,25 @@ const update_ccavenue_payment_link = async (result, encryption) => {
         find.response = result;
         find.save();
     }
-    console.log(find)
-    let plan = await purchasePlan.findOne({ ccavenue: find._id })
-    if (!plan) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'pursace Plan  not found');
+    if (result.order_status == 'Success') {
+        let plan = await purchasePlan.findOne({ ccavenue: find._id })
+        if (!plan) {
+            throw new ApiError(httpStatus.NOT_FOUND, 'pursace Plan  not found');
+        }
+        else {
+            await create_PlanPayment(plan._id, result, find._id)
+            plan.status = 'Activated';
+            plan.save();
+        }
+        let link = await PurchaseLink.findById(find.paymentLink);
+        if (!link) {
+            throw new ApiError(httpStatus.NOT_FOUND, 'Payment Link not found');
+        }
+        link.status = "Paid";
+        link.save();
     }
-    else {
-        await create_PlanPayment(plan._id, result, find._id)
-        plan.status = 'Activated';
-        plan.save();
-    }
-    let link = await PurchaseLink.findById(find.paymentLink);
-    if (!link) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Payment Link not found');
-    }
-    link.status = "Paid";
-    link.save();
     return find;
+
 }
 
 
