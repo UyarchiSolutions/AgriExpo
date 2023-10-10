@@ -14519,7 +14519,7 @@ const purchesPlane_exhibitor = async (req, res) => {
   let price = plandetails.offer_price;
   let gst = (price * 18) / 100;
   let total = price + gst;
-  let paynow = await ccavenue.exhibitor_purchese_plan(total, 'https://agriexpo.click/success', price, gst);
+  let paynow = await ccavenue.exhibitor_purchese_plan(total, 'https://agriexpo.click/success', null, price, gst);
   console.log(paynow.payment.id, paynow.payment._id);
   let purchase = await purchese_plan.create_PurchasePlan_EXpo(plan, req.userId, paynow.payment.id, gst);
   return paynow;

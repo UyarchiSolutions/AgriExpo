@@ -108,7 +108,7 @@ const pay_now_encript_value = async (req) => {
 }
 
 
-const exhibitor_purchese_plan = async (amount, redirct, price, gst) => {
+const exhibitor_purchese_plan = async (amount, redirct, paymentLink, price, gst) => {
     var body = '',
         workingKey = '1AC82EC283C6AE1561C420D21169F52F',	//Put in the 32-Bit key shared by CCAvenues.
         accessCode = 'AVUK05KI18AW28KUWA',				//Put in the Access Code shared by CCAvenues.
