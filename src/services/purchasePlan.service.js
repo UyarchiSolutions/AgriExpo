@@ -1584,7 +1584,6 @@ const getPurchasedPlanPayment = async (query) => {
         preserveNullAndEmptyArrays: true,
       },
     },
-    { $addFields: { totalAmount: { $toInt: '$totalAmount' } } },
     {
       $lookup: {
         from: 'ccavanuepayments',
@@ -1599,32 +1598,22 @@ const getPurchasedPlanPayment = async (query) => {
         path: '$ccavanue',
       },
     },
+    { $addFields: { paidAmount: { $ifNull: ['$Payment.Amount', 0] }, } },
     {
       $project: {
         _id: 1,
         planName: 1,
+        Payment: "$Payment",
         active: 1,
-        // Price: { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+        Price: "$offer_price",
         exhibitorName: '$Sellers.tradeName',
         exhibitorNumber: { $convert: { input: '$Sellers.mobileNumber', to: 'string' } },
         number: '$Sellers.mobileNumber',
         exhibitorId: '$Sellers._id',
-        paidAmount1: { $ifNull: ['$Payment.Amount', 0] },
-        paidAmount: { $ifNull: ['$Payment.Amount', 0] },
-        PendingAmount: {
-          $ifNull: [
-            {
-              $subtract: [
-                '$totalAmount',
-                { $ifNull: ['$Payment.Amount', 0] }
-              ],
-            },
-            "$totalAmount"
-          ],
-        },
+        paidAmount: 1,
+        PendingAmount: { $subtract: ['$totalAmount', "$paidAmount"] },
         Type: { $ifNull: ['$Type', 'Online'] },
         status: 1,
-        Discount: { $ifNull: ['$Discount', 0] },
         PayementStatus: {
           $cond: {
             if: {
@@ -1635,6 +1624,10 @@ const getPurchasedPlanPayment = async (query) => {
           },
         },
         ccavanue: '$ccavanue',
+        offer_price: 1,
+        Discount: 1,
+        totalAmount: 1,
+        gst: 1
       },
     },
     {
@@ -1653,7 +1646,7 @@ const create_PlanPayment = async (body) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Plan not found');
   }
   let discound = Plan.Discount ? Plan.Discount : 0;
-  let PlanPrice = parseInt(Plan.Price) - discound;
+  let PlanPrice = parseInt(Plan.totalAmount) - discound;
   let PaidAmount = Plan.PaidAmount ? Plan.PaidAmount : 0;
   let ToBePaid = PaidAmount + body.Amount;
   let finding = await PlanPayment.find().count();

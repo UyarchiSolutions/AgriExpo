@@ -200,6 +200,7 @@ const purchasePlanSchema = mongoose.Schema(
     },
     Discount: {
       type: Number,
+      default: 0
     },
     RevisedAmount: {
       type: Number,
