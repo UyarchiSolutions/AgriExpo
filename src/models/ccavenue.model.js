@@ -118,7 +118,9 @@ const ccavenueSchema = mongoose.Schema({
     },
     paymentLink: {
         type: String,
-    }
+    },
+    price: Number,
+    gst: Number
 },
     { timestamps: true }
 );

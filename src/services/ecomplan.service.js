@@ -14512,9 +14512,16 @@ const get_address_log = async (req) => {
 
 const purchesPlane_exhibitor = async (req, res) => {
   const { amount, plan, redirct } = req.body;
-  let paynow = await ccavenue.exhibitor_purchese_plan(amount, 'https://agriexpo.click/success');
+  let plandetails = await Streamplan.findById(plan)
+  if (!plandetails) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
+  }
+  let price = plandetails.offer_price;
+  let gst = (price * 18) / 100;
+  let total = price + gst;
+  let paynow = await ccavenue.exhibitor_purchese_plan(total, 'https://agriexpo.click/success', price, gst);
   console.log(paynow.payment.id, paynow.payment._id);
-  let purchase = await purchese_plan.create_PurchasePlan_EXpo(plan, req.userId, paynow.payment.id);
+  let purchase = await purchese_plan.create_PurchasePlan_EXpo(plan, req.userId, paynow.payment.id, gst);
   return paynow;
 };
 

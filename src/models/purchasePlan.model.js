@@ -111,6 +111,7 @@ const purchasePlanSchema = mongoose.Schema(
     salesPrice: {
       type: Number,
     },
+
     description: {
       type: String,
     },
@@ -258,6 +259,12 @@ const purchasePlanSchema = mongoose.Schema(
     },
     raisehandcontrol: {
       type: String,
+    },
+    gst: {
+      type: Number,
+    },
+    totalAmount: {
+      type: Number,
     }
   },
   { timestamps: true }

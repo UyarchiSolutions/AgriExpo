@@ -108,7 +108,7 @@ const pay_now_encript_value = async (req) => {
 }
 
 
-const exhibitor_purchese_plan = async (amount, redirct, paymentLink) => {
+const exhibitor_purchese_plan = async (amount, redirct, price, gst) => {
     var body = '',
         workingKey = '1AC82EC283C6AE1561C420D21169F52F',	//Put in the 32-Bit key shared by CCAvenues.
         accessCode = 'AVUK05KI18AW28KUWA',				//Put in the Access Code shared by CCAvenues.
@@ -146,7 +146,9 @@ const exhibitor_purchese_plan = async (amount, redirct, paymentLink) => {
         merchant_param5: "additional Info.",
         promo_code: "",
         redirct: redirct,
-        my_redirect_url: redirct
+        my_redirect_url: redirct,
+        price: price,
+        gst: gst
     };
     const queryString = objectToQueryString(data);
     const bufferData = Buffer.from(queryString, 'utf-8');

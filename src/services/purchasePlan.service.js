@@ -490,7 +490,7 @@ const Purchased_Message = async (Name, plan, mobile) => {
   return reva.data;
 };
 
-const create_PurchasePlan_EXpo = async (planId, userId, ccavenue) => {
+const create_PurchasePlan_EXpo = async (planId, userId, ccavenue, gst) => {
   console.log(ccavenue, 98765789);
   let findUser = await Seller.findById(userId);
   if (!findUser) {
@@ -531,7 +531,9 @@ const create_PurchasePlan_EXpo = async (planId, userId, ccavenue) => {
     No_of_Limitations: findPlan.No_of_Limitations,
     Service_Charges: findPlan.Service_Charges,
     TimeType: findPlan.TimeType,
-    raisehandcontrol: findPlan.raisehandcontrol
+    raisehandcontrol: findPlan.raisehandcontrol,
+    totalAmount: findPlan.offer_price + gst,
+    gst: gst
   };
   console.log(data);
   const creations = await purchasePlan.create(data);
