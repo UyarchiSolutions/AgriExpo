@@ -46,7 +46,7 @@ const forget_password = async (body) => {
   const mobileNumber = body.mobile;
   let shop = await Shop.findOne({ mobile: mobileNumber });
   if (!shop) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Shop-Not-found');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Mobile Number Not Registered');
   }
   if (body.reg == true) {
     shop = await Shop.findOne({ mobile: mobileNumber, registered: { $eq: true } });
