@@ -10,6 +10,8 @@ const httpStatus = require('http-status');
 const { Slotseperation } = require('./models/slot.model');
 const { Purchased_Message } = require("./services/purchasePlan.service")
 
+const { Seller } = require("./models/seller.models")
+
 exports.postReq = function (request, response) {
     var body = '',
         workingKey = 'B0050D8C882D10898AE305B141D27C8C',	//Put in the 32-Bit key shared by CCAvenues.
