@@ -1584,7 +1584,7 @@ const getPurchasedPlanPayment = async (query) => {
         preserveNullAndEmptyArrays: true,
       },
     },
-    { $addFields: { Price: { $toInt: '$Price' } } },
+    { $addFields: { totalAmount: { $toInt: '$totalAmount' } } },
     {
       $lookup: {
         from: 'ccavanuepayments',
@@ -1604,7 +1604,7 @@ const getPurchasedPlanPayment = async (query) => {
         _id: 1,
         planName: 1,
         active: 1,
-        Price: { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+        // Price: { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
         exhibitorName: '$Sellers.tradeName',
         exhibitorNumber: { $convert: { input: '$Sellers.mobileNumber', to: 'string' } },
         number: '$Sellers.mobileNumber',
@@ -1615,11 +1615,11 @@ const getPurchasedPlanPayment = async (query) => {
           $ifNull: [
             {
               $subtract: [
-                { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+                '$totalAmount',
                 { $ifNull: ['$Payment.Amount', 0] }
               ],
             },
-            { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+            "$totalAmount"
           ],
         },
         Type: { $ifNull: ['$Type', 'Online'] },
@@ -1943,10 +1943,6 @@ const plan_payment_link_generate = async (req) => {
         planName: 1,
         active: 1,
         Price: { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
-        exhibitorName: '$Sellers.tradeName',
-        exhibitorNumber: { $convert: { input: '$Sellers.mobileNumber', to: 'string' } },
-        number: '$Sellers.mobileNumber',
-        exhibitorId: '$Sellers._id',
         paidAmount1: { $ifNull: ['$Payment.Amount', 0] },
         paidAmount: { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
         PendingAmount: {
