@@ -61,9 +61,9 @@ exports.success_recive = function (request, response) {
     });
     request.on('end', async function () {
         orders = await update_ccavenue_payment(result, encryption)
-        let redirectUr = "https://exhibitor.agriexpo.live/"
+        let redirectUrl = "https://exhibitor.agriexpo.live/"
         if (result.order_status == 'Success') {
-            redirectUr = 'https://exhibitor.agriexpo.live/dashboard/plan/success/' + orders._id;
+            redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/plan/success/' + orders._id;
 
         }
         else {
