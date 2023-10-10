@@ -1936,29 +1936,38 @@ const plan_payment_link_generate = async (req) => {
         preserveNullAndEmptyArrays: true,
       },
     },
-    { $addFields: { Price: { $toInt: '$Price' } } },
+    { $addFields: { Price: { $toInt: '$totalAmount' } } },
     {
       $project: {
         _id: 1,
         planName: 1,
         active: 1,
-        Price: { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
         paidAmount1: { $ifNull: ['$Payment.Amount', 0] },
-        paidAmount: { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
+        paidAmount: { $ifNull: ['$Payment.Amount', 0] },
         PendingAmount: {
           $ifNull: [
             {
               $subtract: [
-                { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
-                { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
+                '$totalAmount',
+                { $ifNull: ['$Payment.Amount', 0] }
               ],
             },
-            { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+            "$totalAmount"
           ],
         },
         Type: { $ifNull: ['$Type', 'Online'] },
         status: 1,
         Discount: { $ifNull: ['$Discount', 0] },
+        PayementStatus: {
+          $cond: {
+            if: {
+              $eq: ['$ccavanue.response.order_status', 'Success'],
+            },
+            then: 'FullyPaid',
+            else: '$PayementStatus',
+          },
+        },
+        ccavanue: '$ccavanue',
       },
     },
   ]);
