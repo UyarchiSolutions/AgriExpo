@@ -75,7 +75,14 @@ exports.success_recive = function (request, response) {
         // // response.end();
         // response.render("payment-success.html", { data: ccavResponse });
         orders = await update_ccavenue_payment(result, encryption)
-        const redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/plan/cancel/' + orders._id;
+        let redirectUr = "https://exhibitor.agriexpo.live/"
+        if (result.order_status == 'Success') {
+            redirectUr = 'https://exhibitor.agriexpo.live/dashboard/plan/success/' + orders._id;
+
+        }
+        else {
+            redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/plan/cancel/' + orders._id;
+        }
         response.redirect(301, redirectUrl);
         // response.redirect(result.merchant_param1 + "/" + result.order_id)
     });
@@ -110,7 +117,13 @@ exports.payment_success = function (request, response) {
     });
     request.on('end', async function () {
         orders = await update_ccavenue_payment_link(result, encryption)
-        const redirectUrl = 'https://exhibitor.agriexpo.live/paynow/success/' + orders._id;
+        let redirectUr = "https://exhibitor.agriexpo.live/"
+        if (result.order_status == 'Success') {
+            redirectUr = 'https://exhibitor.agriexpo.live/paynow/success/' + orders._id;
+        }
+        else {
+            redirectUrl = 'https://exhibitor.agriexpo.live/paynow/cancel/' + orders._id;
+        }
         response.redirect(301, redirectUrl);
 
     });
