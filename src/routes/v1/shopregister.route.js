@@ -38,5 +38,6 @@ router.route('/getmy/orders/single').get(shopverify, shopregister.get_my_orders_
 router.route('/get/Streaming/orders/:id').get(shopregister.get_Streaming_orders);
 router.route('/get/Streaming/ordersByStream/:id').get(shopregister.get_Streaming_ordersByStream);
 router.route('/get/Streaming/ordersBy/Order/:id').get(shopregister.get_Streaming_ordersByOrder);
-router.route('/create/Wallet').post(shopregister.createWallet);
+router.route('/create/Wallet').post(shopverify, shopregister.createWallet);
+router.route('/getWallet/ByShopId').get(shopverify, shopregister.getWalletByShopId);
 module.exports = router;

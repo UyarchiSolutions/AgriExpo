@@ -2596,9 +2596,51 @@ const get_my_orders_single = async (req) => {
 
 const createWallet = async (req) => {
   let userId = req.shopId;
-  let data = { ...body, ...{ userId: userId } };
+  let data = { ...req.body, ...{ userId: userId } };
   let creation = await Wallet.create(data);
-  return create;
+  return creation;
+};
+
+const getWalletByShopId = async (req) => {
+  let userId = req.shopId;
+  const values = await Wallet.aggregate([
+    {
+      $match: {
+        userId: userId,
+      },
+    },
+    {
+      $lookup: {
+        from: 'visitorwallets',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'visitorWallet',
+      },
+    },
+    {
+      $unwind: {
+        path: '$visitorWallet',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        visitorWallet: { $push: '$visitorWallet' },
+        totalAmount: { $sum: '$Amount' },
+      },
+    },
+    {
+      $project: {
+        _id: '',
+        visitorWallet: '$visitorWallet',
+        totalAmount: '$totalAmount',
+        spendAmount: '0',
+        currentAmount: '0',
+      },
+    },
+  ]);
+  return values;
 };
 
 module.exports = {
@@ -2636,4 +2678,5 @@ module.exports = {
   get_Streaming_ordersByOrder,
   verify_otpDelete_Account,
   createWallet,
+  getWalletByShopId,
 };
