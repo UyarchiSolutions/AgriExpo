@@ -210,7 +210,12 @@ const get_Streaming_ordersByOrder = catchAsync(async (req, res) => {
 });
 
 const createWallet = catchAsync(async (req, res) => {
-  const data = await registerShop.createWallet;
+  const data = await registerShop.createWallet(req);
+  res.send(data);
+});
+
+const getWalletByShopId = catchAsync(async (req, res) => {
+  const data = await registerShop.getWalletByShopId(req);
   res.send(data);
 });
 
@@ -249,4 +254,5 @@ module.exports = {
   get_Streaming_ordersByOrder,
   verify_otpDelete_Account,
   createWallet,
+  getWalletByShopId,
 };

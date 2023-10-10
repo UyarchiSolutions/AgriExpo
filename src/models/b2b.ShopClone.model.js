@@ -479,6 +479,6 @@ const walletSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-const Wallet = mongoose.model('Wallet', walletSchema);
+const Wallet = mongoose.model('visitorWallet', walletSchema);
 
 module.exports = { Shop, AttendanceClone, AttendanceClonenew, Wallet };
