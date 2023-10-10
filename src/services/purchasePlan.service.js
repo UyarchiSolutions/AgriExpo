@@ -612,6 +612,23 @@ const updatePurchasedPlanById = async (id, body) => {
   return values;
 };
 
+const updatePurchase_admin = async (id, body) => {
+  let values = await purchasePlan.findById(id);
+  if (!values) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'plan Not Found');
+  }
+
+
+  values = await purchasePlan.findByIdAndUpdate({ _id: id }, body, { new: true });
+
+  let payamount = (values.offer_price - values.Discount);
+  let gst = (payamount * 18) / 100;
+  values.totalAmount = payamount + gst;
+  values.gst = gst;
+  values.save();
+  return values;
+};
+
 const get_All_Planes = async (page) => {
   let values = await purchasePlan.aggregate([
     { $sort: { createdAt: -1 } },
@@ -2169,6 +2186,7 @@ module.exports = {
   getPurchasedPlan,
   updatePurchasedPlan,
   updatePurchasedPlanById,
+  updatePurchase_admin,
   get_All_Planes,
   ChangePurchasedPlan,
   UploadProof,

@@ -90,6 +90,13 @@ const updatePurchasedPlanById = catchAsync(async (req, res) => {
   res.send(values);
 });
 
+
+const updatePurchase_admin = catchAsync(async (req, res) => {
+  const values = await purchasePlan.updatePurchase_admin(req.params.id, req.body);
+  res.send(values);
+});
+
+
 const get_All_Planes = catchAsync(async (req, res) => {
   const value = await purchasePlan.get_All_Planes(req.params.page);
   res.send(value);
@@ -250,6 +257,7 @@ module.exports = {
   getPurchasedPlan,
   updatePurchasedPlan,
   updatePurchasedPlanById,
+  updatePurchase_admin,
   get_All_Planes,
   ChangePurchasedPlan,
   UploadProof,
