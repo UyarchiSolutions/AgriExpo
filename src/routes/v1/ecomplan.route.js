@@ -38,12 +38,12 @@ const upload_s3 = multer({ storage: storage_s3 });
 // plan APIS
 router.route('/create/plan').post(Ecomcontroller.create_Plans);
 router.route('/create/plan/addon').post(Ecomcontroller.create_Plans_addon);
-
 router.route('/get/all/plan').get(Ecomcontroller.get_all_Plans);
 router.route('/get/all/plan/pagination').get(Ecomcontroller.get_all_Plans_pagination);
 router.route('/get/all/plan/normal').get(Ecomcontroller.get_all_Plans_normal);
 router.route('/get/all/plan/addon').get(Ecomcontroller.get_all_Plans_addon);
 router.route('/get/one/plan').get(Ecomcontroller.get_one_Plans);
+router.route('/exp/get/one/plan').get(SellerAuth, Ecomcontroller.get_one_Plans);
 router.route('/update/one/plan').put(Ecomcontroller.update_one_Plans);
 router.route('/delete/one/plan').delete(Ecomcontroller.delete_one_Plans);
 router.route('/updatePlanById/:id').put(Ecomcontroller.updatePlanById);
