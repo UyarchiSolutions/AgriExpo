@@ -537,7 +537,7 @@ const create_PurchasePlan_EXpo = async (planId, userId, ccavenue, gst) => {
   };
   console.log(data);
   const creations = await purchasePlan.create(data);
-  await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
+  // await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
   return creations;
 };
 
@@ -2216,5 +2216,6 @@ module.exports = {
   plan_payment_link_generate,
   get_payment_link,
   paynow_payment,
-  get_purchase_links
+  get_purchase_links,
+  Purchased_Message
 };

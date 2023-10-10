@@ -8,6 +8,7 @@ const { purchasePlan, PlanPayment, PurchaseLink } = require("./models/purchasePl
 const ApiError = require('./utils/ApiError');
 const httpStatus = require('http-status');
 const { Slotseperation } = require('./models/slot.model');
+const { Purchased_Message } = require("./services/purchasePlan.service")
 
 exports.postReq = function (request, response) {
     var body = '',
@@ -124,28 +125,33 @@ const update_ccavenue_payment = async (result, encryption) => {
         find.response = result;
         find.save();
     }
+    if (result.order_status == 'Success') {
+        let plan = await purchasePlan.findOne({ ccavenue: find._id })
+        if (!plan) {
+            throw new ApiError(httpStatus.NOT_FOUND, 'pursace Plan  not found');
+        }
+        else {
+            await create_PlanPayment(plan._id, result, find._id)
+            plan.status = 'Activated';
+            plan.save();
 
-    let plan = await purchasePlan.findOne({ ccavenue: find._id })
-    if (!plan) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'pursace Plan  not found');
-    }
-    else {
-        await create_PlanPayment(plan._id, result, find._id)
-        plan.status = 'Activated';
-        plan.save();
-
-        plan.slotInfo.forEach(async (e) => {
-            // suppierId
-            await Slotseperation.create({
-                SlotType: e.slotType,
-                Duration: e.Duration,
-                userId: plan.suppierId,
-                Slots: e.No_Of_Slot,
-                PlanId: plan._id,
-                streamPlanId: plan.planId,
+            plan.slotInfo.forEach(async (e) => {
+                // suppierId
+                await Slotseperation.create({
+                    SlotType: e.slotType,
+                    Duration: e.Duration,
+                    userId: plan.suppierId,
+                    Slots: e.No_Of_Slot,
+                    PlanId: plan._id,
+                    streamPlanId: plan.planId,
+                });
             });
-        });
+            let findUser = await Seller.findById(plan.suppierId);
+            await Purchased_Message(findUser.tradeName, plan.planName, findUser.mobileNumber);
+        }
+
     }
+
     return find;
 }
 
@@ -175,6 +181,8 @@ const update_ccavenue_payment_link = async (result, encryption) => {
         }
         link.status = "Paid";
         link.save();
+        let findUser = await Seller.findById(plan.suppierId);
+        await Purchased_Message(findUser.tradeName, plan.planName, findUser.mobileNumber);
     }
     return find;
 
