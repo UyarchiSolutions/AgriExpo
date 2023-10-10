@@ -142,9 +142,9 @@ exports.payment_success = function (request, response) {
         console.log(result)
     });
     request.on('end', async function () {
-        orders = await update_ccavenue_payment_link(result, encryption)
-        const redirectUrl = 'https://exhibitor.agriexpo.live/paynow/success/' + orders._id;
-        response.redirect(301, redirectUrl);
+        // orders = await update_ccavenue_payment_link(result, encryption)
+        // const redirectUrl = 'https://exhibitor.agriexpo.live/paynow/success/' + orders._id;
+        // response.redirect(301, redirectUrl);
 
     });
 };
