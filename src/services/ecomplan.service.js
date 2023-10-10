@@ -1822,7 +1822,7 @@ const get_all_stream = async (req) => {
     },
     {
       $addFields: {
-        postCount: { $ifNull: ['$purchasedplans.postCount', 0] },
+        postCount: { $ifNull: ['$purchasedplans.PostCount', 0] },
       },
     },
     {
@@ -2741,7 +2741,7 @@ const get_all_streams = async (req) => {
     },
     {
       $addFields: {
-        postCount: { $ifNull: ['$purchasedplans.postCount', 0] },
+        postCount: { $ifNull: ['$purchasedplans.PostCount', 0] },
       },
     },
     {
