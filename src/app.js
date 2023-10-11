@@ -188,6 +188,12 @@ app.post('/payment/success', function (req, res) {
   ccavReqHandler.payment_success(req, res);
 });
 
+app.get('ifame', function (req, res) {
+  res.write("sd")
+  res.end()
+});
+
+
 app.post('/ccavRequestHandler', function (request, response) {
   console.log('sadas');
   ccavReqHandler.postReq(request, response);

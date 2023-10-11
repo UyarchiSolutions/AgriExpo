@@ -74,7 +74,6 @@ exports.success_recive = function (request, response) {
 };
 
 
-
 exports.payment_success = function (request, response) {
     var ccavEncResponse = '',
         ccavResponse = '',
