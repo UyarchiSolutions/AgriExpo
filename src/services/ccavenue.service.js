@@ -122,7 +122,7 @@ const exhibitor_purchese_plan = async (amount, redirct, paymentLink, price, gst)
         currency: "INR",
         amount: amount,
         redirect_url: redirct,
-        cancel_url: "https://agriexpo.click/plan/cancel",
+        cancel_url: redirct,
         language: "EN",
         billing_name: "Peter",
         billing_address: "Santacruz",
@@ -148,7 +148,8 @@ const exhibitor_purchese_plan = async (amount, redirct, paymentLink, price, gst)
         redirct: redirct,
         my_redirect_url: redirct,
         price: price,
-        gst: gst
+        gst: gst,
+        integration_type: 'iframe_normal'
     };
     const queryString = objectToQueryString(data);
     const bufferData = Buffer.from(queryString, 'utf-8');
@@ -157,8 +158,8 @@ const exhibitor_purchese_plan = async (amount, redirct, paymentLink, price, gst)
     data.paymentLink = paymentLink
     const payment = await create_plan_paymant(data)
     data.merchant_param1 = payment._id;
-    formbody = '<form id="nonseamless" method="post" name="redirect" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction"/> <input type="hidden" id="encRequest" name="encRequest" value="' + encRequest + '"><input type="hidden" name="access_code" id="access_code" value="' + accessCode + '"><button>pay</button><script language="javascript">document.redirect.submit();</script></form>';
-    return { payment, formbody };
+    // formbody = '<form id="nonseamless" method="post" name="redirect" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction"/> <input type="hidden" id="encRequest" name="encRequest" value="' + encRequest + '"><input type="hidden" name="access_code" id="access_code" value="' + accessCode + '"><button>pay</button><script language="javascript">document.redirect.submit();</script></form>';
+    return { payment };
 }
 
 const create_plan_paymant = async (data) => {
@@ -494,6 +495,18 @@ const get_paymant_success_response_exp = async (req) => {
     return payment[0];
 }
 
+
+const get_ccavenue_details = async (req) => {
+
+    let id = req.query.id;
+    const find = await ccavenue_paymnet.findById(id)
+    if (!find) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Payment not found');
+    }
+
+    return find;
+
+}
 module.exports = {
     get_paymnent_url,
     pay_now_encript_value,
@@ -503,7 +516,8 @@ module.exports = {
     exhibitor_purchese_plan,
     create_plan_paymant,
     get_paymant_success_response,
-    get_paymant_success_response_exp
+    get_paymant_success_response_exp,
+    get_ccavenue_details
 }
 
 
