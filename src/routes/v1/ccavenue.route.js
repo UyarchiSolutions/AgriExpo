@@ -14,4 +14,9 @@ router.route('/exp/get/payment/response/:id').get(SellerAuth, ccavenue.get_payma
 
 
 
+
+router.route('/ccavenue/payent/details').get(ccavenue.get_ccavenue_details);
+
+
+
 module.exports = router;

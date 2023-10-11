@@ -41,11 +41,16 @@ const get_paymant_success_response = catchAsync(async (req, res) => {
     res.send(category)
 });
 
-const get_paymant_success_response_exp= catchAsync(async (req, res) => {
+const get_paymant_success_response_exp = catchAsync(async (req, res) => {
     const category = await ccavenue.get_paymant_success_response_exp(req);
     res.send(category)
 });
 
+
+const get_ccavenue_details = catchAsync(async (req, res) => {
+    const category = await ccavenue.get_ccavenue_details(req);
+    res.send(category)
+});
 
 
 
@@ -55,5 +60,6 @@ module.exports = {
     nearby_value,
     exhibitor_purchese_plan,
     get_paymant_success_response,
-    get_paymant_success_response_exp
+    get_paymant_success_response_exp,
+    get_ccavenue_details
 }
