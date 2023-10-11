@@ -28,14 +28,14 @@ const register_shop = async (body) => {
 
 const NewRegister_Shop = async (body) => {
   const mobileNumber = body.mobile;
-  let disableCheck = await Shop.findOne({ mobile: mobileNumber, active: false });
+  let disableCheck = await Shop.findOne({ mobile: mobileNumber});
   if (disableCheck) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Your Account Has Been De Activated Please Cantact Event Manager');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile Number Already Registered');
   }
-  let shop = await Shop.findOne({ mobile: mobileNumber, active: true, registered: true });
-  if (shop) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Shop Already Register');
-  }
+  // let shop = await Shop.findOne({ mobile: mobileNumber, active: true, registered: true });
+  // if (shop) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, 'Shop Already Register');
+  // }
   const creations = await Shop.create(body);
   const otp = await sentOTP(mobileNumber, creations);
   console.log(otp);
