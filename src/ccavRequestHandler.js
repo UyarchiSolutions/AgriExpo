@@ -45,49 +45,33 @@ exports.success_recive = function (request, response) {
     request.on('data', function (data) {
         ccavEncResponse += data;
         ccavPOST = qs.parse(ccavEncResponse);
-        console.log(ccavPOST)
+        // console.log(ccavPOST)
         encryption = ccavPOST.encResp;
         ccavResponse = ccav.decrypt(encryption, workingKey);
-        console.log(ccavResponse)
-        console.log(ccavPOST.my_redirect_url)
+        // console.log(ccavResponse)
+        // console.log(ccavPOST.my_redirect_url)
         var keyValuePairs = ccavResponse.split('&');
-        // Create an empty object to store the result
-        // Iterate through the key-value pairs and assign them to the object
         for (var i = 0; i < keyValuePairs.length; i++) {
             var pair = keyValuePairs[i].split('=');
             var key = decodeURIComponent(pair[0]);
             var value = decodeURIComponent(pair[1] || ''); // Use an empty string if the value is missing
             result[key] = value;
         }
-        console.log(result)
-        // let dd = await ccavenue_paymnet.findById('23852f86-cba3-4ce1-ab54-3bfcf47b319e');
-        // console.log(dd, 232, result.order_id)
+        // console.log(result)
     });
     request.on('end', async function () {
-        // var pData = '';
-        // pData = '<table border=1 cellspacing=2 cellpadding=2><tr><td>'
-        // pData = pData + ccavResponse.replace(/=/gi, '</td><td>')
-        // pData = pData.replace(/&/gi, '</td></tr><tr><td>')
-        // pData = pData + '</td></tr></table>'
-        // htmlcode = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Response Handler</title></head><body><center><font size="4" color="blue"><b>Response Page</b></font><br>' + pData + '</center><br></body></html>';
-        // // response.writeHeader(200, { "Content-Type": "text/html" });
-        // // response.write(htmlcode);
-        // // response.end();
-        // response.render("payment-success.html", { data: ccavResponse });
         orders = await update_ccavenue_payment(result, encryption)
-        let redirectUr = "https://exhibitor.agriexpo.live/"
+        let redirectUrl = "https://exhibitor.agriexpo.live/"
         if (result.order_status == 'Success') {
-            redirectUr = 'https://exhibitor.agriexpo.live/dashboard/plan/success/' + orders._id;
+            redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/plan/success/' + orders._id;
 
         }
         else {
             redirectUrl = 'https://exhibitor.agriexpo.live/dashboard/plan/cancel/' + orders._id;
         }
         response.redirect(301, redirectUrl);
-        // response.redirect(result.merchant_param1 + "/" + result.order_id)
     });
 };
-
 
 
 exports.payment_success = function (request, response) {
@@ -101,11 +85,11 @@ exports.payment_success = function (request, response) {
     request.on('data', function (data) {
         ccavEncResponse += data;
         ccavPOST = qs.parse(ccavEncResponse);
-        console.log(ccavPOST)
+        // console.log(ccavPOST)
         encryption = ccavPOST.encResp;
         ccavResponse = ccav.decrypt(encryption, workingKey);
-        console.log(ccavResponse)
-        console.log(ccavPOST.my_redirect_url)
+        // console.log(ccavResponse)
+        // console.log(ccavPOST.my_redirect_url)
         var keyValuePairs = ccavResponse.split('&');
         for (var i = 0; i < keyValuePairs.length; i++) {
             var pair = keyValuePairs[i].split('=');
@@ -113,13 +97,13 @@ exports.payment_success = function (request, response) {
             var value = decodeURIComponent(pair[1] || ''); // Use an empty string if the value is missing
             result[key] = value;
         }
-        console.log(result)
+        // console.log(result)
     });
     request.on('end', async function () {
         orders = await update_ccavenue_payment_link(result, encryption)
-        let redirectUr = "https://exhibitor.agriexpo.live/"
+        let redirectUrl = "https://exhibitor.agriexpo.live/"
         if (result.order_status == 'Success') {
-            redirectUr = 'https://exhibitor.agriexpo.live/paynow/success/' + orders._id;
+            redirectUrl = 'https://exhibitor.agriexpo.live/paynow/success/' + orders._id;
         }
         else {
             redirectUrl = 'https://exhibitor.agriexpo.live/paynow/cancel/' + orders._id;
