@@ -159,7 +159,7 @@ const exhibitor_purchese_plan = async (amount, redirct, paymentLink, price, gst)
     const payment = await create_plan_paymant(data)
     data.merchant_param1 = payment._id;
     // formbody = '<form id="nonseamless" method="post" name="redirect" action="https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction"/> <input type="hidden" id="encRequest" name="encRequest" value="' + encRequest + '"><input type="hidden" name="access_code" id="access_code" value="' + accessCode + '"><button>pay</button><script language="javascript">document.redirect.submit();</script></form>';
-    return { payment, formbody };
+    return { payment };
 }
 
 const create_plan_paymant = async (data) => {
