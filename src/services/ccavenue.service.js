@@ -148,7 +148,8 @@ const exhibitor_purchese_plan = async (amount, redirct, paymentLink, price, gst)
         redirct: redirct,
         my_redirect_url: redirct,
         price: price,
-        gst: gst
+        gst: gst,
+        integration_type: 'iframe_normal'
     };
     const queryString = objectToQueryString(data);
     const bufferData = Buffer.from(queryString, 'utf-8');
