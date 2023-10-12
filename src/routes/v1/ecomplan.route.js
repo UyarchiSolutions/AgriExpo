@@ -114,7 +114,7 @@ router.route('/getAll/shop/live/stream/interested').get(shopverify, Ecomcontroll
 router.route('/getAll/shop/live/stream/completed').get(shopverify, Ecomcontroller.get_watch_live_steams_completed);
 router.route('/getAll/shop/live/stream/watch/admin').get(Ecomcontroller.get_watch_live_steams_admin_watch);
 router.route('/watchlive/go/live').get(Ecomcontroller.get_watch_live_token);
-router.route('/homepage/streamdatails/all').get(Ecomcontroller.getall_homeage_streams);
+router.route('/homepage/streamdatails/all').get(shopverify, Ecomcontroller.getall_homeage_streams);
 router.route('/on/going/stream').get(shopverify, Ecomcontroller.on_going_stream);
 router.route('/getStreamRequestById/:id').get(Ecomcontroller.getStreamRequestById);
 //live Stream pre register
