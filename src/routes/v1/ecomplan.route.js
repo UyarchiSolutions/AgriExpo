@@ -79,6 +79,10 @@ router.route('/create/stream/one/video').post(upload, Ecomcontroller.create_stre
 // router.route('/create/stream/one/Broucher').post(uploadBroucher, Ecomcontroller.create_stream_one_Broucher);
 router.route('/create/stream/two').post(SellerAuth, Ecomcontroller.create_stream_two);
 router.route('/get/all/stream').get(SellerAuth, Ecomcontroller.get_all_stream);
+
+router.route('/remove/:type/:id').put(SellerAuth, Ecomcontroller.remove_post_stream);
+
+
 router.route('/get/one/stream').get(SellerAuth, Ecomcontroller.get_one_stream);
 router.route('/get/one/stream/assign/host').get(SellerAuth, Ecomcontroller.get_one_stream_assign_host);
 router.route('/get/my/stream/step/two').get(SellerAuth, Ecomcontroller.get_one_stream_step_two);

@@ -1740,6 +1740,30 @@ const create_stream_two = async (req) => {
   }
   return { message: 'deleted' };
 };
+
+const remove_post_stream = async (req) => {
+  let value = await Streamrequest.findById(req.params.id);
+  if (!value) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Not Found');
+  }
+
+  if (req.params.type == 'image') {
+    value = await Streamrequest.findByIdAndUpdate({ _id: value._id }, { $unset: { image: 1 } })
+  }
+  if (req.params.type == 'teaser') {
+    value = await Streamrequest.findByIdAndUpdate({ _id: value._id }, { $unset: { teaser: 1 } })
+  }
+
+  if (req.params.type == 'brochure') {
+    value = await Streamrequest.findByIdAndUpdate({ _id: value._id }, { $unset: { broucher: 1 } })
+  }
+
+
+
+
+  return value;
+};
+
 const get_all_stream = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
   let date_now = new Date().getTime();
@@ -14994,5 +15018,6 @@ module.exports = {
   update_post_price_admin,
   post_payment_details,
   remove_stream_admin,
-  search_product_list
+  search_product_list,
+  remove_post_stream
 };
