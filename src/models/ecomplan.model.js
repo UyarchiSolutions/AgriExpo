@@ -339,6 +339,9 @@ const streamPostschema = mongoose.Schema({
   return_policy: {
     type: String,
   },
+  broucherName: {
+    type: String,
+  }
 });
 
 const StreamPost = mongoose.model('Streampost', streamPostschema);
