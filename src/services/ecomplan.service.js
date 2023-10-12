@@ -1899,6 +1899,12 @@ const get_all_stream = async (req) => {
         streamExpire: { $gt: ['$streamExpire', date_now] },
       },
     },
+    {
+      $addFields: {
+        streamExpire_Date: "$streamExpire",
+      },
+    },
+
     { $skip: 10 * page },
     { $limit: 10 },
   ]);
