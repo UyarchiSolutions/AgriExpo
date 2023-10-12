@@ -61,8 +61,6 @@ const pay_now_encript_value = async (req) => {
         accessCode = 'AVOI05KI17AK41IOKA',				//Put in the Access Code shared by CCAvenues.
         encRequest = '';
     const orderId = uuid.v4();
-    // console.log(req.body)
-    // formbody = '<h1>hello<h1>';
     const merchantId = '2742878';
 
     const data = {
