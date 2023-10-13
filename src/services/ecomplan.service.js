@@ -1755,7 +1755,7 @@ const remove_post_stream = async (req) => {
   }
 
   if (req.params.type == 'brochure') {
-    value = await Streamrequest.findByIdAndUpdate({ _id: value._id }, { $unset: { broucher: 1 } })
+    value = await Streamrequest.findByIdAndUpdate({ _id: value._id }, { $unset: { broucher: 1, broucherName: 1 } })
   }
 
 
