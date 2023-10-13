@@ -2859,9 +2859,15 @@ const get_all_streams = async (req) => {
     },
     {
       $addFields: {
+        streamExpire_Date: "$streamExpire",
+      },
+    },
+    {
+      $addFields: {
         streamExpire: { $gt: ['$streamExpire', date_now] },
       },
     },
+
     {
       $project: {
         purchasedplans: '$purchasedplans',
@@ -2922,6 +2928,7 @@ const get_all_streams = async (req) => {
         stream_expired: 1,
         show_completd: 1,
         streamExpire: 1,
+        streamExpire_Date: 1,
         Service_Charges: 1,
         completedStream: 1,
         streamEnd_Time: 1,
@@ -10566,6 +10573,11 @@ const get_completed_stream_completed = async (req) => {
     },
     {
       $addFields: {
+        streamExpire_Date: "$streamExpire",
+      },
+    },
+    {
+      $addFields: {
         streamExpire: { $gt: ['$streamExpire', date_now] },
       },
     },
@@ -10610,7 +10622,8 @@ const get_completed_stream_completed = async (req) => {
         allot_chat: 1,
         temptokens: '$temptokens',
         streamExpire: 1,
-        completedStream: 1
+        completedStream: 1,
+        streamExpire_Date: 1
 
       },
     },
