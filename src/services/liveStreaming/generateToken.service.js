@@ -1921,7 +1921,7 @@ const get_raise_hands = async (req) => {
               dateISO: 1,
               sortData: 1,
               sort: 1,
-              AgriImage: 1
+              AgriImage: "$shops.AgriImage",
             }
           }
         ],
