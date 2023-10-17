@@ -193,6 +193,7 @@ const delete_one_Plans = async (req) => {
 
 const create_post = async (req) => {
   let images = [];
+  let showImage;
   if (req.files.length == 0 && (req.body.old_accept == 'true' || req.body.old_accept == true)) {
     let old_post = await StreamPost.findById(req.body.old_post);
     if (old_post) {
@@ -202,6 +203,10 @@ const create_post = async (req) => {
   }
   else {
     images = await multible_image_array(req.files)
+  }
+
+  if (images.length != 0) {
+    showImage = images[0];
   }
   console.log(images, 9876)
   const value = await StreamPost.create({
@@ -218,6 +223,7 @@ const create_post = async (req) => {
       minLots: req.body.minLots == null ? 0 : req.body.minLots,
       incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
       createdBy: req.userId,
+      showImage: showImage
     });
   }
   return value;
@@ -1591,6 +1597,9 @@ const update_one_Post = async (req) => {
 
     let images = await multible_image_array(req.files)
     value.images = images;
+    if (images.length != 0) {
+      value.showImage = images[0];
+    }
     value.save();
   }
   return value;
