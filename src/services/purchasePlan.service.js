@@ -68,7 +68,7 @@ const create_purchase_plan = async (req) => {
         No_of_Limitations: plan.No_of_Limitations,
         Service_Charges: plan.Service_Charges,
         TimeType: plan.TimeType,
-        raisehandcontrol: plan.raisehandcontrol
+        raisehandcontrol: plan.raisehandcontrol,
       };
       let con = await purchasePlan.create({ ...datas, ...req.body.PaymentDatails });
       await Dates.create_date(con);
@@ -129,7 +129,7 @@ const create_purchase_plan_private = async (req) => {
         No_of_Limitations: plan.No_of_Limitations,
         Service_Charges: plan.Service_Charges,
         TimeType: plan.TimeType,
-        raisehandcontrol: plan.raisehandcontrol
+        raisehandcontrol: plan.raisehandcontrol,
       };
       let con = await purchasePlan.create({ ...datas, ...req.body.PaymentDatails });
       await Dates.create_date(con);
@@ -533,7 +533,7 @@ const create_PurchasePlan_EXpo = async (planId, userId, ccavenue, gst) => {
     TimeType: findPlan.TimeType,
     raisehandcontrol: findPlan.raisehandcontrol,
     totalAmount: findPlan.offer_price + gst,
-    gst: gst
+    gst: gst,
   };
   console.log(data);
   const creations = await purchasePlan.create(data);
@@ -580,7 +580,8 @@ const create_PurchasePlan_EXpo_Admin = async (body, userId) => {
     No_of_Limitations: findPlan.No_of_Limitations,
     Service_Charges: findPlan.Service_Charges,
     TimeType: findPlan.TimeType,
-    raisehandcontrol: findPlan.raisehandcontrol
+    raisehandcontrol: findPlan.raisehandcontrol,
+    Type: body.Type,
   };
   const creations = await purchasePlan.create(data);
   await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
@@ -618,10 +619,9 @@ const updatePurchase_admin = async (id, body) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'plan Not Found');
   }
 
-
   values = await purchasePlan.findByIdAndUpdate({ _id: id }, body, { new: true });
 
-  let payamount = (values.offer_price - values.Discount);
+  let payamount = values.offer_price - values.Discount;
   let gst = (payamount * 18) / 100;
   values.totalAmount = payamount + gst;
   values.gst = gst;
@@ -1053,7 +1053,7 @@ const getPlanes_Request_Streams = async (userId) => {
         PeakSlots: { $ifNull: [{ $size: '$BookedSlotsPeak' }, 0] },
         ExclusiveSlots: { $ifNull: [{ $size: '$BookedSlotsExclusive' }, 0] },
         transaction: 1,
-        PostCount: 1
+        PostCount: 1,
       },
     },
     {
@@ -1076,8 +1076,7 @@ const getPlanes_Request_Streams = async (userId) => {
           ],
         },
         transaction: 1,
-        PostCount: 1
-
+        PostCount: 1,
       },
     },
     {
@@ -1598,20 +1597,20 @@ const getPurchasedPlanPayment = async (query) => {
         path: '$ccavanue',
       },
     },
-    { $addFields: { paidAmount: { $ifNull: ['$Payment.Amount', 0] }, } },
+    { $addFields: { paidAmount: { $ifNull: ['$Payment.Amount', 0] } } },
     {
       $project: {
         _id: 1,
         planName: 1,
-        Payment: "$Payment",
+        Payment: '$Payment',
         active: 1,
-        Price: "$offer_price",
+        Price: '$offer_price',
         exhibitorName: '$Sellers.tradeName',
         exhibitorNumber: { $convert: { input: '$Sellers.mobileNumber', to: 'string' } },
         number: '$Sellers.mobileNumber',
         exhibitorId: '$Sellers._id',
         paidAmount: 1,
-        PendingAmount: { $subtract: ['$totalAmount', "$paidAmount"] },
+        PendingAmount: { $subtract: ['$totalAmount', '$paidAmount'] },
         Type: { $ifNull: ['$Type', 'Online'] },
         status: 1,
         PayementStatus: {
@@ -1627,7 +1626,7 @@ const getPurchasedPlanPayment = async (query) => {
         offer_price: 1,
         Discount: 1,
         totalAmount: 1,
-        gst: 1
+        gst: 1,
       },
     },
     {
@@ -1940,12 +1939,9 @@ const plan_payment_link_generate = async (req) => {
         PendingAmount: {
           $ifNull: [
             {
-              $subtract: [
-                '$totalAmount',
-                { $ifNull: ['$Payment.Amount', 0] }
-              ],
+              $subtract: ['$totalAmount', { $ifNull: ['$Payment.Amount', 0] }],
             },
-            "$totalAmount"
+            '$totalAmount',
           ],
         },
         Type: { $ifNull: ['$Type', 'Online'] },
@@ -2018,16 +2014,16 @@ const get_payment_link = async (req) => {
         preserveNullAndEmptyArrays: true,
       },
     },
-    { $addFields: { paidAmount: { $ifNull: ['$Payment.Amount', 0] }, } },
+    { $addFields: { paidAmount: { $ifNull: ['$Payment.Amount', 0] } } },
     {
       $project: {
         _id: 1,
         planName: 1,
-        Payment: "$Payment",
+        Payment: '$Payment',
         active: 1,
-        Price: "$offer_price",
+        Price: '$offer_price',
         paidAmount: 1,
-        PendingAmount: { $subtract: ['$totalAmount', "$paidAmount"] },
+        PendingAmount: { $subtract: ['$totalAmount', '$paidAmount'] },
         Type: { $ifNull: ['$Type', 'Online'] },
         status: 1,
         PayementStatus: {
@@ -2043,7 +2039,7 @@ const get_payment_link = async (req) => {
         offer_price: 1,
         Discount: 1,
         totalAmount: 1,
-        gst: 1
+        gst: 1,
       },
     },
   ]);
@@ -2075,17 +2071,17 @@ const get_payment_link = async (req) => {
           },
           {
             $addFields: {
-              mobileNumber: "$sellers.mobileNumber",
+              mobileNumber: '$sellers.mobileNumber',
             },
           },
           {
             $addFields: {
-              tradeName: "$sellers.tradeName",
+              tradeName: '$sellers.tradeName',
             },
           },
           {
             $addFields: {
-              email: "$sellers.email",
+              email: '$sellers.email',
             },
           },
         ],
@@ -2103,13 +2099,9 @@ const get_payment_link = async (req) => {
         paymentInfo: null,
       },
     },
-  ])
+  ]);
 
-
-
-
-  console.log(purchaseDetails, link.purchasePlan)
-
+  console.log(purchaseDetails, link.purchasePlan);
 
   if (link.length == 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'purchase not found');
@@ -2166,13 +2158,12 @@ const get_purchase_links = async (req) => {
         as: 'paymentlinks',
       },
     },
-
   ]);
   if (purchasePlandetails.length == 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'purchase not found');
   }
   return purchasePlandetails[0];
-}
+};
 
 module.exports = {
   create_purchase_plan,
@@ -2217,5 +2208,5 @@ module.exports = {
   get_payment_link,
   paynow_payment,
   get_purchase_links,
-  Purchased_Message
+  Purchased_Message,
 };
