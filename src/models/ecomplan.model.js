@@ -339,6 +339,7 @@ const streamPostschema = mongoose.Schema({
   return_policy: {
     type: String,
   },
+
 });
 
 const StreamPost = mongoose.model('Streampost', streamPostschema);
@@ -582,6 +583,9 @@ const streamRequestschema = mongoose.Schema({
   removedBy_id: {
     type: String,
   },
+  broucherName: {
+    type: String,
+  }
 });
 
 const Streamrequest = mongoose.model('StreamRequest', streamRequestschema);

@@ -173,6 +173,13 @@ const get_all_stream = catchAsync(async (req, res) => {
   const value = await Ecomserive.get_all_stream(req);
   res.send(value);
 });
+
+
+const remove_post_stream= catchAsync(async (req, res) => {
+  const value = await Ecomserive.remove_post_stream(req);
+  res.send(value);
+});
+
 const get_one_stream = catchAsync(async (req, res) => {
   //console.log('asdaszas');
   const value = await Ecomserive.get_one_stream(req);
@@ -905,5 +912,6 @@ module.exports = {
   purchesPlane_exhibitor,
   get_Saved_Product,
   remove_stream_admin,
-  search_product_list
+  search_product_list,
+  remove_post_stream
 };

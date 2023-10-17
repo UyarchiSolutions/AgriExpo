@@ -1617,6 +1617,7 @@ const create_stream_one = async (req) => {
         Service_Charges: plan.Service_Charges == null ? 0 : plan.Service_Charges,
         Interest_View_Count: plan.Interest_View_Count,
         No_of_Limitations: plan.No_of_Limitations == null ? 0 : plan.No_of_Limitations,
+        adminApprove: "Approved"
       },
     });
     await UsageAppID.findByIdAndUpdate({ _id: agoraID.vals._id }, { streamID: value._id }, { new: true });
@@ -1740,6 +1741,30 @@ const create_stream_two = async (req) => {
   }
   return { message: 'deleted' };
 };
+
+const remove_post_stream = async (req) => {
+  let value = await Streamrequest.findById(req.params.id);
+  if (!value) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Not Found');
+  }
+
+  if (req.params.type == 'image') {
+    value = await Streamrequest.findByIdAndUpdate({ _id: value._id }, { $unset: { image: 1 } })
+  }
+  if (req.params.type == 'teaser') {
+    value = await Streamrequest.findByIdAndUpdate({ _id: value._id }, { $unset: { teaser: 1 } })
+  }
+
+  if (req.params.type == 'brochure') {
+    value = await Streamrequest.findByIdAndUpdate({ _id: value._id }, { $unset: { broucher: 1, broucherName: 1 } })
+  }
+
+
+
+
+  return value;
+};
+
 const get_all_stream = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
   let date_now = new Date().getTime();
@@ -1896,9 +1921,16 @@ const get_all_stream = async (req) => {
     },
     {
       $addFields: {
+        streamExpire_Date: "$streamExpire",
+      },
+    },
+    {
+      $addFields: {
         streamExpire: { $gt: ['$streamExpire', date_now] },
       },
     },
+
+
     { $skip: 10 * page },
     { $limit: 10 },
   ]);
@@ -2827,9 +2859,15 @@ const get_all_streams = async (req) => {
     },
     {
       $addFields: {
+        streamExpire_Date: "$streamExpire",
+      },
+    },
+    {
+      $addFields: {
         streamExpire: { $gt: ['$streamExpire', date_now] },
       },
     },
+
     {
       $project: {
         purchasedplans: '$purchasedplans',
@@ -2890,6 +2928,7 @@ const get_all_streams = async (req) => {
         stream_expired: 1,
         show_completd: 1,
         streamExpire: 1,
+        streamExpire_Date: 1,
         Service_Charges: 1,
         completedStream: 1,
         streamEnd_Time: 1,
@@ -10534,6 +10573,11 @@ const get_completed_stream_completed = async (req) => {
     },
     {
       $addFields: {
+        streamExpire_Date: "$streamExpire",
+      },
+    },
+    {
+      $addFields: {
         streamExpire: { $gt: ['$streamExpire', date_now] },
       },
     },
@@ -10578,7 +10622,8 @@ const get_completed_stream_completed = async (req) => {
         allot_chat: 1,
         temptokens: '$temptokens',
         streamExpire: 1,
-        completedStream: 1
+        completedStream: 1,
+        streamExpire_Date: 1
 
       },
     },
@@ -14987,5 +15032,6 @@ module.exports = {
   update_post_price_admin,
   post_payment_details,
   remove_stream_admin,
-  search_product_list
+  search_product_list,
+  remove_post_stream
 };
