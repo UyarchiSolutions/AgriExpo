@@ -191,14 +191,19 @@ const delete_one_Plans = async (req) => {
   return { message: 'deleted' };
 };
 
-const create_post = async (req, images) => {
-  if (images.length == 0 && (req.body.old_accept == 'true' || req.body.old_accept == true)) {
+const create_post = async (req) => {
+  let images = [];
+  if (req.files.length == 0 && (req.body.old_accept == 'true' || req.body.old_accept == true)) {
     let old_post = await StreamPost.findById(req.body.old_post);
     if (old_post) {
       images = old_post.images;
       req.body.video = old_post.video;
     }
   }
+  else {
+    images = await multible_image_array(req.files)
+  }
+  console.log(images, 9876)
   const value = await StreamPost.create({
     ...req.body,
     ...{ suppierId: req.userId, images: images, pendingQTY: req.body.quantity },
@@ -217,6 +222,52 @@ const create_post = async (req, images) => {
   }
   return value;
 };
+
+const multible_image_array = (filePaths) => {
+  const uploadPromises = filePaths.map(async (filePath, index) => await uploadToS3(filePath, index));
+  let urls = []
+  return Promise.all(uploadPromises)
+    .then(results => {
+      results.forEach(result => {
+        urls.push(result)
+      });
+      return urls;
+
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
+
+
+
+function uploadToS3(filePath) {
+
+  const s3 = new AWS.S3({
+    accessKeyId: 'AKIA3323XNN7Y2RU77UG',
+    secretAccessKey: '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',
+    region: 'ap-south-1',
+  });
+
+
+  return new Promise((resolve, reject) => {
+    const params = {
+      Bucket: 'b2bimageswarmy',
+      Key: filePath.originalname, // Key under which the file will be stored in S3
+      Body: filePath.buffer,
+    };
+    s3.upload(params, (err, data) => {
+      if (err) {
+        reject(``);
+      } else {
+        resolve(data.Location);
+      }
+    });
+  });
+}
+
+
+
 const create_teaser_upload = async (req, images) => {
   const s3 = new AWS.S3({
     accessKeyId: 'AKIA3323XNN7Y2RU77UG',
@@ -1531,12 +1582,14 @@ const get_one_Post = async (req) => {
   return value;
 };
 
-const update_one_Post = async (req, images) => {
+const update_one_Post = async (req) => {
   const value = await StreamPost.findByIdAndUpdate({ _id: req.query.id, suppierId: req.userId }, req.body, { new: true });
   if (!value) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Not Found');
   }
-  if (images.length != 0) {
+  if (req.files.length != 0) {
+
+    let images = await multible_image_array(req.files)
     value.images = images;
     value.save();
   }

@@ -46,17 +46,17 @@ const delete_one_Plans = catchAsync(async (req, res) => {
 });
 
 const create_post = catchAsync(async (req, res) => {
-  let images = [];
-  if (req.files) {
-    let path = '';
-    path = 'images/';
-    if (req.files.galleryImages != null) {
-      req.files.galleryImages.forEach((e) => {
-        images.push(path + e.filename);
-      });
-    }
-  }
-  const value = await Ecomserive.create_post(req, images);
+  // let images = [];
+  // if (req.files) {
+  //   let path = '';
+  //   path = 'images/';
+  //   if (req.files.galleryImages != null) {
+  //     req.files.galleryImages.forEach((e) => {
+  //       images.push(path + e.filename);
+  //     });
+  //   }
+  // }
+  const value = await Ecomserive.create_post(req);
   res.send(value);
 });
 const create_post_teaser = catchAsync(async (req, res) => {
@@ -105,17 +105,17 @@ const get_one_post = catchAsync(async (req, res) => {
 });
 const update_one_post = catchAsync(async (req, res) => {
   //console.log(req.files);
-  let images = [];
-  if (req.files) {
-    let path = '';
-    path = 'images/';
-    if (req.files.galleryImages != null) {
-      req.files.galleryImages.forEach((e) => {
-        images.push(path + e.filename);
-      });
-    }
-  }
-  const value = await Ecomserive.update_one_Post(req, images);
+  // let images = [];
+  // if (req.files) {
+  //   let path = '';
+  //   path = 'images/';
+  //   if (req.files.galleryImages != null) {
+  //     req.files.galleryImages.forEach((e) => {
+  //       images.push(path + e.filename);
+  //     });
+  //   }
+  // }
+  const value = await Ecomserive.update_one_Post(req);
   res.send(value);
 });
 const delete_one_post = catchAsync(async (req, res) => {

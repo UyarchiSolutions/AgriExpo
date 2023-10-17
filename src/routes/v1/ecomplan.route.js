@@ -34,6 +34,7 @@ const storage_s3 = multer.diskStorage({
 });
 
 const upload_s3 = multer({ storage: storage_s3 });
+const postImages = multer({ storage }).array('galleryImages');
 
 // plan APIS
 router.route('/create/plan').post(Ecomcontroller.create_Plans);
@@ -51,7 +52,7 @@ router.route('/getPlanById/:id').get(Ecomcontroller.getPlanById);
 router.route('/deletePlanById/:id').delete(Ecomcontroller.deletePlanById);
 router.route('/disable/Enable/Plan/:id').put(Ecomcontroller.disable_Enable_Plan);
 // post APIS
-router.route('/create/post').post(SellerAuth, uploadimage.fields([{ name: 'galleryImages' }]), Ecomcontroller.create_post);
+router.route('/create/post').post(SellerAuth, postImages, Ecomcontroller.create_post);
 router.route('/create/post/teaser').post(upload, Ecomcontroller.create_post_teaser);
 router.route('/get/all/post').get(SellerAuth, Ecomcontroller.get_all_post);
 router.route('/get/all/post/transation').get(SellerAuth, Ecomcontroller.get_all_post_transation);
@@ -66,7 +67,7 @@ router.route('/post/payment/details').get(SellerAuth, Ecomcontroller.post_paymen
 
 
 router.route('/get/one/post').get(SellerAuth, Ecomcontroller.get_one_post);
-router.route('/update/one/post').put(SellerAuth, uploadimage.fields([{ name: 'galleryImages' }]), Ecomcontroller.update_one_post);
+router.route('/update/one/post').put(SellerAuth, postImages, Ecomcontroller.update_one_post);
 router.route('/delete/one/post').delete(SellerAuth, Ecomcontroller.delete_one_post);
 router.route('/remove/one/post').put(SellerAuth, Ecomcontroller.remove_one_post);
 
