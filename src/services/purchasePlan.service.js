@@ -1816,6 +1816,7 @@ const getMyPurchasedPlan = async (userId) => {
     {
       $match: {
         suppierId: userId,
+        status: 'Pending',
       },
     },
     {
