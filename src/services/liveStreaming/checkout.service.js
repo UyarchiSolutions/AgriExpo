@@ -282,7 +282,8 @@ const get_addTocart = async (req) => {
               },
               streamingcartproducts: "$streamingcartproducts",
               tempQTY: { $ifNull: ['$streamingcartproducts.tempQTY', 0] },
-              postLiveStreamingPirce: "$streamposts.postLiveStreamingPirce"
+              postLiveStreamingPirce: "$streamposts.postLiveStreamingPirce",
+              image: { $ifNull: ['$streamposts.showImage', '$image'] },
             }
           },
           {
