@@ -688,7 +688,11 @@ const get_sub_golive = async (req, io) => {
                   },
                 },
                 { $unwind: '$streamposts' },
-
+                {
+                  $addFields: {
+                    image: { $ifNull: ['$streamposts.showImage', '$streamposts.products.image'] },
+                  },
+                },
                 {
                   $project: {
                     _id: 1,
@@ -696,7 +700,7 @@ const get_sub_golive = async (req, io) => {
                     archive: 1,
                     productId: '$streamposts.productId',
                     productTitle: '$streamposts.products.productTitle',
-                    image: '$streamposts.products.image',
+                    image: 1,
                     categoryId: 'a7c95af4-abd5-4fe0-b685-fd93bb98f5ec',
                     quantity: '$streamposts.quantity',
                     marketPlace: '$streamposts.marketPlace',
