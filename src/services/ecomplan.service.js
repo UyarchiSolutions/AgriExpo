@@ -8912,7 +8912,7 @@ const purchase_details = async (req) => {
   let value = await purchasePlan.aggregate([
     {
       $addFields: {
-        date: { $dateToString: { format: '%Y-%m-%d', date: '$created' } },
+        date: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
       },
     },
     {
@@ -8922,12 +8922,13 @@ const purchase_details = async (req) => {
     },
     {
       $lookup: {
-        from: 'suppliers',
+        from: 'sellers',
         localField: 'suppierId',
         foreignField: '_id',
         as: 'suppliers',
       },
     },
+
     {
       $unwind: {
         preserveNullAndEmptyArrays: true,
@@ -8935,13 +8936,31 @@ const purchase_details = async (req) => {
       },
     },
     {
-      $addFields: {
-        primaryContactName: '$suppliers.primaryContactName',
+      $lookup: {
+        from: 'streamrequests',
+        localField: '_id',
+        foreignField: 'planId',
+        as: 'stream',
       },
     },
     {
       $addFields: {
-        primaryContactNumber: '$suppliers.primaryContactNumber',
+        primaryContactName: '$suppliers.tradeName',
+      },
+    },
+    {
+      $addFields: {
+        numberOfStreamused: {$size:'$stream'},
+      },
+    },
+    {
+      $addFields: {
+        primaryContactNumber: '$suppliers.mobileNumber',
+      },
+    },
+    {
+      $addFields: {
+        numberofStream: {$sum:'$slotInfo.No_Of_Slot'},
       },
     },
     {
@@ -8960,12 +8979,9 @@ const purchase_details = async (req) => {
     },
     {
       $addFields: {
-        planValidity: '$streamplans.validityofplan',
-      },
-    },
-    {
-      $addFields: {
-        numberofStream: '$streamplans.numberofStream',
+        // planValidity: '$streamplans.validityofplan',
+        planValidity: 'null',
+
       },
     },
     { $skip: 10 * page },
@@ -8974,7 +8990,7 @@ const purchase_details = async (req) => {
   let total = await purchasePlan.aggregate([
     {
       $addFields: {
-        date: { $dateToString: { format: '%Y-%m-%d', date: '$created' } },
+        date: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
       },
     },
     {
@@ -8997,7 +9013,7 @@ const purchase_details_supplier = async (req) => {
     },
     {
       $lookup: {
-        from: 'suppliers',
+        from: 'sellers',
         localField: 'suppierId',
         foreignField: '_id',
         as: 'suppliers',
@@ -9011,12 +9027,12 @@ const purchase_details_supplier = async (req) => {
     },
     {
       $addFields: {
-        primaryContactName: '$suppliers.primaryContactName',
+        primaryContactName: '$suppliers.tradeName',
       },
     },
     {
       $addFields: {
-        primaryContactNumber: '$suppliers.primaryContactNumber',
+        primaryContactNumber: '$suppliers.mobileNumber',
       },
     },
     {

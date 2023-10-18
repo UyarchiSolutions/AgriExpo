@@ -584,7 +584,7 @@ const create_PurchasePlan_EXpo_Admin = async (body, userId) => {
     Type: body.Type,
   };
   const creations = await purchasePlan.create(data);
-  await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
+  // await Purchased_Message(findUser.tradeName, findPlan.planName, findUser.mobileNumber);
   return creations;
 };
 
@@ -1816,6 +1816,7 @@ const getMyPurchasedPlan = async (userId) => {
     {
       $match: {
         suppierId: userId,
+        status: {$ne:'Pending'},
       },
     },
     {
@@ -1867,31 +1868,17 @@ const getMyPurchasedPlan = async (userId) => {
       $project: {
         _id: 1,
         planName: 1,
+        Payment: { $ifNull: ['$Payment.Amount', 0] },
         active: 1,
-        RevisedAmount: 1,
-        Discount: 1,
-        planAmount: '$Price',
-        Price: { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
+        Price: '$offer_price',
         exhibitorName: '$Sellers.tradeName',
         exhibitorNumber: { $convert: { input: '$Sellers.mobileNumber', to: 'string' } },
         number: '$Sellers.mobileNumber',
         exhibitorId: '$Sellers._id',
-        paidAmount1: { $ifNull: ['$Payment.Amount', 0] },
-        paidAmount: { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
-        PendingAmount: {
-          $ifNull: [
-            {
-              $subtract: [
-                { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
-                { $add: [{ $ifNull: ['$Payment.Amount', 0] }, '$onlinePrice'] },
-              ],
-            },
-            { $subtract: ['$Price', { $ifNull: ['$Discount', 0] }] },
-          ],
-        },
+        paidAmount: { $ifNull: ['$paidAmount', 0] },
+        PendingAmount: { $subtract: ['$totalAmount', { $ifNull: ['$paidAmount', 0] }] },
         Type: { $ifNull: ['$Type', 'Online'] },
         status: 1,
-        Discount: { $ifNull: ['$Discount', 0] },
         PayementStatus: {
           $cond: {
             if: {
@@ -1902,6 +1889,10 @@ const getMyPurchasedPlan = async (userId) => {
           },
         },
         ccavanue: '$ccavanue',
+        offer_price: 1,
+        Discount: 1,
+        totalAmount: 1,
+        gst: 1,
       },
     },
   ]);
