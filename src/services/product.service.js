@@ -23,7 +23,12 @@ const { MarketClone } = require('../models/market.model');
 const Trendproductsclones = require('../models/trendsProduct.clocne.model');
 const { ProductorderClone } = require('../models/shopOrder.model');
 const { Category } = require('../models');
-const createProduct = async (productBody) => {
+const AWS = require('aws-sdk');
+
+const createProduct = async (productBody, req) => {
+
+  console.log(req.files)
+  console.log(req.file)
   let { needBidding, biddingStartDate, biddingStartTime, biddingEndDate, biddingEndTime, maxBidAomunt, minBidAmount } =
     productBody;
   if (needBidding === 'no') {
@@ -51,6 +56,51 @@ const doplicte_check = async (req, res, next) => {
   }
   return next();
 };
+
+
+const multible_image_array = (filePaths) => {
+  const uploadPromises = filePaths.map(async (filePath, index) => await uploadToS3(filePath, index));
+  let urls = []
+  return Promise.all(uploadPromises)
+    .then(results => {
+      results.forEach(result => {
+        urls.push(result)
+      });
+      return urls;
+
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
+
+
+
+function uploadToS3(filePath) {
+
+  const s3 = new AWS.S3({
+    accessKeyId: 'AKIA3323XNN7Y2RU77UG',
+    secretAccessKey: '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',
+    region: 'ap-south-1',
+  });
+
+
+  return new Promise((resolve, reject) => {
+    const params = {
+      Bucket: 'b2bimageswarmy',
+      Key: filePath.originalname, // Key under which the file will be stored in S3
+      Body: filePath.buffer,
+    };
+    s3.upload(params, (err, data) => {
+      if (err) {
+        reject(``);
+      } else {
+        resolve(data.Location);
+      }
+    });
+  });
+}
+
 
 const updateStockById = async (id, updateBody) => {
   let stock = await Stock.findById(id);

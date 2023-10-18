@@ -6,13 +6,18 @@ const bill = require('../../middlewares/bills');
 const router = express.Router();
 const productservice = require('../../services/product.service');
 const { SellerAuth } = require('../../controllers/sellerAuth.controller');
-router
-  .route('/create')
-  .post(
-    upload.fields([{ name: 'image' }, { name: 'galleryImages' }]),
-    productservice.doplicte_check,
-    productController.createProduct
-  );
+const multer = require('multer')
+
+const storage = multer.memoryStorage({
+  destination: function (req, res, callback) {
+    callback(null, '');
+  },
+});
+const galleryImages = multer({ storage }).array('galleryImages')
+const image = multer({ storage }).single('image');
+
+
+router.route('/create').post(galleryImages,productController.createProduct);
 router.route('/').get(productController.getProducts);
 router
   .route('/:productId')

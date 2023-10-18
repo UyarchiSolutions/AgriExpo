@@ -7,21 +7,23 @@ const { Stock } = require('../models/product.model');
 const moment = require('moment');
 const createProduct = catchAsync(async (req, res) => {
   const { body } = req;
-  const product = await productService.createProduct(body);
-  if (req.files) {
-    let path = '';
-    path = 'images/';
-    if (req.files.image != null) {
-      product.image = path + req.files.image[0].filename;
-    }
+  console.log(req.files)
 
-    if (req.files.galleryImages != null) {
-      req.files.galleryImages.forEach((e) => {
-        product.galleryImages.push(path + e.filename);
-      });
-    }
-  }
-  await product.save();
+  const product = await productService.createProduct(body,req);
+  // if (req.files) {
+  //   let path = '';
+  //   path = 'images/';
+  //   if (req.files.image != null) {
+  //     product.image = path + req.files.image[0].filename;
+  //   }
+
+  //   if (req.files.galleryImages != null) {
+  //     req.files.galleryImages.forEach((e) => {
+  //       product.galleryImages.push(path + e.filename);
+  //     });
+  //   }
+  // }
+  // await product.save();
   res.status(httpStatus.CREATED).send(product);
 });
 var getDaysArray = function (start, end) {
