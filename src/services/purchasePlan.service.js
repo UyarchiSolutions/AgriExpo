@@ -2169,6 +2169,11 @@ const userPayment = async (body) => {
 const getPaymentDetails = async (id) => {
   let values = await purchasePlan.aggregate([
     {
+      $match: {
+        _id: id,
+      },
+    },
+    {
       $lookup: {
         from: 'sellers',
         localField: 'suppierId',
