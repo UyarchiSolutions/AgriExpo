@@ -90,12 +90,10 @@ const updatePurchasedPlanById = catchAsync(async (req, res) => {
   res.send(values);
 });
 
-
 const updatePurchase_admin = catchAsync(async (req, res) => {
   const values = await purchasePlan.updatePurchase_admin(req.params.id, req.body);
   res.send(values);
 });
-
 
 const get_All_Planes = catchAsync(async (req, res) => {
   const value = await purchasePlan.get_All_Planes(req.params.page);
@@ -245,6 +243,11 @@ const get_purchase_links = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const userPayment = catchAsync(async (req, res) => {
+  const data = await purchasePlan.userPayment(req.body);
+  res.send(data);
+});
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -288,4 +291,5 @@ module.exports = {
   get_payment_link,
   paynow_payment,
   get_purchase_links,
+  userPayment,
 };
