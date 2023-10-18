@@ -2162,7 +2162,7 @@ const userPayment = async (body) => {
   if (!Plan) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Found');
   }
-  Plan = await purchasePlan.findByIdAndUpdate({ _id: PlanId }, { userPaymentRequest: datas }, { new: true });
+  Plan = await purchasePlan.findByIdAndUpdate({ _id: PlanId }, { $push: { userPaymentRequest: datas } }, { new: true });
   return Plan;
 };
 

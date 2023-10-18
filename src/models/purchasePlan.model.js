@@ -268,7 +268,7 @@ const purchasePlanSchema = mongoose.Schema(
       type: Number,
     },
     userPaymentRequest: {
-      type: Object,
+      type: Array,
     },
   },
   { timestamps: true }
