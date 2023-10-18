@@ -2162,7 +2162,7 @@ const userPayment = async (body) => {
   if (!Plan) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Found');
   }
-  let datenow = moment().format('YYYY-MM-dd');
+  let datenow = moment().format('YYYY-MM-DD');
   let time = moment().format('"HH:mm:ss"');
   datas = { ...datas, time: time, date: datenow };
   Plan = await purchasePlan.findByIdAndUpdate({ _id: PlanId }, { $push: { userPaymentRequest: datas } }, { new: true });
