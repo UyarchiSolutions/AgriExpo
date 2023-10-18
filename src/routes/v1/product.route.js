@@ -6,18 +6,17 @@ const bill = require('../../middlewares/bills');
 const router = express.Router();
 const productservice = require('../../services/product.service');
 const { SellerAuth } = require('../../controllers/sellerAuth.controller');
-const multer = require('multer')
+const multer = require('multer');
 
 const storage = multer.memoryStorage({
   destination: function (req, res, callback) {
     callback(null, '');
   },
 });
-const galleryImages = multer({ storage }).array('galleryImages')
+const galleryImages = multer({ storage }).fields([{ name: 'galleryImages' }, { name: 'image' }]);
 const image = multer({ storage }).single('image');
 
-
-router.route('/create').post(galleryImages,productController.createProduct);
+router.route('/create').post(galleryImages, productController.createProduct);
 router.route('/').get(productController.getProducts);
 router
   .route('/:productId')
