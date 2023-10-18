@@ -52,14 +52,11 @@ router.route('/getAll/Ad_Planes').get(purchasePlan.getAll_Ad_Planes);
 router.route('/updateAd/PlanBtId/:id').put(purchasePlan.updateAdPlanBtId);
 router.route('/getPayment/Details/ByPlan/:id').get(purchasePlan.getPayment_Details_ByPlan);
 router.route('/getMyPurchased/Plan').get(SellerAuth, purchasePlan.getMyPurchasedPlan);
-
-
-
-
+router.route('/userPayment').post(SellerAuth, purchasePlan.userPayment);
 router.route('/plan/payment/link/generate').post(purchasePlan.plan_payment_link_generate);
 router.route('/get/payment/link/:id').get(purchasePlan.get_payment_link);
 router.route('/paynow').post(purchasePlan.paynow_payment);
 router.route('/get/purchase/links').get(purchasePlan.get_purchase_links);
-
+router.route('/get/PaymentDetails/:id').get(purchasePlan.getPaymentDetails);
 
 module.exports = router;

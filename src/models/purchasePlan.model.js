@@ -200,7 +200,7 @@ const purchasePlanSchema = mongoose.Schema(
     },
     Discount: {
       type: Number,
-      default: 0
+      default: 0,
     },
     RevisedAmount: {
       type: Number,
@@ -266,7 +266,10 @@ const purchasePlanSchema = mongoose.Schema(
     },
     totalAmount: {
       type: Number,
-    }
+    },
+    userPaymentRequest: {
+      type: Array,
+    },
   },
   { timestamps: true }
 );
@@ -347,14 +350,14 @@ const PlanPaymentSchema = new mongoose.Schema(
     },
     paymentType: {
       type: String,
-      default: "online"
+      default: 'online',
     },
     ccavenue: {
-      type: Object
+      type: Object,
     },
     ccavenueID: {
       type: String,
-    }
+    },
   },
   { timestamps: true }
 );
