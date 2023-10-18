@@ -14,7 +14,6 @@ const storage = multer.memoryStorage({
   },
 });
 const galleryImages = multer({ storage }).fields([{ name: 'galleryImages' }, { name: 'image' }]);
-const image = multer({ storage }).single('image');
 
 router.route('/create').post(galleryImages, productController.createProduct);
 router.route('/').get(productController.getProducts);
@@ -22,7 +21,7 @@ router
   .route('/:productId')
   .get(productController.getproduct)
   .delete(productController.deleteProduct)
-  .put(upload.fields([{ name: 'image' }, { name: 'galleryImages' }]), productController.updateProduct);
+  .put(galleryImages, productController.updateProduct);
 router.route('/setTrendsValue/:id').put(productController.setTrendsValueforProduct);
 router.route('/getProduct/products/:id').get(productController.getProductByIdWithAggregation);
 router.route('/shopProducts/getName').get(productController.productAggregationWithShopOrder);

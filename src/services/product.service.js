@@ -26,9 +26,25 @@ const { Category } = require('../models');
 const AWS = require('aws-sdk');
 
 const createProduct = async (productBody, req) => {
+  let image
+  let galleryImages = []
+  if (req.files.galleryImages != null) {
+    if (req.files.galleryImages.length != 0) {
+      galleryImages = await multible_image_array(req.files.galleryImages)
+    }
+  }
+  if (req.files.image != null) {
+    if (req.files.image.length != 0) {
+      image = await single_image_upload(req.files.image)
+      console.log(image)
+    }
+  }
 
-  console.log(req.files)
-  console.log(req.file)
+  // console.log(req.files.galleryImages)
+  // console.log(req.files)
+  // console.log(req.file)
+  productBody.galleryImages = galleryImages;
+  productBody.image = image;
   let { needBidding, biddingStartDate, biddingStartTime, biddingEndDate, biddingEndTime, maxBidAomunt, minBidAmount } =
     productBody;
   if (needBidding === 'no') {
@@ -73,6 +89,26 @@ const multible_image_array = (filePaths) => {
       console.error(error);
     });
 }
+
+const single_image_upload = async (filePaths) => {
+  console.log(filePaths, 76879)
+  const uploadPromises = filePaths.map(async (filePath, index) => await uploadToS3(filePath, index));
+  let urls = []
+  return Promise.all(uploadPromises)
+    .then(results => {
+      results.forEach(result => {
+        urls.push(result)
+      });
+
+      console.log(urls, 43542)
+      return urls[0];
+
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
+
 
 
 
@@ -1343,12 +1379,29 @@ const getLoadingExecuteDate = async () => {
   return loadings;
 };
 
-const updateProductById = async (productId, updateBody) => {
+const updateProductById = async (productId, updateBody, req) => {
   let prod = await getProductById(productId);
   if (!prod) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Product not found');
   }
   prod = await Product.findByIdAndUpdate({ _id: productId }, updateBody, { new: true });
+  if (req.files.galleryImages != null) {
+    if (req.files.galleryImages.length != 0) {
+      let galleryImages = await multible_image_array(req.files.galleryImages)
+      prod.galleryImages = galleryImages;
+    }
+  }
+  if (req.files.image != null) {
+    if (req.files.image.length != 0) {
+      let image = await single_image_upload(req.files.image)
+      console.log(image)
+      prod.image = image;
+    }
+  }
+
+  prod.save();
+
+
   return prod;
 };
 

@@ -7,8 +7,7 @@ const { Stock } = require('../models/product.model');
 const moment = require('moment');
 const createProduct = catchAsync(async (req, res) => {
   const { body } = req;
-  console.log(req.files.galleryImages)
-  // const product = await productService.createProduct(body,req);
+  const product = await productService.createProduct(body, req);
   // if (req.files) {
   //   let path = '';
   //   path = 'images/';
@@ -23,7 +22,7 @@ const createProduct = catchAsync(async (req, res) => {
   //   }
   // }
   // await product.save();
-  res.status(httpStatus.CREATED).send({msg:"dev"});
+  res.status(httpStatus.CREATED).send(product);
 });
 var getDaysArray = function (start, end) {
   for (var arr = [], dt = new Date(start); dt <= new Date(end); dt.setDate(dt.getDate() + 1)) {
@@ -232,28 +231,28 @@ const getAllienceBySupplierId = catchAsync(async (req, res) => {
 });
 
 const updateProduct = catchAsync(async (req, res) => {
-  const product = await productService.updateProductById(req.params.productId, req.body);
-  if (req.files) {
-    let path = '';
-    path = 'images/';
-    if (req.files.image != null) {
-      product.image = path + req.files.image[0].filename;
-    }
+  const product = await productService.updateProductById(req.params.productId, req.body, req);
+  // if (req.files) {
+  //   let path = '';
+  //   path = 'images/';
+  //   if (req.files.image != null) {
+  //     product.image = path + req.files.image[0].filename;
+  //   }
 
-    if (req.files.galleryImages != null) {
-      product.galleryImages = [];
-      req.files.galleryImages.forEach((e) => {
-        product.galleryImages.push(path + e.filename);
-      });
-    }
-  }
-  if (req.body.removeimage == 'true') {
-    product.image = '';
-  }
-  if (req.body.removegallery == 'true') {
-    product.galleryImages = [];
-  }
-  await product.save();
+  //   if (req.files.galleryImages != null) {
+  //     product.galleryImages = [];
+  //     req.files.galleryImages.forEach((e) => {
+  //       product.galleryImages.push(path + e.filename);
+  //     });
+  //   }
+  // }
+  // if (req.body.removeimage == 'true') {
+  //   product.image = '';
+  // }
+  // if (req.body.removegallery == 'true') {
+  //   product.galleryImages = [];
+  // }
+  // await product.save();
   res.send(product);
 });
 
