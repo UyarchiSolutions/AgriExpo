@@ -2166,6 +2166,88 @@ const userPayment = async (body) => {
   return Plan;
 };
 
+const getPaymentDetails = async (id) => {
+  let values = await purchasePlan.aggregate([
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'Sellers',
+      },
+    },
+    {
+      $unwind: {
+        path: '$Sellers',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'agriplanpayments',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [{ $group: { _id: null, Amount: { $sum: '$Amount' } } }],
+        as: 'Payment',
+      },
+    },
+    {
+      $unwind: {
+        path: '$Payment',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'ccavanuepayments',
+        localField: 'ccavenue',
+        foreignField: '_id',
+        as: 'ccavanue',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$ccavanue',
+      },
+    },
+    { $addFields: { paidAmount: { $ifNull: ['$Payment.Amount', 0] } } },
+    {
+      $project: {
+        _id: 1,
+        planName: 1,
+        Payment: '$Payment',
+        active: 1,
+        Price: '$offer_price',
+        exhibitorName: '$Sellers.tradeName',
+        exhibitorNumber: { $convert: { input: '$Sellers.mobileNumber', to: 'string' } },
+        number: '$Sellers.mobileNumber',
+        exhibitorId: '$Sellers._id',
+        paidAmount: 1,
+        PendingAmount: { $subtract: ['$totalAmount', '$paidAmount'] },
+        Type: { $ifNull: ['$Type', 'Online'] },
+        status: 1,
+        PayementStatus: {
+          $cond: {
+            if: {
+              $eq: ['$ccavanue.response.order_status', 'Success'],
+            },
+            then: 'FullyPaid',
+            else: '$PayementStatus',
+          },
+        },
+        ccavanue: '$ccavanue',
+        offer_price: 1,
+        Discount: 1,
+        totalAmount: 1,
+        gst: 1,
+        userPaymentRequest: 1,
+      },
+    },
+  ]);
+  return values;
+};
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -2211,4 +2293,5 @@ module.exports = {
   get_purchase_links,
   Purchased_Message,
   userPayment,
+  getPaymentDetails,
 };

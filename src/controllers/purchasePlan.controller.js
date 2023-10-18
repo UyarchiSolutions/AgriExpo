@@ -248,6 +248,11 @@ const userPayment = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getPaymentDetails = catchAsync(async (req, res) => {
+  const data = await purchasePlan.getPaymentDetails(req.params.id);
+  res.send(data);
+});
+
 module.exports = {
   create_purchase_plan,
   get_order_details,
@@ -292,4 +297,5 @@ module.exports = {
   paynow_payment,
   get_purchase_links,
   userPayment,
+  getPaymentDetails,
 };
