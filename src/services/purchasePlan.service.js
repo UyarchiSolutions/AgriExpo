@@ -415,6 +415,7 @@ const get_all_my_orders_normal = async (req) => {
         stream_validity:1,
         raisehandcontrol:1,
         Service_Charges:1,
+        transaction:1,
         approvalDate: 1,
         Normal: { $ifNull: ['$NormalSlot.total', 0] },
         Peak: { $ifNull: ['$PeakSlot.total', 0] },
