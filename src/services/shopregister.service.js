@@ -2627,6 +2627,55 @@ const getWalletByShopId = async (req) => {
   return values;
 };
 
+const walletAmountDetails = async (userId) => {
+  let val = await Shop.aggregate([
+    {
+      $match: {
+        _id: userId,
+      },
+    },
+    {
+      $lookup: {
+        from: 'visitorwallets',
+        localField: '_id',
+        foreignField: 'userId',
+        pipeline: [{ $match: { Type: { $eq: 'Addon' } } }, { $group: { _id: null, Amount: { $sum: '$Amount' } } }],
+        as: 'addonwallet',
+      },
+    },
+    {
+      $unwind: {
+        path: '$addonwallet',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'visitorwallets',
+        localField: '_id',
+        foreignField: 'userId',
+        pipeline: [{ $match: { Type: { $ne: 'Addon' } } }, { $group: { _id: null, Amount: { $sum: '$Amount' } } }],
+        as: 'Spendwallet',
+      },
+    },
+    {
+      $unwind: {
+        path: '$Spendwallet',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        WalletTotalAmount: { $ifNull: ['$addonwallet.Amount', 0] },
+        WalletSpendAmount: { $ifNull: ['$Spendwallet.Amount', 0] },
+
+      },
+    },
+  ]);
+  return val[0];
+};
+
 module.exports = {
   register_shop,
   verify_otp,
@@ -2663,4 +2712,5 @@ module.exports = {
   verify_otpDelete_Account,
   createWallet,
   getWalletByShopId,
+  walletAmountDetails,
 };

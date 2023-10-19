@@ -219,6 +219,11 @@ const getWalletByShopId = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const walletAmountDetails = catchAsync(async (req, res) => {
+  const data = await registerShop.walletAmountDetails(req.shopId);
+  res.send(data);
+});
+
 module.exports = {
   register_shop,
   verify_otp,
@@ -255,4 +260,5 @@ module.exports = {
   verify_otpDelete_Account,
   createWallet,
   getWalletByShopId,
+  walletAmountDetails,
 };
