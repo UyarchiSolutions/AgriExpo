@@ -4,7 +4,7 @@ const { Wallet, Enquiry } = require('../models/agri-exhibitor-wallet.model');
 const moment = require('moment');
 
 const createWallet = async (body, userId) => {
-  let data = { ...body, ...{ userId: userId } };
+  let data = { ...body, ...{ userId: userId, Type:"Addon" } };
   let values = await Wallet.create(data);
   return values;
 };

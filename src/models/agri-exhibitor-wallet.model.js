@@ -20,6 +20,9 @@ const WalletSchema = mongoose.Schema(
       type: String,
       default: 'Pending',
     },
+    Type: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
