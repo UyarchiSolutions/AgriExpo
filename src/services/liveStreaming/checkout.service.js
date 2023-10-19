@@ -277,9 +277,7 @@ const get_addTocart = async (req) => {
               minimunQTY: {
                 $gte: ['$streamposts.pendingQTY', '$streamposts.minLots']
               },
-              allowedQTY: {
-                $gte: ['$streamposts.pendingQTY', "$cartQTY"]
-              },
+              allowedQTY: {$gte: ['$streamposts.pendingQTY', "$cartQTY"]},
               streamingcartproducts: "$streamingcartproducts",
               tempQTY: { $ifNull: ['$streamingcartproducts.tempQTY', 0] },
               postLiveStreamingPirce: "$streamposts.postLiveStreamingPirce",
