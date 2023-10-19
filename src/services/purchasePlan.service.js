@@ -701,6 +701,9 @@ const get_All_Planes = async (page) => {
         Tele_Caller: 1,
         Type: 1,
         paymentLink: 1,
+        gst:1,
+        offer_price:1,
+        totalAmount:1,
       },
     },
     { $skip: 10 * page },
@@ -1644,10 +1647,6 @@ const create_PlanPayment = async (body) => {
   if (!Plan) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Plan not found');
   }
-  let discound = Plan.Discount ? Plan.Discount : 0;
-  let PlanPrice = parseInt(Plan.totalAmount) - discound;
-  let PaidAmount = Plan.PaidAmount ? Plan.PaidAmount : 0;
-  let ToBePaid = PaidAmount + body.Amount;
   let finding = await PlanPayment.find().count();
   let center = '';
   if (finding < 9) {
@@ -1664,9 +1663,29 @@ const create_PlanPayment = async (body) => {
   }
   let billId = 'BID' + center + finding + 1;
   let data = { ...body, billId: billId };
-  let paid = await purchasePlan.findByIdAndUpdate({ _id: PlanId }, { PaidAmount: ToBePaid }, { new: true });
-  if (PlanPrice > 0) {
-    if (PlanPrice == paid.PaidAmount) {
+
+  const paidPaymentDetails = await PlanPayment.aggregate([
+    {
+      $match: {
+        PlanId: PlanId,
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        Amount: { $sum: '$Amount' },
+      },
+    },
+  ]);
+  let val = paidPaymentDetails.length > 0 ? paidPaymentDetails[0].Amount : 0;
+
+  let paid = await purchasePlan.findByIdAndUpdate(
+    { _id: PlanId },
+    { PaidAmount: val + parseInt(body.Amount) },
+    { new: true }
+  );
+  if (Plan.totalAmount > 0) {
+    if (Plan.totalAmount >= val) {
       paid.PayementStatus = 'FullyPaid';
     } else {
       paid.PayementStatus = 'PartiallyPaid';
@@ -1696,6 +1715,11 @@ const get_Payment_ById = async (id) => {
       $unwind: {
         preserveNullAndEmptyArrays: true,
         path: '$plan',
+      },
+    },
+    {
+      $addFields: {
+        PaidAmount: { $sum: '$Amount' },
       },
     },
   ]);
@@ -2163,7 +2187,7 @@ const userPayment = async (body) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Found');
   }
   let datenow = moment().format('YYYY-MM-DD');
-  let time = moment().format("HH:mm:ss");
+  let time = moment().format('HH:mm:ss');
   datas = { ...datas, time: time, date: datenow };
   Plan = await purchasePlan.findByIdAndUpdate({ _id: PlanId }, { $push: { userPaymentRequest: datas } }, { new: true });
   return Plan;
@@ -2224,14 +2248,14 @@ const getPaymentDetails = async (id) => {
       $project: {
         _id: 1,
         planName: 1,
-        Payment: '$Payment',
+        Payment: '$Payment.Amount',
         active: 1,
         Price: '$offer_price',
         exhibitorName: '$Sellers.tradeName',
         exhibitorNumber: { $convert: { input: '$Sellers.mobileNumber', to: 'string' } },
         number: '$Sellers.mobileNumber',
         exhibitorId: '$Sellers._id',
-        paidAmount: 1,
+        // paidAmount: "$paidAmount.Amount",
         PendingAmount: { $subtract: ['$totalAmount', '$paidAmount'] },
         Type: { $ifNull: ['$Type', 'Online'] },
         status: 1,
