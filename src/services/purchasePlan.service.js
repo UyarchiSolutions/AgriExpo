@@ -1683,18 +1683,18 @@ const create_PlanPayment = async (body) => {
   ]);
   let val = paidPaymentDetails.length > 0 ? paidPaymentDetails[0].Amount : 0;
   console.log(val, body.Amount, Plan.totalAmount);
-  console.log(val + parseInt(body.Amount));
+  console.log(val + parseFloat(body.Amount));
   let paid = await purchasePlan.findByIdAndUpdate(
     { _id: PlanId },
     { PaidAmount: val + parseInt(body.Amount) },
     { new: true }
   );
-    if (Plan.totalAmount == val + parseInt(body.Amount)) {
-      paid.PayementStatus = 'FullyPaid';
-    } else {
-      paid.PayementStatus = 'PartiallyPaid';
-    }
-    await paid.save();
+  if (Plan.totalAmount == val + parseFloat(body.Amount)) {
+    paid.PayementStatus = 'FullyPaid';
+  } else {
+    paid.PayementStatus = 'PartiallyPaid';
+  }
+  await paid.save();
   const datas = await PlanPayment.create(data);
   return { message: 'Asdffads' };
 };
