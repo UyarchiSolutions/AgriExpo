@@ -1696,7 +1696,7 @@ const create_stream_one = async (req) => {
     await Dates.create_date(value);
     slot_booking = await SlotBooking.findByIdAndUpdate({ _id: slot_booking._id }, { status: 'Booked' }, { new: true });
     slot_booking.timeline.push({ status: "Booked", Time: new Date().getTime(), timelieId: req.timeline });
-    slot_booking.save(); 
+    slot_booking.save();
   } else {
     throw new ApiError(httpStatus.NOT_FOUND, 'App id Not found');
   }
@@ -2477,9 +2477,11 @@ const allot_stream_subhost = async (req) => {
   let value = await Streamrequest.findById(req.query.id);
   if (value.tokenGeneration) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
-  } else {
-    value = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, req.body, { new: true });
   }
+  value = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, req.body, { new: true });
+  value.timeline.push({ status: "Assigned", Time: new Date().getTime(), timelieId: req.timeline })
+  value.save()
+
   return value;
 };
 
