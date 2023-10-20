@@ -41,7 +41,7 @@ const { Usermessage, Interaction } = require('../models/PrivateChat.model');
 
 const create_Plans = async (req) => {
   const { slotInfo, stream_validity } = req.body;
-  const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal', timeline: [{ status: "Created", Time: new Date().getTime() }] } });
+  const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal', timeline: [{ status: "Created", Time: new Date().getTime(), timelieId: req.timeline }] } });
   slotInfo.forEach(async (e) => {
     let datas = { slotType: e.slotType, Duration: e.Duration, No_Of_Slot: e.No_Of_Slot, streamPlanId: value._id };
     console.log(datas);
@@ -211,7 +211,7 @@ const create_post = async (req) => {
   console.log(images, 9876)
   const value = await StreamPost.create({
     ...req.body,
-    ...{ suppierId: req.userId, images: images, pendingQTY: req.body.quantity, timeline: [{ status: "Created", Time: new Date().getTime() }] },
+    ...{ suppierId: req.userId, images: images, pendingQTY: req.body.quantity, timeline: [{ status: "Created", Time: new Date().getTime(), timelieId: req.timeline }] },
   });
   await Dates.create_date(value);
   if (req.body.afterStreaming == 'yes') {
@@ -1617,7 +1617,7 @@ const remove_one_post = async (req) => {
     { status: 'Removed' },
     { new: true }
   );
-  value.timeline.push({ status: "Removed", Time: new Date().getTime() })
+  value.timeline.push({ status: "Removed", Time: new Date().getTime(), timelieId: req.timeline })
   value.save();
   return { message: 'Removed' };
 };
@@ -1657,7 +1657,7 @@ const create_stream_one = async (req) => {
     value = await Streamrequest.create({
       ...req.body,
       ...{
-        timeline: [{ status: "Created", Time: new Date().getTime() }],
+        timeline: [{ status: "Created", Time: new Date().getTime(), timelieId: req.timeline }],
         suppierId: req.userId,
         postCount: req.body.post.length,
         startTime: startTime,
@@ -1688,14 +1688,14 @@ const create_stream_one = async (req) => {
     await UsageAppID.findByIdAndUpdate({ _id: agoraID.vals._id }, { streamID: value._id }, { new: true });
     req.body.post.forEach(async (a) => {
       let streamposts = await StreamPost.findByIdAndUpdate({ _id: a }, { isUsed: true, status: 'Assigned' }, { new: true });
-      streamposts.timeline.push({ status: "Assigned", Time: new Date().getTime() })
+      streamposts.timeline.push({ status: "Assigned", Time: new Date().getTime(), timelieId: req.timeline })
       streamposts.save();
       let post = await StreamrequestPost.create({ suppierId: req.userId, streamRequest: value._id, postId: a });
       await Dates.create_date(post);
     });
     await Dates.create_date(value);
     slot_booking = await SlotBooking.findByIdAndUpdate({ _id: slot_booking._id }, { status: 'Booked' }, { new: true });
-    slot_booking.timeline.push({ status: "Booked", Time: new Date().getTime() });
+    slot_booking.timeline.push({ status: "Booked", Time: new Date().getTime(), timelieId: req.timeline });
     slot_booking.save(); ƒ
   } else {
     throw new ApiError(httpStatus.NOT_FOUND, 'App id Not found');
@@ -2460,7 +2460,7 @@ const get_all_admin = async (req) => {
 
 const update_approved = async (req) => {
   let value = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, { adminApprove: 'Approved' }, { new: true });
-  value.timeline.push({ status: "Approved", Time: new Date().getTime() })
+  value.timeline.push({ status: "Approved", Time: new Date().getTime(), timelieId: req.timeline })
   value.save();
   return value;
 };
@@ -2468,7 +2468,7 @@ const update_approved = async (req) => {
 const update_reject = async (req) => {
   let value = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, { adminApprove: 'Rejected' }, { new: true });
 
-  value.timeline.push({ status: "Rejected", Time: new Date().getTime() })
+  value.timeline.push({ status: "Rejected", Time: new Date().getTime(), timelieId: req.timeline })
   value.save();
   return value;
 };
@@ -2485,12 +2485,12 @@ const allot_stream_subhost = async (req) => {
 
 const cancel_stream = async (req) => {
   let value = await Streamrequest.findByIdAndUpdate({ _id: req.body.id }, { status: 'Cancelled' }, { new: true });
-  value.timeline.push({ status: "Cancelled", Time: new Date().getTime() })
+  value.timeline.push({ status: "Cancelled", Time: new Date().getTime(), timelieId: req.timeline })
   value.save();
   let assginStream = await StreamrequestPost.find({ streamRequest: req.body.id });
   assginStream.forEach(async (a) => {
     let streamposts = await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Cancelled' }, { new: true });
-    streamposts.timeline.push({ status: "Cancelled", Time: new Date().getTime() })
+    streamposts.timeline.push({ status: "Cancelled", Time: new Date().getTime(), timelieId: req.timeline })
     streamposts.save();
   });
   return value;
@@ -2498,12 +2498,12 @@ const cancel_stream = async (req) => {
 
 const remove_stream = async (req) => {
   let value = await Streamrequest.findByIdAndUpdate({ _id: req.body.id }, { status: 'Removed' }, { new: true });
-  value.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "My Self" })
+  value.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "My Self", timelieId: req.timeline })
   value.save();
   let assginStream = await StreamrequestPost.find({ streamRequest: req.body.id });
   assginStream.forEach(async (a) => {
     let streamposts = await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Removed' }, { new: true });
-    streamposts.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "My Self" })
+    streamposts.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "My Self", timelieId: req.timeline })
     streamposts.save();
   });
   value.removedBy = 'My self';
@@ -2515,7 +2515,7 @@ const remove_stream = async (req) => {
 
 const remove_stream_admin = async (req) => {
   let value = await Streamrequest.findByIdAndUpdate({ _id: req.body.id }, { status: 'Removed' }, { new: true });
-  value.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "Admin" })
+  value.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "Admin", timelieId: req.timeline })
   value.save();
   let assginStream = await StreamrequestPost.find({ streamRequest: req.body.id });
   assginStream.forEach(async (a) => {
@@ -2540,13 +2540,13 @@ const end_stream = async (req) => {
     { status: 'Completed', streamEnd_Time: moment(), end_Status: 'HostLeave' },
     { new: true }
   );
-  value.timeline.push({ status: "Completed", Time: new Date().getTime(), end_Status: 'HostLeave' })
+  value.timeline.push({ status: "Completed", Time: new Date().getTime(), end_Status: 'HostLeave', timelieId: req.timeline })
   value.save();
   req.io.emit(req.query.id + '_stream_end', { value: true });
   let assginStream = await StreamrequestPost.find({ streamRequest: req.query.id });
   assginStream.forEach(async (a) => {
     let streamposts = await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Completed' }, { new: true });
-    streamposts.timeline.push({ status: "Completed", Time: new Date().getTime(), end_Status: 'HostLeave' })
+    streamposts.timeline.push({ status: "Completed", Time: new Date().getTime(), end_Status: 'HostLeave', timelieId: req.timeline })
     streamposts.save();
   });
   console.log(value, 23213)
