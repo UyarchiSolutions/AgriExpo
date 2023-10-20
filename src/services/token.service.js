@@ -77,10 +77,10 @@ const verifyToken = async (token) => {
  */
 const generateAuthTokens = async (user) => {
   const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'days');
-  const accessToken = generateToken(user.id, user.userRole, accessTokenExpires, tokenTypes.ACCESS);
+  const accessToken = generateToken(user.id, user.userRole, accessTokenExpires, tokenTypes.ACCESS, user.timeline);
   const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, 'days');
-  const refreshToken = generateToken(user.id, user.userRole, refreshTokenExpires, tokenTypes.REFRESH);
-  await saveToken(refreshToken, user.id, user.userRole, refreshTokenExpires, tokenTypes.REFRESH);
+  const refreshToken = generateToken(user.id, user.userRole, refreshTokenExpires, tokenTypes.REFRESH, user.timeline);
+  let saveTokenss = await saveToken(refreshToken, user.id, user.userRole, refreshTokenExpires, tokenTypes.REFRESH);
 
   return {
     access: {
@@ -91,6 +91,7 @@ const generateAuthTokens = async (user) => {
       token: refreshToken,
       expires: refreshTokenExpires.toDate(),
     },
+    saveToken: saveTokenss
   };
 };
 const generateAuthTokens_forget = async (user) => {

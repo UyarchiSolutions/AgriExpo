@@ -6,7 +6,7 @@ const authorization = require('../../controllers/tokenVerify.controller');
 router.post('/', b2bUsersController.createB2bUsers);
 router.get('/All/:page', b2bUsersController.getAllUsers);
 router.post('/login', b2bUsersController.B2bUsersLogin);
-router.get('/logout', b2bUsersController.B2bUsersLogout);
+router.route('/logout').put(authorization, b2bUsersController.B2bUsersLogout);
 router.route('/getForMyAccount').get(authorization, b2bUsersController.getForMyAccount);
 router.route('/shopOrder/login').post(b2bUsersController.B2bUsersAdminLogin);
 router.route('/:id').get(b2bUsersController.getUsersById);

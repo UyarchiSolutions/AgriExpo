@@ -7,6 +7,10 @@ const b2bUsersService = require('../services/B2BUsers.service');
 const tokenService = require('../services/token.service');
 const ManageSalary = require('../services/manage.salary.service');
 
+const moment = require('moment');
+const timeline = require('../services/timeline.service');
+
+
 const createB2bUsers = catchAsync(async (req, res) => {
   const users = await b2bUsersService.createUser(req.body);
   if (!users) {
@@ -21,7 +25,11 @@ const createB2bUsers = catchAsync(async (req, res) => {
 
 const B2bUsersLogin = catchAsync(async (req, res) => {
   const users = await b2bUsersService.UsersLogin(req.body);
+  const time = await timeline.login_timeline({ userId: data._id, InTime: moment(), Device: req.deviceInfo })
+  users.timeline = time._id;
   const tokens = await tokenService.generateAuthTokens(users);
+  time.Token = tokens.saveToken._id;
+  time.save();
   res.send({ users, tokens });
 });
 
@@ -52,12 +60,11 @@ const B2bUsersAdminLogin = catchAsync(async (req, res) => {
 });
 
 const B2bUsersLogout = catchAsync(async (req, res) => {
-  res.clearCookie('tokens');
-  res.clearCookie('login');
-  res.send();
+  const time = await timeline.logout_timeline(req.timeline);
+  res.send(time);
 });
 
-const smsGateway = catchAsync(async (req, res) => {});
+const smsGateway = catchAsync(async (req, res) => { });
 
 const getAllUsers = catchAsync(async (req, res) => {
   const user = await b2bUsersService.getAllUsers(req.params.page);

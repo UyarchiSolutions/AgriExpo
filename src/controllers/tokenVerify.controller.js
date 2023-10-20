@@ -24,6 +24,7 @@ const authorization = async (req, res, next) => {
     }
     req.userId = payload._id;
     req.userRole = payload.userRole;
+    req.timeline = payload.timeline;
 
     return next();
   } catch {
