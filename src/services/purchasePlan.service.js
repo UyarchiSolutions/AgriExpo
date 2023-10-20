@@ -412,10 +412,10 @@ const get_all_my_orders_normal = async (req) => {
         FromBank: 1,
         PayementMode: 1,
         TransactionId: 1,
-        stream_validity:1,
-        raisehandcontrol:1,
-        Service_Charges:1,
-        transaction:1,
+        stream_validity: 1,
+        raisehandcontrol: 1,
+        Service_Charges: 1,
+        transaction: 1,
         approvalDate: 1,
         Normal: { $ifNull: ['$NormalSlot.total', 0] },
         Peak: { $ifNull: ['$PeakSlot.total', 0] },
@@ -705,9 +705,9 @@ const get_All_Planes = async (page) => {
         Tele_Caller: 1,
         Type: 1,
         paymentLink: 1,
-        gst:1,
-        offer_price:1,
-        totalAmount:1,
+        gst: 1,
+        offer_price: 1,
+        totalAmount: 1,
       },
     },
     { $skip: 10 * page },
@@ -1682,22 +1682,21 @@ const create_PlanPayment = async (body) => {
     },
   ]);
   let val = paidPaymentDetails.length > 0 ? paidPaymentDetails[0].Amount : 0;
-
+  console.log(val, body.Amount, Plan.totalAmount);
+  console.log(val + parseInt(body.Amount));
   let paid = await purchasePlan.findByIdAndUpdate(
     { _id: PlanId },
     { PaidAmount: val + parseInt(body.Amount) },
     { new: true }
   );
-  if (Plan.totalAmount > 0) {
-    if (Plan.totalAmount >= val) {
+    if (Plan.totalAmount == val + parseInt(body.Amount)) {
       paid.PayementStatus = 'FullyPaid';
     } else {
       paid.PayementStatus = 'PartiallyPaid';
     }
     await paid.save();
-  }
   const datas = await PlanPayment.create(data);
-  return datas;
+  return { message: 'Asdffads' };
 };
 
 const get_Payment_ById = async (id) => {
