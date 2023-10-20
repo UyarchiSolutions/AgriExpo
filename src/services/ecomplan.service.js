@@ -211,7 +211,7 @@ const create_post = async (req) => {
   console.log(images, 9876)
   const value = await StreamPost.create({
     ...req.body,
-    ...{ suppierId: req.userId, images: images, pendingQTY: req.body.quantity },
+    ...{ suppierId: req.userId, images: images, pendingQTY: req.body.quantity, timeline: [{ status: "Created", Time: new Date().getTime() }] },
   });
   await Dates.create_date(value);
   if (req.body.afterStreaming == 'yes') {
