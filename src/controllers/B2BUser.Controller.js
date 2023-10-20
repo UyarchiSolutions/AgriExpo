@@ -25,7 +25,7 @@ const createB2bUsers = catchAsync(async (req, res) => {
 
 const B2bUsersLogin = catchAsync(async (req, res) => {
   const users = await b2bUsersService.UsersLogin(req.body);
-  const time = await timeline.login_timeline({ userId: data._id, InTime: moment(), Device: req.deviceInfo })
+  const time = await timeline.login_timeline({ userId: users._id, InTime: moment(), Device: req.deviceInfo })
   users.timeline = time._id;
   const tokens = await tokenService.generateAuthTokens(users);
   time.Token = tokens.saveToken._id;
