@@ -7,4 +7,5 @@ const WalletController = require('../../controllers/agri-exhibitor-wallet.contro
 router.route('/').post(SellerAuth, WalletController.createWallet);
 router.route('/Enquiry').post(shopverify, WalletController.createEnquiry);
 router.route('/getWallets').get(SellerAuth, WalletController.getWallets);
+router.route('/getWallet/Details').get(SellerAuth, WalletController.getWalletDetails);
 module.exports = router;

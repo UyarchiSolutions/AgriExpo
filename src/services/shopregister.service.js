@@ -28,7 +28,7 @@ const register_shop = async (body) => {
 
 const NewRegister_Shop = async (body) => {
   const mobileNumber = body.mobile;
-  let disableCheck = await Shop.findOne({ mobile: mobileNumber});
+  let disableCheck = await Shop.findOne({ mobile: mobileNumber });
   if (disableCheck) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Mobile Number Already Registered');
   }
@@ -2596,7 +2596,7 @@ const get_my_orders_single = async (req) => {
 
 const createWallet = async (req) => {
   let userId = req.shopId;
-  let data = { ...req.body, ...{ userId: userId } };
+  let data = { ...req.body, ...{ userId: userId, Type: 'Addon' } };
   let creation = await Wallet.create(data);
   return creation;
 };
@@ -2623,24 +2623,57 @@ const getWalletByShopId = async (req) => {
         preserveNullAndEmptyArrays: true,
       },
     },
+  ]);
+  return values;
+};
+
+const walletAmountDetails = async (userId) => {
+  let val = await Shop.aggregate([
     {
-      $group: {
-        _id: null,
-        visitorWallet: { $push: '$visitorWallet' },
-        totalAmount: { $sum: '$Amount' },
+      $match: {
+        _id: userId,
+      },
+    },
+    {
+      $lookup: {
+        from: 'visitorwallets',
+        localField: '_id',
+        foreignField: 'userId',
+        pipeline: [{ $match: { Type: { $eq: 'Addon' } } }, { $group: { _id: null, Amount: { $sum: '$Amount' } } }],
+        as: 'addonwallet',
+      },
+    },
+    {
+      $unwind: {
+        path: '$addonwallet',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'visitorwallets',
+        localField: '_id',
+        foreignField: 'userId',
+        pipeline: [{ $match: { Type: { $ne: 'Addon' } } }, { $group: { _id: null, Amount: { $sum: '$Amount' } } }],
+        as: 'Spendwallet',
+      },
+    },
+    {
+      $unwind: {
+        path: '$Spendwallet',
+        preserveNullAndEmptyArrays: true,
       },
     },
     {
       $project: {
-        _id: '',
-        visitorWallet: '$visitorWallet',
-        totalAmount: '$totalAmount',
-        spendAmount: '0',
-        currentAmount: '0',
+        _id: 1,
+        WalletTotalAmount: { $ifNull: ['$addonwallet.Amount', 0] },
+        WalletSpendAmount: { $ifNull: ['$Spendwallet.Amount', 0] },
+
       },
     },
   ]);
-  return values;
+  return val[0];
 };
 
 module.exports = {
@@ -2679,4 +2712,5 @@ module.exports = {
   verify_otpDelete_Account,
   createWallet,
   getWalletByShopId,
+  walletAmountDetails,
 };

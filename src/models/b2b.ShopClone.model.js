@@ -475,6 +475,7 @@ const walletSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    Type: String,
   },
   { timestamps: true }
 );

@@ -21,8 +21,15 @@ const getWallets = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getWalletDetails = catchAsync(async (req, res) => {
+  let userId = req.userId;
+  const data = await WalletService.getWalletDetails(userId);
+  res.send(data);
+});
+
 module.exports = {
   createWallet,
   createEnquiry,
   getWallets,
+  getWalletDetails,
 };
