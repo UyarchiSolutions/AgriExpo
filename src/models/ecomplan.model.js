@@ -177,6 +177,10 @@ const streamplanschema = mongoose.Schema({
   raisehandcontrol: {
     type: String,
   },
+  timeline: {
+    type: Array,
+    default: [],
+  }
 });
 
 const Streamplan = mongoose.model('streamplan', streamplanschema);
@@ -341,6 +345,10 @@ const streamPostschema = mongoose.Schema({
   },
   showImage: {
     type: String,
+  },
+  timeline: {
+    type: Array,
+    default: [],
   }
 });
 
@@ -587,6 +595,10 @@ const streamRequestschema = mongoose.Schema({
   },
   broucherName: {
     type: String,
+  },
+  timeline: {
+    type: Array,
+    default: [],
   }
 });
 
@@ -627,6 +639,10 @@ const streamRequestschema_post = mongoose.Schema({
     type: String,
     default: 'Pending',
   },
+  timeline: {
+    type: Array,
+    default: [],
+  }
 });
 
 const StreamrequestPost = mongoose.model('StreamRequestpost', streamRequestschema_post);
@@ -670,6 +686,10 @@ const streamPreRegister = mongoose.Schema({
   viewstatus: {
     type: String,
   },
+  timeline: {
+    type: Array,
+    default: [],
+  }
 });
 
 const StreamPreRegister = mongoose.model('streampreregister', streamPreRegister);
@@ -715,6 +735,10 @@ const streamPlanlinkschema = mongoose.Schema({
   purchaseId: {
     type: String,
   },
+  timeline: {
+    type: Array,
+    default: [],
+  }
 });
 
 const streamPlanlink = mongoose.model('streamplanlink', streamPlanlinkschema);
@@ -751,6 +775,10 @@ const Slabschema = mongoose.Schema({
   slabPercentage: {
     type: Number,
   },
+  timeline: {
+    type: Array,
+    default: [],
+  }
 });
 
 const Slab = mongoose.model('slabdetails', Slabschema);
@@ -802,6 +830,10 @@ const shopNotificationschema = mongoose.Schema({
   title: {
     type: String,
   },
+  timeline: {
+    type: Array,
+    default: [],
+  }
 });
 
 const shopNotification = mongoose.model('shopNotification', shopNotificationschema);
@@ -831,6 +863,10 @@ const PlanSlotSchema = new mongoose.Schema(
     slotId: {
       type: String,
     },
+    timeline: {
+      type: Array,
+      default: [],
+    }
   },
   { timestamps: true }
 );
@@ -866,6 +902,10 @@ const intrestedschema = mongoose.Schema({
   intrested: {
     type: Boolean,
   },
+  timeline: {
+    type: Array,
+    default: [],
+  }
 });
 const Instestedproduct = mongoose.model('intrestedproduct', intrestedschema);
 
@@ -898,6 +938,10 @@ const savedproductschema = mongoose.Schema({
   saved: {
     type: Boolean,
   },
+  timeline: {
+    type: Array,
+    default: [],
+  }
 });
 const Savedproduct = mongoose.model('savedproduct', savedproductschema);
 
@@ -916,6 +960,10 @@ const NotifySchema = new mongoose.Schema(
     notify: {
       type: Boolean,
     },
+    timeline: {
+      type: Array,
+      default: [],
+    }
   },
   { timestamps: true }
 );
@@ -958,6 +1006,10 @@ const streampostpriceschema = new mongoose.Schema(
     purchased_qty: {
       type: String,
     },
+    timeline: {
+      type: Array,
+      default: [],
+    }
   },
   { timestamps: true }
 );

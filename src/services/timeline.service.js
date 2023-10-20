@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
-const { Usertimeline } = require('../models/timeline.model');
+const { Usertimeline, PropertyTimeline } = require('../models/timeline.model');
 
 const moment = require("moment");
 
@@ -22,8 +22,17 @@ const logout_timeline = async (id) => {
 
 
 
+const create_propety_timeline = async (userId, properyType, properyId, Device, status) => {
+    let property = await PropertyTimeline.create({ properyType, properyId, Device, status, Time: moment(), userId });
+
+    return property;
+    // Time
+}
+
+
 module.exports = {
     createTimeline,
     login_timeline,
-    logout_timeline
+    logout_timeline,
+    create_propety_timeline
 };

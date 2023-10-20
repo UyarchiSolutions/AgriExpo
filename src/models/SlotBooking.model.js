@@ -42,6 +42,10 @@ const SlotBookingSchema = new mongoose.Schema(
     streamPlanId: {
       type: String,
     },
+    timeline: {
+      type: Array,
+      default: [],
+    }
   },
   { timestamps: true }
 );

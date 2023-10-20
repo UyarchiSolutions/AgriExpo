@@ -41,7 +41,7 @@ const { Usermessage, Interaction } = require('../models/PrivateChat.model');
 
 const create_Plans = async (req) => {
   const { slotInfo, stream_validity } = req.body;
-  const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal' } });
+  const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal', timeline: [{ status: "Created", Time: new Date().getTime() }] } });
   slotInfo.forEach(async (e) => {
     let datas = { slotType: e.slotType, Duration: e.Duration, No_Of_Slot: e.No_Of_Slot, streamPlanId: value._id };
     console.log(datas);
@@ -1617,6 +1617,8 @@ const remove_one_post = async (req) => {
     { status: 'Removed' },
     { new: true }
   );
+  value.timeline.push({ status: "Removed", Time: new Date().getTime() })
+  value.save();
   return { message: 'Removed' };
 };
 
@@ -1655,6 +1657,7 @@ const create_stream_one = async (req) => {
     value = await Streamrequest.create({
       ...req.body,
       ...{
+        timeline: [{ status: "Created", Time: new Date().getTime() }],
         suppierId: req.userId,
         postCount: req.body.post.length,
         startTime: startTime,
@@ -1684,12 +1687,16 @@ const create_stream_one = async (req) => {
     });
     await UsageAppID.findByIdAndUpdate({ _id: agoraID.vals._id }, { streamID: value._id }, { new: true });
     req.body.post.forEach(async (a) => {
-      await StreamPost.findByIdAndUpdate({ _id: a }, { isUsed: true, status: 'Assigned' }, { new: true });
+      let streamposts = await StreamPost.findByIdAndUpdate({ _id: a }, { isUsed: true, status: 'Assigned' }, { new: true });
+      streamposts.timeline.push({ status: "Assigned", Time: new Date().getTime() })
+      streamposts.save();
       let post = await StreamrequestPost.create({ suppierId: req.userId, streamRequest: value._id, postId: a });
       await Dates.create_date(post);
     });
     await Dates.create_date(value);
     slot_booking = await SlotBooking.findByIdAndUpdate({ _id: slot_booking._id }, { status: 'Booked' }, { new: true });
+    slot_booking.timeline.push({ status: "Booked", Time: new Date().getTime() });
+    slot_booking.save(); ƒ
   } else {
     throw new ApiError(httpStatus.NOT_FOUND, 'App id Not found');
   }
@@ -2453,11 +2460,16 @@ const get_all_admin = async (req) => {
 
 const update_approved = async (req) => {
   let value = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, { adminApprove: 'Approved' }, { new: true });
+  value.timeline.push({ status: "Approved", Time: new Date().getTime() })
+  value.save();
   return value;
 };
 
 const update_reject = async (req) => {
   let value = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, { adminApprove: 'Rejected' }, { new: true });
+
+  value.timeline.push({ status: "Rejected", Time: new Date().getTime() })
+  value.save();
   return value;
 };
 
@@ -2473,18 +2485,26 @@ const allot_stream_subhost = async (req) => {
 
 const cancel_stream = async (req) => {
   let value = await Streamrequest.findByIdAndUpdate({ _id: req.body.id }, { status: 'Cancelled' }, { new: true });
+  value.timeline.push({ status: "Cancelled", Time: new Date().getTime() })
+  value.save();
   let assginStream = await StreamrequestPost.find({ streamRequest: req.body.id });
   assginStream.forEach(async (a) => {
-    await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Cancelled' }, { new: true });
+    let streamposts = await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Cancelled' }, { new: true });
+    streamposts.timeline.push({ status: "Cancelled", Time: new Date().getTime() })
+    streamposts.save();
   });
   return value;
 };
 
 const remove_stream = async (req) => {
   let value = await Streamrequest.findByIdAndUpdate({ _id: req.body.id }, { status: 'Removed' }, { new: true });
+  value.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "My Self" })
+  value.save();
   let assginStream = await StreamrequestPost.find({ streamRequest: req.body.id });
   assginStream.forEach(async (a) => {
-    await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Removed' }, { new: true });
+    let streamposts = await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Removed' }, { new: true });
+    streamposts.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "My Self" })
+    streamposts.save();
   });
   value.removedBy = 'My self';
   value.removedBy_id = req.userId;
@@ -2495,9 +2515,13 @@ const remove_stream = async (req) => {
 
 const remove_stream_admin = async (req) => {
   let value = await Streamrequest.findByIdAndUpdate({ _id: req.body.id }, { status: 'Removed' }, { new: true });
+  value.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "Admin" })
+  value.save();
   let assginStream = await StreamrequestPost.find({ streamRequest: req.body.id });
   assginStream.forEach(async (a) => {
-    await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Removed' }, { new: true });
+    let streamposts = await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Removed' }, { new: true });
+    streamposts.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "Admin" })
+    streamposts.save();
   });
   value.removedBy = 'Admin';
   value.removedBy_id = req.userId;
@@ -2516,10 +2540,14 @@ const end_stream = async (req) => {
     { status: 'Completed', streamEnd_Time: moment(), end_Status: 'HostLeave' },
     { new: true }
   );
+  value.timeline.push({ status: "Completed", Time: new Date().getTime(), end_Status: 'HostLeave' })
+  value.save();
   req.io.emit(req.query.id + '_stream_end', { value: true });
   let assginStream = await StreamrequestPost.find({ streamRequest: req.query.id });
   assginStream.forEach(async (a) => {
-    await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Completed' }, { new: true });
+    let streamposts = await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Completed' }, { new: true });
+    streamposts.timeline.push({ status: "Completed", Time: new Date().getTime(), end_Status: 'HostLeave' })
+    streamposts.save();
   });
   console.log(value, 23213)
   const mode = 'mix';
@@ -8950,7 +8978,7 @@ const purchase_details = async (req) => {
     },
     {
       $addFields: {
-        numberOfStreamused: {$size:'$stream'},
+        numberOfStreamused: { $size: '$stream' },
       },
     },
     {
@@ -8960,7 +8988,7 @@ const purchase_details = async (req) => {
     },
     {
       $addFields: {
-        numberofStream: {$sum:'$slotInfo.No_Of_Slot'},
+        numberofStream: { $sum: '$slotInfo.No_Of_Slot' },
       },
     },
     {
