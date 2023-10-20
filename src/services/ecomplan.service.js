@@ -1696,7 +1696,7 @@ const create_stream_one = async (req) => {
     await Dates.create_date(value);
     slot_booking = await SlotBooking.findByIdAndUpdate({ _id: slot_booking._id }, { status: 'Booked' }, { new: true });
     slot_booking.timeline.push({ status: "Booked", Time: new Date().getTime(), timelieId: req.timeline });
-    slot_booking.save(); ƒ
+    slot_booking.save(); 
   } else {
     throw new ApiError(httpStatus.NOT_FOUND, 'App id Not found');
   }

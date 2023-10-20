@@ -52,10 +52,6 @@ const getUsersById = catchAsync(async (req, res) => {
 const B2bUsersAdminLogin = catchAsync(async (req, res) => {
   const users = await b2bUsersService.B2bUsersAdminLogin(req.body);
   const tokens = await tokenService.generateAuthTokens(users);
-  // let options = {
-  //   httpOnly: true,
-  // };
-  // res.cookie('tokens', tokens.access.token, options).send({ users, tokens });
   res.send({ users, tokens });
 });
 
