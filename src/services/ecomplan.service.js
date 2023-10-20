@@ -2479,7 +2479,7 @@ const allot_stream_subhost = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
   }
   value = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, req.body, { new: true });
-  value.timeline.push({ status: "Assigned", Time: moment(), timelieId: req.timeline })
+  value.timeline.push({ status: "Assigned", Time: new Date().getTime(), timelieId: req.timeline })
   value.save()
 
   return value;
