@@ -1,10 +1,12 @@
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
-const moment = require('moment');
 const catchAsync = require('../utils/catchAsync');
 const registerShop = require('../services/shopregister.service');
 const tokenService = require('../services/token.service');
 const AWS = require('aws-sdk');
+
+const moment = require('moment');
+const timeline = require('../services/timeline.service');
 const { ShopOrder, ProductorderSchema, ShopOrderClone, ProductorderClone } = require('../models/shopOrder.model');
 
 const register_shop = catchAsync(async (req, res) => {
@@ -44,10 +46,20 @@ const change_password = catchAsync(async (req, res) => {
 
 const login_now = catchAsync(async (req, res) => {
   const shop = await registerShop.login_now(req.body);
+  const time = await timeline.login_timeline({ userId: shop._id, InTime: moment(), Device: req.deviceInfo })
+  shop.timeline = time._id;
   const tokens = await tokenService.generateAuthTokens_shop(shop);
-
+  time.Token = tokens.saveToken._id;
+  time.save();
   res.status(httpStatus.CREATED).send(tokens);
 });
+
+
+const logout_now = catchAsync(async (req, res) => {
+  const time = await timeline.logout_timeline(req.timeline);
+  res.send(time);
+
+})
 
 const get_myDetails = catchAsync(async (req, res) => {
   const shop = await registerShop.get_myDetails(req);
@@ -255,4 +267,5 @@ module.exports = {
   verify_otpDelete_Account,
   createWallet,
   getWalletByShopId,
+  logout_now,
 };

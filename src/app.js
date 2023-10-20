@@ -24,6 +24,8 @@ const privatechat = require('./services/PrivateChat.service');
 const socketService = require('./services/liveStreaming/socket.service');
 const moment = require('moment');
 const UAParser = require('ua-parser-js');
+const useragent = require('express-useragent');
+const validator = require('validator');
 // app.use(session( { secret:'hello world',
 // store:SessionStore,
 // resave:false,
@@ -233,6 +235,7 @@ app.use(
 );
 
 app.use(bodyParser.json());
+app.use(useragent.express());
 
 // limit repeated failed requests to auth endpoints
 if (config.env === 'production') {
@@ -267,6 +270,8 @@ const deviceDetais = async (req, res, next) => {
   req.deviceInfo = deviceInfo;
   return next();
 };
+
+          
 
 app.use('/v1', deviceDetais, routes);
 app.use('/v2', deviceDetais, routes_v2);

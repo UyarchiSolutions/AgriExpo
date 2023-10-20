@@ -15,6 +15,7 @@ router.route('/verify/otpDelete/Account').post(shopregister.verify_otpDelete_Acc
 router.route('/setpassword').post(shopregister.set_password);
 router.route('/changepassword').post(shopverify, shopregister.change_password);
 router.route('/login').post(shopregister.login_now);
+router.route('/logout').put(shopverify, shopregister.logout_now);
 router.route('/mydetails').get(shopverify, shopregister.get_myDetails);
 router.route('/myorder').get(shopverify, shopregister.get_myorder);
 router.route('/mypayments').get(shopverify, shopregister.get_mypayments);

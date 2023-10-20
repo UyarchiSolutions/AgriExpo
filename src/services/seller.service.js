@@ -153,6 +153,9 @@ const loginseller = async (req) => {
   if (!(await userName.isPasswordMatch(password))) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Password');
   }
+  console.log(req.deviceInfo)
+  console.log(req.ipAddress)
+
 
   return userName;
 };

@@ -5,6 +5,10 @@ const catchAsync = require('../utils/catchAsync');
 const SellerService = require('../services/seller.service');
 const tokenService = require('../services/token.service');
 
+const moment = require('moment');
+
+const timeline = require('../services/timeline.service');
+
 const createSeller = catchAsync(async (req, res) => {
   const data = await SellerService.createSeller(req);
   res.send(data);
@@ -32,8 +36,18 @@ const sendOTP_continue = catchAsync(async (req, res) => {
 
 const loginseller = catchAsync(async (req, res) => {
   const data = await SellerService.loginseller(req);
+  const time = await timeline.login_timeline({ userId: data._id, InTime: moment(), Device: req.deviceInfo })
+  data.timeline = time._id;
   const tokens = await tokenService.generateAuthTokens_sellerApp(data);
+  time.Token = tokens.saveToken._id;
+  time.save();
   res.send(tokens);
+});
+
+const logout_seller = catchAsync(async (req, res) => {
+  const time = await timeline.logout_timeline(req.timeline);
+  res.send(time);
+
 });
 
 const alreadyUser = catchAsync(async (req, res) => {
@@ -199,4 +213,5 @@ module.exports = {
   getDispatchLocations,
   DeleteLocation,
   verifyOTP_Delete_Account,
+  logout_seller
 };

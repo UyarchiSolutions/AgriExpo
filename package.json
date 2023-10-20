@@ -79,6 +79,7 @@
     "express-mongo-sanitize": "^2.0.0",
     "express-rate-limit": "^5.0.0",
     "express-session": "^1.17.3",
+    "express-useragent": "^1.0.15",
     "ffmpeg": "^0.0.4",
     "fluent-ffmpeg": "^2.1.2",
     "fs": "^0.0.1-security",
@@ -115,7 +116,7 @@
     "uniqid": "^5.4.0",
     "urlencode": "^1.1.0",
     "uuid": "^8.3.2",
-    "validator": "^13.0.0",
+    "validator": "^13.11.0",
     "websocket": "^1.0.34",
     "winston": "^3.2.1",
     "xss-clean": "^0.1.1"

@@ -9,13 +9,13 @@ const config = require('../config/config');
 const { Seller } = require('../models/seller.models');
 const SellerAuth = async (req, res, next) => {
   const token = req.headers.sellerauth;
-  // //console.log(token)
+  // console.log(token)
   if (!token) {
     return res.send(httpStatus.UNAUTHORIZED, 'Invalid Access set');
   }
   try {
     const payload = jwt.verify(token, config.jwt.secret);
-    console.log(payload['_id'])
+    // console.log(payload)
     const userss = await Seller.findById(payload['_id']);
     if (!userss) {
       return res.send(httpStatus.UNAUTHORIZED, 'Seller Not Found');
@@ -25,6 +25,7 @@ const SellerAuth = async (req, res, next) => {
     }
     req.userId = payload['_id'];
     req.seller = payload.userRole;
+    req.timeline = payload.timeline;
     if (userss.mainSeller == 'admin') {
       req.accessBy = userss._id;
     } else {

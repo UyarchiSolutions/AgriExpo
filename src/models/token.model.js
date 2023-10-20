@@ -1,9 +1,14 @@
 const mongoose = require('mongoose');
 const { toJSON } = require('./plugins');
 const { tokenTypes } = require('../config/tokens');
+const { v4 } = require('uuid');
 
 const tokenSchema = mongoose.Schema(
   {
+    _id: {
+      type: String,
+      default: v4,
+    },
     token: {
       type: String,
       required: true,
@@ -27,6 +32,9 @@ const tokenSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    timeline: {
+      type: String,
+    }
   },
   {
     timestamps: true,
