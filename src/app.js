@@ -33,6 +33,7 @@ const validator = require('validator');
 // secure:false,
 // httpOnly:false // by default it's boolean value true }
 // }}));
+const channels = {};
 app.use(cookieparser());
 let http = require('http');
 let server = http.Server(app);
@@ -44,13 +45,16 @@ app.use(express.static('public'));
 // app.use(express.static(path.join(__dirname, '../public')));
 app.set('views', __dirname + '/public');
 app.engine('html', require('ejs').renderFile);
-
+let activeUserCount = 0;
 server.listen(config.port, () => {
   logger.info(`Listening to port ${config.port}`);
   // //console.log(moment(1674035400000).add(40, 'minutes').format('hh:mm:ss a'));
 });
 
 io.sockets.on('connection', async (socket) => {
+  console.log(socket.id, 9876789876)
+  activeUserCount++;
+  io.sockets.emit('userCount', activeUserCount);
   socket.on('groupchat', async (data) => {
     await chetModule.chat_room_create(data, io);
   });
@@ -80,24 +84,46 @@ io.sockets.on('connection', async (socket) => {
     await socketService.admin_allow_controls(data, io);
   });
 
-  socket.on('livejoin_count', async (roomName) => {
-    socket.join(roomName);
-    socket.on(roomName + '_room_jion', (streamId) => {
-      let room = io.sockets.adapter.rooms.get(streamId);
-      let numUsersInRoom = room ? room.size : 0;
-      console.log(numUsersInRoom, 788);
-      console.log(io.sockets.adapter.rooms.get(streamId));
-      // io.sockets.emit(streamId + '_userCountUpdate', numUsersInRoom);
-      socket.broadcast.emit(streamId + '_userCountUpdate', numUsersInRoom);
-      socket.on('disconnect', () => {
-        console.log(streamId, 2312312987);
-        room = io.sockets.adapter.rooms.get(streamId);
-        numUsersInRoom = room ? room.size : 0;
-        console.log(numUsersInRoom, 788);
-        console.log(io.sockets.adapter.rooms.get(streamId));
-        socket.broadcast.emit(streamId + '_userCountUpdate', numUsersInRoom);
-      });
-    });
+  socket.on('joinChannel', (channelName) => {
+    console.log("sjh   ygh h", 87878)
+    socket.join(channelName); // Join a specific channel
+    console.log(`User joined channel: ${channelName}`);
+
+    // Keep track of users in each channel
+    if (!channels[channelName]) {
+      channels[channelName] = [];
+    }
+    channels[channelName].push(socket);
+
+    // Notify other users in the channel that a user has joined
+    socket.to(channelName).emit('userJoined', socket.id);
+  });
+
+  socket.on('leaveChannel', (channelName) => {
+    socket.leave(channelName); // Leave a specific channel
+    console.log(`User left channel: ${channelName}`);
+
+    // Remove the user from the channel's user list
+    if (channels[channelName]) {
+      const index = channels[channelName].indexOf(socket);
+      if (index !== -1) {
+        channels[channelName].splice(index, 1);
+      }
+    }
+
+    // Notify other users in the channel that a user has left
+    socket.to(channelName).emit('userLeft', socket.id);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
+
+    // Remove the user from all channels they were in
+    for (const channelName in channels) {
+      if (channels[channelName].includes(socket)) {
+        channels[channelName].splice(channels[channelName].indexOf(socket), 1);
+      }
+    }
   });
 
   socket.on('', (msg) => {
@@ -164,6 +190,10 @@ io.sockets.on('connection', async (socket) => {
       // Emit an event to notify other clients in the room about the user disconnecting
       socket.to(room).emit('userDisconnected', socket.id);
     });
+  });
+  socket.on('disconnect', () => {
+    activeUserCount--;
+    io.sockets.emit('userCount', activeUserCount);
   });
 });
 
@@ -271,7 +301,7 @@ const deviceDetais = async (req, res, next) => {
   return next();
 };
 
-          
+
 
 app.use('/v1', deviceDetais, routes);
 app.use('/v2', deviceDetais, routes_v2);
