@@ -54,6 +54,7 @@ server.listen(config.port, () => {
 io.sockets.on('connection', async (socket) => {
   console.log(socket.id, 9876789876)
   activeUserCount++;
+  console.log(activeUserCount,9876897)
   io.sockets.emit('userCount', activeUserCount);
   socket.on('groupchat', async (data) => {
     await chetModule.chat_room_create(data, io);
