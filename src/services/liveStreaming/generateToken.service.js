@@ -120,7 +120,6 @@ const generateToken_sub = async (req) => {
   const channel = req.query.id;
   let str = await Streamrequest.findById(channel);
   let users = await Joinusers.find({ streamId: channel }).count();
-  //console.log(users, str.noOfParticipants)
   let user = await Joinusers.findOne({ streamId: channel, shopId: req.shopId });
   if (!user) {
     user = await Joinusers.create({ shopId: req.shopId, streamId: channel, hostId: str.tokenDetails });
@@ -161,15 +160,7 @@ const generateToken_sub = async (req) => {
   await Joinusers.findByIdAndUpdate({ _id: user._id }, { latestedToken: stream._id, token: stream._id }, { new: true });
   await get_participents_limit(req);
   return { stream: stream, user: user };
-  // }
-  // else {
-  //   let user = await Joinusers.findOne({ token: stream._id, shopId: req.shopId, });
-  //   if (!user) {
-  //     throw new ApiError(httpStatus.NOT_FOUND, 'Max participants Reached');
-  //   }
-  //   await get_participents_limit(req)
-  //   return { stream: stream, user: user };
-  // }
+
 };
 
 const getHostTokens = async (req) => {

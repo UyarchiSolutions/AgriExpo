@@ -26,13 +26,7 @@ const moment = require('moment');
 const UAParser = require('ua-parser-js');
 const useragent = require('express-useragent');
 const validator = require('validator');
-// app.use(session( { secret:'hello world',
-// store:SessionStore,
-// resave:false,
-// cookie:{
-// secure:false,
-// httpOnly:false // by default it's boolean value true }
-// }}));
+
 const channels = {};
 app.use(cookieparser());
 let http = require('http');
@@ -51,10 +45,10 @@ server.listen(config.port, () => {
   // //console.log(moment(1674035400000).add(40, 'minutes').format('hh:mm:ss a'));
 });
 
+
 io.sockets.on('connection', async (socket) => {
   console.log(socket.id, 9876789876)
   activeUserCount++;
-  console.log(activeUserCount,9876897)
   io.sockets.emit('userCount', activeUserCount);
   socket.on('groupchat', async (data) => {
     await chetModule.chat_room_create(data, io);
@@ -179,6 +173,10 @@ io.sockets.on('connection', async (socket) => {
     //console.log(socket.id,2136712)
     socket.to(room).emit('userJoined', socket.id);
     //console.log(socket.rooms)
+  });
+
+  socket.on('leavestream', (room) => {
+    console.log(room, 987876786)
   });
 
   socket.on('disconnecting', () => {

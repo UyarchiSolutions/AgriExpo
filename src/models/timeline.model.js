@@ -80,7 +80,45 @@ const propertyschema = new mongoose.Schema({
 const PropertyTimeline = mongoose.model('propertytimeline', propertyschema);
 
 
+
+const streamTimelineshema = new mongoose.Schema({
+    _id: {
+        type: String,
+        default: v4,
+    },
+    active: {
+        type: Boolean,
+        default: true,
+    },
+    archive: {
+        type: Boolean,
+        default: false,
+    },
+    Time: {
+        type: Number,
+    },
+    Device: {
+        type: Object,
+    },
+    userId: {
+        type: String,
+    },
+    properyType: {
+        type: String,
+    },
+    properyId: {
+        type: String,
+    },
+    status: {
+        type: String,
+    }
+});
+const StreamTimeline = mongoose.model('streamtimeline', streamTimelineshema);
+
+
+
 module.exports = {
     Usertimeline,
-    PropertyTimeline
+    PropertyTimeline,
+    StreamTimeline
 };
