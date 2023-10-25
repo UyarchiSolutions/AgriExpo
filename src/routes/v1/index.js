@@ -120,7 +120,7 @@ const PrivateChatRoute = require('./PrivateChat.route');
 const ccavenue = require('./ccavenue.route');
 const AgriWallet = require('./agri-exhibitor-wallet.route');
 const ExpoPartner = require('./Partner.expo.router');
-
+const StreamhistoryRoute = require('./stream.history.route');
 const defaultRoutes = [
   {
     path: '/ccavenue',
@@ -133,6 +133,10 @@ const defaultRoutes = [
   {
     path: '/agriExhibitorWallet',
     route: AgriWallet,
+  },
+  {
+    path: '/streamhistory',
+    route: StreamhistoryRoute,
   },
   {
     path: '/slotbooking',
