@@ -2022,9 +2022,9 @@ const get_one_stream = async (req) => {
         as: 'purchasedplans',
       },
     },
-    // {
-    //   $unwind: '$purchasedplans',
-    // },
+    {
+      $unwind: '$purchasedplans',
+    },
     {
       $lookup: {
         from: 'streamrequestposts',
