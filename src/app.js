@@ -176,7 +176,7 @@ io.sockets.on('connection', async (socket) => {
   });
 
   socket.on('leavestream', (room) => {
-    console.log(room, 987876786)
+    console.log(room, 987876786, socket.id)
   });
 
   socket.on('disconnecting', () => {
