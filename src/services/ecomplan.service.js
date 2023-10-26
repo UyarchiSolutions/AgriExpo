@@ -1422,7 +1422,7 @@ const get_all_Post_with_page_assigned = async (req, type) => {
     timeout = { streamEnd_Time: { $gte: date_now } }
   }
 
-  streamEnd_Time
+  // streamEnd_Time
   const value = await StreamPost.aggregate([
     { $match: { $and: [dateMatch, { suppierId: { $eq: req.userId } }, { status: { $eq: 'Assigned' } },] } },
     {
