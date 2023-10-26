@@ -114,9 +114,6 @@ const streamTimelineshema = new mongoose.Schema({
     }
 });
 const StreamTimeline = mongoose.model('streamtimeline', streamTimelineshema);
-
-
-
 module.exports = {
     Usertimeline,
     PropertyTimeline,

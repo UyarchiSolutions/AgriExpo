@@ -80,7 +80,10 @@ const get_all_Post_with_page = catchAsync(async (req, res) => {
     value = await Ecomserive.get_all_Post_with_page(req, status);
   }
   if (status == 'assigned') {
-    value = await Ecomserive.get_all_Post_with_page_assigned(req);
+    value = await Ecomserive.get_all_Post_with_page_assigned(req, 'assigned');
+  }
+  if (status == 'timeout') {
+    value = await Ecomserive.get_all_Post_with_page_assigned(req, 'timeout');
   }
   if (status == 'live') {
     value = await Ecomserive.get_all_Post_with_page_live(req);
@@ -175,7 +178,7 @@ const get_all_stream = catchAsync(async (req, res) => {
 });
 
 
-const remove_post_stream= catchAsync(async (req, res) => {
+const remove_post_stream = catchAsync(async (req, res) => {
   const value = await Ecomserive.remove_post_stream(req);
   res.send(value);
 });

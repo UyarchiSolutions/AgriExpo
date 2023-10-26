@@ -1400,7 +1400,7 @@ const get_all_Post_with_page = async (req, status) => {
   return { value, next: total.length != 0 };
 };
 
-const get_all_Post_with_page_assigned = async (req) => {
+const get_all_Post_with_page_assigned = async (req, type) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
   var date_now = new Date().getTime();
   let filterdate = req.query.date;
@@ -1417,8 +1417,14 @@ const get_all_Post_with_page_assigned = async (req) => {
     }
     // //console.log(date, dateMatch)
   }
+  let timeout = { active: true }
+  if (type == 'timeout') {
+    timeout = { streamEnd_Time: { $gte: date_now } }
+  }
+
+  streamEnd_Time
   const value = await StreamPost.aggregate([
-    { $match: { $and: [dateMatch, { suppierId: { $eq: req.userId } }, { status: { $eq: 'Assigned' } }] } },
+    { $match: { $and: [dateMatch, { suppierId: { $eq: req.userId } }, { status: { $eq: 'Assigned' } },] } },
     {
       $lookup: {
         from: 'products',
@@ -1452,7 +1458,7 @@ const get_all_Post_with_page_assigned = async (req) => {
               from: 'streamrequests',
               localField: 'streamRequest',
               foreignField: '_id',
-              pipeline: [{ $match: { $or: [{ tokenGeneration: { $eq: false } }, { startTime: { $gte: date_now } }] } }],
+              pipeline: [{ $match: { $and: [timeout, { $or: [{ tokenGeneration: { $eq: false } }, { startTime: { $gte: date_now } }] }] } }],
               as: 'streamrequests',
             },
           },

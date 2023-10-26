@@ -31,14 +31,9 @@ router.route('/getsub/token/golive').get(shopverify, generateToken.get_sub_goliv
 router.route('/getsub/token/single').post(shopverify, generateToken.get_sub_token_single);
 router.route('/participents/limit/all').get(generateToken.get_participents_limit);
 router.route('/get/current/live/stream').get(shopverify, generateToken.get_current_live_stream);
-
-
 router.route('/remove/hostlive/now').get(generateToken.remove_host_live);
-
 router.route('/create/subhost/token').post(SellerAuth, generateToken.create_subhost_token);
 router.route('/create/raice/your/token').post(generateToken.create_raice_token);
-
-
 router.route('/production/livestream/generateToken/supplier').post(SellerAuth, generateToken.production_supplier_token);
 router.route('/production/livestream/generateToken/supplier/cloudrecording').post(generateToken.production_supplier_token_cloudrecording);
 router.route('/production/livestream/generateToken/watchamin').post(generateToken.production_supplier_token_watchamin);
