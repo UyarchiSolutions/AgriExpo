@@ -2508,15 +2508,19 @@ const cancel_stream = async (req) => {
 };
 
 const remove_stream = async (req) => {
-  let value = await Streamrequest.findByIdAndUpdate({ _id: req.body.id }, { status: 'Removed' }, { new: true });
+  let value = await Streamrequest.findById(req.body.id);
+  if (!value) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
+  }
+  // value = await Streamrequest.findByIdAndUpdate({ _id: req.body.id }, { status: 'Removed' }, { new: true });
   value.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "My Self", timelieId: req.timeline })
-  value.save();
   let assginStream = await StreamrequestPost.find({ streamRequest: req.body.id });
   assginStream.forEach(async (a) => {
     let streamposts = await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Removed' }, { new: true });
     streamposts.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "My Self", timelieId: req.timeline })
     streamposts.save();
   });
+  value.status = 'Removed';
   value.removedBy = 'My self';
   value.removedBy_id = req.userId;
   value.save();
