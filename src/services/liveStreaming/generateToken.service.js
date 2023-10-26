@@ -1231,6 +1231,7 @@ const production_supplier_token = async (req) => {
     stream.save();
   }
 
+  req.io.emit(streamId + value.supplierId, { streamId: streamId });
   req.io.emit(streamId + '_golive', { streamId: streamId });
   // console.log(streamId);
   await production_supplier_token_cloudrecording(req, streamId, stream.agoraID);
