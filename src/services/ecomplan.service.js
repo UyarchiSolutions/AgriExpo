@@ -1419,6 +1419,9 @@ const get_all_Post_with_page_assigned = async (req, type) => {
   }
   let timeout = { active: true }
   if (type == 'timeout') {
+    timeout = { streamEnd_Time: { $lte: date_now } }
+  }
+  else {
     timeout = { streamEnd_Time: { $gte: date_now } }
   }
 
