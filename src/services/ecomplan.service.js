@@ -3754,6 +3754,7 @@ const go_live_stream_host = async (req, userId) => {
         allot_host_1: 1,
         transaction: 1,
         broucher: 1,
+        streamCurrent_Watching:1
       },
     },
   ]);
