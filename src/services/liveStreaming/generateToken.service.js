@@ -860,8 +860,9 @@ const get_sub_golive = async (req, io) => {
 
 
   value[0].last_joined = u4;
-  value[0].save();
-  return value[0];
+  let result = value[0];
+  result.save();
+  return result;
 };
 
 const get_participents_limit = async (req) => {
