@@ -85,7 +85,7 @@ const get_sub_golive = catchAsync(async (req, res) => {
 
 const get_sub_token_single = catchAsync(async (req, res) => {
   let tokens = await generateTokenService.generateToken_sub(req);
-  req.io.emit('subscriberjoined', { user: 'sd' });
+  // req.io.emit('subscriberjoined', { user: 'sd' });
   res.status(httpStatus.CREATED).send(tokens);
 });
 

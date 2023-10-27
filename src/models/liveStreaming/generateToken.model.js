@@ -192,6 +192,9 @@ const joinedusers = mongoose.Schema({
   joindedUserBan: {
     type: Boolean,
     default: false
+  },
+  last_joined: {
+    type: String,
   }
 });
 

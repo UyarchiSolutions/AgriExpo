@@ -11,6 +11,8 @@ const axios = require('axios'); //
 //   'base64'
 // )}`;
 const Dates = require('../Date.serive');
+
+const { u4 } = require('uuid')
 const {
   Streamplan,
   StreamPost,
@@ -157,8 +159,9 @@ const generateToken_sub = async (req) => {
     value.save();
     stream = value;
   }
-  await Joinusers.findByIdAndUpdate({ _id: user._id }, { latestedToken: stream._id, token: stream._id }, { new: true });
+  let userjoin = await Joinusers.findByIdAndUpdate({ _id: user._id }, { latestedToken: stream._id, token: stream._id }, { new: true });
   await get_participents_limit(req);
+  req.io.emit(userjoin.last_joined, { leave: true });
   return { stream: stream, user: user };
 
 };
@@ -854,6 +857,10 @@ const get_sub_golive = async (req, io) => {
   if (value.length == 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'plan_not_found');
   }
+
+
+  value[0].last_joined = u4;
+  value[0].save();
   return value[0];
 };
 
