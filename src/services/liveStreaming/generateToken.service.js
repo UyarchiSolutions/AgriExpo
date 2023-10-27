@@ -851,6 +851,7 @@ const get_sub_golive = async (req, io) => {
         raiseUID: 1,
         allot_host_1_details: 1,
         current_raise: "$streamrequests.current_raise",
+        last_joined: 1
       },
     },
   ]);
