@@ -12,7 +12,7 @@ const axios = require('axios'); //
 // )}`;
 const Dates = require('../Date.serive');
 
-const { V4 } = require('uuid')
+const { v4 } = require('uuid')
 const {
   Streamplan,
   StreamPost,
@@ -858,7 +858,7 @@ const get_sub_golive = async (req, io) => {
   if (value.length == 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'plan_not_found');
   }
-  let lastJion = V4;
+  let lastJion = v4;
   value[0].last_joined = lastJion;
   console.log(lastJion)
   await Joinusers.findByIdAndUpdate({ _id: value[0]._id }, { last_joined: lastJion }, { new: true });
