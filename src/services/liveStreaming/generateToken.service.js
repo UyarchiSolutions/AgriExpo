@@ -857,12 +857,10 @@ const get_sub_golive = async (req, io) => {
   if (value.length == 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'plan_not_found');
   }
-
-
+  let lastJion = u4;
   value[0].last_joined = u4;
-  let result = value[0];
-  result.save();
-  return result;
+  await Joinusers.findByIdAndUpdate({ _id: value[0]._id }, { last_joined: lastJion }, { new: true });
+  return value[0];
 };
 
 const get_participents_limit = async (req) => {
