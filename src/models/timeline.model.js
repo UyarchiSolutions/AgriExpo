@@ -39,6 +39,16 @@ const Timelineschema = new mongoose.Schema({
     Token: {
         type: String,
     },
+    socketId: {
+        type: String,
+    },
+    streamId: {
+        type: String,
+    },
+    streamingTimelineID: {
+        type: String,
+    }
+
 });
 const Usertimeline = mongoose.model('usertimeline', Timelineschema);
 
@@ -94,9 +104,6 @@ const streamTimelineshema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    Time: {
-        type: Number,
-    },
     Device: {
         type: Object,
     },
@@ -111,8 +118,23 @@ const streamTimelineshema = new mongoose.Schema({
     },
     status: {
         type: String,
+        default: "Stared"
+    },
+    usertimeline: {
+        type: String,
+    },
+    streamId: {
+        type: String,
+    },
+    IN: {
+        type: Number,
+
+    },
+    OUT: {
+        type: Number,
+
     }
-});
+}, { timestamps: true });
 const StreamTimeline = mongoose.model('streamtimeline', streamTimelineshema);
 module.exports = {
     Usertimeline,

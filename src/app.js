@@ -42,12 +42,21 @@ app.engine('html', require('ejs').renderFile);
 let activeUserCount = 0;
 server.listen(config.port, () => {
   logger.info(`Listening to port ${config.port}`);
-  // //console.log(moment(1674035400000).add(40, 'minutes').format('hh:mm:ss a'));
 });
 
-
+io.use(async (socket, next) => {
+  const token = socket.handshake.auth.token;
+  await socketService.auth_details(socket, token, next)
+})
 io.sockets.on('connection', async (socket) => {
-  console.log(socket.id, 9876789876)
+  await socketService.cost_connect_live_now(socket)
+  socket.on('livestream_joined', async (data) => {
+
+    await socketService.livestream_joined(data, socket, io)
+  });
+  socket.on('livestream_leave', async (data) => {
+    await socketService.livestream_leave(data, socket, io)
+  });
   activeUserCount++;
   io.sockets.emit('userCount', activeUserCount);
   socket.on('groupchat', async (data) => {
@@ -79,39 +88,9 @@ io.sockets.on('connection', async (socket) => {
     await socketService.admin_allow_controls(data, io);
   });
 
-  socket.on('joinChannel', (channelName) => {
-    console.log("sjh   ygh h", 87878)
-    socket.join(channelName); // Join a specific channel
-    console.log(`User joined channel: ${channelName}`);
-
-    // Keep track of users in each channel
-    if (!channels[channelName]) {
-      channels[channelName] = [];
-    }
-    channels[channelName].push(socket);
-
-    // Notify other users in the channel that a user has joined
-    socket.to(channelName).emit('userJoined', socket.id);
-  });
-
-  socket.on('leaveChannel', (channelName) => {
-    socket.leave(channelName); // Leave a specific channel
-    console.log(`User left channel: ${channelName}`);
-
-    // Remove the user from the channel's user list
-    if (channels[channelName]) {
-      const index = channels[channelName].indexOf(socket);
-      if (index !== -1) {
-        channels[channelName].splice(index, 1);
-      }
-    }
-
-    // Notify other users in the channel that a user has left
-    socket.to(channelName).emit('userLeft', socket.id);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('A user disconnected');
+  socket.on('disconnect', async () => {
+    await socketService.user_Disconect(socket, io)
+    console.log('A user disconnected', socket.role);
 
     // Remove the user from all channels they were in
     for (const channelName in channels) {
