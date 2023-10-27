@@ -858,6 +858,7 @@ const get_sub_golive = async (req, io) => {
   if (value.length == 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'plan_not_found');
   }
+  req.io.emit(value[0].last_joined, { leave: true });
   let lastJion = v4();
   value[0].last_joined = lastJion;
   console.log(lastJion)
