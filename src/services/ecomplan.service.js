@@ -4126,7 +4126,8 @@ const get_subhost_token = async (req, userId) => {
         current_raise: 1,
         allot_host_1: 1,
         allot_host_1_details: 1,
-        last_joined: "$temptokens.last_joined"
+        last_joined: "$temptokens.last_joined",
+        streamCurrent_Watching: 1
       },
     },
   ]);
