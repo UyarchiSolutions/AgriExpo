@@ -1164,6 +1164,7 @@ const create_subhost_token = async (req) => {
     stream.save();
   }
   req.io.emit(streamId + '_golive', { streamId: streamId });
+  req.io.emit(value.last_joined, { leave: true });
   await production_supplier_token_cloudrecording(req, streamId, stream.agoraID);
   return value;
 };
