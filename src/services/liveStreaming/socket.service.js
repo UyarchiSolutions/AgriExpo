@@ -259,7 +259,7 @@ const livestream_joined = async (streamId, socket, io) => {
   console.log(userTimeline, 9876578)
   if (userTimeline) {
     if (userTimeline.streamId != streamId && userTimeline.userId == userId) {
-      console.log(78908765678, true)
+      console.log(78908765678, true, streamId)
       let stream = await StreamTimeline.create({
         timeline: timeline,
         userId: userId,
@@ -273,7 +273,9 @@ const livestream_joined = async (streamId, socket, io) => {
       userTimeline.save();
 
       let streamrequest = await Streamrequest.findById(streamId);
+      console.log(userTimeline)
       if (streamrequest) {
+        console.log(streamrequest)
         streamrequest.streamCurrent_Watching = streamrequest.streamCurrent_Watching + 1;
         streamrequest.save();
         io.sockets.emit(streamId + "_current_watching", { streamCurrent_Watching: streamrequest.streamCurrent_Watching })
