@@ -39,6 +39,8 @@ const ccavenue = require('./ccavenue.service');
 const purchese_plan = require('./purchasePlan.service');
 const { Usermessage, Interaction } = require('../models/PrivateChat.model');
 
+const {v4}=require("uuid")
+
 const create_Plans = async (req) => {
   const { slotInfo, stream_validity } = req.body;
   const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal', timeline: [{ status: "Created", Time: new Date().getTime(), timelieId: req.timeline }] } });
