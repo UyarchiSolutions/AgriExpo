@@ -39,7 +39,7 @@ const ccavenue = require('./ccavenue.service');
 const purchese_plan = require('./purchasePlan.service');
 const { Usermessage, Interaction } = require('../models/PrivateChat.model');
 
-const {v4}=require("uuid")
+const { v4 } = require("uuid")
 
 const create_Plans = async (req) => {
   const { slotInfo, stream_validity } = req.body;
@@ -4126,9 +4126,20 @@ const get_subhost_token = async (req, userId) => {
         current_raise: 1,
         allot_host_1: 1,
         allot_host_1_details: 1,
+        last_joined: "$temptokens.last_joined"
       },
     },
   ]);
+  if (value.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
+  }
+
+  let temp = await tempTokenModel.findById(value[0].temptokens._id)
+  req.io.emit(temp.last_joined, { leave: true });
+  let lastJion = v4();
+  temp.last_joined = lastJion;
+  temp.save();
+  value[0].last_joined = lastJion;
   return value;
 };
 
