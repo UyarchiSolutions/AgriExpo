@@ -278,6 +278,7 @@ const livestream_joined = async (streamId, socket, io) => {
         console.log(streamrequest)
         streamrequest.streamCurrent_Watching = streamrequest.streamCurrent_Watching + 1;
         streamrequest.save();
+        console.log(streamrequest)
         io.sockets.emit(streamId + "_current_watching", { streamCurrent_Watching: streamrequest.streamCurrent_Watching })
       }
     }
