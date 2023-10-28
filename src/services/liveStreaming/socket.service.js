@@ -297,7 +297,7 @@ const livestream_leave = async (streamId, socket, io) => {
   const userTimeline = await Usertimeline.findById(timeline);
   console.log(userTimeline, 9876898797657)
   if (userTimeline) {
-    if (userTimeline.streamId == streamId && userTimeline.userId == userId) {
+    if (userTimeline.userId == userId) {
       let stream = await StreamTimeline.findById(userTimeline.streamingTimelineID);
       if (stream) {
         stream.OUT = new Date().getTime();
