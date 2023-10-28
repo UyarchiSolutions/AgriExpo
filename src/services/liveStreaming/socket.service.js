@@ -279,7 +279,9 @@ const livestream_joined = async (streamId, socket, io) => {
         streamrequest.streamCurrent_Watching = streamrequest.streamCurrent_Watching + 1;
         streamrequest.save();
         console.log(streamrequest)
-        io.sockets.emit(streamId + "_current_watching", { streamCurrent_Watching: streamrequest.streamCurrent_Watching })
+        setTimeout(() => {
+          io.sockets.emit(streamId + "_current_watching", { streamCurrent_Watching: streamrequest.streamCurrent_Watching })
+        }, 100)
       }
     }
     else {
@@ -324,7 +326,6 @@ const auth_details = async (socket, token, next) => {
     socket.timeline = payload.timeline;
     socket.role = payload.role;
     socket.userId = payload._id;
-
     return next();
   } catch {
     return next(new Error('Unauthorized'));
