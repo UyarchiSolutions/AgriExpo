@@ -3737,6 +3737,7 @@ const go_live_stream_host = async (req, userId) => {
         streamrequestposts: '$streamrequestposts',
         adminApprove: 1,
         temptokens: '$temptokens',
+        last_joined: '$temptokens.last_joined',
         Duration: 1,
         startTime: 1,
         endTime: 1,
@@ -3754,14 +3755,25 @@ const go_live_stream_host = async (req, userId) => {
         allot_host_1: 1,
         transaction: 1,
         broucher: 1,
-        streamCurrent_Watching:1
+        streamCurrent_Watching: 1
       },
     },
   ]);
   if (value.length == 0) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
   }
+  let temp = await tempTokenModel.findById(value[0].temptokens._id)
+  req.io.emit(temp.last_joined, { leave: true });
+  let lastJion = v4();
+  temp.last_joined = lastJion;
+  temp.save();
+  value[0].last_joined = lastJion;
   return value[0];
+
+
+
+
+
 };
 
 const get_subhost_token = async (req, userId) => {

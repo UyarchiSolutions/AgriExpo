@@ -146,6 +146,9 @@ const tempToken = mongoose.Schema({
   },
   long: {
     type: String,
+  },
+  last_joined: {
+    type: String,
   }
 });
 
