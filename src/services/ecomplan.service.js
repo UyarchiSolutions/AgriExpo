@@ -3508,10 +3508,15 @@ const go_live_stream_host = async (req, userId) => {
 
                 { $unwind: '$products' },
                 {
+                  $addFields: {
+                    image: { $ifNull: ['$showImage', '$products.image'] },
+                  },
+                },
+                {
                   $project: {
                     _id: 1,
                     productTitle: '$products.productTitle',
-                    image: '$products.image',
+                    image: 1,
                     productId: 1,
                     categoryId: 1,
                     quantity: 1,
