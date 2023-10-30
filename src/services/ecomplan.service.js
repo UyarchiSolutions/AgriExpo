@@ -3770,7 +3770,7 @@ const go_live_stream_host = async (req, userId) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
   }
   let temp = await tempTokenModel.findById(value[0].temptokens._id)
-  req.io.emit(temp.last_joined, { leave: true });
+  req.io.emit(temp.last_joined, { leave: true }, temp);
   let lastJion = v4();
   temp.last_joined = lastJion;
   temp.save();
