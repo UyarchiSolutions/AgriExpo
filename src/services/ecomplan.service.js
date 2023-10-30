@@ -214,7 +214,7 @@ const create_post = async (req) => {
   console.log(images, 9876)
   const value = await StreamPost.create({
     ...req.body,
-    ...{ suppierId: req.userId, images: images, pendingQTY: req.body.quantity, timeline: [{ status: "Created", Time: new Date().getTime(), timelieId: req.timeline }] },
+    ...{ suppierId: req.userId, images: images, pendingQTY: req.body.quantity, showImage: showImage, timeline: [{ status: "Created", Time: new Date().getTime(), timelieId: req.timeline }] },
   });
   await Dates.create_date(value);
   if (req.body.afterStreaming == 'yes') {
@@ -226,7 +226,6 @@ const create_post = async (req) => {
       minLots: req.body.minLots == null ? 0 : req.body.minLots,
       incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
       createdBy: req.userId,
-      showImage: showImage
     });
   }
   return value;
