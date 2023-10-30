@@ -201,6 +201,7 @@ const create_post = async (req) => {
     if (old_post) {
       images = old_post.images;
       req.body.video = old_post.video;
+      showImage = old_post.showImage;
     }
   }
   else {
@@ -2665,7 +2666,6 @@ const only_chat_get = async (req) => {
 
 const get_all_streams = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
-
   var date_now = new Date().getTime();
   let statusFilter = { active: true };
   if (req.query.status == 'All') {

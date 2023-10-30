@@ -36,8 +36,8 @@ const leave_subhost = async (req, io) => {
 const stream_view_change = async (req, io) => {
   let stream = await tempTokenModel.updateMany({ chennel: req.streamId }, { bigSize: false }, { new: true });
   let token = await tempTokenModel.findByIdAndUpdate({ _id: req.tokenId }, { bigSize: req.bigSize }, { new: true });
-  console.log(stream)
-  console.log(token)
+  // console.log(stream)
+  // console.log(token)
   io.sockets.emit(req.streamId + "stream_view_change", { req, token, stream });
 }
 
@@ -252,14 +252,15 @@ const cost_connect_live_now = async (socket) => {
 }
 
 const livestream_joined = async (streamId, socket, io) => {
+  console.log(98765789765546)
   let timeline = socket.timeline;
   let userId = socket.userId;
 
   const userTimeline = await Usertimeline.findById(socket.timeline);
-  console.log(userTimeline, 9876578)
+  // console.log(userTimeline, 9876578)
   if (userTimeline) {
     if (userTimeline.userId == userId) {
-      console.log(78908765678, true, streamId)
+      // console.log(78908765678, true, streamId)
       let stream = await StreamTimeline.create({
         timeline: timeline,
         userId: userId,
@@ -273,19 +274,19 @@ const livestream_joined = async (streamId, socket, io) => {
       userTimeline.save();
 
       let streamrequest = await Streamrequest.findById(streamId);
-      console.log(userTimeline)
+      // console.log(userTimeline)
       if (streamrequest) {
-        console.log(streamrequest)
+        // console.log(streamrequest)
         streamrequest.streamCurrent_Watching = streamrequest.streamCurrent_Watching + 1;
         streamrequest.save();
-        console.log(streamrequest)
+        // console.log(streamrequest)
         setTimeout(() => {
           io.sockets.emit(streamId + "_current_watching", { streamCurrent_Watching: streamrequest.streamCurrent_Watching })
         }, 100)
       }
     }
     else {
-      console.log(78908765678, false)
+      // console.log(78908765678, false)
     }
   }
 }
@@ -295,7 +296,7 @@ const livestream_leave = async (streamId, socket, io) => {
   let userId = socket.userId;
 
   const userTimeline = await Usertimeline.findById(timeline);
-  console.log(userTimeline, 9876898797657)
+  // console.log(userTimeline, 9876898797657)
   if (userTimeline) {
     if (userTimeline.userId == userId) {
       let stream = await StreamTimeline.findById(userTimeline.streamingTimelineID);
@@ -338,7 +339,7 @@ const user_Disconect = async (socket, io) => {
   let userId = socket.userId;
   let streamId;
   const userTimeline = await Usertimeline.findById(timeline);
-  console.log(userTimeline, 9876898797657)
+  // console.log(userTimeline, 9876898797657)
   if (userTimeline) {
     if (userTimeline.streamId != null && userTimeline.userId == userId) {
       streamId = userTimeline.streamId;
