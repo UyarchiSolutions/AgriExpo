@@ -391,7 +391,12 @@ const send_request_link = async (req) => {
   // console.log(emailservice.sendDemolink(['bharathiraja996574@gmail.com', 'bharathi@uyarchi.com', 'mps.bharathiraja@gmail.com'], demostream._id));
   return { demopoat, demostream };
 }
+const get_demo_requests = async (req) => {
+  let userID = req.userId;
+  let stream = await Demostream.find({ createdBy: userID });
 
+  return stream;
+}
 const send_livestream_link_demo = async (req) => {
   let userID = req.userId;
   let seller = await Seller.findById(userID);
@@ -2831,5 +2836,6 @@ module.exports = {
   issueResolve,
   demorequest,
   get_demo_request,
-  send_request_link
+  send_request_link,
+  get_demo_requests
 };

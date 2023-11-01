@@ -12,6 +12,11 @@ const send_livestream_link_demo = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(data);
 });
 
+const get_demo_requests = catchAsync(async (req, res) => {
+  const data = await demostream.get_demo_requests(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
 
 const demorequest = catchAsync(async (req, res) => {
   const data = await demostream.demorequest(req);
@@ -291,5 +296,6 @@ module.exports = {
   demorequest,
   get_demo_request,
   send_request_link,
-  send_livestream_link_demo
+  send_livestream_link_demo,
+  get_demo_requests
 };
