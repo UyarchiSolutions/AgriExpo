@@ -127,15 +127,10 @@ const generateToken_sub = async (req) => {
     user = await Joinusers.create({ shopId: req.shopId, streamId: channel, hostId: str.tokenDetails });
     await Dates.create_date(user);
   }
-  let stream = await tempTokenModel.findOne({ streamId: channel, type: 'sub', hostId: { $ne: null }, shopId: req.shopId });
+  let stream = await tempTokenModel.findOne({ streamId: channel, type: 'sub', joinedUser: user._id, shopId: req.shopId });
   if (!stream) {
     const uid = await generateUid();
     const role = Agora.RtcRole.SUBSCRIBER;
-
-    const moment_curr = moment();
-    const currentTimestamp = moment_curr.add(600, 'minutes');
-    const expirationTimestamp =
-      new Date(new Date(currentTimestamp.format('YYYY-MM-DD') + ' ' + currentTimestamp.format('HH:mm:ss'))).getTime() / 1000;
     let value = await tempTokenModel.create({
       ...body,
       ...{
@@ -2116,6 +2111,7 @@ const approve_request = async (req) => {
   raise.status = 'approved';
   raise.sort = 2;
   raise.save();
+  console.log(raise._id, 987867676675)
   req.io.emit(raise._id + '_status', { message: "approved" });
   return raise;
 }

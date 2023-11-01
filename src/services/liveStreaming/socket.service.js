@@ -329,7 +329,7 @@ const auth_details = async (socket, token, next) => {
     socket.userId = payload._id;
     return next();
   } catch {
-    return next(new Error('Unauthorized'));
+    return next();
   }
 
 }

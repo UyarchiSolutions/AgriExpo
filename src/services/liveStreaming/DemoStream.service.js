@@ -902,6 +902,7 @@ const join_stream_buyer = async (req) => {
     register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
     req.io.emit(demotoken.streamID + '_buyer_registor', { register });
   }, 300);
+  console.log(demotoken.streamID + '_buyer_registor', 987887678678)
   return demotoken;
 };
 
