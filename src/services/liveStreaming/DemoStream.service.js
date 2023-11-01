@@ -404,7 +404,7 @@ const send_livestream_link_demo = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Seller Not Fount');
   }
   let streamcount = await Demostream.find({ createdBy: userID }).count();
-  if (streamcount < 6) {
+  if (streamcount < 5) {
     // Seller
     const { transaction } = req.body;
     let user = await Demoseller.findOne({ phoneNumber: seller.mobileNumber });
