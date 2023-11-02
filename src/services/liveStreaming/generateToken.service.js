@@ -2076,6 +2076,7 @@ const raise_request = async (req) => {
         designation: "$shops.designation",
         email: "$shops.email",
         address: "$shops.address",
+        AgriImage: "$shops.AgriImage",
         streamId: 1,
         shopId: 1,
         tempID: 1,
