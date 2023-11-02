@@ -239,7 +239,7 @@ const mydetails = async (req) => {
     sellerRole: 0,
     sellerType: 0,
     status: 0,
-    tradeName: 1,
+    tradeName: 0,
     webSite: 0,
     _id: 0,
   });;
