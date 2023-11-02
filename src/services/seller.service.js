@@ -243,8 +243,8 @@ const mydetails = async (req) => {
 
   let purchase = await purchasePlan.find({ suppierId: value._id }).limit(1);
   let purchaseplan = purchase != null ? purchase.length == 0 ? false : true : false;
-  value.purchaseplan = purchaseplan;
-  let val = value.merge({ purchaseplan: purchaseplan })
+  let second = { purchaseplan: purchaseplan };
+  let val = { ...value, ...second }
   console.log(val);
   return value;
 };
