@@ -244,7 +244,8 @@ const mydetails = async (req) => {
 
   let purchase = await purchasePlan.find({ suppierId: value._id }).limit(1);
   let purchaseplan = purchase != null ? purchase.length == 0 ? false : true : false;
-  return { ...value, ...{ purchaseplan } };
+  value.purchasepla = purchaseplan;
+  return value;
 };
 
 const GetAllSeller = async () => {
