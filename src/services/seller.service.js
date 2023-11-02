@@ -235,7 +235,7 @@ const mydetails = async (req) => {
     mainSeller: 0,
     mobileNumber: 0,
     registered: 0,
-    roleNum: 1,
+    roleNum: 0,
     sellerRole: 0,
     sellerType: 0,
     status: 0,
