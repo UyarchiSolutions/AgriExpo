@@ -234,8 +234,8 @@ const mydetails = async (req) => {
   delete mutableQueryResult.password;
 
   let purchase = await purchasePlan.find({ suppierId: value._id }).limit(1);
-  mutableQueryResult.purchasePlan = purchase != null ? purchase.length == 0 ? false : true : false;
-  return mutableQueryResult;
+  let purchaseplan = purchase != null ? purchase.length == 0 ? false : true : false;
+  return { ...mutableQueryResult, ...{ purchaseplan } };
 };
 
 const GetAllSeller = async () => {
