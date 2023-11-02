@@ -2128,6 +2128,8 @@ const pending_request = async (req) => {
   stream.save();
   raise.status = 'end';
   raise.sort = 0;
+  raise.re = 0;
+  raise.already_joined = true;
   raise.save();
   req.io.emit(raise._id + '_status', { message: "end" });
   req.io.emit(stream._id + '_raise_hands_request', raise);
