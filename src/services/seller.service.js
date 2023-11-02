@@ -226,22 +226,14 @@ const createSubUser = async (req) => {
 const mydetails = async (req) => {
   let sellerID = req.userId;
   let value = await Seller.findById(sellerID).select({
-    Pincode: 0,
-    address: 0,
-    category: 0,
-    companyName: 0,
-    email: 0,
-    how_did_you_know_us: 0,
-    mainSeller: 0,
-    mobileNumber: 0,
-    registered: 0,
-    roleNum: 0,
-    sellerRole: 0,
-    sellerType: 0,
-    status: 0,
-    tradeName: 0,
-    webSite: 0,
-    _id: 0,
+    Designation: 0,
+    GST_Number: 0,
+    active: 0,
+    archive: 0,
+    createdDate: 0,
+    notifyCount: 0,
+    password: 0,
+    updatedDate: 0,
   });;
 
   if (!value) {
