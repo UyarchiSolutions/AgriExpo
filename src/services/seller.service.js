@@ -7,6 +7,8 @@ const bcrypt = require('bcryptjs');
 const moment = require('moment');
 
 const { Streamplan, StreamPost, Streamrequest, StreamrequestPost, StreamPreRegister } = require('../models/ecomplan.model');
+
+const { purchasePlan } = require('../models/purchasePlan.model');
 const createSeller = async (req) => {
   let body = req.body;
   let value = await Seller.findOne({ mobileNumber: body.mobileNumber });
@@ -231,6 +233,8 @@ const mydetails = async (req) => {
   let mutableQueryResult = value; // _doc property holds the mutable object
   delete mutableQueryResult.password;
 
+  let purchase = await purchasePlan.find({ suppierId: value._id }).limit(1);
+  mutableQueryResult.purchasePlan = purchase != null ? purchase.length == 0 ? false : true : false;
   return mutableQueryResult;
 };
 
