@@ -225,17 +225,34 @@ const createSubUser = async (req) => {
 
 const mydetails = async (req) => {
   let sellerID = req.userId;
-  let value = await Seller.findById(sellerID);
+  let value = await Seller.findById(sellerID).select({
+    Pincode: 0,
+    address: 0,
+    category: 0,
+    companyName: 0,
+    email: 0,
+    how_did_you_know_us: 0,
+    mainSeller: 0,
+    mobileNumber: 0,
+    registered: 0,
+    roleNum: 1,
+    sellerRole: 0,
+    sellerType: 0,
+    status: 0,
+    tradeName: 1,
+    webSite: 0,
+    _id: 0,
+  });;
 
   if (!value) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User Not Found');
   }
-  let mutableQueryResult = value; // _doc property holds the mutable object
-  delete mutableQueryResult.password;
+  // let mutableQueryResult = value; // _doc property holds the mutable object
+  // delete mutableQueryResult.password;
 
   let purchase = await purchasePlan.find({ suppierId: value._id }).limit(1);
   let purchaseplan = purchase != null ? purchase.length == 0 ? false : true : false;
-  return { ...mutableQueryResult, ...{ purchaseplan } };
+  return { ...value, ...{ purchaseplan } };
 };
 
 const GetAllSeller = async () => {
