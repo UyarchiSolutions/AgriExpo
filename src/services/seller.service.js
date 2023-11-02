@@ -226,7 +226,6 @@ const createSubUser = async (req) => {
 const mydetails = async (req) => {
   let sellerID = req.userId;
   let value = await Seller.findById(sellerID).select({
-    Designation: 0,
     GST_Number: 0,
     active: 0,
     archive: 0,
@@ -244,7 +243,9 @@ const mydetails = async (req) => {
 
   let purchase = await purchasePlan.find({ suppierId: value._id }).limit(1);
   let purchaseplan = purchase != null ? purchase.length == 0 ? false : true : false;
-  value.purchasepla = purchaseplan;
+  value.purchaseplan = purchaseplan;
+  let val = { ...value, ...{ purchaseplan: purchaseplan } }
+  console.log(val);
   return value;
 };
 
