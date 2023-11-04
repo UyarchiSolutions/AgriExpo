@@ -3867,6 +3867,7 @@ const go_live_stream_host = async (req, userId) => {
                     productId: 1,
                     categoryId: 1,
                     quantity: 1,
+                    unit: 1,
                     marketPlace: 1,
                     offerPrice: 1,
                     postLiveStreamingPirce: 1,
