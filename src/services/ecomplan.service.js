@@ -3905,6 +3905,7 @@ const go_live_stream_host = async (req, userId) => {
               streamEnd: '$streamposts.streamEnd',
               streampostsId: '$streamposts._id',
               stream_cart: '$streamposts.stream_cart',
+              unit: '$streamposts.unit',
               stream_checkout: '$streamposts.stream_checkout',
             },
           },
