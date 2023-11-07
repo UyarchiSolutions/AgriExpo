@@ -226,7 +226,6 @@ const createSubUser = async (req) => {
 const mydetails = async (req) => {
   let sellerID = req.userId;
   let value = await Seller.findById(sellerID).select({
-    GST_Number: 0,
     active: 0,
     archive: 0,
     createdDate: 0,
