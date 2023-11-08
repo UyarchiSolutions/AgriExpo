@@ -3375,7 +3375,7 @@ const get_subhost_streams = async (req) => {
         endTime: 1,
         registeredUsers: 1,
         noOfParticipants: 1,
-        max_post_per_stream: "$purchasedplans",
+        max_post_per_stream: 1,
         status: 1,
         no_of_host: '$purchasedplans.no_of_host',
         chat_need: 1,
