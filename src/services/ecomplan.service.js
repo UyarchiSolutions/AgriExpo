@@ -3155,6 +3155,8 @@ const get_subhost_streams = async (req) => {
                     suppierId: 1,
                     DateIso: 1,
                     created: 1,
+                    discription: 1,
+                    pack_discription: 1
                   },
                 },
               ],
@@ -3174,6 +3176,8 @@ const get_subhost_streams = async (req) => {
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
+              discription:'$streamposts.discription',
+              pack_discription: '$streamposts.pack_discription',
             },
           },
         ],
