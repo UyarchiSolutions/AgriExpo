@@ -3241,7 +3241,7 @@ const get_subhost_streams = async (req) => {
     },
     {
       $addFields: {
-        max_post_per_stream: { $ifNull: ['$purchasedplans.max_post_per_stream', 0] },
+        max_post_per_stream: { $ifNull: ['$purchasedplans.PostCount', 0] },
       },
     },
     {
@@ -3397,7 +3397,7 @@ const get_subhost_streams = async (req) => {
         transaction: 1,
         Location: 1,
         slots: 1,
-        streamEnd_Time:1
+        streamEnd_Time: 1
       },
     },
 
