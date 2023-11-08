@@ -3310,6 +3310,20 @@ const get_subhost_streams = async (req) => {
       },
     },
     {
+      $lookup: {
+        from: 'slots',
+        localField: 'slotId',
+        foreignField: '_id',
+        as: 'slots',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$slots',
+      },
+    },
+    {
       $project: {
         _id: 1,
         supplierName: '$suppliers.contactName',
@@ -3362,10 +3376,11 @@ const get_subhost_streams = async (req) => {
         allot_host_1_name: 1,
         allot_host_2_name: 1,
         allot_host_3_name: 1,
-        primarycommunication:1,
-        secondarycommunication:1,
-        transaction:1,
-        Location:1,
+        primarycommunication: 1,
+        secondarycommunication: 1,
+        transaction: 1,
+        Location: 1,
+        slots: 1
       },
     },
 
