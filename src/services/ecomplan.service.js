@@ -3362,6 +3362,7 @@ const get_subhost_streams = async (req) => {
         allot_host_1_name: 1,
         allot_host_2_name: 1,
         allot_host_3_name: 1,
+        primarycommunication:1,
         secondarycommunication:1
       },
     },
