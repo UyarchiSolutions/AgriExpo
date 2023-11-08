@@ -3396,7 +3396,8 @@ const get_subhost_streams = async (req) => {
         secondarycommunication: 1,
         transaction: 1,
         Location: 1,
-        slots: 1
+        slots: 1,
+        streamEnd_Time:1
       },
     },
 
