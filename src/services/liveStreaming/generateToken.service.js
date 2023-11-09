@@ -510,6 +510,350 @@ const get_sub_token = async (req) => {
   return value[0];
 };
 
+const get_sub_golive_details = async (req, io) => {
+  let code = req.query.code;
+  let streamId = req.query.id;
+  let value = await Joinusers.aggregate([
+    { $match: { $and: [{ _id: { $eq: req.query.id } }, { shopId: { $eq: req.shopId } }] } },
+    {
+      $lookup: {
+        from: 'temptokens',
+        localField: 'latestedToken',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'temptokens',
+              localField: 'hostId',
+              foreignField: '_id',
+              as: 'active_users',
+            },
+          },
+          // { $unwind: "$active_users" },
+          {
+            $project: {
+              active: 1,
+              archived: 1,
+              hostId: 1,
+              type: 1,
+              date: 1,
+              time: 1,
+              created: 1,
+              Uid: 1,
+              chennel: 1,
+              participents: 1,
+              created_num: 1,
+              expDate: 1,
+              token: 1,
+              // hostUid: "$active_users.Uid",
+              // expDate_host: "$active_users.expDate",
+              // active_users: "$active_users"
+            },
+          },
+        ],
+        as: 'temptokens',
+      },
+    },
+    { $unwind: '$temptokens' },
+    {
+      $lookup: {
+        from: 'streamrequests',
+        localField: 'streamId',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'purchasedplans',
+              localField: 'planId',
+              foreignField: '_id',
+              // pipeline: [
+              //   {
+              //     $lookup: {
+              //       from: 'streamplans',
+              //       localField: 'planId',
+              //       foreignField: '_id',
+              //       as: 'streamplans',
+              //     },
+              //   },
+              //   { $unwind: '$streamplans' },
+              // ],
+              as: 'purchasedplans',
+            },
+          },
+          { $unwind: '$purchasedplans' },
+          {
+            $lookup: {
+              from: 'agoraappids',
+              localField: 'agoraID',
+              foreignField: '_id',
+              as: 'agoraappids',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$agoraappids',
+            },
+          },
+        ],
+        as: 'streamrequests',
+      },
+    },
+    { $unwind: '$streamrequests' },
+    {
+      $lookup: {
+        from: 'streamrequests',
+        localField: 'streamId',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'streamrequestposts',
+              localField: '_id',
+              foreignField: 'streamRequest',
+              pipeline: [
+                {
+                  $lookup: {
+                    from: 'streamposts',
+                    localField: 'postId',
+                    foreignField: '_id',
+                    pipeline: [
+                      {
+                        $lookup: {
+                          from: 'products',
+                          localField: 'productId',
+                          foreignField: '_id',
+                          as: 'products',
+                        },
+                      },
+                      { $unwind: '$products' },
+                      {
+                        $lookup: {
+                          from: 'intrestedproducts',
+                          localField: '_id',
+                          foreignField: 'productID',
+                          pipeline: [
+                            { $match: { $and: [{ userID: req.shopId }] } }
+                          ],
+                          as: 'intrestedproduct',
+                        },
+                      },
+                      {
+                        $unwind: {
+                          preserveNullAndEmptyArrays: true,
+                          path: '$intrestedproduct',
+                        },
+                      },
+                      {
+                        $addFields: {
+                          intrested: { $ifNull: ['$intrestedproduct.intrested', false] },
+                        },
+                      },
+                      {
+                        $lookup: {
+                          from: 'savedproducts',
+                          localField: '_id',
+                          foreignField: 'productID',
+                          pipeline: [
+                            { $match: { $and: [{ userID: req.shopId }] } }
+                          ],
+                          as: 'savedproduct',
+                        },
+                      },
+                      {
+                        $unwind: {
+                          preserveNullAndEmptyArrays: true,
+                          path: '$savedproduct',
+                        },
+                      },
+                      {
+                        $addFields: {
+                          saved: { $ifNull: ['$savedproduct.saved', false] },
+                        },
+                      },
+                    ],
+                    as: 'streamposts',
+                  },
+                },
+                { $unwind: '$streamposts' },
+                {
+                  $addFields: {
+                    image: { $ifNull: ['$streamposts.showImage', '$streamposts.products.image'] },
+                  },
+                },
+                {
+                  $project: {
+                    _id: 1,
+                    active: 1,
+                    archive: 1,
+                    productId: '$streamposts.productId',
+                    productTitle: '$streamposts.products.productTitle',
+                    image: 1,
+                    categoryId: 'a7c95af4-abd5-4fe0-b685-fd93bb98f5ec',
+                    quantity: '$streamposts.quantity',
+                    marketPlace: '$streamposts.marketPlace',
+                    offerPrice: '$streamposts.offerPrice',
+                    postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
+                    validity: '$streamposts.validity',
+                    minLots: '$streamposts.minLots',
+                    incrementalLots: '$streamposts.incrementalLots',
+                    bookingAmount: '$streamposts.bookingAmount',
+                    streamPostId: '$streamposts._id',
+                    allowAdd_to_cart: { $gte: ['$streamposts.pendingQTY', '$streamposts.minLots'] },
+                    suppierId: 1,
+                    DateIso: 1,
+                    created: '2023-01-20T11:46:58.201Z',
+                    intrested: "$streamposts.intrested",
+                    saved: "$streamposts.saved",
+                    unit: "$streamposts.unit",
+                  },
+                },
+              ],
+              as: 'streamrequestposts',
+            },
+          },
+        ],
+        as: 'streamrequests_post',
+      },
+    },
+    { $unwind: '$streamrequests_post' },
+
+    {
+      $lookup: {
+        from: 'temptokens',
+        localField: 'streamId',
+        foreignField: 'streamId',
+        pipeline: [
+          {
+            $match: {
+              $or: [{ $and: [{ type: { $eq: 'subhost' } }] }, { type: { $eq: 'Supplier' } }],
+            },
+          },
+          {
+            $lookup: {
+              from: 'sellers',
+              localField: 'supplierId',
+              foreignField: '_id',
+              as: 'subhosts',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$subhosts',
+            },
+          },
+          {
+            $lookup: {
+              from: 'sellers',
+              localField: 'supplierId',
+              foreignField: '_id',
+              as: 'suppliers',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$suppliers',
+            },
+          },
+          {
+            $addFields: {
+              supplierName: { $ifNull: ['$suppliers.tradeName', '$subhosts.contactName'] },
+            },
+          },
+        ],
+        as: 'temptokens_sub',
+      },
+    },
+    {
+      $lookup: {
+        from: 'raiseusers',
+        localField: 'streamId',
+        foreignField: 'streamId',
+        pipeline: [
+          { $match: { $and: [{ shopId: { $eq: req.shopId } }] } }
+        ],
+        as: 'raiseusers',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$raiseusers',
+      },
+    },
+    {
+      $addFields: {
+        raise_hands: { $ifNull: ['$raiseusers.status', 'raise'] },
+      },
+    },
+    {
+      $addFields: {
+        allot_host_1_details: { $cond: { if: { $eq: ['$streamrequests.allot_host_1', 'my self'] }, then: '$streamrequests.suppierId', else: '$streamrequests.allot_host_1' } },
+      },
+    },
+    {
+      $lookup: {
+        from: 'temptokens',
+        localField: 'streamId',
+        foreignField: 'streamId',
+        pipeline: [{ $match: { $and: [{ type: { $eq: 'raiseHands' } }] } }],
+        as: 'raiseID',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$raiseID',
+      },
+    },
+    {
+      $addFields: {
+        raiseUID: { $ifNull: ['$raiseID.Uid', 0] },
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        active: '$temptokens.active',
+        archived: '$temptokens.archived',
+        hostId: '$temptokens.hostId',
+        type: '$temptokens.type',
+        date: '$temptokens.date',
+        time: '$temptokens.time',
+        created: '$temptokens.created',
+        Uid: '$temptokens.Uid',
+        chennel: '$temptokens.chennel',
+        participents: '$temptokens.participents',
+        created_num: '$temptokens.created_num',
+        expDate: '$temptokens.expDate',
+        token: '$temptokens.token',
+        hostUid: '$temptokens.hostUid',
+        expDate_host: '$temptokens.expDate_host',
+        temptokens: '$temptokens',
+        streamrequests: '$streamrequests',
+        chat: '$streamrequests.purchasedplans.chat_Option',
+        streamrequests_post: '$streamrequests_post',
+        streamrequestposts: '$streamrequests_post.streamrequestposts',
+        chat_need: '$streamrequests.chat_need',
+        temptokens_sub: '$temptokens_sub',
+        joindedUserBan: 1,
+        appID: "$streamrequests.agoraappids.appID",
+        raise_hands: 1,
+        raiseID: "$raiseusers._id",
+        raiseUID: 1,
+        allot_host_1_details: 1,
+        current_raise: "$streamrequests.current_raise",
+        last_joined: 1
+      },
+    },
+  ]);
+  if (value.length == 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'plan_not_found');
+  }
+  return value[0];
+};
 const get_sub_golive = async (req, io) => {
   let code = req.query.code;
   let streamId = req.query.id;
