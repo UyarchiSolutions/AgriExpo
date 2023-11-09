@@ -321,7 +321,6 @@ const livestream_leave = async (streamId, socket, io) => {
 
 
 const auth_details = async (socket, token, next) => {
-
   try {
     const payload = jwt.verify(token, config.jwt.secret);
     socket.timeline = payload.timeline;
