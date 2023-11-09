@@ -89,15 +89,7 @@ io.sockets.on('connection', async (socket) => {
   });
 
   socket.on('disconnect', async () => {
-    await socketService.user_Disconect(socket, io)
-    console.log('A user disconnected', socket.role);
-
-    // Remove the user from all channels they were in
-    for (const channelName in channels) {
-      if (channels[channelName].includes(socket)) {
-        channels[channelName].splice(channels[channelName].indexOf(socket), 1);
-      }
-    }
+    // await socketService.user_Disconect(socket, io)
   });
 
   socket.on('', (msg) => {
@@ -152,10 +144,6 @@ io.sockets.on('connection', async (socket) => {
     //console.log(socket.id,2136712)
     socket.to(room).emit('userJoined', socket.id);
     //console.log(socket.rooms)
-  });
-
-  socket.on('leavestream', (room) => {
-    console.log(room, 987876786, socket.id)
   });
 
   socket.on('disconnecting', () => {
