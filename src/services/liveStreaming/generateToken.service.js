@@ -112,6 +112,7 @@ const generateToken_sub_record = async (channel, isPublisher, req, hostIdss, exp
   });
   //console.log(role);
   const token = await geenerate_rtc_token(channel, uid, role, expirationTimestamp);
+  console.log
   value.token = token;
   value.save();
   return { uid, token, value };
