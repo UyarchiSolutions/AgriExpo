@@ -10246,25 +10246,47 @@ const get_completed_stream_buyer = async (req) => {
                 },
                 { $unwind: '$products' },
                 {
-                  $project: {
-                    _id: 1,
-                    productTitle: '$products.productTitle',
-                    image: '$products.image',
-                    productId: 1,
-                    categoryId: 1,
-                    quantity: 1,
-                    marketPlace: 1,
-                    offerPrice: 1,
-                    postLiveStreamingPirce: 1,
-                    validity: 1,
-                    minLots: 1,
-                    incrementalLots: 1,
-                    suppierId: 1,
-                    DateIso: 1,
-                    created: 1,
-                    bookingAmount: 1,
-                    products: '$products',
-                    status: 1,
+                  $lookup: {
+                    from: 'intrestedproducts',
+                    localField: '_id',
+                    foreignField: 'productID',
+                    pipeline: [
+                      { $match: { $and: [{ userID: req.shopId }] } }
+                    ],
+                    as: 'intrestedproduct',
+                  },
+                },
+                {
+                  $unwind: {
+                    preserveNullAndEmptyArrays: true,
+                    path: '$intrestedproduct',
+                  },
+                },
+                {
+                  $addFields: {
+                    intrested: { $ifNull: ['$intrestedproduct.intrested', false] },
+                  },
+                },
+                {
+                  $lookup: {
+                    from: 'savedproducts',
+                    localField: '_id',
+                    foreignField: 'productID',
+                    pipeline: [
+                      { $match: { $and: [{ userID: req.shopId }] } }
+                    ],
+                    as: 'savedproduct',
+                  },
+                },
+                {
+                  $unwind: {
+                    preserveNullAndEmptyArrays: true,
+                    path: '$savedproduct',
+                  },
+                },
+                {
+                  $addFields: {
+                    saved: { $ifNull: ['$savedproduct.saved', false] },
                   },
                 },
               ],
@@ -10273,13 +10295,18 @@ const get_completed_stream_buyer = async (req) => {
           },
           { $unwind: '$streamposts' },
           {
+            $addFields: {
+              image: { $ifNull: ['$streamposts.showImage', '$streamposts.products.image'] },
+            },
+          },
+          {
             $project: {
               _id: 1,
               active: 1,
               archive: 1,
               productId: '$streamposts.productId',
               productTitle: '$streamposts.products.productTitle',
-              image: '$streamposts.products.image',
+              image: 1,
               categoryId: 'a7c95af4-abd5-4fe0-b685-fd93bb98f5ec',
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
@@ -10289,13 +10316,14 @@ const get_completed_stream_buyer = async (req) => {
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
               bookingAmount: '$streamposts.bookingAmount',
-              afterStreaming: '$streamposts.afterStreaming',
               streamPostId: '$streamposts._id',
               allowAdd_to_cart: { $gte: ['$streamposts.pendingQTY', '$streamposts.minLots'] },
               suppierId: 1,
               DateIso: 1,
               created: '2023-01-20T11:46:58.201Z',
-              postStatus: '$streamposts.status',
+              intrested: "$streamposts.intrested",
+              saved: "$streamposts.saved",
+              unit: "$streamposts.unit",
             },
           },
         ],
@@ -10371,7 +10399,7 @@ const get_completed_stream_buyer = async (req) => {
         showLink: 1,
         selectvideo: 1,
         userinteractions: "$userinteractions._id",
-        transaction:1
+        transaction: 1
       },
     },
   ]);
