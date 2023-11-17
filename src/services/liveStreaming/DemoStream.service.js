@@ -1110,14 +1110,27 @@ const join_stream_buyer = async (req) => {
   }
 
   let register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
-  if (register < 5) {
-    demotoken.golive = true;
-    if (stream.status == 'Pending') {
-      stream.status = 'Ready';
-      stream.save();
+  if (stream.type == 'demo') {
+    if (register < 5) {
+      demotoken.golive = true;
+      if (stream.status == 'Pending') {
+        stream.status = 'Ready';
+        stream.save();
+      }
+    } else {
+      demotoken.golive = false;
     }
-  } else {
-    demotoken.golive = false;
+  }
+  else {
+    if (register < 100) {
+      demotoken.golive = true;
+      if (stream.status == 'Pending') {
+        stream.status = 'Ready';
+        stream.save();
+      }
+    } else {
+      demotoken.golive = false;
+    }
   }
 
   demotoken.status = 'resgistered';
