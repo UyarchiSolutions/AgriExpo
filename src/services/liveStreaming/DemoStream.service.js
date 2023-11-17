@@ -212,7 +212,7 @@ const send_request_link = async (req) => {
     createdBy: userID,
     _id: id,
     transaction: transaction,
-    tokenExp: moment().add(30, 'minutes'),
+    tokenExp: moment().add(demorequest.type == 'demo' ? 30 : 45, 'minutes'),
     demoType: "seller"
   });
   // endTime: moment().add(15, 'minutes'),
@@ -222,8 +222,13 @@ const send_request_link = async (req) => {
     type: 'demostream',
   };
   let valitity = jwt.sign(payload, secret, {
-    expiresIn: '30m', // Set token expiration to 30 minutes
+    expiresIn: '45m', // Set token expiration to 30 minutes
   });
+  if (demorequest.type == 'demo') {
+    valitity = jwt.sign(payload, secret, {
+      expiresIn: '30m', // Set token expiration to 30 minutes
+    });
+  }
   demostream.streamValitity = valitity;
   demostream.save();
   demorequest.streamID = demostream._id;
@@ -435,8 +440,13 @@ const send_livestream_link_demo = async (req) => {
       type: 'demostream',
     };
     let valitity = jwt.sign(payload, secret, {
-      expiresIn: '30m', // Set token expiration to 30 minutes
+      expiresIn: '45m', // Set token expiration to 30 minutes
     });
+    if (demorequest.type == 'demo') {
+      valitity = jwt.sign(payload, secret, {
+        expiresIn: '30m', // Set token expiration to 30 minutes
+      });
+    }
     demostream.streamValitity = valitity;
     demostream.save();
     let product = await Product.find().limit(10);
@@ -631,7 +641,7 @@ const send_livestream_link = async (req) => {
     createdBy: userID,
     _id: id,
     transaction: transaction,
-    tokenExp: moment().add(30, 'minutes'),
+    tokenExp: moment().add(type == 'demo' ? 30 : 45, 'minutes'),
     type: type
   });
 
