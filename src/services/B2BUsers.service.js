@@ -16,6 +16,7 @@ const ChatBotOTP = require('../models/chatBot.OTP.model');
 const moment = require('moment');
 
 const createUser = async (userBody) => {
+  const salt = await bcrypt.genSalt(7);
   let value = Users.create({ ...userBody, ...{ password: await bcrypt.hash(userBody.password.toString(), salt) } });
   return value;
 };
