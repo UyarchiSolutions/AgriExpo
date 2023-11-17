@@ -85,7 +85,7 @@ const updateRolesById = async (roleId, updateBody) => {
   } catch (e) {
     print(e);
   }
-  updateBody.forEach(async (e) => {
+  updateBody.menus.forEach(async (e) => {
     //console.log(e)
     await MenueAssign.create({
       rolesId: roleId,
@@ -531,7 +531,7 @@ const getsalesman = async () => {
         as: 'b2bshopclones_re_da',
       },
     },
-    
+
     {
       $lookup: {
         from: 'b2bshopclones',
@@ -873,12 +873,12 @@ const get_user_menu = async (userRole) => {
         delete: "$menueassigns.delete",
         point: "$menueassigns.point",
         child: "$menueassigns.menues",
-        createdDate:1
+        createdDate: 1
       }
     },
     {
       $sort: {
-        createdDate:1,
+        createdDate: 1,
         point: 1,
       }
     }
