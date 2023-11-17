@@ -637,7 +637,7 @@ const send_livestream_link = async (req) => {
     dateISO: moment(),
     phoneNumber: phoneNumber,
     name: name,
-    streamName: 'Demo Stream - ' + (parseInt(streamCount) + 1),
+    streamName: type=='demo'?'Demo Stream - ' + (parseInt(streamCount) + 1):"ASE Queries Meet -"+(parseInt(streamCount)),
     createdBy: userID,
     _id: id,
     transaction: transaction,
