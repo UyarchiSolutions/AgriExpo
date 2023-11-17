@@ -1551,9 +1551,10 @@ const go_live = async (req) => {
   const uid = await generateUid();
   const role = Agora.RtcRole.PUBLISHER;
   let demostream = await Demostream.findById(req.query.id);
+  let expirationTimestamp;
   if (demostream.agoraID == null) {
     let agoraID = await agoraToken.token_assign(1000, demostream._id, 'demo');
-    let expirationTimestamp = moment().add(30, 'minutes') / 1000;
+    expirationTimestamp = moment().add(30, 'minutes') / 1000;
 
     if (demostream.type == 'demo') {
       agoraID = await agoraToken.token_assign(105, demostream._id, 'demo');
