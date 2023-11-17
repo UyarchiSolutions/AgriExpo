@@ -14513,7 +14513,7 @@ const get_post_view = async (req) => {
         incrementalLots: 1,
         discription: 1,
         location: 1,
-        afterStreaming: 1,
+        // afterStreaming: 1,
         DateIso: 1,
         productTitle: '$products.productTitle',
         video: 1,
@@ -14548,23 +14548,22 @@ const update_post_price = async (req) => {
   if (streampost.suppierId != userId) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Bad Request');
   }
-  if (streampost.afterStreaming == 'yes') {
-    streampost.marketPlace = req.body.marketPlace;
-    streampost.postLiveStreamingPirce = req.body.postLiveStreamingPirce;
-    streampost.minLots = req.body.minLots;
-    streampost.incrementalLots = req.body.incrementalLots;
-    streampost.save();
-    await Streampostprice.create({
-      marketPlace: req.body.marketPlace,
-      postLiveStreamingPirce: req.body.postLiveStreamingPirce,
-      streampostId: streampost._id,
-      minLots: req.body.minLots == null ? 0 : req.body.minLots,
-      incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
-      createdBy: userId,
-      purchased_qty: req.body.purchased_qty,
-      edited_qty: req.body.edited_qty
-    });
-  }
+  streampost.offerPrice = req.body.offerPrice;
+  streampost.marketPlace = req.body.marketPlace;
+  streampost.minLots = req.body.minLots;
+  streampost.incrementalLots = req.body.incrementalLots;
+  streampost.save();
+  await Streampostprice.create({
+    marketPlace: req.body.marketPlace,
+    offerPrice: req.body.offerPrice,
+    streampostId: streampost._id,
+    minLots: req.body.minLots == null ? 0 : req.body.minLots,
+    incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
+    createdBy: userId,
+    purchased_qty: req.body.purchased_qty,
+    edited_qty: req.body.edited_qty
+  });
+
   streampost;
 
   return streampost;
@@ -14573,21 +14572,19 @@ const update_post_price_admin = async (req) => {
   req.body.post;
   let userId = req.userId;
   let streampost = await StreamPost.findById(req.body.post);
-  if (streampost.afterStreaming == 'yes') {
-    streampost.marketPlace = req.body.marketPlace;
-    streampost.postLiveStreamingPirce = req.body.postLiveStreamingPirce;
-    streampost.minLots = req.body.minLots;
-    streampost.incrementalLots = req.body.incrementalLots;
-    streampost.save();
-    await Streampostprice.create({
-      marketPlace: req.body.marketPlace,
-      postLiveStreamingPirce: req.body.postLiveStreamingPirce,
-      streampostId: streampost._id,
-      minLots: req.body.minLots == null ? 0 : req.body.minLots,
-      incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
-      createdBy: userId,
-    });
-  }
+  streampost.marketPlace = req.body.marketPlace;
+  streampost.offerPrice = req.body.offerPrice;
+  streampost.minLots = req.body.minLots;
+  streampost.incrementalLots = req.body.incrementalLots;
+  streampost.save();
+  await Streampostprice.create({
+    marketPlace: req.body.marketPlace,
+    offerPrice: req.body.offerPrice,
+    streampostId: streampost._id,
+    minLots: req.body.minLots == null ? 0 : req.body.minLots,
+    incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
+    createdBy: userId,
+  });
 
   return streampost;
 };

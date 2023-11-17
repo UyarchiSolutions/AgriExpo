@@ -612,7 +612,7 @@ const send_livestream_link_demo = async (req) => {
 
 const send_livestream_link = async (req) => {
   let userID = req.userId;
-  const { phoneNumber, name, transaction } = req.body;
+  const { phoneNumber, name, transaction, type } = req.body;
   let user = await Demoseller.findOne({ phoneNumber: phoneNumber });
   if (!user) {
     user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
@@ -622,7 +622,6 @@ const send_livestream_link = async (req) => {
   }
   const id = generateUniqueID();
   let streamCount = await Demostream.find().count();
-  console.log(moment().add(15, 'minutes').format('hh:mm a'));
   let demostream = await Demostream.create({
     userID: user._id,
     dateISO: moment(),
@@ -633,7 +632,10 @@ const send_livestream_link = async (req) => {
     _id: id,
     transaction: transaction,
     tokenExp: moment().add(30, 'minutes'),
+    type: type
   });
+
+
   // endTime: moment().add(15, 'minutes'),
   const payload = {
     _id: user._id,
@@ -641,8 +643,13 @@ const send_livestream_link = async (req) => {
     type: 'demostream',
   };
   let valitity = jwt.sign(payload, secret, {
-    expiresIn: '30m', // Set token expiration to 30 minutes
+    expiresIn: '45m', // Set token expiration to 30 minutes
   });
+  if (type == 'demo') {
+    valitity = jwt.sign(payload, secret, {
+      expiresIn: '30m', // Set token expiration to 30 minutes
+    });
+  }
   demostream.streamValitity = valitity;
   demostream.save();
   let product = await Product.find().limit(10);
@@ -1543,10 +1550,16 @@ const end_stream = async (req) => {
 const go_live = async (req) => {
   const uid = await generateUid();
   const role = Agora.RtcRole.PUBLISHER;
-  let expirationTimestamp = moment().add(15, 'minutes') / 1000;
   let demostream = await Demostream.findById(req.query.id);
   if (demostream.agoraID == null) {
-    let agoraID = await agoraToken.token_assign(105, demostream._id, 'demo');
+    let agoraID = await agoraToken.token_assign(1000, demostream._id, 'demo');
+    let expirationTimestamp = moment().add(30, 'minutes') / 1000;
+
+    if (demostream.type == 'demo') {
+      agoraID = await agoraToken.token_assign(105, demostream._id, 'demo');
+      expirationTimestamp = moment().add(15, 'minutes') / 1000;
+    }
+
     if (agoraID) {
       demostream.agoraID = agoraID.element._id;
     }
