@@ -112,6 +112,9 @@ const demostreamchema = mongoose.Schema({
   demoType: {
     type: String,
     default: "By Admin"
+  },
+  type: {
+    type: String,
   }
 });
 
