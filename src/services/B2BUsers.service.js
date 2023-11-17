@@ -17,7 +17,9 @@ const moment = require('moment');
 
 const createUser = async (userBody) => {
   const salt = await bcrypt.genSalt(10);
-  let value = Users.create({ ...userBody, ...{ password: await bcrypt.hash(userBody.password.toString(), salt) } });
+  let { password } = body;
+  password = await bcrypt.hash(userBody.password, salt);
+  let value = Users.create({ ...userBody, ...{ password: password } });
   return value;
 };
 
