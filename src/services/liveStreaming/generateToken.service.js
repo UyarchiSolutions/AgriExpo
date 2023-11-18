@@ -303,7 +303,6 @@ const agora_acquire = async (req, id, agroaID) => {
 
 const recording_start = async (req, id) => {
   let token = await tempTokenModel.findOne({ chennel: id, type: 'CloudRecording', recoredStart: { $eq: "acquire" } }).sort({ created: -1 });
-  console.log(token)
   if (token) {
     let str = await Streamrequest.findById(token.streamId);
     let agoraToken = await AgoraAppId.findById(str.agoraID);
@@ -387,18 +386,23 @@ const recording_query = async (req, id, agoraToken) => {
   }).catch((err) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Query:' + err.message);
   });;
-  if (query.data.serverResponse.fileList.length != 0) {
-    token.videoLink = query.data.serverResponse.fileList[0].fileName;
-    token.videoLink_array = query.data.serverResponse.fileList;
-    let m3u8 = query.data.serverResponse.fileList[0].fileName;
-    if (m3u8 != null) {
-      let mp4 = m3u8.replace('.m3u8', '_0.mp4')
-      token.videoLink_mp4 = mp4;
+  if (query.data != null) {
+    if (query.data.serverResponse.fileList.length != 0) {
+      token.videoLink = query.data.serverResponse.fileList[0].fileName;
+      token.videoLink_array = query.data.serverResponse.fileList;
+      let m3u8 = query.data.serverResponse.fileList[0].fileName;
+      if (m3u8 != null) {
+        let mp4 = m3u8.replace('.m3u8', '_0.mp4')
+        token.videoLink_mp4 = mp4;
+      }
+      token.recoredStart = 'query';
+      token.save();
     }
-    token.recoredStart = 'query';
-    token.save();
+    return query.data;
   }
-  return query.data;
+  else {
+    return { message: "Query failed" };
+  }
 };
 
 const recording_stop = async (req) => {
@@ -427,7 +431,7 @@ const recording_stop = async (req) => {
           },
         }
       ).then((res) => {
-        return res.data;
+        return res;
       }).catch((err) => {
 
         throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Stop:' + err.message);
