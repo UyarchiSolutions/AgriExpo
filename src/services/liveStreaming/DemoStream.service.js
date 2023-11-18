@@ -641,19 +641,17 @@ const send_livestream_link = async (req) => {
     createdBy: userID,
     _id: id,
     transaction: transaction,
-    tokenExp: moment().add(type == 'demo' ? 30 : 45, 'minutes'),
+    tokenExp: type == 'demo' ? moment().add(30, 'minutes') : moment().add(10, 'days'),
     type: type
   });
 
-
-  // endTime: moment().add(15, 'minutes'),
   const payload = {
     _id: user._id,
     streamID: demostream._id,
     type: 'demostream',
   };
   let valitity = jwt.sign(payload, secret, {
-    expiresIn: '45m', // Set token expiration to 30 minutes
+    expiresIn: '10d',
   });
   if (type == 'demo') {
     valitity = jwt.sign(payload, secret, {
