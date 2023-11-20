@@ -115,6 +115,10 @@ const demostreamchema = mongoose.Schema({
   },
   type: {
     type: String,
+  },
+  chat: {
+    type: Boolean,
+    default: false
   }
 });
 

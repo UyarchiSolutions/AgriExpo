@@ -644,7 +644,6 @@ const send_livestream_link = async (req) => {
     tokenExp: type == 'demo' ? moment().add(30, 'minutes') : moment().add(10, 'days'),
     type: type
   });
-
   const payload = {
     _id: user._id,
     streamID: demostream._id,
@@ -655,7 +654,7 @@ const send_livestream_link = async (req) => {
   });
   if (type == 'demo') {
     valitity = jwt.sign(payload, secret, {
-      expiresIn: '30m', // Set token expiration to 30 minutes
+      expiresIn: '30m',
     });
   }
   demostream.streamValitity = valitity;
@@ -2822,6 +2821,12 @@ const issueResolve = async (id, body) => {
   return issue;
 };
 
+const turn_on_chat = async (req) => {
+  let stream = await Demostream.findById(req.query.id);
+  stream.chat = !stream.chat;
+  stream.save();
+  req.io.emit(req.query.id + "_enable_chat", { chat: stream.chat });
+}
 module.exports = {
   send_livestream_link,
   send_livestream_link_demo,
@@ -2872,5 +2877,6 @@ module.exports = {
   demorequest,
   get_demo_request,
   send_request_link,
-  get_demo_requests
+  get_demo_requests,
+  turn_on_chat
 };

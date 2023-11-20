@@ -11,7 +11,10 @@ const send_livestream_link_demo = catchAsync(async (req, res) => {
   const data = await demostream.send_livestream_link_demo(req);
   res.status(httpStatus.CREATED).send(data);
 });
-
+const turn_on_chat = catchAsync(async (req, res) => {
+  const data = await demostream.turn_on_chat(req);
+  res.status(httpStatus.CREATED).send(data);
+});
 const get_demo_requests = catchAsync(async (req, res) => {
   const data = await demostream.get_demo_requests(req);
   res.status(httpStatus.CREATED).send(data);
@@ -297,5 +300,6 @@ module.exports = {
   get_demo_request,
   send_request_link,
   send_livestream_link_demo,
-  get_demo_requests
+  get_demo_requests,
+  turn_on_chat
 };
