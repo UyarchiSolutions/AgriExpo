@@ -13,7 +13,7 @@ const { SellerAuth } = require("../../../controllers/sellerAuth.controller")
 router.route('/send/livestream/link').post(authorization, demostream.send_livestream_link);
 router.route('/demo/request').post(SellerAuth, demostream.send_livestream_link_demo);
 
-router.route('/chat/turn/on').get(SellerAuth, demostream.turn_on_chat);
+router.route('/chat/turn/on').get(demostream.turn_on_chat);
 
 
 
