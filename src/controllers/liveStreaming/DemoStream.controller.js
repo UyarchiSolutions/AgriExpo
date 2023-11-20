@@ -7,6 +7,20 @@ const send_livestream_link = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(data);
 });
 
+const send_livestream_link_demo = catchAsync(async (req, res) => {
+  const data = await demostream.send_livestream_link_demo(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+const turn_on_chat = catchAsync(async (req, res) => {
+  const data = await demostream.turn_on_chat(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+const get_demo_requests = catchAsync(async (req, res) => {
+  const data = await demostream.get_demo_requests(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
+
 const demorequest = catchAsync(async (req, res) => {
   const data = await demostream.demorequest(req);
   res.status(httpStatus.CREATED).send(data);
@@ -109,7 +123,7 @@ const go_live = catchAsync(async (req, res) => {
 });
 
 const get_DemoStream_By_Admin = catchAsync(async (req, res) => {
-  const data = await demostream.get_DemoStream_By_Admin(req.params.page,req.userId);
+  const data = await demostream.get_DemoStream_By_Admin(req.params.page, req.userId);
   res.send(data);
 });
 
@@ -284,5 +298,8 @@ module.exports = {
   issueResolve,
   demorequest,
   get_demo_request,
-  send_request_link
+  send_request_link,
+  send_livestream_link_demo,
+  get_demo_requests,
+  turn_on_chat
 };

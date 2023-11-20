@@ -8,7 +8,16 @@ const authorization = require('../../../controllers/tokenVerify.controller');
 const router = express.Router();
 const demostream = require('../../../controllers/liveStreaming/DemoStream.controller');
 
+const { SellerAuth } = require("../../../controllers/sellerAuth.controller")
+
 router.route('/send/livestream/link').post(authorization, demostream.send_livestream_link);
+router.route('/demo/request').post(SellerAuth, demostream.send_livestream_link_demo);
+
+router.route('/chat/turn/on').get(demostream.turn_on_chat);
+
+
+
+router.route('/demo/request').get(SellerAuth, demostream.get_demo_requests);
 router.route('/get/livestream/details').get(demostream.get_stream_details);
 router.route('/verify/token/stream').get(demostream.get_stream_verify);
 router.route('/verify/token/stream/buyer').get(demostream.get_stream_verify_buyer);

@@ -83,9 +83,15 @@ const get_sub_golive = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(tokens);
 });
 
+const get_sub_golive_details= catchAsync(async (req, res) => {
+  const tokens = await generateTokenService.get_sub_golive_details(req, req.io);
+  res.status(httpStatus.CREATED).send(tokens);
+});
+
+
 const get_sub_token_single = catchAsync(async (req, res) => {
   let tokens = await generateTokenService.generateToken_sub(req);
-  req.io.emit('subscriberjoined', { user: 'sd' });
+  // req.io.emit('subscriberjoined', { user: 'sd' });
   res.status(httpStatus.CREATED).send(tokens);
 });
 
@@ -247,5 +253,6 @@ module.exports = {
 
   // raise Hands admin
   start_rice_user_hands_admin,
-  get_raise_hands_admin
+  get_raise_hands_admin,
+  get_sub_golive_details
 };

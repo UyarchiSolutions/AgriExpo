@@ -599,6 +599,10 @@ const streamRequestschema = mongoose.Schema({
   timeline: {
     type: Array,
     default: [],
+  },
+  streamCurrent_Watching: {
+    type: Number,
+    default: 0
   }
 });
 

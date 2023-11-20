@@ -80,7 +80,10 @@ const get_all_Post_with_page = catchAsync(async (req, res) => {
     value = await Ecomserive.get_all_Post_with_page(req, status);
   }
   if (status == 'assigned') {
-    value = await Ecomserive.get_all_Post_with_page_assigned(req);
+    value = await Ecomserive.get_all_Post_with_page_assigned(req, 'assigned');
+  }
+  if (status == 'timeout') {
+    value = await Ecomserive.get_all_Post_with_page_assigned(req, 'timeout');
   }
   if (status == 'live') {
     value = await Ecomserive.get_all_Post_with_page_live(req);
@@ -175,7 +178,7 @@ const get_all_stream = catchAsync(async (req, res) => {
 });
 
 
-const remove_post_stream= catchAsync(async (req, res) => {
+const remove_post_stream = catchAsync(async (req, res) => {
   const value = await Ecomserive.remove_post_stream(req);
   res.send(value);
 });
@@ -284,11 +287,31 @@ const go_live_stream_host = catchAsync(async (req, res) => {
   res.send(value);
 });
 
+
+const front_end_code = catchAsync(async (req, res) => {
+  //console.log('sdas');
+  const value = await Ecomserive.front_end_code(req, req.userId);
+  res.send(value);
+});
+const go_live_stream_host_details = catchAsync(async (req, res) => {
+  //console.log('sdas');
+  const value = await Ecomserive.go_live_stream_host_details(req, req.userId);
+  res.send(value);
+});
+
 const get_subhost_token = catchAsync(async (req, res) => {
   //console.log('sdas');
   const value = await Ecomserive.get_subhost_token(req, req.userId);
   res.send(value);
 });
+
+
+const get_subhost_token_details= catchAsync(async (req, res) => {
+  //console.log('sdas');
+  const value = await Ecomserive.get_subhost_token_details(req, req.userId);
+  res.send(value);
+});
+
 
 const go_live_stream_host_subhost = catchAsync(async (req, res) => {
   //console.log('sdas');
@@ -913,5 +936,8 @@ module.exports = {
   get_Saved_Product,
   remove_stream_admin,
   search_product_list,
-  remove_post_stream
+  remove_post_stream,
+  go_live_stream_host_details,
+  get_subhost_token_details,
+  front_end_code
 };

@@ -23,6 +23,9 @@ const demosellerschema = mongoose.Schema({
   name: {
     type: String,
   },
+  type: {
+    type: String,
+  }
 });
 
 const Demoseller = mongoose.model('demoseller', demosellerschema);
@@ -109,6 +112,13 @@ const demostreamchema = mongoose.Schema({
   demoType: {
     type: String,
     default: "By Admin"
+  },
+  type: {
+    type: String,
+  },
+  chat: {
+    type: Boolean,
+    default: false
   }
 });
 
