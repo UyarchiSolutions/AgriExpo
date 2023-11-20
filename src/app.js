@@ -45,7 +45,12 @@ server.listen(config.port, () => {
 
 io.use(async (socket, next) => {
   const token = socket.handshake.auth.token;
-  await socketService.auth_details(socket, token, next)
+  if (token != null) {
+    await socketService.auth_details(socket, token, next)
+  }
+  else {
+    next();
+  }
 })
 io.sockets.on('connection', async (socket) => {
   await socketService.cost_connect_live_now(socket)
