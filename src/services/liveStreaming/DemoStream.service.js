@@ -2826,6 +2826,8 @@ const turn_on_chat = async (req) => {
   stream.chat = !stream.chat;
   stream.save();
   req.io.emit(req.query.id + "_enable_chat", { chat: stream.chat });
+
+  return stream;
 }
 module.exports = {
   send_livestream_link,
