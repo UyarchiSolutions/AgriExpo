@@ -66,6 +66,7 @@
     "body-parser": "^1.20.1",
     "ccavenue": "^1.0.2",
     "compression": "^1.7.4",
+    "config": "3.3.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "countries-and-states": "^1.0.6",
