@@ -6402,7 +6402,7 @@ const get_watch_live_steams_completed = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }, { status: { $ne: 'Removed' } }] } }],
+              pipeline: [{ $match: { $and: [{ status: { $ne: 'Removed' } }] } }],
               as: 'streamposts',
             },
           },
@@ -6441,7 +6441,6 @@ const get_watch_live_steams_completed = async (req) => {
               localField: 'postId',
               foreignField: '_id',
               pipeline: [
-                { $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } },
                 {
                   $lookup: {
                     from: 'products',
@@ -6642,7 +6641,6 @@ const get_watch_live_steams_completed = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } }],
               as: 'streamposts',
             },
           },
@@ -8044,7 +8042,7 @@ const getall_homeage_streams = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }, { status: { $ne: 'Removed' } }] } }],
+              pipeline: [{ $match: { $and: [{ status: { $ne: 'Removed' } }] } }],
               as: 'streamposts',
             },
           },
@@ -8083,7 +8081,6 @@ const getall_homeage_streams = async (req) => {
               localField: 'postId',
               foreignField: '_id',
               pipeline: [
-                { $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } },
                 {
                   $lookup: {
                     from: 'products',
@@ -8300,7 +8297,7 @@ const getall_homeage_streams = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }, { status: { $ne: 'Removed' } }] } }],
+              pipeline: [{ $match: { $and: [ { status: { $ne: 'Removed' } }] } }],
               as: 'streamposts',
             },
           },
@@ -8339,7 +8336,6 @@ const getall_homeage_streams = async (req) => {
               localField: 'postId',
               foreignField: '_id',
               pipeline: [
-                { $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } },
                 {
                   $lookup: {
                     from: 'products',
