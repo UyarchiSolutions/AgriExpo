@@ -17,7 +17,7 @@ const {
 const { SlotBooking } = require('../models/SlotBooking.model');
 
 const { Slot } = require('../models/slot.model');
-const axios = require('axios'); //
+const axios = require('axios');
 const { streamingOrder, streamingorderProduct, streamingorderPayments } = require('../models/liveStreaming/checkout.model');
 const { Joinusers } = require('../models/liveStreaming/generateToken.model');
 const ApiError = require('../utils/ApiError');
@@ -43,7 +43,10 @@ const { v4 } = require("uuid")
 
 const create_Plans = async (req) => {
   const { slotInfo, stream_validity } = req.body;
-  const value = await Streamplan.create({ ...req.body, ...{ planType: 'normal', timeline: [{ status: "Created", Time: new Date().getTime(), timelieId: req.timeline }] } });
+  const value = await Streamplan.create({
+    ...req.body,
+    ...{ planType: 'normal', timeline: [{ status: 'Created', Time: new Date().getTime(), timelieId: req.timeline }] },
+  });
   slotInfo.forEach(async (e) => {
     let datas = { slotType: e.slotType, Duration: e.Duration, No_Of_Slot: e.No_Of_Slot, streamPlanId: value._id };
     console.log(datas);
@@ -203,18 +206,17 @@ const create_post = async (req) => {
       req.body.video = old_post.video;
       showImage = old_post.showImage;
     }
-  }
-  else {
-    images = await multible_image_array(req.files)
+  } else {
+    images = await multible_image_array(req.files);
   }
 
   if (images.length != 0) {
     showImage = images[0];
   }
-  console.log(images, 9876)
+  console.log(images, 9876);
   const value = await StreamPost.create({
     ...req.body,
-    ...{ suppierId: req.userId, images: images, pendingQTY: req.body.quantity, showImage: showImage, timeline: [{ status: "Created", Time: new Date().getTime(), timelieId: req.timeline }] },
+    ...{ suppierId: req.userId, images: images, pendingQTY: req.body.quantity, timeline: [{ status: "Created", Time: new Date().getTime(), timelieId: req.timeline }] },
   });
   await Dates.create_date(value);
   if (req.body.afterStreaming == 'yes') {
@@ -226,6 +228,7 @@ const create_post = async (req) => {
       minLots: req.body.minLots == null ? 0 : req.body.minLots,
       incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
       createdBy: req.userId,
+      showImage: showImage
     });
   }
   return value;
@@ -233,30 +236,25 @@ const create_post = async (req) => {
 
 const multible_image_array = (filePaths) => {
   const uploadPromises = filePaths.map(async (filePath, index) => await uploadToS3(filePath, index));
-  let urls = []
+  let urls = [];
   return Promise.all(uploadPromises)
-    .then(results => {
-      results.forEach(result => {
-        urls.push(result)
+    .then((results) => {
+      results.forEach((result) => {
+        urls.push(result);
       });
       return urls;
-
     })
-    .catch(error => {
+    .catch((error) => {
       console.error(error);
     });
-}
-
-
+};
 
 function uploadToS3(filePath) {
-
   const s3 = new AWS.S3({
     accessKeyId: 'AKIA3323XNN7Y2RU77UG',
     secretAccessKey: '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',
     region: 'ap-south-1',
   });
-
 
   return new Promise((resolve, reject) => {
     const params = {
@@ -273,8 +271,6 @@ function uploadToS3(filePath) {
     });
   });
 }
-
-
 
 const create_teaser_upload = async (req, images) => {
   const s3 = new AWS.S3({
@@ -1605,8 +1601,7 @@ const update_one_Post = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Not Found');
   }
   if (req.files.length != 0) {
-
-    let images = await multible_image_array(req.files)
+    let images = await multible_image_array(req.files);
     value.images = images;
     if (images.length != 0) {
       value.showImage = images[0];
@@ -1628,7 +1623,7 @@ const remove_one_post = async (req) => {
     { status: 'Removed' },
     { new: true }
   );
-  value.timeline.push({ status: "Removed", Time: new Date().getTime(), timelieId: req.timeline })
+  value.timeline.push({ status: 'Removed', Time: new Date().getTime(), timelieId: req.timeline });
   value.save();
   return { message: 'Removed' };
 };
@@ -1657,7 +1652,6 @@ const create_stream_one = async (req) => {
   let totalMinutes = numberOfParticipants + no_of_host + Duration;
   let agoraID = await agoraToken.token_assign(totalMinutes, '', 'agri');
 
-
   let datess = new Date().setTime(new Date(startTime).getTime() + slot.Duration * 60 * 1000);
   let expiretime = datess;
   if (plan.completedStream == 'yes') {
@@ -1668,7 +1662,7 @@ const create_stream_one = async (req) => {
     value = await Streamrequest.create({
       ...req.body,
       ...{
-        timeline: [{ status: "Created", Time: new Date().getTime(), timelieId: req.timeline }],
+        timeline: [{ status: 'Created', Time: new Date().getTime(), timelieId: req.timeline }],
         suppierId: req.userId,
         postCount: req.body.post.length,
         startTime: startTime,
@@ -1693,20 +1687,20 @@ const create_stream_one = async (req) => {
         Service_Charges: plan.Service_Charges == null ? 0 : plan.Service_Charges,
         Interest_View_Count: plan.Interest_View_Count,
         No_of_Limitations: plan.No_of_Limitations == null ? 0 : plan.No_of_Limitations,
-        adminApprove: "Approved"
+        adminApprove: 'Approved',
       },
     });
     await UsageAppID.findByIdAndUpdate({ _id: agoraID.vals._id }, { streamID: value._id }, { new: true });
     req.body.post.forEach(async (a) => {
       let streamposts = await StreamPost.findByIdAndUpdate({ _id: a }, { isUsed: true, status: 'Assigned' }, { new: true });
-      streamposts.timeline.push({ status: "Assigned", Time: new Date().getTime(), timelieId: req.timeline })
+      streamposts.timeline.push({ status: 'Assigned', Time: new Date().getTime(), timelieId: req.timeline });
       streamposts.save();
       let post = await StreamrequestPost.create({ suppierId: req.userId, streamRequest: value._id, postId: a });
       await Dates.create_date(post);
     });
     await Dates.create_date(value);
     slot_booking = await SlotBooking.findByIdAndUpdate({ _id: slot_booking._id }, { status: 'Booked' }, { new: true });
-    slot_booking.timeline.push({ status: "Booked", Time: new Date().getTime(), timelieId: req.timeline });
+    slot_booking.timeline.push({ status: 'Booked', Time: new Date().getTime(), timelieId: req.timeline });
     slot_booking.save();
   } else {
     throw new ApiError(httpStatus.NOT_FOUND, 'App id Not found');
@@ -1829,18 +1823,15 @@ const remove_post_stream = async (req) => {
   }
 
   if (req.params.type == 'image') {
-    value = await Streamrequest.findByIdAndUpdate({ _id: value._id }, { $unset: { image: 1 } })
+    value = await Streamrequest.findByIdAndUpdate({ _id: value._id }, { $unset: { image: 1 } });
   }
   if (req.params.type == 'teaser') {
-    value = await Streamrequest.findByIdAndUpdate({ _id: value._id }, { $unset: { teaser: 1 } })
+    value = await Streamrequest.findByIdAndUpdate({ _id: value._id }, { $unset: { teaser: 1 } });
   }
 
   if (req.params.type == 'brochure') {
-    value = await Streamrequest.findByIdAndUpdate({ _id: value._id }, { $unset: { broucher: 1, broucherName: 1 } })
+    value = await Streamrequest.findByIdAndUpdate({ _id: value._id }, { $unset: { broucher: 1, broucherName: 1 } });
   }
-
-
-
 
   return value;
 };
@@ -1956,8 +1947,7 @@ const get_all_stream = async (req) => {
               dispatchPincode: '$streamposts.dispatchPincode',
               transaction: '$streamposts.transaction',
               dispatchLocation: '$streamposts.dispatchLocation',
-              unit: '$streamposts.unit'
-
+              unit: '$streamposts.unit',
             },
           },
           // {
@@ -1971,7 +1961,7 @@ const get_all_stream = async (req) => {
     },
     {
       $addFields: {
-        streamExpire_Date: "$streamExpire",
+        streamExpire_Date: '$streamExpire',
       },
     },
     {
@@ -1979,7 +1969,6 @@ const get_all_stream = async (req) => {
         streamExpire: { $gt: ['$streamExpire', date_now] },
       },
     },
-
 
     { $skip: 10 * page },
     { $limit: 10 },
@@ -2264,7 +2253,7 @@ const get_all_admin = async (req) => {
               dispatchPincode: '$streamposts.dispatchPincode',
               transaction: '$streamposts.transaction',
               dispatchLocation: '$streamposts.dispatchLocation',
-              unit: '$streamposts.unit'
+              unit: '$streamposts.unit',
             },
           },
         ],
@@ -2323,7 +2312,7 @@ const get_all_admin = async (req) => {
         chat_need: 1,
         transaction: 1,
         Location: 1,
-        slots: "$slots"
+        slots: '$slots',
       },
     },
 
@@ -2441,7 +2430,7 @@ const get_all_admin = async (req) => {
 
 const update_approved = async (req) => {
   let value = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, { adminApprove: 'Approved' }, { new: true });
-  value.timeline.push({ status: "Approved", Time: new Date().getTime(), timelieId: req.timeline })
+  value.timeline.push({ status: 'Approved', Time: new Date().getTime(), timelieId: req.timeline });
   value.save();
   return value;
 };
@@ -2449,7 +2438,7 @@ const update_approved = async (req) => {
 const update_reject = async (req) => {
   let value = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, { adminApprove: 'Rejected' }, { new: true });
 
-  value.timeline.push({ status: "Rejected", Time: new Date().getTime(), timelieId: req.timeline })
+  value.timeline.push({ status: 'Rejected', Time: new Date().getTime(), timelieId: req.timeline });
   value.save();
   return value;
 };
@@ -2460,36 +2449,38 @@ const allot_stream_subhost = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
   }
   value = await Streamrequest.findByIdAndUpdate({ _id: req.query.id }, req.body, { new: true });
-  value.timeline.push({ status: "Assigned", Time: new Date().getTime(), timelieId: req.timeline })
-  value.save()
+  value.timeline.push({ status: 'Assigned', Time: new Date().getTime(), timelieId: req.timeline });
+  value.save();
 
   return value;
 };
 
 const cancel_stream = async (req) => {
   let value = await Streamrequest.findByIdAndUpdate({ _id: req.body.id }, { status: 'Cancelled' }, { new: true });
-  value.timeline.push({ status: "Cancelled", Time: new Date().getTime(), timelieId: req.timeline })
+  value.timeline.push({ status: 'Cancelled', Time: new Date().getTime(), timelieId: req.timeline });
   value.save();
   let assginStream = await StreamrequestPost.find({ streamRequest: req.body.id });
   assginStream.forEach(async (a) => {
     let streamposts = await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Cancelled' }, { new: true });
-    streamposts.timeline.push({ status: "Cancelled", Time: new Date().getTime(), timelieId: req.timeline })
+    streamposts.timeline.push({ status: 'Cancelled', Time: new Date().getTime(), timelieId: req.timeline });
     streamposts.save();
   });
   return value;
 };
 
 const remove_stream = async (req) => {
-  let value = await Streamrequest.findById(req.body.id);
-  if (!value) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Stream Not Found');
-  }
-  // value = await Streamrequest.findByIdAndUpdate({ _id: req.body.id }, { status: 'Removed' }, { new: true });
+  let value = await Streamrequest.findByIdAndUpdate({ _id: req.body.id }, { status: 'Removed' }, { new: true });
   value.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "My Self", timelieId: req.timeline })
+  value.save();
   let assginStream = await StreamrequestPost.find({ streamRequest: req.body.id });
   assginStream.forEach(async (a) => {
     let streamposts = await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Removed' }, { new: true });
-    streamposts.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "My Self", timelieId: req.timeline })
+    streamposts.timeline.push({
+      status: 'Removed',
+      Time: new Date().getTime(),
+      removedBy: 'My Self',
+      timelieId: req.timeline,
+    });
     streamposts.save();
   });
   value.status = 'Removed';
@@ -2499,15 +2490,14 @@ const remove_stream = async (req) => {
   return value;
 };
 
-
 const remove_stream_admin = async (req) => {
   let value = await Streamrequest.findByIdAndUpdate({ _id: req.body.id }, { status: 'Removed' }, { new: true });
-  value.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "Admin", timelieId: req.timeline })
+  value.timeline.push({ status: 'Removed', Time: new Date().getTime(), removedBy: 'Admin', timelieId: req.timeline });
   value.save();
   let assginStream = await StreamrequestPost.find({ streamRequest: req.body.id });
   assginStream.forEach(async (a) => {
     let streamposts = await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Removed' }, { new: true });
-    streamposts.timeline.push({ status: "Removed", Time: new Date().getTime(), removedBy: "Admin" })
+    streamposts.timeline.push({ status: 'Removed', Time: new Date().getTime(), removedBy: 'Admin' });
     streamposts.save();
   });
   value.removedBy = 'Admin';
@@ -2527,41 +2517,51 @@ const end_stream = async (req) => {
     { status: 'Completed', streamEnd_Time: moment(), end_Status: 'HostLeave' },
     { new: true }
   );
-  value.timeline.push({ status: "Completed", Time: new Date().getTime(), end_Status: 'HostLeave', timelieId: req.timeline })
+  value.timeline.push({ status: 'Completed', Time: new Date().getTime(), end_Status: 'HostLeave', timelieId: req.timeline });
   value.save();
   req.io.emit(req.query.id + '_stream_end', { value: true });
   let assginStream = await StreamrequestPost.find({ streamRequest: req.query.id });
   assginStream.forEach(async (a) => {
     let streamposts = await StreamPost.findByIdAndUpdate({ _id: a.postId }, { status: 'Completed' }, { new: true });
-    streamposts.timeline.push({ status: "Completed", Time: new Date().getTime(), end_Status: 'HostLeave', timelieId: req.timeline })
+    streamposts.timeline.push({
+      status: 'Completed',
+      Time: new Date().getTime(),
+      end_Status: 'HostLeave',
+      timelieId: req.timeline,
+    });
     streamposts.save();
   });
-  console.log(value, 23213)
+  console.log(value, 23213);
   const mode = 'mix';
-  let token = await tempTokenModel.findOne({ chennel: req.query.id, type: 'CloudRecording', recoredStart: { $eq: 'query' } }).sort({ created: -1 });
+  let token = await tempTokenModel
+    .findOne({ chennel: req.query.id, type: 'CloudRecording', recoredStart: { $eq: 'query' } })
+    .sort({ created: -1 });
   if (token != null) {
     let agoraToken = await AgoraAppId.findById(value.agoraID);
-    console.log(agoraToken, 23142)
+    console.log(agoraToken, 23142);
     const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString('base64')}`;
     const resource = token.resourceId;
     const sid = token.sid;
-    const stop = await axios.post(
-      `https://api.agora.io/v1/apps/${agoraToken.appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
-      {
-        cname: token.chennel,
-        uid: token.Uid.toString(),
-        clientRequest: {},
-      },
-      {
-        headers: {
-          Authorization,
+    const stop = await axios
+      .post(
+        `https://api.agora.io/v1/apps/${agoraToken.appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
+        {
+          cname: token.chennel,
+          uid: token.Uid.toString(),
+          clientRequest: {},
         },
-      }
-    ).then((res) => {
-      return res.data;
-    }).catch((err) => {
-      throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Stop:' + err.message);
-    });
+        {
+          headers: {
+            Authorization,
+          },
+        }
+      )
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Stop:' + err.message);
+      });
     token.recoredStart = 'stop';
     token.save();
     return stop;
@@ -2650,7 +2650,11 @@ const get_all_streams = async (req) => {
           $or: [
             { status: { $eq: 'Completed' } },
             {
-              $and: [{ tokenGeneration: { $eq: true } }, { streamEnd_Time: { $lte: date_now } }, { status: { $ne: 'Cancelled' } }],
+              $and: [
+                { tokenGeneration: { $eq: true } },
+                { streamEnd_Time: { $lte: date_now } },
+                { status: { $ne: 'Cancelled' } },
+              ],
             },
           ],
         },
@@ -2762,7 +2766,7 @@ const get_all_streams = async (req) => {
                     dispatchPincode: 1,
                     transaction: 1,
                     dispatchLocation: 1,
-                    unit: 1
+                    unit: 1,
                   },
                 },
               ],
@@ -2801,7 +2805,6 @@ const get_all_streams = async (req) => {
               transaction: '$streamposts.transaction',
               dispatchLocation: '$streamposts.dispatchLocation',
               unit: '$streamposts.unit',
-
             },
           },
         ],
@@ -2940,7 +2943,7 @@ const get_all_streams = async (req) => {
     },
     {
       $addFields: {
-        streamExpire_Date: "$streamExpire",
+        streamExpire_Date: '$streamExpire',
       },
     },
     {
@@ -3015,8 +3018,7 @@ const get_all_streams = async (req) => {
         streamEnd_Time: 1,
         transaction: 1,
         Location: 1,
-        slots: "$slots",
-        slotType: 1
+        slots: "$slots"
       },
     },
 
@@ -5158,7 +5160,6 @@ const get_watch_live_steams_upcoming_byid = async (req) => {
   return value[0];
 };
 
-
 const get_watch_live_steams_current = async (req) => {
   var date_now = new Date().getTime();
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : parseInt(req.query.page);
@@ -6297,8 +6298,8 @@ const get_watch_live_steams_completed = async (req) => {
           { status: { $ne: 'Cancelled' } },
           { show_completd: { $eq: true } },
           { status: { $ne: 'Removed' } },
-          { completedStream: { $eq: "yes" } },
-          { streamExpire: { $gt: date_now } }
+          { completedStream: { $eq: 'yes' } },
+          { streamExpire: { $gt: date_now } },
         ],
       },
     },
@@ -6531,7 +6532,17 @@ const get_watch_live_steams_completed = async (req) => {
   ]);
   let total = await Streamrequest.aggregate([
     { $sort: { startTime: 1 } },
-    { $match: { $and: [statusFilter, { adminApprove: { $eq: 'Approved' } }, { show_completd: { $eq: true } }, { completedStream: { $eq: "yes" } }, { streamExpire: { $gt: date_now } }] } },
+    {
+      $match: {
+        $and: [
+          statusFilter,
+          { adminApprove: { $eq: 'Approved' } },
+          { show_completd: { $eq: true } },
+          { completedStream: { $eq: 'yes' } },
+          { streamExpire: { $gt: date_now } },
+        ],
+      },
+    },
     {
       $lookup: {
         from: 'joinedusers',
@@ -7943,8 +7954,8 @@ const getall_homeage_streams = async (req) => {
           { status: { $ne: 'Cancelled' } },
           { show_completd: { $eq: true } },
           { status: { $ne: 'Removed' } },
-          { completedStream: { $eq: "yes" } },
-          { streamExpire: { $gt: date_now } }
+          { completedStream: { $eq: 'yes' } },
+          { streamExpire: { $gt: date_now } },
         ],
       },
     },
@@ -8185,8 +8196,8 @@ const getall_homeage_streams = async (req) => {
           { adminApprove: { $eq: 'Approved' } },
           { status: { $ne: 'Cancelled' } },
           { show_completd: { $eq: true } },
-          { completedStream: { $eq: "yes" } },
-          { streamExpire: { $gt: date_now } }
+          { completedStream: { $eq: 'yes' } },
+          { streamExpire: { $gt: date_now } },
         ],
       },
     },
@@ -9598,8 +9609,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+        ? 'RAC'
+        : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -9608,8 +9619,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-            ? 'RAC'
-            : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -9682,7 +9693,9 @@ const unregisetr_strean_instrest = async (req) => {
     }
   }
   await single_stream_details(req);
-  let update = await StreamPreRegister.find({ streamId: participents._id, eligible: false }).sort({ DateIso: -1 }).limit(participents.noOfParticipants / 2);
+  let update = await StreamPreRegister.find({ streamId: participents._id, eligible: false })
+    .sort({ DateIso: -1 })
+    .limit(participents.noOfParticipants / 2);
   update.forEach(async (e) => {
     e.viewstatus = 'RAC';
     e.save();
@@ -9783,7 +9796,6 @@ const purchase_details = async (req) => {
       $addFields: {
         // planValidity: '$streamplans.validityofplan',
         planValidity: 'null',
-
       },
     },
     { $skip: 10 * page },
@@ -10398,8 +10410,7 @@ const get_completed_stream_buyer = async (req) => {
         // temptokens: '$temptokens',
         showLink: 1,
         selectvideo: 1,
-        userinteractions: "$userinteractions._id",
-        transaction: 1
+        userinteractions: "$userinteractions._id"
       },
     },
   ]);
@@ -11482,7 +11493,7 @@ const get_completed_stream_completed = async (req) => {
     },
     {
       $addFields: {
-        streamExpire_Date: "$streamExpire",
+        streamExpire_Date: '$streamExpire',
       },
     },
     {
@@ -11532,8 +11543,7 @@ const get_completed_stream_completed = async (req) => {
         temptokens: '$temptokens',
         streamExpire: 1,
         completedStream: 1,
-        streamExpire_Date: 1
-
+        streamExpire_Date: 1,
       },
     },
     { $sort: { DateIso: -1 } },
@@ -14482,7 +14492,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => { };
+const get_video_link = async (req) => {};
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
@@ -14548,22 +14558,23 @@ const update_post_price = async (req) => {
   if (streampost.suppierId != userId) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Bad Request');
   }
-  streampost.offerPrice = req.body.offerPrice;
-  streampost.marketPlace = req.body.marketPlace;
-  streampost.minLots = req.body.minLots;
-  streampost.incrementalLots = req.body.incrementalLots;
-  streampost.save();
-  await Streampostprice.create({
-    marketPlace: req.body.marketPlace,
-    offerPrice: req.body.offerPrice,
-    streampostId: streampost._id,
-    minLots: req.body.minLots == null ? 0 : req.body.minLots,
-    incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
-    createdBy: userId,
-    purchased_qty: req.body.purchased_qty,
-    edited_qty: req.body.edited_qty
-  });
-
+  if (streampost.afterStreaming == 'yes') {
+    streampost.marketPlace = req.body.marketPlace;
+    streampost.postLiveStreamingPirce = req.body.postLiveStreamingPirce;
+    streampost.minLots = req.body.minLots;
+    streampost.incrementalLots = req.body.incrementalLots;
+    streampost.save();
+    await Streampostprice.create({
+      marketPlace: req.body.marketPlace,
+      postLiveStreamingPirce: req.body.postLiveStreamingPirce,
+      streampostId: streampost._id,
+      minLots: req.body.minLots == null ? 0 : req.body.minLots,
+      incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
+      createdBy: userId,
+      purchased_qty: req.body.purchased_qty,
+      edited_qty: req.body.edited_qty
+    });
+  }
   streampost;
 
   return streampost;
@@ -14593,33 +14604,33 @@ const post_payment_details = async (req) => {
     { $match: { $and: [{ _id: req.query.id }] } },
     {
       $lookup: {
-        from: "streamrequestposts",
-        localField: "_id",
-        foreignField: "postId",
+        from: 'streamrequestposts',
+        localField: '_id',
+        foreignField: 'postId',
         pipeline: [
           {
             $lookup: {
-              from: "streamrequests",
-              localField: "streamRequest",
-              foreignField: "_id",
-              as: "streams"
-            }
+              from: 'streamrequests',
+              localField: 'streamRequest',
+              foreignField: '_id',
+              as: 'streams',
+            },
           },
           {
             $unwind: {
               preserveNullAndEmptyArrays: true,
-              path: "$streams"
-            }
-          }
+              path: '$streams',
+            },
+          },
         ],
-        as: "post",
-      }
+        as: 'post',
+      },
     },
     {
       $unwind: {
         preserveNullAndEmptyArrays: true,
-        path: "$post"
-      }
+        path: '$post',
+      },
     },
     {
       $lookup: {
@@ -14687,13 +14698,13 @@ const post_payment_details = async (req) => {
         afterStreaming: 1,
         suppierId: 1,
         streamName: 1,
-        post: "$post",
+        post: '$post',
         createdAt: 1,
         streamName: 1,
-        post: "$post",
+        post: '$post',
         createdAt: 1,
-        edited_qty: { $ifNull: ["streampostprices.edited_qty", null] },
-        purchased_qty: { $ifNull: ["streampostprices.purchased_qty", null] },
+        edited_qty: { $ifNull: ['streampostprices.edited_qty', null] },
+        purchased_qty: { $ifNull: ['streampostprices.purchased_qty', null] },
       },
     },
   ]);
@@ -15464,7 +15475,7 @@ const get_address_log = async (req) => {
 
 const purchesPlane_exhibitor = async (req, res) => {
   const { amount, plan, redirct } = req.body;
-  let plandetails = await Streamplan.findById(plan)
+  let plandetails = await Streamplan.findById(plan);
   if (!plandetails) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
   }
@@ -15575,29 +15586,26 @@ const get_Saved_Product = async (userId) => {
   return values;
 };
 
-
 const search_product_list = async (req) => {
-
-  console.log(moment(1696500000000).format("YYYY-MM-DD hh:mm a"))
-  console.log(moment(1696588200000).format("YYYY-MM-DD hh:mm a"))
-  let language = { active: true }
+  console.log(moment(1696500000000).format('YYYY-MM-DD hh:mm a'));
+  console.log(moment(1696588200000).format('YYYY-MM-DD hh:mm a'));
+  let language = { active: true };
   if (req.query.language != null && req.query.language != '') {
-    console.log("sds")
+    console.log('sds');
     let match_lang = req.query.language ? [].concat(req.query.language) : [];
-    console.log(match_lang)
-    language = { $or: [{ primarycommunication: { $in: match_lang } }, { secondarycommunication: { $in: match_lang } }] }
+    console.log(match_lang);
+    language = { $or: [{ primarycommunication: { $in: match_lang } }, { secondarycommunication: { $in: match_lang } }] };
   }
-  let streamType = { active: true }
+  let streamType = { active: true };
   if (req.query.streamtype != null && req.query.streamtype != '') {
     let streamtype_match = req.query.streamtype ? [].concat(req.query.streamtype) : [];
-    streamType = { streamType: { $in: streamtype_match } }
+    streamType = { streamType: { $in: streamtype_match } };
   }
   var date_now = new Date().getTime();
-  let search = { active: true }
+  let search = { active: true };
   if (req.query.search != null && req.query.search != '') {
-    search = { productTitle: { $regex: req.query.search, $options: 'i' } }
+    search = { productTitle: { $regex: req.query.search, $options: 'i' } };
   }
-
 
   // startTime
   // streamEnd_Time
@@ -15605,22 +15613,22 @@ const search_product_list = async (req) => {
   let findstreamType = {
     $cond: {
       if: { $and: [{ $gte: ['$startTime', date_now] }] },
-      then: "Upcoming",
+      then: 'Upcoming',
       else: {
         $cond: {
           if: { $and: [{ $lte: ['$startTime', date_now] }, { $gte: ['$streamEnd_Time', date_now] }] },
-          then: "Live",
+          then: 'Live',
           else: {
             $cond: {
               if: { $and: [{ $lte: ['$streamEnd_Time', date_now] }] },
-              then: "Completed",
+              then: 'Completed',
               else: 3,
             },
           },
         },
       },
     },
-  }
+  };
 
   let streamingorder = {
     $cond: {
@@ -15640,16 +15648,14 @@ const search_product_list = async (req) => {
         },
       },
     },
-  }
+  };
   let product = await StreamPost.aggregate([
     {
       $lookup: {
         from: 'products',
         localField: 'productId',
         foreignField: '_id',
-        pipeline: [
-          { $match: { $and: [search] } }
-        ],
+        pipeline: [{ $match: { $and: [search] } }],
         as: 'productName',
       },
     },
@@ -15658,8 +15664,8 @@ const search_product_list = async (req) => {
     },
     {
       $addFields: {
-        productName: "$productName.productTitle"
-      }
+        productName: '$productName.productTitle',
+      },
     },
     {
       $lookup: {
@@ -15673,15 +15679,23 @@ const search_product_list = async (req) => {
               localField: 'streamRequest',
               foreignField: '_id',
               pipeline: [
-                { $match: { $and: [language, { streamExpire: { $gt: date_now } }, { $or: [{ show_completd: { $eq: true } }, { streamEnd_Time: { $gte: date_now } }] }] } },
                 {
-                  $addFields: {
-                    streamType: findstreamType
+                  $match: {
+                    $and: [
+                      language,
+                      { streamExpire: { $gt: date_now } },
+                      { $or: [{ show_completd: { $eq: true } }, { streamEnd_Time: { $gte: date_now } }] },
+                    ],
                   },
                 },
                 {
                   $addFields: {
-                    streamorder: streamingorder
+                    streamType: findstreamType,
+                  },
+                },
+                {
+                  $addFields: {
+                    streamorder: streamingorder,
                   },
                 },
                 { $match: { $and: [streamType] } },
@@ -15701,43 +15715,43 @@ const search_product_list = async (req) => {
     },
     {
       $addFields: {
-        streamName: '$streamrequestposts.streamrequests.streamName'
-      }
+        streamName: '$streamrequestposts.streamrequests.streamName',
+      },
     },
     {
       $addFields: {
-        primarycommunication: '$streamrequestposts.streamrequests.primarycommunication'
-      }
+        primarycommunication: '$streamrequestposts.streamrequests.primarycommunication',
+      },
     },
     {
       $addFields: {
-        Location: '$streamrequestposts.streamrequests.Location'
-      }
+        Location: '$streamrequestposts.streamrequests.Location',
+      },
     },
     {
       $addFields: {
-        startTime: '$streamrequestposts.streamrequests.startTime'
-      }
+        startTime: '$streamrequestposts.streamrequests.startTime',
+      },
     },
     {
       $addFields: {
-        streamEnd_Time: '$streamrequestposts.streamrequests.streamEnd_Time'
-      }
+        streamEnd_Time: '$streamrequestposts.streamrequests.streamEnd_Time',
+      },
     },
     {
       $addFields: {
-        streamorder: '$streamrequestposts.streamrequests.streamorder'
-      }
+        streamorder: '$streamrequestposts.streamrequests.streamorder',
+      },
     },
     {
       $addFields: {
-        streamType: '$streamrequestposts.streamrequests.streamType'
-      }
+        streamType: '$streamrequestposts.streamrequests.streamType',
+      },
     },
     {
       $addFields: {
-        streamId: '$streamrequestposts.streamrequests._id'
-      }
+        streamId: '$streamrequestposts.streamrequests._id',
+      },
     },
     {
       $lookup: {
@@ -15767,21 +15781,20 @@ const search_product_list = async (req) => {
         pruductreturnble: 1,
         unit: 1,
         productName: 1,
-        productimage: "$productName.image",
-        address: "$sellers.address",
-        mobileNumber: "$sellers.mobileNumber",
-        tradeName: "$sellers.tradeName",
-        companyName: "$sellers.companyName",
+        productimage: '$productName.image',
+        address: '$sellers.address',
+        mobileNumber: '$sellers.mobileNumber',
+        tradeName: '$sellers.tradeName',
+        companyName: '$sellers.companyName',
         suppierId: 1,
-        streamId: 1
+        streamId: 1,
       },
     },
-    { $limit: 50 }
-  ])
+    { $limit: 50 },
+  ]);
 
   return product;
-
-}
+};
 
 module.exports = {
   create_Plans,
@@ -15942,5 +15955,5 @@ module.exports = {
   post_payment_details,
   remove_stream_admin,
   search_product_list,
-  remove_post_stream
+  remove_post_stream,
 };
