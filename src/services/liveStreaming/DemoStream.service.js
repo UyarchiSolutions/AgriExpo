@@ -1573,7 +1573,7 @@ const go_live = async (req) => {
   let demostream = await Demostream.findById(req.query.id);
   let expirationTimestamp;
   if (demostream.agoraID == null) {
-    let agoraID = await agoraToken.token_assign(1000, demostream._id, 'demo');
+    let agoraID = await agoraToken.token_assign(6000, demostream._id, 'demo');
     expirationTimestamp = moment().add(30, 'minutes') / 1000;
 
     if (demostream.type == 'demo') {
