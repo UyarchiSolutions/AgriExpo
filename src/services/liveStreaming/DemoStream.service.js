@@ -1129,7 +1129,7 @@ const join_stream_buyer = async (req) => {
     }
   }
   else {
-    if (register < 100) {
+    if (register < 300) {
       demotoken.golive = true;
       if (stream.status == 'Pending') {
         stream.status = 'Ready';
