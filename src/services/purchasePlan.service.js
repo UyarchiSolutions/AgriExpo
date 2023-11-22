@@ -457,6 +457,7 @@ const get_all_purchasePlans = async (req) => {
     {
       $unwind: '$streamplans',
     },
+
     {
       $project: {
         _id: 1,
@@ -938,6 +939,7 @@ const getPlanDetailsByUser = async (userId) => {
 };
 
 const getPlanes_Request_Streams = async (userId) => {
+  let date_now = new Date().getTime();
   let val = await purchasePlan.aggregate([
     {
       $match: { status: { $in: ['Activated'] }, suppierId: userId },
@@ -1048,6 +1050,63 @@ const getPlanes_Request_Streams = async (userId) => {
       },
     },
     {
+      $lookup: {
+        from: 'slotbookings',
+        localField: '_id',
+        foreignField: 'PlanId',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'slots',
+              localField: 'slotId',
+              pipeline: [
+                {
+                  $addFields: {
+                    slotExpire: {
+                      $cond: { if: { $lt: ['$end', date_now] }, then: true, else: false },
+                    },
+                  },
+                },
+              ],
+              foreignField: '_id',
+              as: 'slots',
+            },
+          },
+          {
+            $unwind: {
+              preserveNullAndEmptyArrays: true,
+              path: '$slots',
+            },
+          },
+          {
+            $addFields: {
+              slotExpire: "$slots.slotExpire",
+            },
+          },
+          { $match: { $and: [{ slotExpire: { $eq: false } }] } },
+          {
+            $group: {
+              _id: null,
+              count: { $sum: 1 }
+            }
+          }
+        ],
+        as: 'slotbookings',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$slotbookings',
+      },
+    },
+    {
+      $addFields: {
+        slotCount: { $ifNull: ["$slotbookings.count", 0] },
+      },
+    },
+    { $match: { $and: [{ slotCount: { $ne: 0 } }] } },
+    {
       $project: {
         _id: 1,
         active: 1,
@@ -1061,6 +1120,7 @@ const getPlanes_Request_Streams = async (userId) => {
         ExclusiveSlots: { $ifNull: [{ $size: '$BookedSlotsExclusive' }, 0] },
         transaction: 1,
         PostCount: 1,
+        slotbookings: "$slotbookings"
       },
     },
     {
@@ -1084,6 +1144,8 @@ const getPlanes_Request_Streams = async (userId) => {
         },
         transaction: 1,
         PostCount: 1,
+        slotbookings: 1
+
       },
     },
     {
