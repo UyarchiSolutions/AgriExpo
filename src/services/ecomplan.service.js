@@ -219,18 +219,15 @@ const create_post = async (req) => {
     ...{ suppierId: req.userId, images: images, pendingQTY: req.body.quantity, timeline: [{ status: "Created", Time: new Date().getTime(), timelieId: req.timeline }] },
   });
   await Dates.create_date(value);
-  if (req.body.afterStreaming == 'yes') {
-    await Streampostprice.create({
-      marketPlace: req.body.marketPlace,
-      offerPrice: req.body.offerPrice,
-      postLiveStreamingPirce: req.body.postLiveStreamingPirce,
-      streampostId: value._id,
-      minLots: req.body.minLots == null ? 0 : req.body.minLots,
-      incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
-      createdBy: req.userId,
-      showImage: showImage
-    });
-  }
+  await Streampostprice.create({
+    marketPlace: req.body.marketPlace,
+    offerPrice: req.body.offerPrice,
+    streampostId: value._id,
+    minLots: req.body.minLots == null ? 0 : req.body.minLots,
+    incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
+    createdBy: req.userId,
+    showImage: showImage
+  });
   return value;
 };
 
@@ -327,7 +324,6 @@ const get_all_Post = async (req) => {
         quantity: 1,
         marketPlace: 1,
         offerPrice: 1,
-        postLiveStreamingPirce: 1,
         validity: 1,
         minLots: 1,
         incrementalLots: 1,
@@ -390,7 +386,6 @@ const get_all_post_transation = async (req) => {
         quantity: 1,
         marketPlace: 1,
         offerPrice: 1,
-        postLiveStreamingPirce: 1,
         validity: 1,
         minLots: 1,
         incrementalLots: 1,
@@ -505,7 +500,6 @@ const get_all_Post_with_page_live = async (req) => {
         quantity: 1,
         marketPlace: 1,
         offerPrice: 1,
-        postLiveStreamingPirce: 1,
         minLots: 1,
         incrementalLots: 1,
         _id: 1,
@@ -518,7 +512,6 @@ const get_all_Post_with_page_live = async (req) => {
         location: 1,
         discription: 1,
         bookingAmount: 1,
-        afterStreaming: 1,
         status: 1,
         streamStart: 1,
         streamEnd: 1,
@@ -690,7 +683,6 @@ const get_all_Post_with_page_completed = async (req) => {
         quantity: 1,
         marketPlace: 1,
         offerPrice: 1,
-        postLiveStreamingPirce: 1,
         minLots: 1,
         incrementalLots: 1,
         _id: 1,
@@ -703,7 +695,6 @@ const get_all_Post_with_page_completed = async (req) => {
         location: 1,
         discription: 1,
         bookingAmount: 1,
-        afterStreaming: 1,
         status: 'Completed',
         streamStart: 1,
         streamEnd: 1,
@@ -852,7 +843,6 @@ const get_all_Post_with_page_exhausted = async (req) => {
         quantity: 1,
         marketPlace: 1,
         offerPrice: 1,
-        postLiveStreamingPirce: 1,
         minLots: 1,
         incrementalLots: 1,
         _id: 1,
@@ -865,7 +855,6 @@ const get_all_Post_with_page_exhausted = async (req) => {
         location: 1,
         discription: 1,
         bookingAmount: 1,
-        afterStreaming: 1,
         unit: 1,
         dispatchLocation: 1,
         purchase_limit: 1,
@@ -985,7 +974,6 @@ const get_all_Post_with_page_removed = async (req) => {
         quantity: 1,
         marketPlace: 1,
         offerPrice: 1,
-        postLiveStreamingPirce: 1,
         minLots: 1,
         incrementalLots: 1,
         _id: 1,
@@ -998,7 +986,6 @@ const get_all_Post_with_page_removed = async (req) => {
         location: 1,
         discription: 1,
         bookingAmount: 1,
-        afterStreaming: 1,
         status: 1,
         streamStart: 1,
         streamEnd: 1,
@@ -1179,7 +1166,6 @@ const get_all_Post_with_page_all = async (req, status) => {
         quantity: 1,
         marketPlace: 1,
         offerPrice: 1,
-        postLiveStreamingPirce: 1,
         minLots: 1,
         incrementalLots: 1,
         _id: 1,
@@ -1192,7 +1178,6 @@ const get_all_Post_with_page_all = async (req, status) => {
         location: 1,
         discription: 1,
         bookingAmount: 1,
-        afterStreaming: 1,
         status: 1,
         streamStart: 1,
         streamEnd: 1,
@@ -1339,7 +1324,6 @@ const get_all_Post_with_page = async (req, status) => {
         quantity: 1,
         marketPlace: 1,
         offerPrice: 1,
-        postLiveStreamingPirce: 1,
         minLots: 1,
         incrementalLots: 1,
         _id: 1,
@@ -1352,7 +1336,6 @@ const get_all_Post_with_page = async (req, status) => {
         location: 1,
         discription: 1,
         bookingAmount: 1,
-        afterStreaming: 1,
         status: 1,
         streamStart: 1,
         streamEnd: 1,
@@ -1495,7 +1478,6 @@ const get_all_Post_with_page_assigned = async (req, type) => {
         quantity: 1,
         marketPlace: 1,
         offerPrice: 1,
-        postLiveStreamingPirce: 1,
         minLots: 1,
         incrementalLots: 1,
         _id: 1,
@@ -1508,7 +1490,6 @@ const get_all_Post_with_page_assigned = async (req, type) => {
         location: 1,
         discription: 1,
         bookingAmount: 1,
-        afterStreaming: 1,
         status: 1,
         streamStart: 1,
         streamEnd: 1,
@@ -1627,7 +1608,19 @@ const remove_one_post = async (req) => {
   value.save();
   return { message: 'Removed' };
 };
-
+const post_show_toggle = async (req) => {
+  let value = await StreamPost.findById(req.query.id);
+  if (!value) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream Post Not Found');
+  }
+  if (value.suppierId != req.userId) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Host Post Not Found');
+  }
+  value.showPost = !value.showPost;
+  value.timeline.push({ showPost: value.showPost, Time: new Date().getTime(), timelieId: req.timeline });
+  value.save();
+  return value;
+};
 const create_stream_one = async (req) => {
   let slot_booking = await SlotBooking.findById(req.body.slot);
   if (!slot_booking) {
@@ -1925,11 +1918,9 @@ const get_all_stream = async (req) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
-              afterStreaming: '$streamposts.afterStreaming',
               bookingAmount: '$streamposts.bookingAmount',
               discription: '$streamposts.discription',
               images: '$streamposts.images',
@@ -2192,14 +2183,12 @@ const get_all_admin = async (req) => {
                     quantity: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
                     suppierId: 1,
                     DateIso: 1,
                     created: 1,
-                    afterStreaming: 1,
                     bookingAmount: 1,
                     discription: 1,
                     images: 1,
@@ -2232,11 +2221,9 @@ const get_all_admin = async (req) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
-              afterStreaming: '$streamposts.afterStreaming',
               bookingAmount: '$streamposts.bookingAmount',
               discription: '$streamposts.discription',
               images: '$streamposts.images',
@@ -2352,7 +2339,6 @@ const get_all_admin = async (req) => {
                     quantity: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
@@ -2374,7 +2360,6 @@ const get_all_admin = async (req) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
@@ -2486,6 +2471,14 @@ const remove_stream = async (req) => {
   value.status = 'Removed';
   value.removedBy = 'My self';
   value.removedBy_id = req.userId;
+  value.save();
+  return value;
+};
+
+const toggle_stream = async (req) => {
+  let value = await Streamrequest.findById(req.body.id);
+  value.showStream = !value.showStream;
+  value.timeline.push({ showStream: value.showStream, Time: new Date().getTime(), action: "My Self", timelieId: req.timeline })
   value.save();
   return value;
 };
@@ -2743,14 +2736,12 @@ const get_all_streams = async (req) => {
                     quantity: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
                     suppierId: 1,
                     DateIso: 1,
                     created: 1,
-                    afterStreaming: 1,
                     bookingAmount: 1,
                     discription: 1,
                     images: 1,
@@ -2782,11 +2773,9 @@ const get_all_streams = async (req) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
-              afterStreaming: '$streamposts.afterStreaming',
               bookingAmount: '$streamposts.bookingAmount',
               discription: '$streamposts.discription',
               images: '$streamposts.images',
@@ -3150,7 +3139,6 @@ const get_subhost_streams = async (req) => {
                     quantity: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
@@ -3180,7 +3168,6 @@ const get_subhost_streams = async (req) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
@@ -3534,7 +3521,6 @@ const go_live_stream_host_details = async (req, userId) => {
                     quantity: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
@@ -3560,7 +3546,6 @@ const go_live_stream_host_details = async (req, userId) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
@@ -3884,7 +3869,6 @@ const go_live_stream_host = async (req, userId) => {
                     unit: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
@@ -3910,7 +3894,6 @@ const go_live_stream_host = async (req, userId) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
@@ -4247,7 +4230,6 @@ const get_subhost_token_details = async (req, userId) => {
                     quantity: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
@@ -4273,7 +4255,6 @@ const get_subhost_token_details = async (req, userId) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
@@ -4605,7 +4586,6 @@ const get_subhost_token = async (req, userId) => {
                     quantity: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
@@ -4631,7 +4611,6 @@ const get_subhost_token = async (req, userId) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
@@ -4994,7 +4973,6 @@ const get_watch_live_steams_upcoming_byid = async (req) => {
         viewstatus: { $ifNull: ['$streampreregister.viewstatus', ''] },
       },
     },
-    { $match: { $and: [registeredFilter] } },
     {
       $lookup: {
         from: 'streamrequestposts',
@@ -5006,7 +4984,6 @@ const get_watch_live_steams_upcoming_byid = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } }],
               as: 'streamposts',
             },
           },
@@ -5027,8 +5004,6 @@ const get_watch_live_steams_upcoming_byid = async (req) => {
         path: '$streamrequestposts_count',
       },
     },
-
-    { $match: { $and: [registeredFilter] } },
     {
       $lookup: {
         from: 'streamrequestposts',
@@ -5064,7 +5039,6 @@ const get_watch_live_steams_upcoming_byid = async (req) => {
             $project: {
               DateIso: '$streamposts.DateIso',
               active: '$streamposts.active',
-              afterStreaming: '$streamposts.afterStreaming',
               archive: '$streamposts.archive',
               bookingAmount: '$streamposts.bookingAmount',
               categoryId: '$streamposts.categoryId',
@@ -5080,7 +5054,6 @@ const get_watch_live_steams_upcoming_byid = async (req) => {
               offerPrice: '$streamposts.offerPrice',
               orderedQTY: '$streamposts.orderedQTY',
               pendingQTY: '$streamposts.pendingQTY',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               productId: '$streamposts.productId',
               productTitle: '$streamposts.productTitle',
               quantity: '$streamposts.quantity',
@@ -5274,7 +5247,6 @@ const get_watch_live_steams_current = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } }],
               as: 'streamposts',
             },
           },
@@ -5506,7 +5478,6 @@ const get_watch_live_steams_current = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } }],
               as: 'streamposts',
             },
           },
@@ -5541,7 +5512,6 @@ const get_watch_live_steams_current = async (req) => {
               localField: 'postId',
               foreignField: '_id',
               pipeline: [
-                { $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } },
                 {
                   $lookup: {
                     from: 'products',
@@ -5735,7 +5705,6 @@ const get_watch_live_steams_upcoming = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } }],
               as: 'streamposts',
             },
           },
@@ -6057,7 +6026,6 @@ const get_watch_live_steams_interested = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } }],
               as: 'streamposts',
             },
           },
@@ -6813,7 +6781,6 @@ const get_watch_live_steams = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } }],
               as: 'streamposts',
             },
           },
@@ -7122,7 +7089,6 @@ const on_going_stream = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } }],
               as: 'streamposts',
             },
           },
@@ -7356,7 +7322,6 @@ const on_going_stream = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } }],
               as: 'streamposts',
             },
           },
@@ -7583,7 +7548,6 @@ const on_going_stream = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } }],
               as: 'streamposts',
             },
           },
@@ -8297,7 +8261,7 @@ const getall_homeage_streams = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [ { status: { $ne: 'Removed' } }] } }],
+              pipeline: [{ $match: { $and: [{ status: { $ne: 'Removed' } }] } }],
               as: 'streamposts',
             },
           },
@@ -8758,7 +8722,6 @@ const getall_homeage_streams = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } }],
               as: 'streamposts',
             },
           },
@@ -8984,7 +8947,6 @@ const getall_homeage_streams = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } }],
               as: 'streamposts',
             },
           },
@@ -9215,7 +9177,6 @@ const getall_homeage_streams = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } }],
               as: 'streamposts',
             },
           },
@@ -9250,7 +9211,6 @@ const getall_homeage_streams = async (req) => {
               localField: 'postId',
               foreignField: '_id',
               pipeline: [
-                // { $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } },
                 {
                   $lookup: {
                     from: 'products',
@@ -9447,7 +9407,6 @@ const getall_homeage_streams = async (req) => {
               from: 'streamposts',
               localField: 'postId',
               foreignField: '_id',
-              pipeline: [{ $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } }],
               as: 'streamposts',
             },
           },
@@ -9482,7 +9441,6 @@ const getall_homeage_streams = async (req) => {
               localField: 'postId',
               foreignField: '_id',
               pipeline: [
-                // { $match: { $and: [{ afterStreaming: { $eq: 'yes' } }] } },
                 {
                   $lookup: {
                     from: 'products',
@@ -9605,8 +9563,8 @@ const regisetr_strean_instrest = async (req) => {
       participents.noOfParticipants > count
         ? 'Confirmed'
         : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-        ? 'RAC'
-        : 'Waiting';
+          ? 'RAC'
+          : 'Waiting';
     await Dates.create_date(findresult);
   } else {
     if (findresult.status != 'Registered') {
@@ -9615,8 +9573,8 @@ const regisetr_strean_instrest = async (req) => {
         participents.noOfParticipants > count
           ? 'Confirmed'
           : participents.noOfParticipants + participents.noOfParticipants / 2 > count
-          ? 'RAC'
-          : 'Waiting';
+            ? 'RAC'
+            : 'Waiting';
       findresult.eligible = participents.noOfParticipants > count;
       findresult.status = 'Registered';
       await Dates.create_date(findresult);
@@ -10064,7 +10022,6 @@ const get_cancel_stream = async (req) => {
                     quantity: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
@@ -10086,7 +10043,6 @@ const get_cancel_stream = async (req) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
@@ -10243,7 +10199,7 @@ const get_completed_stream_buyer = async (req) => {
               localField: 'postId',
               foreignField: '_id',
               pipeline: [
-                { $match: { $and: [{ afterStreaming: { $eq: 'yes' } }, { status: { $ne: 'Removed' } }] } },
+                { $match: { $and: [{ status: { $ne: 'Removed' } }] } },
                 {
                   $lookup: {
                     from: 'products',
@@ -10319,7 +10275,6 @@ const get_completed_stream_buyer = async (req) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
@@ -10406,7 +10361,8 @@ const get_completed_stream_buyer = async (req) => {
         // temptokens: '$temptokens',
         showLink: 1,
         selectvideo: 1,
-        userinteractions: "$userinteractions._id"
+        userinteractions: "$userinteractions._id",
+        transaction: 1
       },
     },
   ]);
@@ -10448,7 +10404,6 @@ const get_completed_stream_byid = async (req) => {
                     quantity: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
@@ -10470,7 +10425,6 @@ const get_completed_stream_byid = async (req) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
@@ -10731,7 +10685,6 @@ const get_completed_stream_upcommming = async (req) => {
                     quantity: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
@@ -10753,7 +10706,6 @@ const get_completed_stream_upcommming = async (req) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
@@ -11018,7 +10970,6 @@ const get_completed_stream_live = async (req) => {
                     quantity: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
@@ -11040,7 +10991,6 @@ const get_completed_stream_live = async (req) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
@@ -11305,7 +11255,6 @@ const get_completed_stream_completed = async (req) => {
                     quantity: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
@@ -11327,7 +11276,6 @@ const get_completed_stream_completed = async (req) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
@@ -11599,7 +11547,6 @@ const get_completed_stream_expired = async (req) => {
                     quantity: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
@@ -11621,7 +11568,6 @@ const get_completed_stream_expired = async (req) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
@@ -11878,7 +11824,6 @@ const get_completed_stream_removed = async (req) => {
                     quantity: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
@@ -11900,7 +11845,6 @@ const get_completed_stream_removed = async (req) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
@@ -12159,7 +12103,6 @@ const get_completed_stream_cancelled = async (req) => {
                     quantity: 1,
                     marketPlace: 1,
                     offerPrice: 1,
-                    postLiveStreamingPirce: 1,
                     validity: 1,
                     minLots: 1,
                     incrementalLots: 1,
@@ -12181,7 +12124,6 @@ const get_completed_stream_cancelled = async (req) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               validity: '$streamposts.validity',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
@@ -14389,7 +14331,6 @@ const get_stream_post_after_live_stream = async (req) => {
               quantity: '$streamposts.quantity',
               marketPlace: '$streamposts.marketPlace',
               offerPrice: '$streamposts.offerPrice',
-              postLiveStreamingPirce: '$streamposts.postLiveStreamingPirce',
               minLots: '$streamposts.minLots',
               incrementalLots: '$streamposts.incrementalLots',
               discription: '$streamposts.discription',
@@ -14408,9 +14349,9 @@ const get_stream_post_after_live_stream = async (req) => {
               second: '$streamposts.second',
               videoTime: '$streamposts.videoTime',
               bookingAmount: '$streamposts.bookingAmount',
-              afterStreaming: '$streamposts.afterStreaming',
               streampostId: '$streamposts._id',
               streampostprices: '$streamposts.streampostprices',
+              showPost: "$streamposts.showPost"
             },
           },
           // {
@@ -14488,7 +14429,7 @@ const video_upload_post = async (req) => {
   return up;
 };
 
-const get_video_link = async (req) => {};
+const get_video_link = async (req) => { };
 
 const get_post_view = async (req) => {
   //console.log(req.query.id)
@@ -14514,12 +14455,10 @@ const get_post_view = async (req) => {
         marketPlace: 1,
         offerPrice: 1,
         bookingAmount: 1,
-        postLiveStreamingPirce: 1,
         minLots: 1,
         incrementalLots: 1,
         discription: 1,
         location: 1,
-        // afterStreaming: 1,
         DateIso: 1,
         productTitle: '$products.productTitle',
         video: 1,
@@ -14554,24 +14493,21 @@ const update_post_price = async (req) => {
   if (streampost.suppierId != userId) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Bad Request');
   }
-  if (streampost.afterStreaming == 'yes') {
-    streampost.marketPlace = req.body.marketPlace;
-    streampost.postLiveStreamingPirce = req.body.postLiveStreamingPirce;
-    streampost.minLots = req.body.minLots;
-    streampost.incrementalLots = req.body.incrementalLots;
-    streampost.save();
-    await Streampostprice.create({
-      marketPlace: req.body.marketPlace,
-      postLiveStreamingPirce: req.body.postLiveStreamingPirce,
-      streampostId: streampost._id,
-      minLots: req.body.minLots == null ? 0 : req.body.minLots,
-      incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
-      createdBy: userId,
-      purchased_qty: req.body.purchased_qty,
-      edited_qty: req.body.edited_qty
-    });
-  }
-  streampost;
+  streampost.marketPlace = req.body.marketPlace;
+  streampost.minLots = req.body.minLots == null ? 0 : req.body.minLots;
+  streampost.incrementalLots = req.body.incrementalLots == null ? 0 : req.body.incrementalLots;
+  streampost.offerPrice = req.body.offerPrice;
+  streampost.save();
+  await Streampostprice.create({
+    marketPlace: req.body.marketPlace,
+    offerPrice: req.body.offerPrice,
+    streampostId: streampost._id,
+    minLots: req.body.minLots == null ? 0 : req.body.minLots,
+    incrementalLots: req.body.incrementalLots == null ? 0 : req.body.incrementalLots,
+    createdBy: userId,
+    purchased_qty: req.body.purchased_qty,
+    edited_qty: req.body.edited_qty
+  });
 
   return streampost;
 };
@@ -14691,7 +14627,6 @@ const post_payment_details = async (req) => {
         offerPrice: 1,
         minLots: 1,
         incrementalLots: 1,
-        afterStreaming: 1,
         suppierId: 1,
         streamName: 1,
         post: '$post',
@@ -15773,7 +15708,6 @@ const search_product_list = async (req) => {
         discription: 1,
         marketPlace: 1,
         pack_discription: 1,
-        postLiveStreamingPirce: 1,
         pruductreturnble: 1,
         unit: 1,
         productName: 1,
@@ -15833,6 +15767,7 @@ module.exports = {
   get_subhost_streams,
   cancel_stream,
   remove_stream,
+  toggle_stream,
   end_stream,
   get_all_Post_with_page_all,
   get_all_Post_with_page_live,
@@ -15952,4 +15887,5 @@ module.exports = {
   remove_stream_admin,
   search_product_list,
   remove_post_stream,
+  post_show_toggle
 };

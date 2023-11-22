@@ -432,6 +432,7 @@ const send_livestream_link_demo = async (req) => {
       _id: id,
       transaction: transaction,
       tokenExp: moment().add(30, 'minutes'),
+      type: "demo"
     });
     // endTime: moment().add(15, 'minutes'),
     const payload = {
@@ -440,13 +441,9 @@ const send_livestream_link_demo = async (req) => {
       type: 'demostream',
     };
     let valitity = jwt.sign(payload, secret, {
-      expiresIn: '45m', // Set token expiration to 30 minutes
+      expiresIn: '30m', // Set token expiration to 30 minutes
     });
-    if (demorequest.type == 'demo') {
-      valitity = jwt.sign(payload, secret, {
-        expiresIn: '30m', // Set token expiration to 30 minutes
-      });
-    }
+
     demostream.streamValitity = valitity;
     demostream.save();
     let product = await Product.find().limit(10);
