@@ -4,6 +4,6 @@ const ClimbEventController = require('../../controllers/climb.event.controller')
 
 router.route('/').get(ClimbEventController.getDatasBy_Event);
 router.route('/slots/details').get(ClimbEventController.getSlotDetails_WithCandidate);
-router.route('/getCandidateBySlot/:date/:time').get(ClimbEventController.getCandidateBySlot);
+router.route('/getCandidateBySlot/:date/:time/:attended').get(ClimbEventController.getCandidateBySlot);
 
 module.exports = router;

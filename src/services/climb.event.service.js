@@ -9,22 +9,22 @@ const getDatasBy_Event = (req) => {
 
 const getSlotDetails_WithCandidate = async () => {
   let values = await Eventslot.aggregate([
-    {
-      $lookup: {
-        from: 'climbeventregisters',
-        let: { eventDate: '$date', eventTime: '$slot' },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $and: [{ $eq: ['$date', '$$eventDate'] }, { $eq: ['$slot', '$$eventTime'] }],
-              },
-            },
-          },
-        ],
-        as: 'candidates',
-      },
-    },
+    // {
+    //   $lookup: {
+    //     from: 'climbeventregisters',
+    //     let: { eventDate: '$date', eventTime: '$slot' },
+    //     pipeline: [
+    //       {
+    //         $match: {
+    //           $expr: {
+    //             $and: [{ $eq: ['$date', '$$eventDate'] }, { $eq: ['$slot', '$$eventTime'] }],
+    //           },
+    //         },
+    //       },
+    //     ],
+    //     as: 'candidates',
+    //   },
+    // },
     {
       $project: {
         _id: 1,
@@ -33,8 +33,6 @@ const getSlotDetails_WithCandidate = async () => {
         slot: 1,
         no_of_count: 1,
         createdAt: 1,
-        candidates: { $size: '$candidates' },
-        candList: '$candidates',
       },
     },
   ]);
@@ -42,7 +40,16 @@ const getSlotDetails_WithCandidate = async () => {
 };
 
 const getCandidateBySlot = async (req) => {
-  const { date, time } = req.params;
+  const { date, time, attended } = req.params;
+
+  attendedMatch = { active: true };
+  if (attended == 'yes') {
+    attendedMatch = { attended: { $gt: 0 } };
+  } else if (attended == 'no') {
+    attendedMatch = { attended: { $eq: 0 } };
+  } else {
+  }
+
   let values = await EventRegister.aggregate([
     {
       $match: {
@@ -103,9 +110,11 @@ const getCandidateBySlot = async (req) => {
         attended: { $ifNull: ['$demobuyers.count', 0] },
       },
     },
+    { $match: attendedMatch },
     { $sort: { attended: -1 } },
   ]);
-  return values;
+  let registrationCount = await EventRegister.find({ date: date, slot: time }).count();
+  return { values, registrationCount };
 };
 
 module.exports = {
