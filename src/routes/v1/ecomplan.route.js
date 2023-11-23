@@ -70,6 +70,7 @@ router.route('/get/one/post').get(SellerAuth, Ecomcontroller.get_one_post);
 router.route('/update/one/post').put(SellerAuth, postImages, Ecomcontroller.update_one_post);
 router.route('/delete/one/post').delete(SellerAuth, Ecomcontroller.delete_one_post);
 router.route('/remove/one/post').put(SellerAuth, Ecomcontroller.remove_one_post);
+router.route('/toggle/one/post').put(SellerAuth, Ecomcontroller.post_show_toggle);
 
 // Stream Request APIS
 router.route('/create/stream/one').post(SellerAuth, Ecomcontroller.create_stream_one);
@@ -101,6 +102,7 @@ router.route('/subhost/assign/streams').get(SellerAuth, Ecomcontroller.get_subho
 router.route('/allot/stream/subhost').put(SellerAuth, Ecomcontroller.allot_stream_subhost);
 router.route('/cancel/stream').put(SellerAuth, Ecomcontroller.cancel_stream);
 router.route('/remove/stream').put(SellerAuth, Ecomcontroller.remove_stream);
+router.route('/toggle/stream').put(SellerAuth, Ecomcontroller.toggle_stream);
 router.route('/remove/stream/admin').put(authorization, Ecomcontroller.remove_stream_admin);
 router.route('/cancel/stream/admin').put(Ecomcontroller.cancel_stream);
 router.route('/steam/end/now').put(Ecomcontroller.end_stream);

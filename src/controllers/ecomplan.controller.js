@@ -131,6 +131,10 @@ const remove_one_post = catchAsync(async (req, res) => {
   res.send(value);
 });
 
+const post_show_toggle = catchAsync(async (req, res) => {
+  const value = await Ecomserive.post_show_toggle(req);
+  res.send(value);
+});
 const create_stream_one = catchAsync(async (req, res) => {
   const value = await Ecomserive.create_stream_one(req);
   res.send(value);
@@ -269,6 +273,12 @@ const remove_stream = catchAsync(async (req, res) => {
   res.send(value);
 });
 
+const toggle_stream = catchAsync(async (req, res) => {
+  //console.log('sdas');
+  const value = await Ecomserive.toggle_stream(req);
+  res.send(value);
+});
+
 const remove_stream_admin = catchAsync(async (req, res) => {
   //console.log('sdas');
   const value = await Ecomserive.remove_stream_admin(req);
@@ -306,7 +316,7 @@ const get_subhost_token = catchAsync(async (req, res) => {
 });
 
 
-const get_subhost_token_details= catchAsync(async (req, res) => {
+const get_subhost_token_details = catchAsync(async (req, res) => {
   //console.log('sdas');
   const value = await Ecomserive.get_subhost_token_details(req, req.userId);
   res.send(value);
@@ -830,6 +840,7 @@ module.exports = {
   allot_stream_subhost,
   cancel_stream,
   remove_stream,
+  toggle_stream,
   get_completed_stream,
   get_completed_stream_byid,
   get_completed_stream_buyer,
@@ -939,5 +950,6 @@ module.exports = {
   remove_post_stream,
   go_live_stream_host_details,
   get_subhost_token_details,
-  front_end_code
+  front_end_code,
+  post_show_toggle
 };

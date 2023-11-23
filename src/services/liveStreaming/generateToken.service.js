@@ -386,17 +386,34 @@ const recording_query = async (req, id, agoraToken) => {
   }).catch((err) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Query:' + err.message);
   });;
+
   if (query.data != null) {
-    if (query.data.serverResponse.fileList.length != 0) {
-      token.videoLink = query.data.serverResponse.fileList[0].fileName;
-      token.videoLink_array = query.data.serverResponse.fileList;
-      let m3u8 = query.data.serverResponse.fileList[0].fileName;
-      if (m3u8 != null) {
-        let mp4 = m3u8.replace('.m3u8', '_0.mp4')
-        token.videoLink_mp4 = mp4;
+    if (query.data.serverResponse != null) {
+      if (query.data.serverResponse.fileList != null) {
+        if (query.data.serverResponse.fileList.length != 0) {
+          if (Array.isArray(query.data.serverResponse.fileList)) {
+            token.videoLink = query.data.serverResponse.fileList[0].fileName;
+            token.videoLink_array = query.data.serverResponse.fileList;
+            let m3u8 = query.data.serverResponse.fileList[0].fileName;
+            if (m3u8 != null) {
+              let mp4 = m3u8.replace('.m3u8', '_0.mp4')
+              token.videoLink_mp4 = mp4;
+            }
+            token.recoredStart = 'query';
+            token.save();
+          }
+          else {
+            token.videoLink = query.data.serverResponse.fileList.fileName;
+            let m3u8 = query.data.serverResponse.fileList.fileName;
+            if (m3u8 != null) {
+              let mp4 = m3u8.replace('.m3u8', '_0.mp4')
+              token.videoLink_mp4 = mp4;
+            }
+            token.recoredStart = 'query';
+            token.save();
+          }
+        }
       }
-      token.recoredStart = 'query';
-      token.save();
     }
     return query.data;
   }

@@ -349,6 +349,10 @@ const streamPostschema = mongoose.Schema({
   timeline: {
     type: Array,
     default: [],
+  },
+  showPost: {
+    type: Boolean,
+    default: true
   }
 });
 
@@ -603,6 +607,10 @@ const streamRequestschema = mongoose.Schema({
   streamCurrent_Watching: {
     type: Number,
     default: 0
+  },
+  showStream: {
+    type: Boolean,
+    default: true
   }
 });
 

@@ -432,6 +432,7 @@ const send_livestream_link_demo = async (req) => {
       _id: id,
       transaction: transaction,
       tokenExp: moment().add(30, 'minutes'),
+      type: "demo"
     });
     // endTime: moment().add(15, 'minutes'),
     const payload = {
@@ -440,13 +441,9 @@ const send_livestream_link_demo = async (req) => {
       type: 'demostream',
     };
     let valitity = jwt.sign(payload, secret, {
-      expiresIn: '45m', // Set token expiration to 30 minutes
+      expiresIn: '30m', // Set token expiration to 30 minutes
     });
-    if (demorequest.type == 'demo') {
-      valitity = jwt.sign(payload, secret, {
-        expiresIn: '30m', // Set token expiration to 30 minutes
-      });
-    }
+
     demostream.streamValitity = valitity;
     demostream.save();
     let product = await Product.find().limit(10);
@@ -1129,7 +1126,7 @@ const join_stream_buyer = async (req) => {
     }
   }
   else {
-    if (register < 100) {
+    if (register < 300) {
       demotoken.golive = true;
       if (stream.status == 'Pending') {
         stream.status = 'Ready';
@@ -1573,7 +1570,7 @@ const go_live = async (req) => {
   let demostream = await Demostream.findById(req.query.id);
   let expirationTimestamp;
   if (demostream.agoraID == null) {
-    let agoraID = await agoraToken.token_assign(1000, demostream._id, 'demo');
+    let agoraID = await agoraToken.token_assign(6000, demostream._id, 'demo');
     expirationTimestamp = moment().add(30, 'minutes') / 1000;
 
     if (demostream.type == 'demo') {

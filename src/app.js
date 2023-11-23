@@ -53,7 +53,7 @@ server.listen(config.port, () => {
 //   }
 // })
 io.sockets.on('connection', async (socket) => {
-  // await socketService.cost_connect_live_now(socket)
+  await socketService.cost_connect_live_now(socket)
   socket.on('livestream_joined', async (data) => {
     await socketService.livestream_joined(data, socket, io)
   });

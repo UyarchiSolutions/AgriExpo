@@ -11,7 +11,7 @@ const init = express();
 //   .toISOString()
 //   .replace(/(.*)T(.*)\..*/, '$1 $2');
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
-  console.log(new Date().setTime(new Date(1695817800000).getTime() + 5 * 60 * 1000))
+  // console.log(new Date().setTime(new Date(1695817800000).getTime() + 5 * 60 * 1000))
   // console.log("10"+10)
   // 1695817800000
   logger.info('Connected to MongoDB');

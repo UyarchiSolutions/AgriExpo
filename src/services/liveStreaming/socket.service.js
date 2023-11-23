@@ -257,7 +257,6 @@ const livestream_joined = async (streamId, socket, io) => {
   let userId = socket.userId;
 
   const userTimeline = await Usertimeline.findById(socket.timeline);
-  // console.log(userTimeline, 9876578)
   if (userTimeline) {
     if (userTimeline.userId == userId) {
       // console.log(78908765678, true, streamId)
