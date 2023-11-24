@@ -125,6 +125,9 @@ const getCandidateBySlot = async (req) => {
         attended: { $ifNull: ['$demobuyers.count', 0] },
       },
     },
+    {
+      $match: { attended: { $gt: 0 } },
+    },
     { $match: attendedMatch },
     { $sort: { attended: -1 } },
   ]);
