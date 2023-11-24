@@ -41,6 +41,7 @@ const getSlotDetails_WithCandidate = async () => {
 
 const getCandidateBySlot = async (req) => {
   const { date, time, attended } = req.params;
+  const { key } = req.query;
 
   attendedMatch = { active: true };
   if (attended == 'yes') {
@@ -50,6 +51,18 @@ const getCandidateBySlot = async (req) => {
   } else {
   }
 
+  let keyMatch = { active: true };
+
+  if (key && key != null && key != 'null' && key != '') {
+    keyMatch = {
+      $or: [
+        { mail: { $regex: key, $options: 'i' } },
+        { mobileNumber: { $regex: key, $options: 'i' } },
+        { currentLocation: { $regex: key, $options: 'i' } },
+      ],
+    };
+  }
+
   let values = await EventRegister.aggregate([
     {
       $match: {
@@ -57,6 +70,8 @@ const getCandidateBySlot = async (req) => {
         slot: time,
       },
     },
+    { $match: keyMatch },
+
     {
       $addFields: {
         mobilenumber: { $toDecimal: '$mobileNumber' },
