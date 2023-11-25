@@ -25,6 +25,7 @@ const getSlotDetails_WithCandidate = async () => {
     //     as: 'candidates',
     //   },
     // },
+    { $sort: { date: 1, sortcount: 1 } },
     {
       $project: {
         _id: 1,
@@ -35,6 +36,8 @@ const getSlotDetails_WithCandidate = async () => {
         createdAt: 1,
       },
     },
+    { $sort: { createdAt: 1 } },
+    // { $sort: { sortcount: 1 } },
   ]);
   return values;
 };
