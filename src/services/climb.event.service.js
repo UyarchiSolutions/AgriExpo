@@ -7,7 +7,14 @@ const getDatasBy_Event = (req) => {
   return req;
 };
 
-const getSlotDetails_WithCandidate = async () => {
+const getSlotDetails_WithCandidate = async (req) => {
+  const { key } = req.query;
+  let keyMatch = { active: true };
+
+  if (key && key != null && key != 'null' && key != '') {
+    keyMatch = { $or: [{ mail: { $regex: key, $options: 'i' } }, { mobileNumber: { $regex: key, $options: 'i' } }] };
+  }
+
   let values = await Eventslot.aggregate([
     // {
     //   $lookup: {
@@ -25,6 +32,26 @@ const getSlotDetails_WithCandidate = async () => {
     //     as: 'candidates',
     //   },
     // },
+
+    {
+      $lookup: {
+        from: 'climbeventregisters',
+        let: { eventDate: '$date', eventTime: '$slot' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [{ $eq: ['$date', '$$eventDate'] }, { $eq: ['$slot', '$$eventTime'] }],
+              },
+            },
+          },
+          {
+            $match: keyMatch,
+          },
+        ],
+        as: 'candidates',
+      },
+    },
     { $sort: { date: 1, sortcount: 1 } },
     {
       $project: {
@@ -34,8 +61,10 @@ const getSlotDetails_WithCandidate = async () => {
         slot: 1,
         no_of_count: 1,
         createdAt: 1,
+        user: { $size: '$candidates' },
       },
     },
+    { $match: { user: { $gt: 0 } } },
     { $sort: { createdAt: 1 } },
     // { $sort: { sortcount: 1 } },
   ]);

@@ -9,7 +9,7 @@ const getDatasBy_Event = catchAsync(async (req, res) => {
 });
 
 const getSlotDetails_WithCandidate = catchAsync(async (req, res) => {
-  const data = await ClimbEventService.getSlotDetails_WithCandidate();
+  const data = await ClimbEventService.getSlotDetails_WithCandidate(req);
   res.send(data);
 });
 
