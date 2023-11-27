@@ -7,8 +7,32 @@ const getDatasBy_Event = (req) => {
   return req;
 };
 
-const getSlotDetails_WithCandidate = async () => {
+const getSlotDetails_WithCandidate = async (req) => {
+  const { key } = req.query;
+  let keyMatch = { active: true };
+
+  if (key && key != null && key != 'null' && key != '') {
+    keyMatch = { $or: [{ mail: { $regex: key, $options: 'i' } }, { mobileNumber: { $regex: key, $options: 'i' } }] };
+  }
+
   let values = await Eventslot.aggregate([
+    // {
+    //   $lookup: {
+    //     from: 'climbeventregisters',
+    //     let: { eventDate: '$date', eventTime: '$slot' },
+    //     pipeline: [
+    //       {
+    //         $match: {
+    //           $expr: {
+    //             $and: [{ $eq: ['$date', '$$eventDate'] }, { $eq: ['$slot', '$$eventTime'] }],
+    //           },
+    //         },
+    //       },
+    //     ],
+    //     as: 'candidates',
+    //   },
+    // },
+
     {
       $lookup: {
         from: 'climbeventregisters',
@@ -21,10 +45,14 @@ const getSlotDetails_WithCandidate = async () => {
               },
             },
           },
+          {
+            $match: keyMatch,
+          },
         ],
         as: 'candidates',
       },
     },
+    { $sort: { date: 1, sortcount: 1 } },
     {
       $project: {
         _id: 1,
@@ -33,16 +61,40 @@ const getSlotDetails_WithCandidate = async () => {
         slot: 1,
         no_of_count: 1,
         createdAt: 1,
-        candidates: { $size: '$candidates' },
-        candList: '$candidates',
+        user: { $size: '$candidates' },
       },
     },
+    { $match: { user: { $gt: 0 } } },
+    { $sort: { createdAt: 1 } },
+    // { $sort: { sortcount: 1 } },
   ]);
   return values;
 };
 
 const getCandidateBySlot = async (req) => {
-  const { date, time } = req.params;
+  const { date, time, attended } = req.params;
+  const { key } = req.query;
+
+  attendedMatch = { active: true };
+  if (attended == 'yes') {
+    attendedMatch = { attended: { $gt: 0 } };
+  } else if (attended == 'no') {
+    attendedMatch = { attended: { $eq: 0 } };
+  } else {
+  }
+
+  let keyMatch = { active: true };
+
+  if (key && key != null && key != 'null' && key != '') {
+    keyMatch = {
+      $or: [
+        { mail: { $regex: key, $options: 'i' } },
+        { mobileNumber: { $regex: key, $options: 'i' } },
+        { currentLocation: { $regex: key, $options: 'i' } },
+      ],
+    };
+  }
+
   let values = await EventRegister.aggregate([
     {
       $match: {
@@ -50,6 +102,8 @@ const getCandidateBySlot = async (req) => {
         slot: time,
       },
     },
+    { $match: keyMatch },
+
     {
       $addFields: {
         mobilenumber: { $toDecimal: '$mobileNumber' },
@@ -103,9 +157,14 @@ const getCandidateBySlot = async (req) => {
         attended: { $ifNull: ['$demobuyers.count', 0] },
       },
     },
+    {
+      $match: { attended: { $gt: 0 } },
+    },
+    { $match: attendedMatch },
     { $sort: { attended: -1 } },
   ]);
-  return values;
+  let registrationCount = await EventRegister.find({ date: date, slot: time }).count();
+  return { values, registrationCount };
 };
 
 module.exports = {
