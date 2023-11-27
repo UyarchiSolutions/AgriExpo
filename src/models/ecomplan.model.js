@@ -538,6 +538,10 @@ const streamRequestschema = mongoose.Schema({
     type: String,
     default: 'Pending',
   },
+  shortsuploadStatus: {
+    type: String,
+    default: 'Pending',
+  },
   transaction: {
     type: String,
   },
