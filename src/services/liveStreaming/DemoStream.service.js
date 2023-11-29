@@ -1431,15 +1431,16 @@ const get_interviewer_list = async (req) => {
 
 const join_live = async (req) => {
   let token = await DemostreamToken.findByIdAndUpdate({ _id: req.query.id }, { live: true }, { new: true });
-  console.log(token._id)
-  req.emit(token.channel+"_jion_now", token);
+  console.log(token.channel + "_jion_now")
+  req.emit(token.channel + "_jion_now", token);
 
   return token;
 }
 
 const end_live = async (req) => {
   let token = await DemostreamToken.findByIdAndUpdate({ _id: req.query.id }, { live: false }, { new: true });
-  req.emit(token.channel+"_jion_now", token);
+  console.log(token.channel + "_jion_now")
+  req.emit(token.channel + "_jion_now", token);
   return token;
 
 }
