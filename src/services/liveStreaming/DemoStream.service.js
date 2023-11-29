@@ -52,6 +52,17 @@ const sms_send_seller = async (link, mobile) => {
   console.log(reva.data);
   return reva.data;
 };
+const sms_send_seller_assessment = async (link, mobile) => {
+  mobile = 91 + '' + mobile;
+  console.log(mobile)
+  console.log(link)
+  let message = `Dear Client, Thanks for your interest in our services. You can test our service by using this link https://ag23.site/s/${'a/' + link} - AgriExpoLive2023(An Ookam company event)`;
+  let reva = await axios.get(
+    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168958870053466`
+  );
+  console.log(reva.data);
+  return reva.data;
+};
 const geenerate_rtc_token = async (chennel, uid, role, expirationTimestamp, agoraID) => {
   let agoraToken = await AgoraAppId.findById(agoraID);
   console.log(chennel, uid, role, expirationTimestamp, agoraID, agoraToken);
@@ -815,8 +826,14 @@ const send_livestream_link = async (req) => {
   demopoat.push(streampost8);
   demopoat.push(streampost9);
   // if (demopoat.length == 10) {
-  await sms_send_seller(demostream._id, phoneNumber);
+  if (type != 'assessment') {
+    await sms_send_seller(demostream._id, phoneNumber);
+  }
+  else {
+    await sms_send_seller_assessment(demostream._id, phoneNumber);
+  }
   // console.log(emailservice.sendDemolink(['bharathiraja996574@gmail.com', 'bharathi@uyarchi.com', 'mps.bharathiraja@gmail.com'], demostream._id));
+
   return { demopoat, demostream };
   // }
   // });
