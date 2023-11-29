@@ -3,7 +3,13 @@ const catchAsync = require('../../utils/catchAsync');
 const demostream = require('../../services/liveStreaming/DemoStream.service');
 
 const send_livestream_link = catchAsync(async (req, res) => {
-  const data = await demostream.send_livestream_link(req);
+  let data;
+  if (req.body.type != 'assessment') {
+    data = await demostream.send_livestream_link(req);
+  }
+  else {
+    data = await demostream.send_livestream_link_assessment(req);
+  }
   res.status(httpStatus.CREATED).send(data);
 });
 

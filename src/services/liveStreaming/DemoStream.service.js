@@ -826,17 +826,51 @@ const send_livestream_link = async (req) => {
   demopoat.push(streampost8);
   demopoat.push(streampost9);
   // if (demopoat.length == 10) {
-  if (type != 'assessment') {
-    await sms_send_seller(demostream._id, phoneNumber);
-  }
-  else {
-    await sms_send_seller_assessment(demostream._id, phoneNumber);
-  }
+  await sms_send_seller(demostream._id, phoneNumber);
+
   // console.log(emailservice.sendDemolink(['bharathiraja996574@gmail.com', 'bharathi@uyarchi.com', 'mps.bharathiraja@gmail.com'], demostream._id));
 
   return { demopoat, demostream };
   // }
   // });
+};
+
+const send_livestream_link_assessment = async (req) => {
+  let userID = req.userId;
+  const { phoneNumber, name, transaction, type } = req.body;
+  let user = await Demoseller.findOne({ phoneNumber: phoneNumber });
+  if (!user) {
+    user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
+  } else {
+    user.name = name;
+    user.save();
+  }
+  const id = generateUniqueID();
+  let demostream = await Demostream.create({
+    userID: user._id,
+    dateISO: moment(),
+    phoneNumber: phoneNumber,
+    name: name,
+    streamName: type == "JOBS - WARMY - Assessment",
+    createdBy: userID,
+    _id: id,
+    transaction: transaction,
+    tokenExp: type == moment().add(1, 'days'),
+    type: type
+  });
+  const payload = {
+    _id: user._id,
+    streamID: demostream._id,
+    type: 'demostream',
+  };
+  let valitity = jwt.sign(payload, secret, {
+    expiresIn: '1d',
+  });
+
+  demostream.streamValitity = valitity;
+  demostream.save();
+  await sms_send_seller_assessment(demostream._id, phoneNumber);
+  return { demostream };
 };
 
 const verifyToken = async (req) => {
@@ -2846,6 +2880,7 @@ const turn_on_chat = async (req) => {
 module.exports = {
   send_livestream_link,
   send_livestream_link_demo,
+  send_livestream_link_assessment,
   verifyToken,
   get_stream_details_check,
   get_stream_details_check_golive,
