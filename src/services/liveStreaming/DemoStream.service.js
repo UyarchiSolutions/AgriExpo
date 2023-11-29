@@ -1432,7 +1432,7 @@ const get_interviewer_list = async (req) => {
 const join_live = async (req) => {
   let token = await DemostreamToken.findByIdAndUpdate({ _id: req.query.id }, { live: true }, { new: true });
   console.log(token.channel + "_jion_now")
-  req.emit(token.channel + "_jion_now", token);
+  req.io.emit(token.channel + "_jion_now", token);
 
   return token;
 }
@@ -1440,9 +1440,9 @@ const join_live = async (req) => {
 const end_live = async (req) => {
   let token = await DemostreamToken.findByIdAndUpdate({ _id: req.query.id }, { live: false }, { new: true });
   console.log(token.channel + "_jion_now")
-  req.emit(token.channel + "_jion_now", token);
+  req.io.emit(token.channel + "_jion_now", token);
   return token;
-
+  
 }
 
 const get_buyer_token = async (req) => {
