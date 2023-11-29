@@ -16,6 +16,11 @@ router.route('/demo/request').post(SellerAuth, demostream.send_livestream_link_d
 router.route('/chat/turn/on').get(demostream.turn_on_chat);
 
 
+router.route('/join_live').get(demostream.join_live);
+router.route('/end_live').get(demostream.end_live);
+
+
+router.route('/interviewer/list').get(demostream.get_interviewer_list);
 
 router.route('/demo/request').get(SellerAuth, demostream.get_demo_requests);
 router.route('/get/livestream/details').get(demostream.get_stream_details);
@@ -25,6 +30,7 @@ router.route('/get/stream/details').get(demostream.get_stream_details_check);
 router.route('/get/stream/details/golive').get(demostream.get_stream_details_check_golive);
 router.route('/go/live/stream').get(demostream.get_stream_details_check);
 router.route('/join/stream/buyer').post(demostream.join_stream_buyer);
+router.route('/join/stream/candidate').post(demostream.join_stream_candidate);
 router.route('/get/buyer/token').get(demostream.get_buyer_token);
 // router.route('/register/buyer/stream').get(demostream.stream_register_buyer);
 router.route('/get/get_add_to_cart').get(demostream.get_get_add_to_cart);

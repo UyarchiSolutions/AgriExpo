@@ -77,10 +77,31 @@ const join_stream_buyer = catchAsync(async (req, res) => {
   const data = await demostream.join_stream_buyer(req);
   res.status(httpStatus.CREATED).send(data);
 });
+const join_stream_candidate = catchAsync(async (req, res) => {
+  const data = await demostream.join_stream_candidate(req);
+  res.status(httpStatus.CREATED).send(data);
+});
 const buyer_go_live_stream = catchAsync(async (req, res) => {
   const data = await demostream.buyer_go_live_stream(req);
   res.status(httpStatus.CREATED).send(data);
 });
+
+const get_interviewer_list = catchAsync(async (req, res) => {
+  const data = await demostream.get_interviewer_list(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
+const join_live = catchAsync(async (req, res) => {
+  const data = await demostream.join_live(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
+
+const end_live = catchAsync(async (req, res) => {
+  const data = await demostream.end_live(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
 
 const get_buyer_token = catchAsync(async (req, res) => {
   const data = await demostream.get_buyer_token(req);
@@ -264,6 +285,7 @@ module.exports = {
   get_stream_details_check,
   go_live_stream,
   join_stream_buyer,
+  join_stream_candidate,
   get_stream_verify_buyer,
   get_buyer_token,
   stream_register_buyer,
@@ -307,5 +329,8 @@ module.exports = {
   send_request_link,
   send_livestream_link_demo,
   get_demo_requests,
-  turn_on_chat
+  turn_on_chat,
+  get_interviewer_list,
+  join_live,
+  end_live
 };
