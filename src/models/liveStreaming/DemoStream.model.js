@@ -25,6 +25,9 @@ const demosellerschema = mongoose.Schema({
   },
   type: {
     type: String,
+  },
+  recuiteUser: {
+    type: String,
   }
 });
 
@@ -119,6 +122,9 @@ const demostreamchema = mongoose.Schema({
   chat: {
     type: Boolean,
     default: false
+  },
+  recuiteUser: {
+    type: String,
   }
 });
 

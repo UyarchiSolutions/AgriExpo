@@ -56,7 +56,9 @@ const sms_send_seller_assessment = async (link, mobile) => {
   mobile = 91 + '' + mobile;
   console.log(mobile)
   console.log(link)
-  let message = `Dear Client, Thanks for your interest in our services. You can test our service by using this link https://ag23.site/s/${'a/' + link} - AgriExpoLive2023(An Ookam company event)`;
+  // let message = `Dear Client, Thanks for your interest in our services. You can test our service by using this link https://ag23.site/s/${'a/' + link} - AgriExpoLive2023(An Ookam company event)`;
+  let message = `Dear Client, Thanks for your interest in our services. You can test our service by using this link https://ag23.site/s/${'a/' + link
+    } - AgriExpoLive2023(An Ookam company event)`;
   let reva = await axios.get(
     `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168958870053466`
   );
@@ -839,6 +841,7 @@ const send_livestream_link_assessment = async (req) => {
     user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
   } else {
     user.name = name;
+    user.recuiteUser = req.body.user;
     user.save();
   }
   const id = generateUniqueID();
@@ -852,7 +855,8 @@ const send_livestream_link_assessment = async (req) => {
     _id: id,
     transaction: transaction,
     tokenExp: type == moment().add(1, 'days'),
-    type: type
+    type: type,
+    recuiteUser: req.body.user
   });
   const payload = {
     _id: user._id,
@@ -2516,7 +2520,7 @@ const cloude_recording_stream = async (stream, app, endTime) => {
           )}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
           { headers: { Authorization } }
         )
-        .then((res) => {})
+        .then((res) => { })
         .catch(async (error) => {
           console.log('error');
           await Democloudrecord.findByIdAndUpdate({ _id: record._id }, { recoredStart: 'stop' }, { new: true });
