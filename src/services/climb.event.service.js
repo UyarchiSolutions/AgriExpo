@@ -167,8 +167,22 @@ const getCandidateBySlot = async (req) => {
   return { values, registrationCount };
 };
 
+const getTestCandidates = async () => {
+  let values = await EventRegister.aggregate([
+    {
+      $match: {
+        testEntry: true,
+      },
+    },
+  ]);
+  return values;
+};
+
+// let values = await EventRegister.ag
+
 module.exports = {
   getDatasBy_Event,
   getSlotDetails_WithCandidate,
   getCandidateBySlot,
+  getTestCandidates,
 };

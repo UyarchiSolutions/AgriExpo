@@ -20,18 +20,15 @@ const get_demo_requests = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(data);
 });
 
-
 const demorequest = catchAsync(async (req, res) => {
   const data = await demostream.demorequest(req);
   res.status(httpStatus.CREATED).send(data);
 });
 
-
 const get_demo_request = catchAsync(async (req, res) => {
   const data = await demostream.get_demo_request(req);
   res.status(httpStatus.CREATED).send(data);
 });
-
 
 const send_request_link = catchAsync(async (req, res) => {
   const data = await demostream.send_request_link(req);
@@ -251,6 +248,11 @@ const issueResolve = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(TechIssue);
 });
 
+const getDatas = catchAsync(async (req, res) => {
+  const TechIssue = await demostream.getDatas();
+  res.status(httpStatus.OK).send(TechIssue);
+});
+
 module.exports = {
   send_livestream_link,
   get_stream_details,
@@ -301,5 +303,6 @@ module.exports = {
   send_request_link,
   send_livestream_link_demo,
   get_demo_requests,
-  turn_on_chat
+  turn_on_chat,
+  getDatas,
 };

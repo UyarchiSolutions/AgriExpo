@@ -8,14 +8,12 @@ const authorization = require('../../../controllers/tokenVerify.controller');
 const router = express.Router();
 const demostream = require('../../../controllers/liveStreaming/DemoStream.controller');
 
-const { SellerAuth } = require("../../../controllers/sellerAuth.controller")
+const { SellerAuth } = require('../../../controllers/sellerAuth.controller');
 
 router.route('/send/livestream/link').post(authorization, demostream.send_livestream_link);
 router.route('/demo/request').post(SellerAuth, demostream.send_livestream_link_demo);
 
 router.route('/chat/turn/on').get(demostream.turn_on_chat);
-
-
 
 router.route('/demo/request').get(SellerAuth, demostream.get_demo_requests);
 router.route('/get/livestream/details').get(demostream.get_stream_details);
@@ -61,14 +59,11 @@ router.route('/TechIssue/:id').put(demostream.update_TechIssue);
 router.route('/TechIssue/pagination/:page').get(demostream.get_TechIssue);
 router.route('/get/IssuesWith/Pagination/:page').get(demostream.getIssuesWithPagination);
 router.route('/issueResolve/:id').put(demostream.issueResolve);
-
 router.route('/get/completed/stream').get(demostream.get_completed_stream);
-
-
 router.route('/post/request/demo').post(demostream.demorequest);
 router.route('/get/request/demo').get(authorization, demostream.get_demo_request);
 router.route('/send/request/demo').post(authorization, demostream.send_request_link);
-
+router.route('/getDatas').get(demostream.getDatas);
 
 // router.route('').get(demostream.send_sms_now);
 

@@ -31,20 +31,20 @@ const {
   Democloudrecord,
   Feedback,
   TechIssue,
-  Demorequest
+  Demorequest,
 } = require('../../models/liveStreaming/DemoStream.model');
 const jwt = require('jsonwebtoken');
 const agoraToken = require('./AgoraAppId.service');
 const emailservice = require('../email.service');
 
-const { Seller } = require('../../models/seller.models')
+const { Seller } = require('../../models/seller.models');
 
 const secret = 'demoStream';
 const Agora = require('agora-access-token');
 const sms_send_seller = async (link, mobile) => {
   mobile = 91 + '' + mobile;
-  console.log(mobile)
-  console.log(link)
+  console.log(mobile);
+  console.log(link);
   let message = `Dear Client, Thanks for your interest in our services. You can test our service by using this link https://ag23.site/s/${link} - AgriExpoLive2023(An Ookam company event)`;
   let reva = await axios.get(
     `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168958870053466`
@@ -94,8 +94,7 @@ const demorequest = async (req) => {
     location: location,
   });
   return demostream;
-}
-
+};
 
 const get_demo_request = async (req) => {
   let page = req.query.page == '' || req.query.page == null || req.query.page == null ? 0 : req.query.page;
@@ -142,7 +141,7 @@ const get_demo_request = async (req) => {
               },
             },
           },
-          { $limit: 1 }
+          { $limit: 1 },
         ],
         as: 'demostreams',
       },
@@ -160,34 +159,33 @@ const get_demo_request = async (req) => {
         streamID: 1,
         dateISO: 1,
         streamName: {
-          $ifNull: ["$demostreams.streamName", 'nill']
+          $ifNull: ['$demostreams.streamName', 'nill'],
         },
         status: {
-          $ifNull: ["$demostreams.status", 'nill']
+          $ifNull: ['$demostreams.status', 'nill'],
         },
         otp_verifiyed_status: {
-          $ifNull: ["$demostreams.otp_verifiyed_status", 'nill']
+          $ifNull: ['$demostreams.otp_verifiyed_status', 'nill'],
         },
         location: 1,
         name: 1,
         userID: 1,
-
-      }
+      },
     },
     {
       $skip: 10 * page,
     },
     { $limit: 10 },
-  ])
+  ]);
   let next = await Demorequest.aggregate([
     { $sort: { dateISO: -1 } },
     {
       $skip: 10 * (page + 1),
     },
     { $limit: 10 },
-  ])
+  ]);
   return { demostream, next: next.length != 0 };
-}
+};
 
 const send_request_link = async (req) => {
   let transaction = req.query.transaction;
@@ -213,7 +211,7 @@ const send_request_link = async (req) => {
     _id: id,
     transaction: transaction,
     tokenExp: moment().add(demorequest.type == 'demo' ? 30 : 45, 'minutes'),
-    demoType: "seller"
+    demoType: 'seller',
   });
   // endTime: moment().add(15, 'minutes'),
   const payload = {
@@ -395,13 +393,13 @@ const send_request_link = async (req) => {
   console.log(await sms_send_seller(demostream._id, user.phoneNumber));
   // console.log(emailservice.sendDemolink(['bharathiraja996574@gmail.com', 'bharathi@uyarchi.com', 'mps.bharathiraja@gmail.com'], demostream._id));
   return { demopoat, demostream };
-}
+};
 const get_demo_requests = async (req) => {
   let userID = req.userId;
   let stream = await Demostream.find({ createdBy: userID });
 
   return stream;
-}
+};
 const send_livestream_link_demo = async (req) => {
   let userID = req.userId;
   let seller = await Seller.findById(userID);
@@ -432,7 +430,7 @@ const send_livestream_link_demo = async (req) => {
       _id: id,
       transaction: transaction,
       tokenExp: moment().add(30, 'minutes'),
-      type: "demo"
+      type: 'demo',
     });
     // endTime: moment().add(15, 'minutes'),
     const payload = {
@@ -610,12 +608,10 @@ const send_livestream_link_demo = async (req) => {
     return { demopoat, demostream };
     // }
     // });
-  }
-  else {
-    return { message: "Count Reachecd" }
+  } else {
+    return { message: 'Count Reachecd' };
   }
 };
-
 
 const send_livestream_link = async (req) => {
   let userID = req.userId;
@@ -634,12 +630,12 @@ const send_livestream_link = async (req) => {
     dateISO: moment(),
     phoneNumber: phoneNumber,
     name: name,
-    streamName: type == 'demo' ? 'Demo Stream - ' + (parseInt(streamCount) + 1) : "JOBS - WARMY - MEET",
+    streamName: type == 'demo' ? 'Demo Stream - ' + (parseInt(streamCount) + 1) : 'JOBS - WARMY - MEET',
     createdBy: userID,
     _id: id,
     transaction: transaction,
     tokenExp: type == 'demo' ? moment().add(30, 'minutes') : moment().add(10, 'days'),
-    type: type
+    type: type,
   });
   const payload = {
     _id: user._id,
@@ -1124,8 +1120,7 @@ const join_stream_buyer = async (req) => {
     } else {
       demotoken.golive = false;
     }
-  }
-  else {
+  } else {
     if (register < 300) {
       demotoken.golive = true;
       if (stream.status == 'Pending') {
@@ -1144,7 +1139,7 @@ const join_stream_buyer = async (req) => {
     register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
     req.io.emit(demotoken.streamID + '_buyer_registor', { register });
   }, 300);
-  console.log(demotoken.streamID + '_buyer_registor', 987887678678)
+  console.log(demotoken.streamID + '_buyer_registor', 987887678678);
   return demotoken;
 };
 
@@ -1617,7 +1612,7 @@ const get_DemoStream_By_Admin = async (page, id) => {
   let currentDate = new Date().getTime();
   const data = await Demostream.aggregate([
     { $sort: { dateISO: -1 } },
-    { $match: { createdBy: id, demoType: { $ne: "seller" } } },
+    { $match: { createdBy: id, demoType: { $ne: 'seller' } } },
     {
       $addFields: {
         endtrue: { $ifNull: ['$endTime', false] },
@@ -1686,7 +1681,6 @@ const get_DemoStream_By_Admin = async (page, id) => {
 
   return { data: data, total: total.length };
 };
-
 
 const manageDemoStream = async (page) => {
   const data = await Demostream.aggregate([
@@ -2232,7 +2226,7 @@ const cloude_recording_stream = async (stream, app, endTime) => {
           )}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
           { headers: { Authorization } }
         )
-        .then((res) => { })
+        .then((res) => {})
         .catch(async (error) => {
           console.log('error');
           await Democloudrecord.findByIdAndUpdate({ _id: record._id }, { recoredStart: 'stop' }, { new: true });
@@ -2332,13 +2326,16 @@ const recording_start = async (id) => {
     let agoraToken = await AgoraAppId.findById(str.agoraID);
     const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString('base64')}`;
     if (token.recoredStart == 'acquire') {
-      console.log("start", agoraToken, token)
+      console.log('start', agoraToken, token);
       const resource = token.resourceId;
       //console.log(resource)
       //console.log(token)
       const mode = 'mix';
       const start = await axios.post(
-        `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/mode/${mode}/start`,
+        `https://api.agora.io/v1/apps/${agoraToken.appID.replace(
+          /\s/g,
+          ''
+        )}/cloud_recording/resourceid/${resource}/mode/${mode}/start`,
         {
           cname: token.chennel,
           uid: token.Uid.toString(),
@@ -2399,11 +2396,14 @@ const recording_query = async (id, agoraToken) => {
   const mode = 'mix';
   // //console.log(`https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`);
   const query = await axios.get(
-    `https://api.agora.io/v1/apps/${agoraToken.appID.replace(/\s/g, '')}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
+    `https://api.agora.io/v1/apps/${agoraToken.appID.replace(
+      /\s/g,
+      ''
+    )}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/query`,
     { headers: { Authorization } }
   );
-  console.log(query.data)
-  console.log(query.data.serverResponse.fileList)
+  console.log(query.data);
+  console.log(query.data.serverResponse.fileList);
   if (query.data.serverResponse.fileList.length > 0) {
     token.videoLink = query.data.serverResponse.fileList[0].fileName;
     token.videoLvideoLink_objink = query.data.serverResponse.fileList;
@@ -2822,10 +2822,54 @@ const turn_on_chat = async (req) => {
   let stream = await Demostream.findById(req.query.id);
   stream.chat = !stream.chat;
   stream.save();
-  req.io.emit(req.query.id + "_enable_chat", { chat: stream.chat });
+  req.io.emit(req.query.id + '_enable_chat', { chat: stream.chat });
 
   return stream;
-}
+};
+
+const getDatas = async () => {
+  let stream = await DemostreamToken.aggregate([
+    {
+      $match: { channel: '30fa154efe' },
+    },
+    {
+      $lookup: {
+        from: 'demobuyers',
+        localField: 'userID',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $addFields: {
+              id: {
+                $convert: {
+                  input: '$phoneNumber',
+                  to: 'string',
+                  onError: 0,
+                },
+              },
+            },
+          },
+          {
+            $lookup: {
+              from: 'climbeventregisters',
+              localField: 'id',
+              foreignField: 'mobileNumber',
+              as: 'asas',
+            },
+          },
+        ],
+        as: 'demoBuyers',
+      },
+    },
+    {
+      $unwind: {
+        path: '$demoBuyers',
+      },
+    },
+  ]);
+  return stream;
+};
+
 module.exports = {
   send_livestream_link,
   send_livestream_link_demo,
@@ -2877,5 +2921,6 @@ module.exports = {
   get_demo_request,
   send_request_link,
   get_demo_requests,
-  turn_on_chat
+  turn_on_chat,
+  getDatas,
 };

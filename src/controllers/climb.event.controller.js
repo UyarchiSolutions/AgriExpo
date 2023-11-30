@@ -18,8 +18,14 @@ const getCandidateBySlot = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const getTestCandidates = catchAsync(async (req, res) => {
+  const data = await ClimbEventService.getTestCandidates();
+  res.send(data);
+});
+
 module.exports = {
   getDatasBy_Event,
   getSlotDetails_WithCandidate,
   getCandidateBySlot,
+  getTestCandidates,
 };
