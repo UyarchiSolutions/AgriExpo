@@ -172,6 +172,7 @@ const getTestCandidates = async () => {
     {
       $match: {
         testEntry: true,
+        status:'Activated'
       },
     },
   ]);
