@@ -103,6 +103,11 @@ const end_live = catchAsync(async (req, res) => {
 });
 
 
+const leave_admin_call = catchAsync(async (req, res) => {
+  const data = await demostream.leave_admin_call(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
 const get_buyer_token = catchAsync(async (req, res) => {
   const data = await demostream.get_buyer_token(req);
   res.status(httpStatus.CREATED).send(data);
@@ -332,5 +337,6 @@ module.exports = {
   turn_on_chat,
   get_interviewer_list,
   join_live,
-  end_live
+  end_live,
+  leave_admin_call
 };

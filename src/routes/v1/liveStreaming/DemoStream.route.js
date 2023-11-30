@@ -19,6 +19,7 @@ router.route('/chat/turn/on').get(demostream.turn_on_chat);
 router.route('/join_live').get(demostream.join_live);
 router.route('/end_live').get(demostream.end_live);
 
+router.route('/leave/admin').get(demostream.leave_admin_call);
 
 router.route('/interviewer/list').get(demostream.get_interviewer_list);
 

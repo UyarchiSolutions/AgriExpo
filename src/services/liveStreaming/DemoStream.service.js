@@ -1442,7 +1442,15 @@ const end_live = async (req) => {
   console.log(token._id + "_jion_now")
   req.io.emit(token._id + "_jion_now", token);
   return token;
-  
+
+}
+
+const leave_admin_call = async (req) => {
+  let token = await DemostreamToken.findByIdAndUpdate({ _id: req.query.id }, { live: false }, { new: true });
+  console.log(token._id + "_jion_now")
+  req.io.emit(token._id + "_jion_now", token);
+  return token;
+
 }
 
 const get_buyer_token = async (req) => {
@@ -1889,7 +1897,7 @@ const go_live = async (req) => {
     req.io.emit(demostream._id + 'stream_on_going', demostream);
   }
 
-  // await cloude_recording_stream(demostream._id, demostream.agoraID, demostream.endTime);
+  await cloude_recording_stream(demostream._id, demostream.agoraID, demostream.endTime);
   return demotoken;
 };
 
@@ -3162,5 +3170,6 @@ module.exports = {
   turn_on_chat,
   get_interviewer_list,
   join_live,
-  end_live
+  end_live,
+  leave_admin_call
 };
