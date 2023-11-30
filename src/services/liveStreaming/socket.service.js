@@ -329,7 +329,6 @@ const auth_details = async (socket, token, next) => {
   } catch {
     return next();
   }
-
 }
 
 const user_Disconect = async (socket, io) => {

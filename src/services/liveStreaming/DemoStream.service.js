@@ -52,6 +52,17 @@ const sms_send_seller = async (link, mobile) => {
   console.log(reva.data);
   return reva.data;
 };
+const sms_send_seller_assessment = async (link, mobile) => {
+  mobile = 91 + '' + mobile;
+  console.log(mobile)
+  console.log(link)
+  let message = `Dear Client, Thanks for your interest in our services. You can test our service by using this link https://ag23.site/s/${'a/' + link} - AgriExpoLive2023(An Ookam company event)`;
+  let reva = await axios.get(
+    `http://panel.smsmessenger.in/api/mt/SendSMS?user=ookam&password=ookam&senderid=OOKAMM&channel=Trans&DCS=0&flashsms=0&number=${mobile}&text=${message}&route=6&peid=1701168700339760716&DLTTemplateId=1707168958870053466`
+  );
+  console.log(reva.data);
+  return reva.data;
+};
 const geenerate_rtc_token = async (chennel, uid, role, expirationTimestamp, agoraID) => {
   let agoraToken = await AgoraAppId.findById(agoraID);
   console.log(chennel, uid, role, expirationTimestamp, agoraID, agoraToken);
@@ -812,10 +823,50 @@ const send_livestream_link = async (req) => {
   demopoat.push(streampost9);
   // if (demopoat.length == 10) {
   await sms_send_seller(demostream._id, phoneNumber);
+
   // console.log(emailservice.sendDemolink(['bharathiraja996574@gmail.com', 'bharathi@uyarchi.com', 'mps.bharathiraja@gmail.com'], demostream._id));
+
   return { demopoat, demostream };
   // }
   // });
+};
+
+const send_livestream_link_assessment = async (req) => {
+  let userID = req.userId;
+  const { phoneNumber, name, transaction, type } = req.body;
+  let user = await Demoseller.findOne({ phoneNumber: phoneNumber });
+  if (!user) {
+    user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
+  } else {
+    user.name = name;
+    user.save();
+  }
+  const id = generateUniqueID();
+  let demostream = await Demostream.create({
+    userID: user._id,
+    dateISO: moment(),
+    phoneNumber: phoneNumber,
+    name: name,
+    streamName: "JOBS - WARMY - Assessment",
+    createdBy: userID,
+    _id: id,
+    transaction: transaction,
+    tokenExp: type == moment().add(1, 'days'),
+    type: type
+  });
+  const payload = {
+    _id: user._id,
+    streamID: demostream._id,
+    type: 'demostream',
+  };
+  let valitity = jwt.sign(payload, secret, {
+    expiresIn: '1d',
+  });
+
+  demostream.streamValitity = valitity;
+  demostream.save();
+  await sms_send_seller_assessment(demostream._id, phoneNumber);
+  return { demostream };
 };
 
 const verifyToken = async (req) => {
@@ -1071,6 +1122,115 @@ const go_live_stream = async (req) => {
   return { token, streampost };
 };
 
+const join_stream_candidate = async (req) => {
+  const { phoneNumber, name, type } = req.body;
+
+  const streamId = req.query.id;
+
+  let user = await Demobuyer.findOne({ phoneNumber: phoneNumber });
+
+  if (!user) {
+    user = await Demobuyer.create({ phoneNumber: phoneNumber, name: name, dateISO: moment(), type });
+  } else {
+    user.name = name;
+    user.type = type;
+    user.save();
+  }
+
+  const stream = await Demostream.findById(streamId);
+  if (!stream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
+  }
+
+  let demotoken = await DemostreamToken.findOne({ userID: user._id, streamID: stream._id });
+  if (!demotoken) {
+    // const uid = await generateUid();
+    // const role = Agora.RtcRole.PUBLISHER;
+    // let expirationTimestamp = moment().add(15, 'minutes') / 1000;
+    // const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp, stream.agoraID);
+    demotoken = await DemostreamToken.create({
+      // expirationTimestamp: moment().add(15, 'minutes'),
+      streamID: streamId,
+      type: 'BUYER',
+      // uid: uid,
+      agoraID: stream.agoraID,
+      // token: token,
+      channel: streamId,
+      dateISO: moment(),
+      userID: user._id,
+      usertype: type
+    });
+  }
+  let register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
+  if (stream.type == 'demo') {
+    if (register < 5) {
+      demotoken.golive = true;
+      if (stream.status == 'Pending') {
+        stream.status = 'Ready';
+        stream.save();
+      }
+    } else {
+      demotoken.golive = false;
+    }
+  }
+  else if (stream.type == 'assessment') {
+    if (register < 5) {
+      demotoken.golive = true;
+      if (stream.status == 'Pending') {
+        stream.status = 'Ready';
+        stream.save();
+      }
+    } else {
+      demotoken.golive = false;
+    }
+  }
+  else {
+    if (register < 300) {
+      demotoken.golive = true;
+      if (stream.status == 'Pending') {
+        stream.status = 'Ready';
+        stream.save();
+      }
+    } else {
+      demotoken.golive = false;
+    }
+  }
+  demotoken.status = 'resgistered';
+  demotoken.save();
+  setTimeout(async () => {
+    register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
+    req.io.emit(demotoken.streamID + '_buyer_registor', { register });
+
+    let interviewvers = await DemostreamToken.aggregate([
+      { $match: { $and: [{ _id: { $eq: demotoken._id } }] } },
+      {
+        $lookup: {
+          from: 'demobuyers',
+          localField: 'userID',
+          foreignField: '_id',
+          as: 'demobuyers',
+        },
+      },
+      { $unwind: '$demobuyers' },
+
+      {
+        $project: {
+          name: "$demobuyers.name",
+          phoneNumber: "$demobuyers.phoneNumber",
+          _id: 1,
+          date: 1,
+          dateISO: 1,
+          live: 1
+        }
+      }
+    ])
+    if (interviewvers.length != 0) {
+      req.io.emit(demotoken.streamID + '_candidate', interviewvers[0]);
+    }
+  }, 300);
+  return demotoken;
+};
+
 const join_stream_buyer = async (req) => {
   const { phoneNumber, name } = req.body;
 
@@ -1120,7 +1280,19 @@ const join_stream_buyer = async (req) => {
     } else {
       demotoken.golive = false;
     }
-  } else {
+  }
+  else if (stream.type == 'assessment') {
+    if (register < 5) {
+      demotoken.golive = true;
+      if (stream.status == 'Pending') {
+        stream.status = 'Ready';
+        stream.save();
+      }
+    } else {
+      demotoken.golive = false;
+    }
+  }
+  else {
     if (register < 300) {
       demotoken.golive = true;
       if (stream.status == 'Pending') {
@@ -1138,8 +1310,36 @@ const join_stream_buyer = async (req) => {
   setTimeout(async () => {
     register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
     req.io.emit(demotoken.streamID + '_buyer_registor', { register });
+
+    let interviewvers = await DemostreamToken.aggregate([
+      { $match: { $and: [{ _id: { $eq: demotoken._id } }] } },
+      {
+        $lookup: {
+          from: 'demobuyers',
+          localField: 'userID',
+          foreignField: '_id',
+          as: 'demobuyers',
+        },
+      },
+      { $unwind: '$demobuyers' },
+
+      {
+        $project: {
+          name: "$demobuyers.name",
+          phoneNumber: "$demobuyers.phoneNumber",
+          _id: 1,
+          date: 1,
+          dateISO: 1,
+          live: 1
+
+        }
+      }
+    ])
+    if (interviewvers.length != 0) {
+      req.io.emit(demotoken.streamID + '_interviewer', interviewvers[0]);
+    }
+
   }, 300);
-  console.log(demotoken.streamID + '_buyer_registor', 987887678678);
   return demotoken;
 };
 
@@ -1148,10 +1348,10 @@ const buyer_go_live_stream = async (req) => {
   if (!demotoken) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
   }
+  const stream = await Demostream.findById(demotoken.streamID);
   if (demotoken.token == null) {
-    const stream = await Demostream.findById(demotoken.streamID);
     const uid = await generateUid();
-    const role = Agora.RtcRole.PUBLISHER;
+    const role = Agora.RtcRole.SUBSCRIBER;
     let expirationTimestamp = stream.endTime / 1000;
     const token = await geenerate_rtc_token(stream._id, uid, role, expirationTimestamp, stream.agoraID);
     demotoken.expirationTimestamp = stream.endTime;
@@ -1159,8 +1359,95 @@ const buyer_go_live_stream = async (req) => {
     demotoken.token = token;
     demotoken.save();
   }
+  if (stream.type == 'assessment') {
+    await cloude_recording_stream(stream._id, stream.agoraID, stream.endTime);
+  }
   return demotoken;
 };
+
+
+const get_interviewer_list = async (req) => {
+  let id = req.query.id;
+
+  let interviewvers = await DemostreamToken.aggregate([
+    { $match: { $and: [{ streamID: { $eq: id } }, { usertype: { $ne: "Candidate" } }] } },
+    {
+      $lookup: {
+        from: 'demobuyers',
+        localField: 'userID',
+        foreignField: '_id',
+        as: 'demobuyers',
+      },
+    },
+    { $unwind: '$demobuyers' },
+
+    {
+      $project: {
+        name: "$demobuyers.name",
+        phoneNumber: "$demobuyers.phoneNumber",
+        _id: 1,
+        date: 1,
+        dateISO: 1,
+        live: 1
+
+      }
+    }
+
+
+  ])
+  let candidate = await DemostreamToken.aggregate([
+    { $match: { $and: [{ streamID: { $eq: id } }, { usertype: { $eq: "Candidate" } }] } },
+    {
+      $lookup: {
+        from: 'demobuyers',
+        localField: 'userID',
+        foreignField: '_id',
+        as: 'demobuyers',
+      },
+    },
+    { $unwind: '$demobuyers' },
+
+    {
+      $project: {
+        name: "$demobuyers.name",
+        phoneNumber: "$demobuyers.phoneNumber",
+        _id: 1,
+        date: 1,
+        dateISO: 1,
+        live: 1
+
+      }
+    }
+
+  ])
+
+  return { interviewvers, candidate }
+};
+
+
+const join_live = async (req) => {
+  let token = await DemostreamToken.findByIdAndUpdate({ _id: req.query.id }, { live: true }, { new: true });
+  console.log(token._id + "_jion_now")
+  req.io.emit(token._id + "_jion_now", token);
+
+  return token;
+}
+
+const end_live = async (req) => {
+  let token = await DemostreamToken.findByIdAndUpdate({ _id: req.query.id }, { live: false }, { new: true });
+  console.log(token._id + "_jion_now")
+  req.io.emit(token._id + "_jion_now", token);
+  return token;
+
+}
+
+const leave_admin_call = async (req) => {
+  let token = await DemostreamToken.findByIdAndUpdate({ _id: req.query.id }, { live: false }, { new: true });
+  console.log(token._id + "_jion_now")
+  req.io.emit(token._id + "_jion_now", token);
+  return token;
+
+}
 
 const get_buyer_token = async (req) => {
   let join_token = req.query.id;
@@ -1572,6 +1859,10 @@ const go_live = async (req) => {
       agoraID = await agoraToken.token_assign(105, demostream._id, 'demo');
       expirationTimestamp = moment().add(15, 'minutes') / 1000;
     }
+    if (demostream.type == 'assessment') {
+      agoraID = await agoraToken.token_assign(330, demostream._id, 'demo');
+      expirationTimestamp = moment().add(30, 'minutes') / 1000;
+    }
 
     if (agoraID) {
       demostream.agoraID = agoraID.element._id;
@@ -1601,8 +1892,6 @@ const go_live = async (req) => {
     demostream.save();
     req.io.emit(demostream._id + 'stream_on_going', demostream);
   }
-
-  console.log(demostream.agoraID);
 
   await cloude_recording_stream(demostream._id, demostream.agoraID, demostream.endTime);
   return demotoken;
@@ -2873,11 +3162,13 @@ const getDatas = async () => {
 module.exports = {
   send_livestream_link,
   send_livestream_link_demo,
+  send_livestream_link_assessment,
   verifyToken,
   get_stream_details_check,
   get_stream_details_check_golive,
   go_live_stream,
   join_stream_buyer,
+  join_stream_candidate,
   get_stream_verify_buyer,
   get_buyer_token,
   stream_register_buyer,
@@ -2922,5 +3213,8 @@ module.exports = {
   send_request_link,
   get_demo_requests,
   turn_on_chat,
-  getDatas,
+  get_interviewer_list,
+  join_live,
+  end_live,
+  leave_admin_call
 };

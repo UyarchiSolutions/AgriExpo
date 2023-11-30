@@ -202,6 +202,9 @@ const Demobuyerschema = mongoose.Schema({
   name: {
     type: String,
   },
+  type: {
+    type: String,
+  }
 });
 
 const Demobuyer = mongoose.model('demobuyer', Demobuyerschema);
@@ -373,6 +376,13 @@ const Demostreamchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  usertype: {
+    type: String,
+  },
+  live: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 const DemostreamToken = mongoose.model('demostreamtoken', Demostreamchema);

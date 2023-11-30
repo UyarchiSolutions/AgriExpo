@@ -3,7 +3,13 @@ const catchAsync = require('../../utils/catchAsync');
 const demostream = require('../../services/liveStreaming/DemoStream.service');
 
 const send_livestream_link = catchAsync(async (req, res) => {
-  const data = await demostream.send_livestream_link(req);
+  let data;
+  if (req.body.type != 'assessment') {
+    data = await demostream.send_livestream_link(req);
+  }
+  else {
+    data = await demostream.send_livestream_link_assessment(req);
+  }
   res.status(httpStatus.CREATED).send(data);
 });
 
@@ -68,8 +74,34 @@ const join_stream_buyer = catchAsync(async (req, res) => {
   const data = await demostream.join_stream_buyer(req);
   res.status(httpStatus.CREATED).send(data);
 });
+const join_stream_candidate = catchAsync(async (req, res) => {
+  const data = await demostream.join_stream_candidate(req);
+  res.status(httpStatus.CREATED).send(data);
+});
 const buyer_go_live_stream = catchAsync(async (req, res) => {
   const data = await demostream.buyer_go_live_stream(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
+const get_interviewer_list = catchAsync(async (req, res) => {
+  const data = await demostream.get_interviewer_list(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
+const join_live = catchAsync(async (req, res) => {
+  const data = await demostream.join_live(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
+
+const end_live = catchAsync(async (req, res) => {
+  const data = await demostream.end_live(req);
+  res.status(httpStatus.CREATED).send(data);
+});
+
+
+const leave_admin_call = catchAsync(async (req, res) => {
+  const data = await demostream.leave_admin_call(req);
   res.status(httpStatus.CREATED).send(data);
 });
 
@@ -260,6 +292,7 @@ module.exports = {
   get_stream_details_check,
   go_live_stream,
   join_stream_buyer,
+  join_stream_candidate,
   get_stream_verify_buyer,
   get_buyer_token,
   stream_register_buyer,
@@ -304,5 +337,9 @@ module.exports = {
   send_livestream_link_demo,
   get_demo_requests,
   turn_on_chat,
-  getDatas,
+  get_interviewer_list,
+  join_live,
+  end_live,
+  leave_admin_call,
+  getDatas
 };
