@@ -863,7 +863,7 @@ const send_livestream_link_assessment = async (req) => {
     type: 'demostream',
   };
   let valitity = jwt.sign(payload, secret, {
-    expiresIn: '1d',
+    expiresIn: '10d',
   });
 
   demostream.streamValitity = valitity;
