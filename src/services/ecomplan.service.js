@@ -14973,6 +14973,21 @@ const purchesPlane_exhibitor = async (req, res) => {
   return paynow;
 };
 
+const purchesPlane_mexhibitor = async (req, res) => {
+  const { amount, plan, redirct } = req.body;
+  let plandetails = await Streamplan.findById(plan);
+  if (!plandetails) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Plan Not Available');
+  }
+  let price = plandetails.offer_price;
+  let gst = (price * 18) / 100;
+  let total = price + gst;
+  let paynow = await ccavenue.mexhibitor_purchese_plan(total, 'https://agriexpo.click/success', null, price, gst);
+  console.log(paynow.payment.id, paynow.payment._id);
+  let purchase = await purchese_plan.create_PurchasePlan_EXpo(plan, req.userId, paynow.payment.id, gst);
+  return paynow;
+};
+
 const get_Saved_Product = async (userId) => {
   var date_now = new Date().getTime();
   let values = await Savedproduct.aggregate([
@@ -15435,6 +15450,7 @@ module.exports = {
 
   // purchese plan
   purchesPlane_exhibitor,
+  purchesPlane_mexhibitor,
   get_Saved_Product,
   update_post_price_admin,
   post_payment_details,

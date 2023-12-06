@@ -785,7 +785,10 @@ const purchesPlane_exhibitor = catchAsync(async (req, res) => {
   const data = await Ecomserive.purchesPlane_exhibitor(req, res);
   res.send(data);
 });
-
+const purchesPlane_mexhibitor = catchAsync(async (req, res) => {
+  const data = await Ecomserive.purchesPlane_mexhibitor(req, res);
+  res.send(data);
+});
 const get_Saved_Product = catchAsync(async (req, res) => {
   let userId = req.shopId;
   const data = await Ecomserive.get_Saved_Product(userId);
@@ -944,6 +947,7 @@ module.exports = {
 
   // pruchese plan
   purchesPlane_exhibitor,
+  purchesPlane_mexhibitor,
   get_Saved_Product,
   remove_stream_admin,
   search_product_list,

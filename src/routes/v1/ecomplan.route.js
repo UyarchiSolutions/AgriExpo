@@ -242,6 +242,7 @@ router.route('/get/address/lat/log').get(SellerAuth, Ecomcontroller.get_address_
 
 
 router.route('/purchese/plan/exhibitor').post(SellerAuth, Ecomcontroller.purchesPlane_exhibitor);
+router.route('/purchese/plan/mexhibitor').post(SellerAuth, Ecomcontroller.purchesPlane_mexhibitor);
 
 router.route('/get_Saved/Product').get(shopverify, Ecomcontroller.get_Saved_Product)
 
