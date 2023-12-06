@@ -194,7 +194,7 @@ const mexhibitor_purchese_plan = async (amount, redirct, paymentLink, price, gst
         delivery_zip: "400038",
         delivery_country: "India",
         delivery_tel: "0123456789",
-        merchant_param1: 'https://exhibitor.agriexpo.live/dashboard/payment-success',
+        merchant_param1: 'https://mexhibitor.agriexpo.live/dashboard/payment-success',
         merchant_param2: "additional Info.",
         merchant_param3: "additional Info.",
         merchant_param4: "additional Info.",
