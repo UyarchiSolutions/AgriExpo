@@ -2636,6 +2636,7 @@ const get_raise_hand_user = async (req) => {
 }
 
 
+const { Users } = require('../../models/B2Busers.model');
 
 const push_notification = async (req) => {
   const { text, title, image, user } = req.body
