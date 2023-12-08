@@ -654,6 +654,12 @@ const get_Tele_Sales = async () => {
   return values;
 };
 
+
+const get_b2buser_eligible = async (body) => {
+  let userss = await Users.aggregate([{ $match: { $and: [{ fcmToken: { $ne: null } }] } }])
+  return userss;
+};
+
 module.exports = {
   createUser,
   UsersLogin,
@@ -692,4 +698,5 @@ module.exports = {
   chatBotOtp,
   chatBotOtpVerify,
   get_Tele_Sales,
+  get_b2buser_eligible
 };

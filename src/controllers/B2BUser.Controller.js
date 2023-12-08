@@ -219,6 +219,11 @@ const get_Tele_Sales = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const get_b2buser_eligible = catchAsync(async (req, res) => {
+  const data = await b2bUsersService.get_b2buser_eligible(req.body);
+  res.send(data);
+});
+
 module.exports = {
   createB2bUsers,
   getsalesExecuteRolesUsers,
@@ -257,4 +262,5 @@ module.exports = {
   chatBotOtp,
   chatBotOtpVerify,
   get_Tele_Sales,
+  get_b2buser_eligible
 };
