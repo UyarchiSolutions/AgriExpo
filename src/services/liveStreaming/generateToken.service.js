@@ -2635,6 +2635,43 @@ const get_raise_hand_user = async (req) => {
   return user[0];
 }
 
+
+
+const push_notification = async (req) => {
+  const { text, title, image, user } = req.body
+
+  let userss = await Users.findById(user);
+  if (userss) {
+    if (userss.fcmToken.length != 0) {
+      const admin = require('../firebase.service');
+      const token = userss.fcmToken;
+      const message = {
+        tokens: token,
+        notification: {
+          title: text,
+          body: title,
+          image: image
+        },
+        // topic: 'your-topic', // Replace with the topic or device token you want to send the notification to
+      };
+      let messages = await admin
+        .messaging()
+        .sendEachForMulticast(message)
+        .then((response) => {
+          return response;
+        })
+        .catch((error) => console.log(error));
+
+      return messages;
+    }
+    else {
+      return { message: "device Not found" }
+    }
+  }
+  return { message: "user Not found" }
+};
+
+
 module.exports = {
   generateToken,
   getHostTokens,
@@ -2676,5 +2713,6 @@ module.exports = {
 
   // raise Hands
   start_rice_user_hands_admin,
-  get_raise_hands_admin
+  get_raise_hands_admin,
+  push_notification
 };

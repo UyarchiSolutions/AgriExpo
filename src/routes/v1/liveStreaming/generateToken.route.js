@@ -68,4 +68,9 @@ router.route('/get/raise/hand/user/admin').post(authorization, generateToken.get
 
 
 
+router.route('/push/notification/send').post(generateToken.push_notification);
+
+
+
+
 module.exports = router;
