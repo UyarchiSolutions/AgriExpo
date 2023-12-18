@@ -32,6 +32,7 @@ const {
   Feedback,
   TechIssue,
   Demorequest,
+  Demoraisehands
 } = require('../../models/liveStreaming/DemoStream.model');
 const jwt = require('jsonwebtoken');
 const agoraToken = require('./AgoraAppId.service');
@@ -619,12 +620,49 @@ const send_livestream_link_demo = async (req) => {
     await sms_send_seller(demostream._id, seller.mobileNumber);
     // console.log(emailservice.sendDemolink(['bharathiraja996574@gmail.com', 'bharathi@uyarchi.com', 'mps.bharathiraja@gmail.com'], demostream._id));
     return { demopoat, demostream };
-    // }
-    // });
   } else {
     return { message: 'Count Reachecd' };
   }
 };
+
+const send_livestream_link_ryh = async (req) => {
+  let userID = req.userId;
+  const { phoneNumber, name, transaction, type } = req.body;
+  let user = await Demoseller.findOne({ phoneNumber: phoneNumber });
+  if (!user) {
+    user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
+  } else {
+    user.name = name;
+    user.save();
+  }
+  const id = generateUniqueID();
+  let streamCount = await Demostream.find().count();
+  let demostream = await Demostream.create({
+    userID: user._id,
+    dateISO: moment(),
+    phoneNumber: phoneNumber,
+    name: name,
+    streamName: 'Demo Stream - ' + (parseInt(streamCount) + 1),
+    createdBy: userID,
+    _id: id,
+    transaction: transaction,
+    tokenExp: type == moment().add(10, 'days'),
+    type: type,
+  });
+  const payload = {
+    _id: user._id,
+    streamID: demostream._id,
+    type: 'demostream',
+  };
+  let valitity = jwt.sign(payload, secret, {
+    expiresIn: '10d',
+  });
+  demostream.streamValitity = valitity;
+  demostream.save();
+  await sms_send_seller(demostream._id, phoneNumber);
+
+  return { demostream };
+}
 
 const send_livestream_link = async (req) => {
   let userID = req.userId;
@@ -875,10 +913,12 @@ const send_livestream_link_assessment = async (req) => {
 
 const verifyToken = async (req) => {
   console.log(req.query.id);
+
   const token = await Demostream.findById(req.query.id);
   if (!token) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
   }
+  console.log(token.streamValitity)
   try {
     const payload = jwt.verify(token.streamValitity, 'demoStream');
   } catch (err) {
@@ -1859,7 +1899,6 @@ const go_live = async (req) => {
   if (demostream.agoraID == null) {
     let agoraID = await agoraToken.token_assign(6000, demostream._id, 'demo');
     expirationTimestamp = moment().add(30, 'minutes') / 1000;
-
     if (demostream.type == 'demo') {
       agoraID = await agoraToken.token_assign(105, demostream._id, 'demo');
       expirationTimestamp = moment().add(15, 'minutes') / 1000;
@@ -1878,7 +1917,6 @@ const go_live = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Invalid Link');
   }
   let demotoken = await DemostreamToken.findOne({ type: 'HOST', streamID: demostream._id });
-
   if (!demotoken) {
     demotoken = await DemostreamToken.create({
       expirationTimestamp: expirationTimestamp * 1000,
@@ -3164,8 +3202,54 @@ const getDatas = async () => {
   return stream;
 };
 
+const toggle_raise_hand = async (req) => {
+  let stream = await Demostream.findById(req.query.id);
+  stream.raise_hands = !stream.raise_hands;
+  stream.save();
+  req.io.emit(req.query.id + '_enable_raise_hands', { raise_hands: stream.chat });
+
+  return stream;
+};
+
+
+const raise_my_hands = async (req) => {
+  let stream = await DemostreamToken.findById(req.query.id);
+  if (!stream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Demo Request Not Found');
+  }
+
+  stream.raise_hands = !stream.raise_hands;
+  stream.save();
+
+  stream = await DemostreamToken.aggregate([
+    { $match: { $and: [{ _id: { $eq: stream._id } }] } },
+    {
+      $lookup: {
+        from: 'demobuyers',
+        localField: 'userID',
+        foreignField: '_id',
+        as: 'demobuyers',
+      },
+    },
+    { $unwind: '$demobuyers' },
+    {
+      $addFields: {
+        name: "$demobuyers.name",
+        phoneNumber: "$demobuyers.phoneNumber",
+
+      },
+    },
+  ])
+
+  req.io.emit(stream.streamID + '_join_raise_hands', stream[0]);
+
+  return stream;
+};
+
+
 module.exports = {
   send_livestream_link,
+  send_livestream_link_ryh,
   send_livestream_link_demo,
   send_livestream_link_assessment,
   verifyToken,
@@ -3222,5 +3306,7 @@ module.exports = {
   get_interviewer_list,
   join_live,
   end_live,
-  leave_admin_call
+  leave_admin_call,
+  toggle_raise_hand,
+  raise_my_hands
 };

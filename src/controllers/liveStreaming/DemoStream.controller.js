@@ -4,7 +4,10 @@ const demostream = require('../../services/liveStreaming/DemoStream.service');
 
 const send_livestream_link = catchAsync(async (req, res) => {
   let data;
-  if (req.body.type != 'assessment') {
+  if (req.body.type == 'meet-RYH') {
+    data = await demostream.send_livestream_link_ryh(req);
+  }
+  else if (req.body.type != 'assessment') {
     data = await demostream.send_livestream_link(req);
   }
   else {
@@ -285,6 +288,16 @@ const getDatas = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(TechIssue);
 });
 
+const toggle_raise_hand = catchAsync(async (req, res) => {
+  const TechIssue = await demostream.toggle_raise_hand(req);
+  res.status(httpStatus.OK).send(TechIssue);
+});
+
+const raise_my_hands= catchAsync(async (req, res) => {
+  const TechIssue = await demostream.raise_my_hands(req);
+  res.status(httpStatus.OK).send(TechIssue);
+});
+
 module.exports = {
   send_livestream_link,
   get_stream_details,
@@ -341,5 +354,7 @@ module.exports = {
   join_live,
   end_live,
   leave_admin_call,
-  getDatas
+  getDatas,
+  toggle_raise_hand,
+  raise_my_hands
 };

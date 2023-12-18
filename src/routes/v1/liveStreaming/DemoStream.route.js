@@ -12,10 +12,7 @@ const { SellerAuth } = require('../../../controllers/sellerAuth.controller');
 
 router.route('/send/livestream/link').post(authorization, demostream.send_livestream_link);
 router.route('/demo/request').post(SellerAuth, demostream.send_livestream_link_demo);
-
 router.route('/chat/turn/on').get(demostream.turn_on_chat);
-
-
 router.route('/join_live').get(demostream.join_live);
 router.route('/end_live').get(demostream.end_live);
 
@@ -75,5 +72,12 @@ router.route('/send/request/demo').post(authorization, demostream.send_request_l
 router.route('/getDatas').get(demostream.getDatas);
 
 // router.route('').get(demostream.send_sms_now);
+
+
+
+
+router.route('/toggle/raise/hands').get(demostream.toggle_raise_hand);
+router.route('/raise/my/hands').get(demostream.toggle_raise_hand);
+
 
 module.exports = router;

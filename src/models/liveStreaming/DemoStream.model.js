@@ -125,6 +125,10 @@ const demostreamchema = mongoose.Schema({
   },
   recuiteUser: {
     type: String,
+  },
+  raise_hands: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -996,6 +1000,40 @@ const Demorequstshema = new mongoose.Schema(
 
 const Demorequest = mongoose.model('demorequest', Demorequstshema);
 
+
+
+
+
+
+const demoraisehandsshema = new mongoose.Schema(
+  {
+    _id: {
+      type: String,
+      default: v4,
+    },
+    streamID: {
+      type: String,
+    },
+    userID: {
+      type: String,
+    },
+    dateISO: {
+      type: Number,
+    },
+    joineID: {
+      type: String,
+    },
+    joinLive: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
+
+const Demoraisehands = mongoose.model('demoraisehands', demoraisehandsshema);
+
+
 module.exports = {
   Demoseller,
   Demostream,
@@ -1013,5 +1051,6 @@ module.exports = {
   Democloudrecord,
   Feedback,
   TechIssue,
-  Demorequest
+  Demorequest,
+  Demoraisehands
 };
