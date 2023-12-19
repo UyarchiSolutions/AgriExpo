@@ -293,10 +293,27 @@ const toggle_raise_hand = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(TechIssue);
 });
 
-const raise_my_hands= catchAsync(async (req, res) => {
+const raise_my_hands = catchAsync(async (req, res) => {
   const TechIssue = await demostream.raise_my_hands(req);
   res.status(httpStatus.OK).send(TechIssue);
 });
+
+const accept_raise_hands = catchAsync(async (req, res) => {
+  const TechIssue = await demostream.accept_raise_hands(req);
+  res.status(httpStatus.OK).send(TechIssue);
+});
+
+const end_raise_hands = catchAsync(async (req, res) => {
+  const TechIssue = await demostream.end_raise_hands(req);
+  res.status(httpStatus.OK).send(TechIssue);
+});
+
+const leave_raise_hands = catchAsync(async (req, res) => {
+  const TechIssue = await demostream.leave_raise_hands(req);
+  res.status(httpStatus.OK).send(TechIssue);
+});
+
+
 
 module.exports = {
   send_livestream_link,
@@ -356,5 +373,8 @@ module.exports = {
   leave_admin_call,
   getDatas,
   toggle_raise_hand,
-  raise_my_hands
+  raise_my_hands,
+  accept_raise_hands,
+  end_raise_hands,
+  leave_raise_hands
 };

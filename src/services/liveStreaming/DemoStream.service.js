@@ -1148,7 +1148,32 @@ const get_stream_details_check_golive = async (req) => {
   const agoraID = await AgoraAppId.findById(token.agoraID);
   const allowed_count = await DemostreamToken.find({ golive: true, status: 'resgistered', streamID: token._id }).count();
   await cloude_recording_stream(token._id, token.agoraID, token.endTime);
-  return { token, streampost, agora, agoraID, allowed_count };
+
+  const raise = await DemostreamToken.aggregate([
+    { $match: { $and: [{ streamID: { $eq: req.query.id } }, { raise_hands: { $eq: true } }] } },
+    {
+      $lookup: {
+        from: 'demobuyers',
+        localField: 'userID',
+        foreignField: '_id',
+        as: 'demobuyers',
+      },
+    },
+    { $unwind: '$demobuyers' },
+    {
+      $project: {
+        name: "$demobuyers.name",
+        phoneNumber: "$demobuyers.phoneNumber",
+        _id: 1,
+        date: 1,
+        dateISO: 1,
+        live: 1,
+        raise_hands: 1
+      }
+    }
+  ])
+
+  return { token, raise, streampost, agora, agoraID, allowed_count };
 };
 
 const go_live_stream = async (req) => {
@@ -3206,7 +3231,7 @@ const toggle_raise_hand = async (req) => {
   let stream = await Demostream.findById(req.query.id);
   stream.raise_hands = !stream.raise_hands;
   stream.save();
-  req.io.emit(req.query.id + '_enable_raise_hands', { raise_hands: stream.chat });
+  req.io.emit(req.query.id + '_enable_raise_hands', { raise_hands: stream.raise_hands });
 
   return stream;
 };
@@ -3236,15 +3261,95 @@ const raise_my_hands = async (req) => {
       $addFields: {
         name: "$demobuyers.name",
         phoneNumber: "$demobuyers.phoneNumber",
-
+        raise_hands: stream.raise_hands
       },
     },
   ])
 
-  req.io.emit(stream.streamID + '_join_raise_hands', stream[0]);
+  req.io.emit(stream[0].streamID + '_join_raise_hands', stream[0]);
 
-  return stream;
+  return stream[0];
 };
+
+const accept_raise_hands = async (req) => {
+  let stream = await DemostreamToken.findById(req.query.id);
+
+  if (!stream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Demo Token Not Found');
+  }
+  let strm = await Demostream.findById(stream.streamID);
+
+  if (!strm) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Demo Stream Not Found');
+  }
+  strm.raiseUser = stream._id;
+  strm.save();
+  req.io.emit(stream._id + '_accept_stream', strm);
+
+  return strm;
+
+}
+
+const end_raise_hands = async (req) => {
+  let stream = await DemostreamToken.findById(req.query.id);
+
+  if (!stream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Demo Token Not Found');
+  }
+  let strm = await Demostream.findById(stream.streamID);
+
+  if (!strm) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Demo Stream Not Found');
+  }
+  strm.raiseUser = null;
+  strm.save();
+  req.io.emit(stream._id + '_accept_stream', strm);
+  return strm;
+
+}
+
+const leave_raise_hands = async (req) => {
+  let stream = await DemostreamToken.findById(req.query.id);
+
+  if (!stream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Demo Token Not Found');
+  }
+  let strm = await Demostream.findById(stream.streamID);
+
+  if (!strm) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Demo Stream Not Found');
+  }
+  strm.raiseUser = null;
+  strm.save();
+  req.io.emit(strm._id + '_accept_stream', strm);
+  stream.raise_hands = false;
+  stream.save();
+
+  stream = await DemostreamToken.aggregate([
+    { $match: { $and: [{ _id: { $eq: stream._id } }] } },
+    {
+      $lookup: {
+        from: 'demobuyers',
+        localField: 'userID',
+        foreignField: '_id',
+        as: 'demobuyers',
+      },
+    },
+    { $unwind: '$demobuyers' },
+    {
+      $addFields: {
+        name: "$demobuyers.name",
+        phoneNumber: "$demobuyers.phoneNumber",
+        raise_hands: stream.raise_hands
+      },
+    },
+  ])
+
+  req.io.emit(stream[0].streamID + '_join_raise_hands', stream[0]);
+
+  return strm;
+
+}
 
 
 module.exports = {
@@ -3308,5 +3413,8 @@ module.exports = {
   end_live,
   leave_admin_call,
   toggle_raise_hand,
-  raise_my_hands
+  raise_my_hands,
+  accept_raise_hands,
+  end_raise_hands,
+  leave_raise_hands
 };

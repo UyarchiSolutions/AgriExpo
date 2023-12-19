@@ -129,6 +129,9 @@ const demostreamchema = mongoose.Schema({
   raise_hands: {
     type: Boolean,
     default: false
+  },
+  raiseUser: {
+    type: String,
   }
 });
 
@@ -392,6 +395,10 @@ const Demostreamchema = mongoose.Schema({
   live: {
     type: Boolean,
     default: false,
+  },
+  raise_hands: {
+    type: Boolean,
+    default: false
   }
 });
 

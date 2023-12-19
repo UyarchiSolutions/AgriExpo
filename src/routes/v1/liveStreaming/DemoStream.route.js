@@ -77,7 +77,10 @@ router.route('/getDatas').get(demostream.getDatas);
 
 
 router.route('/toggle/raise/hands').get(demostream.toggle_raise_hand);
-router.route('/raise/my/hands').get(demostream.toggle_raise_hand);
+router.route('/raise/my/hands').get(demostream.raise_my_hands);
+router.route('/accept/raise/hands').get(demostream.accept_raise_hands);
+router.route('/end/raise/hands').get(demostream.end_raise_hands);
 
+router.route('/leave/raise/hands').get(demostream.leave_raise_hands);
 
 module.exports = router;
