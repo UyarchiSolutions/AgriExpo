@@ -1312,7 +1312,7 @@ const join_stream_buyer = async (req) => {
   } else {
     user.name = name;
     user.Institution_name = Institution_name;
-    user.name = location;
+    user.location = location;
     user.save();
   }
 
