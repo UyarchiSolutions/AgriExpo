@@ -3356,7 +3356,7 @@ const leave_raise_hands = async (req) => {
 
 }
 
-const stop_recording = async () => {
+const stop_recording = async (req) => {
   let token = await DemostreamToken.findOne({ chennel: req.query.id, type: 'CloudRecording', recoredStart: { $eq: "query" } }).sort({ created: -1 });
   if (token) {
     let str = await Demostream.findById(token.streamID);
