@@ -1301,7 +1301,7 @@ const join_stream_candidate = async (req) => {
 };
 
 const join_stream_buyer = async (req) => {
-  const { phoneNumber, name } = req.body;
+  const { phoneNumber, name, Institution_name, location } = req.body;
 
   const streamId = req.query.id;
 
@@ -1311,6 +1311,8 @@ const join_stream_buyer = async (req) => {
     user = await Demobuyer.create({ phoneNumber: phoneNumber, name: name, dateISO: moment() });
   } else {
     user.name = name;
+    user.Institution_name = Institution_name;
+    user.name = location;
     user.save();
   }
 
@@ -3233,6 +3235,9 @@ const toggle_raise_hand = async (req) => {
   stream.save();
   req.io.emit(req.query.id + '_enable_raise_hands', { raise_hands: stream.raise_hands });
 
+
+
+
   return stream;
 };
 
@@ -3351,6 +3356,57 @@ const leave_raise_hands = async (req) => {
 
 }
 
+const stop_recording = async () => {
+  let token = await DemostreamToken.findOne({ chennel: req.query.id, type: 'CloudRecording', recoredStart: { $eq: "query" } }).sort({ created: -1 });
+  if (token) {
+    let str = await Demostream.findById(token.streamID);
+    let agoraToken = await AgoraAppId.findById(str.agoraID);
+    const Authorization = `Basic ${Buffer.from(agoraToken.Authorization.replace(/\s/g, '')).toString(
+      'base64'
+    )}`;
+    if (token.recoredStart == 'query') {
+      const resource = token.resourceId;
+      const sid = token.sid;
+      const mode = 'mix';
+
+      const stop = await axios.post(
+        `https://api.agora.io/v1/apps/${agoraToken.appID}/cloud_recording/resourceid/${resource}/sid/${sid}/mode/${mode}/stop`,
+        {
+          cname: token.chennel,
+          uid: token.Uid.toString(),
+          clientRequest: {},
+        },
+        {
+          headers: {
+            Authorization,
+          },
+        }
+      ).then((res) => {
+        return res;
+      }).catch((err) => {
+
+        throw new ApiError(httpStatus.NOT_FOUND, 'Cloud Recording Stop:' + err.message);
+      });
+
+      token.recoredStart = 'stop';
+      if (stop.data.serverResponse.fileList.length == 2) {
+        token.videoLink = stop.data.serverResponse.fileList[0].fileName;
+        token.videoLink_array = stop.data.serverResponse.fileList;
+        let m3u8 = stop.data.serverResponse.fileList[0].fileName;
+        token.videoLink_mp4 = m3u8;
+      }
+      token.save();
+      return stop;
+    }
+    else {
+      return { message: 'Already Stoped' };
+    }
+  }
+  else {
+    return { message: 'Clound not Found' };
+  }
+}
+
 
 module.exports = {
   send_livestream_link,
@@ -3416,5 +3472,6 @@ module.exports = {
   raise_my_hands,
   accept_raise_hands,
   end_raise_hands,
-  leave_raise_hands
+  leave_raise_hands,
+  stop_recording
 };

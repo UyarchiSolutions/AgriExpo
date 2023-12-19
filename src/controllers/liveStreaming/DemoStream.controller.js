@@ -314,6 +314,12 @@ const leave_raise_hands = catchAsync(async (req, res) => {
 });
 
 
+const stop_recording = catchAsync(async (req, res) => {
+  const TechIssue = await demostream.stop_recording(req);
+  res.status(httpStatus.OK).send(TechIssue);
+});
+
+
 
 module.exports = {
   send_livestream_link,
@@ -376,5 +382,6 @@ module.exports = {
   raise_my_hands,
   accept_raise_hands,
   end_raise_hands,
-  leave_raise_hands
+  leave_raise_hands,
+  stop_recording
 };

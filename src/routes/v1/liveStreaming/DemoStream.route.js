@@ -83,4 +83,9 @@ router.route('/end/raise/hands').get(demostream.end_raise_hands);
 
 router.route('/leave/raise/hands').get(demostream.leave_raise_hands);
 
+
+
+router.route('/stop/recording').get(demostream.stop_recording);
+
+
 module.exports = router;

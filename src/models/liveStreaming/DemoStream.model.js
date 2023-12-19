@@ -217,6 +217,12 @@ const Demobuyerschema = mongoose.Schema({
   },
   type: {
     type: String,
+  },
+  Institution_name: {
+    type: String,
+  },
+  location: {
+    type: String,
   }
 });
 
