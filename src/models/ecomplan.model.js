@@ -615,6 +615,12 @@ const streamRequestschema = mongoose.Schema({
   showStream: {
     type: Boolean,
     default: true
+  },
+  shortsLink: {
+    type: String,
+  },
+  shortsUploadTime: {
+    type: Number,
   }
 });
 

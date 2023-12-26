@@ -14383,6 +14383,40 @@ const upload_s3_stream_video = async (req) => {
   });
   return stream;
 };
+
+const upload_s3_shorts_video = async (req) => {
+  console.log(req.file);
+  let streamId = req.query.id;
+  let stream = await Streamrequest.findById(streamId);
+
+  if (!stream) {
+    fileupload.unlink(req.file.path, (err) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+    });
+    throw new ApiError(httpStatus.NOT_FOUND, 'Not Found stream');
+  }
+  let up = await S3video.videoupload(req.file, 'shorts/admin/upload', 'mp4');
+  console.log(up);
+  if (up) {
+    stream.shortsLink = up.Location;
+    stream.shortsUploadTime = moment();
+    stream.shortsuploadStatus = 'upload';
+    stream.save();
+  }
+  fileupload.unlink(req.file.path, (err) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+  });
+  return stream;
+};
+
+
+
 const upload_s3_stream_video_admin = async (req) => {
   console.log(req.file);
   let streamId = req.query.id;
@@ -15457,5 +15491,6 @@ module.exports = {
   remove_stream_admin,
   search_product_list,
   remove_post_stream,
-  post_show_toggle
+  post_show_toggle,
+  upload_s3_shorts_video
 };
