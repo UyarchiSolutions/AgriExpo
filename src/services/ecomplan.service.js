@@ -14398,7 +14398,7 @@ const upload_s3_shorts_video = async (req) => {
     });
     throw new ApiError(httpStatus.NOT_FOUND, 'Not Found stream');
   }
-  let up = await S3video.videoupload(req.file, 'shorts/admin/upload', 'mp4');
+  let up = await S3video.videoupload(req.file, 'upload/admin/upload', 'mp4');
   console.log(up);
   if (up) {
     stream.shortsLink = up.Location;
