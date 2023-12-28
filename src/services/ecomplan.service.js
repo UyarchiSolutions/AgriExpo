@@ -14389,6 +14389,8 @@ const upload_s3_shorts_video = async (req) => {
   let streamId = req.query.id;
   let stream = await Streamrequest.findById(streamId);
 
+  console.log(stream)
+
   if (!stream) {
     fileupload.unlink(req.file.path, (err) => {
       if (err) {

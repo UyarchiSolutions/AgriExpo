@@ -244,21 +244,25 @@ const current_live_jion_count = async (req, io) => {
 
 
 const cost_connect_live_now = async (socket) => {
-  const timeline = await Usertimeline.findById(socket.timeline);
-  if (timeline) {
-    timeline.socketId = socket.id;
-    timeline.save();
+  // console.log(socket.timeline,87687667)
+  if (socket.timeline != null) {
+    const timeline = await Usertimeline.findByIdAndUpdate({ _id: socket.timeline }, { socketId: socket.id }, { new: true });
+    // console.log(timeline)
+    console.log("user Connected", timeline.userName, timeline.mobileNumber)
   }
 }
 
 const livestream_joined = async (streamId, socket, io) => {
-  console.log(98765789765546)
+  // console.log(98765789765546)
   let timeline = socket.timeline;
   let userId = socket.userId;
 
   const userTimeline = await Usertimeline.findById(socket.timeline);
+  console.log(11111)
   if (userTimeline) {
+    console.log(2222)
     if (userTimeline.userId == userId) {
+      console.log(33333);
       // console.log(78908765678, true, streamId)
       let stream = await StreamTimeline.create({
         timeline: timeline,
@@ -273,12 +277,23 @@ const livestream_joined = async (streamId, socket, io) => {
       userTimeline.save();
 
       let streamrequest = await Streamrequest.findById(streamId);
-      // console.log(userTimeline)
       if (streamrequest) {
-        // console.log(streamrequest)
-        streamrequest.streamCurrent_Watching = streamrequest.streamCurrent_Watching + 1;
+        console.log(44444);
+        // streamrequest.join_users = streamrequest.join_users == null ? [] : streamrequest.join_users;
+        // streamrequest.Current_join = streamrequest.Current_join == null ? [] : streamrequest.Current_join;
+        let index = streamrequest.join_users.findIndex((a) => a == userId);
+        console.log(index, 78678765)
+        if (index == -1) {
+          let join = streamrequest.join_users.concat([userId]);
+          streamrequest.join_users = join;
+        }
+        let index_all = streamrequest.Current_join.findIndex((a) => a == userId);
+        if (index_all == -1) {
+          streamrequest.streamCurrent_Watching = streamrequest.streamCurrent_Watching + 1;
+          let join = streamrequest.Current_join.concat([userId]);
+          streamrequest.Current_join = join;
+        }
         streamrequest.save();
-        // console.log(streamrequest)
         setTimeout(() => {
           io.sockets.emit(streamId + "_current_watching", { streamCurrent_Watching: streamrequest.streamCurrent_Watching })
         }, 100)
@@ -293,25 +308,37 @@ const livestream_joined = async (streamId, socket, io) => {
 const livestream_leave = async (streamId, socket, io) => {
   let timeline = socket.timeline;
   let userId = socket.userId;
+  console.log(socket.timeline, 798678675)
+  if (socket.timeline != null) {
+    const userTimeline = await Usertimeline.findById(timeline);
+    console.log(userTimeline)
+    // console.log(userTimeline, 9876898797657)
+    if (userTimeline) {
+      if (userTimeline.userId == userId) {
+        let stream = await StreamTimeline.findById(userTimeline.streamingTimelineID);
+        if (stream) {
+          stream.OUT = new Date().getTime();
+          stream.status = "END";
+          stream.save();
+        }
+        userTimeline.streamingTimelineID = null;
+        userTimeline.streamId = null;
+        userTimeline.save();
+        let streamrequest = await Streamrequest.findById(streamId);
+        let join = streamrequest.Current_join;
+        if (streamrequest) {
+          let index = streamrequest.Current_join.findIndex((a) => a == userId);
+          console.log(index, 786876)
+          if (index != -1) {
+            streamrequest.streamCurrent_Watching = streamrequest.streamCurrent_Watching - 1 >= 0 ? streamrequest.streamCurrent_Watching - 1 : 0;
+            join.splice(index, 1);
+            console.log(join, 767687876)
+            streamrequest.Current_join = join
+          }
 
-  const userTimeline = await Usertimeline.findById(timeline);
-  // console.log(userTimeline, 9876898797657)
-  if (userTimeline) {
-    if (userTimeline.userId == userId) {
-      let stream = await StreamTimeline.findById(userTimeline.streamingTimelineID);
-      if (stream) {
-        stream.OUT = new Date().getTime();
-        stream.status = "END";
-        stream.save();
-      }
-      userTimeline.streamingTimelineID = null;
-      userTimeline.streamId = null;
-      userTimeline.save();
-      let streamrequest = await Streamrequest.findById(streamId);
-      if (streamrequest) {
-        streamrequest.streamCurrent_Watching = streamrequest.streamCurrent_Watching - 1 >= 0 ? streamrequest.streamCurrent_Watching - 1 : 0;
-        streamrequest.save();
-        io.sockets.emit(streamId + "_current_watching", { streamCurrent_Watching: streamrequest.streamCurrent_Watching })
+          streamrequest.save();
+          io.sockets.emit(streamId + "_current_watching", { streamCurrent_Watching: streamrequest.streamCurrent_Watching })
+        }
       }
     }
   }
@@ -332,32 +359,42 @@ const auth_details = async (socket, token, next) => {
 }
 
 const user_Disconect = async (socket, io) => {
+  console.log("user disconnetced", 8767868, socket.timeline)
   let timeline = socket.timeline;
   let userId = socket.userId;
   let streamId;
-  const userTimeline = await Usertimeline.findById(timeline);
-  // console.log(userTimeline, 9876898797657)
-  if (userTimeline) {
-    if (userTimeline.streamId != null && userTimeline.userId == userId) {
-      streamId = userTimeline.streamId;
-      let stream = await StreamTimeline.findById(userTimeline.streamingTimelineID);
-      if (stream) {
-        stream.OUT = new Date().getTime();
-        stream.status = "END";
-        stream.save();
-      }
-      userTimeline.streamingTimelineID = null;
-      userTimeline.streamId = null;
-      userTimeline.save();
-      let streamrequest = await Streamrequest.findById(streamId);
-      if (streamrequest) {
-        streamrequest.streamCurrent_Watching = streamrequest.streamCurrent_Watching - 1 >= 0 ? streamrequest.streamCurrent_Watching - 1 : 0;
-        streamrequest.save();
-        io.sockets.emit(streamId + "_current_watching", { streamCurrent_Watching: streamrequest.streamCurrent_Watching })
+  if (socket.timeline != null) {
+    const userTimeline = await Usertimeline.findById(timeline);
+
+    if (userTimeline) {
+      if (userTimeline.streamId != null && userTimeline.userId == userId) {
+        streamId = userTimeline.streamId;
+        let stream = await StreamTimeline.findById(userTimeline.streamingTimelineID);
+        if (stream) {
+          stream.OUT = new Date().getTime();
+          stream.status = "END";
+          stream.save();
+        }
+        userTimeline.streamingTimelineID = null;
+        userTimeline.streamId = null;
+        userTimeline.save();
+        let streamrequest = await Streamrequest.findById(streamId);
+        if (streamrequest != null) {
+          let index = streamrequest.Current_join.findIndex((a) => a == userId);
+          let join = streamrequest.Current_join;
+          if (index != -1) {
+            let counts = streamrequest.streamCurrent_Watching - 1 >= 0 ? streamrequest.streamCurrent_Watching - 1 : 0;
+            streamrequest.streamCurrent_Watching = counts;
+            join.splice(index, 1);
+            streamrequest.Current_join = join;
+            streamrequest.save();
+          }
+          // streamrequest.streamCurrent_Watching = streamrequest.streamCurrent_Watching - 1 >= 0 ? streamrequest.streamCurrent_Watching - 1 : 0;
+          io.sockets.emit(streamId + "_current_watching", { streamCurrent_Watching: streamrequest.streamCurrent_Watching })
+        }
       }
     }
   }
-
 }
 
 

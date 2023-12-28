@@ -47,6 +47,12 @@ const Timelineschema = new mongoose.Schema({
     },
     streamingTimelineID: {
         type: String,
+    },
+    userName: {
+        type: String,
+    },
+    mobileNumber: {
+        type: String,
     }
 
 });

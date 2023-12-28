@@ -621,6 +621,14 @@ const streamRequestschema = mongoose.Schema({
   },
   shortsUploadTime: {
     type: Number,
+  },
+  join_users: {
+    type: Array,
+    default: []
+  },
+  Current_join: {
+    type: Array,
+    default: []
   }
 });
 
