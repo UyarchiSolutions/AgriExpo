@@ -13,6 +13,8 @@ const jwt = require('jsonwebtoken');
 const { tempTokenModel, Joinusers } = require('../../models/liveStreaming/generateToken.model');
 const { CodeBuild } = require('aws-sdk');
 
+const logger = require("../../config/logger");
+
 const romove_message = async (req, io) => {
   //console.log(req)
   let message = await Groupchat.findById(req._id);
@@ -247,8 +249,7 @@ const cost_connect_live_now = async (socket) => {
   // console.log(socket.timeline,87687667)
   if (socket.timeline != null) {
     const timeline = await Usertimeline.findByIdAndUpdate({ _id: socket.timeline }, { socketId: socket.id }, { new: true });
-    // console.log(timeline)
-    console.log("user Connected", timeline.userName, timeline.mobileNumber)
+    logger.info(`user Connected -> ${timeline.userName} - ${timeline.mobileNumber}`)
   }
 }
 
@@ -289,9 +290,9 @@ const livestream_joined = async (streamId, socket, io) => {
         }
         let index_all = streamrequest.Current_join.findIndex((a) => a == userId);
         if (index_all == -1) {
-          streamrequest.streamCurrent_Watching = streamrequest.streamCurrent_Watching + 1;
           let join = streamrequest.Current_join.concat([userId]);
           streamrequest.Current_join = join;
+          streamrequest.streamCurrent_Watching = join.length;
         }
         streamrequest.save();
         setTimeout(() => {
@@ -330,10 +331,10 @@ const livestream_leave = async (streamId, socket, io) => {
           let index = streamrequest.Current_join.findIndex((a) => a == userId);
           console.log(index, 786876)
           if (index != -1) {
-            streamrequest.streamCurrent_Watching = streamrequest.streamCurrent_Watching - 1 >= 0 ? streamrequest.streamCurrent_Watching - 1 : 0;
             join.splice(index, 1);
             console.log(join, 767687876)
             streamrequest.Current_join = join
+            streamrequest.streamCurrent_Watching = join.length;
           }
 
           streamrequest.save();
@@ -384,13 +385,12 @@ const user_Disconect = async (socket, io) => {
           let join = streamrequest.Current_join;
           if (index != -1) {
             let counts = streamrequest.streamCurrent_Watching - 1 >= 0 ? streamrequest.streamCurrent_Watching - 1 : 0;
-            streamrequest.streamCurrent_Watching = counts;
             join.splice(index, 1);
-            streamrequest.Current_join = join;
-            streamrequest.save();
+            streamrequest = await Streamrequest.findByIdAndUpdate({ _id: streamrequest._id }, { streamCurrent_Watching: join.length, Current_join: join });
+            io.sockets.emit(streamId + "_current_watching", { streamCurrent_Watching: counts })
+
           }
           // streamrequest.streamCurrent_Watching = streamrequest.streamCurrent_Watching - 1 >= 0 ? streamrequest.streamCurrent_Watching - 1 : 0;
-          io.sockets.emit(streamId + "_current_watching", { streamCurrent_Watching: streamrequest.streamCurrent_Watching })
         }
       }
     }

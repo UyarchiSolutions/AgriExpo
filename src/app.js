@@ -45,16 +45,25 @@ server.listen(config.port, () => {
 
 io.use(async (socket, next) => {
   const token = socket.handshake.auth.token;
+  socket.on('connect_buyer', async (data) => {
+    console.log(data)
+    console.log("user Connected connect-emit")
+  });
   if (token != null) {
     await socketService.auth_details(socket, token, next)
   }
   else {
     next();
   }
+
 })
 io.sockets.on('connection', async (socket) => {
 
   await socketService.cost_connect_live_now(socket)
+  socket.on('connect_buyer', async (data) => {
+    console.log(data)
+    logger.info("user Connected connect-emit")
+  });
   socket.on('livestream_joined', async (data) => {
     await socketService.livestream_joined(data, socket, io)
   });

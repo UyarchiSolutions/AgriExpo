@@ -1222,8 +1222,29 @@ const get_sub_golive = async (req, io) => {
   req.io.emit(value[0].last_joined, { leave: true });
   let lastJion = v4();
   value[0].last_joined = lastJion;
-  console.log(lastJion)
-  await Joinusers.findByIdAndUpdate({ _id: value[0]._id }, { last_joined: lastJion }, { new: true });
+  let join_unser = await Joinusers.findByIdAndUpdate({ _id: value[0]._id }, { last_joined: lastJion }, { new: true });
+  let streamrequest = await Streamrequest.findById(value[0].chennel);
+  if (streamrequest) {
+    let index = streamrequest.join_users.findIndex((a) => a == join_unser.shopId);
+    if (index == -1) {
+      let join = streamrequest.join_users.concat([join_unser.shopId]);
+      streamrequest.join_users = join;
+    }
+    let index_all = streamrequest.Current_join.findIndex((a) => a == join_unser.shopId);
+    if (index_all == -1) {
+      let join = streamrequest.Current_join.concat([join_unser.shopId]);
+      console.log(join,45645)
+      streamrequest.Current_join = join;
+      streamrequest.streamCurrent_Watching = join.length;
+      setTimeout(() => {
+        req.io.emit(value[0].chennel + "_current_watching", { streamCurrent_Watching: streamrequest.streamCurrent_Watching })
+      }, 100)
+    }
+    streamrequest.save();
+
+  }
+
+
   return value[0];
 };
 

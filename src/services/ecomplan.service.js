@@ -5134,6 +5134,7 @@ const get_watch_live_steams_upcoming_byid = async (req) => {
         primarycommunication: 1,
         secondarycommunication: 1,
         broucher: 1,
+        streamCurrent_Watching:1
       },
     },
   ]);
