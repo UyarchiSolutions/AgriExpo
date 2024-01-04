@@ -250,4 +250,9 @@ router.route('/get_Saved/Product').get(shopverify, Ecomcontroller.get_Saved_Prod
 
 
 router.route('/search/product').get(Ecomcontroller.search_product_list)
+
+
+
+router.route('/shorts/all').post(shopverify, Ecomcontroller.get_shorts_all);
+
 module.exports = router;

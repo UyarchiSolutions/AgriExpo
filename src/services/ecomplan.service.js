@@ -5134,7 +5134,7 @@ const get_watch_live_steams_upcoming_byid = async (req) => {
         primarycommunication: 1,
         secondarycommunication: 1,
         broucher: 1,
-        streamCurrent_Watching:1
+        streamCurrent_Watching: 1
       },
     },
   ]);
@@ -15332,6 +15332,208 @@ const search_product_list = async (req) => {
   return product;
 };
 
+const get_shorts_all = async (req) => {
+
+  let { page, short } = req.body;
+  page = page == '' || page == null || page == null ? 0 : parseInt(page);
+  console.log(short)
+  let completedHide = { streamrequestposts_count: { $ne: 0 } };
+
+  let stream = await Streamrequest.aggregate([
+    { $match: { $and: [{ $or: [{ shortsuploadStatus: { $eq: "upload" } }, { _id: { $eq: short } }] }] } },
+    { $match: { $and: [{ showStream: { $eq: true } }, { adminApprove: { $eq: 'Approved' } }] } },
+    { $unwind: "$_id" },
+    {
+      $addFields: {
+        sort_by_id: {
+          $cond: { if: { $eq: ['$_id', short] }, then: 1, else: 0 },
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'suppierId',
+        foreignField: '_id',
+        as: 'suppliers',
+      },
+    },
+    {
+      $unwind: '$suppliers',
+    },
+    {
+      $lookup: {
+        from: 'streamrequestposts',
+        localField: '_id',
+        foreignField: 'streamRequest',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'streamposts',
+              localField: 'postId',
+              foreignField: '_id',
+              pipeline: [
+                { $match: { $and: [{ showPost: { $eq: true } }, { status: { $ne: 'Removed' } }] } }
+              ],
+              as: 'streamposts',
+            },
+          },
+          { $unwind: '$streamposts' },
+          {
+            $group: {
+              _id: null,
+              count: { $sum: 1 },
+            },
+          },
+        ],
+        as: 'streamrequestposts_count',
+      },
+    },
+    {
+      $unwind: {
+        preserveNullAndEmptyArrays: true,
+        path: '$streamrequestposts_count',
+      },
+    },
+    {
+      $addFields: {
+        streamrequestposts_count: { $ifNull: ['$streamrequestposts_count.count', 0] },
+      },
+    },
+    { $match: { $and: [completedHide] } },
+    {
+      $lookup: {
+        from: 'streamrequestposts',
+        localField: '_id',
+        foreignField: 'streamRequest',
+        pipeline: [
+          {
+            $lookup: {
+              from: 'streamposts',
+              localField: 'postId',
+              foreignField: '_id',
+              pipeline: [
+                {
+                  $lookup: {
+                    from: 'products',
+                    localField: 'productId',
+                    foreignField: '_id',
+                    as: 'products',
+                  },
+                },
+                { $unwind: '$products' },
+                {
+                  $addFields: {
+                    productTitle: '$products.productTitle',
+                  },
+                },
+              ],
+              as: 'streamposts',
+            },
+          },
+          { $unwind: '$streamposts' },
+          {
+            $project: {
+              DateIso: '$streamposts.DateIso',
+              active: '$streamposts.active',
+              archive: '$streamposts.archive',
+              bookingAmount: '$streamposts.bookingAmount',
+              categoryId: '$streamposts.categoryId',
+              created: '$streamposts.created',
+              discription: '$streamposts.discription',
+              images: '$streamposts.images',
+              incrementalLots: '$streamposts.incrementalLots',
+              isUsed: '$streamposts.isUsed',
+              location: '$streamposts.location',
+              marketPlace: '$streamposts.marketPlace',
+              minLots: '$streamposts.minLots',
+              newVideoUpload: '$streamposts.newVideoUpload',
+              offerPrice: '$streamposts.offerPrice',
+              orderedQTY: '$streamposts.orderedQTY',
+              pendingQTY: '$streamposts.pendingQTY',
+              productId: '$streamposts.productId',
+              productTitle: '$streamposts.productTitle',
+              quantity: '$streamposts.quantity',
+              status: '$streamposts.status',
+              suppierId: '$streamposts.suppierId',
+              video: '$streamposts.video',
+              postId: '$streamposts._id',
+              define_QTY: '$streamposts.define_QTY',
+              define_UNIT: '$streamposts.define_UNIT',
+              booking_charge: '$streamposts.booking_charge',
+              booking_percentage: '$streamposts.booking_percentage',
+              pack_discription: '$streamposts.pack_discription',
+              dispatchPincode: '$streamposts.dispatchPincode',
+              transaction: '$streamposts.transaction',
+              dispatchLocation: '$streamposts.dispatchLocation',
+              latitude: '$streamposts.latitude',
+              longitude: '$streamposts.longitude',
+            },
+          },
+        ],
+        as: 'streamrequestposts',
+      },
+    },
+    { $sort: { sort_by_id: -1 } },
+    {
+      $project: {
+        _id: 1,
+        active: 1,
+        archive: 1,
+        post: 1,
+        communicationMode: 1,
+        sepTwo: 1,
+        adminApprove: 1,
+        activelive: 1,
+        tokenGeneration: 1,
+        bookingAmount: 1,
+        streamingDate: 1,
+        streamingTime: 1,
+        discription: 1,
+        streamName: 1,
+        suppierId: 1,
+        postCount: 1,
+        startTime: 1,
+        DateIso: 1,
+        created: 1,
+        Duration: 1,
+        chat: 1,
+        endTime: 1,
+        max_post_per_stream: 1,
+        noOfParticipants: 1,
+        planId: 1,
+        suppliersName: '$suppliers.contactName',
+        tradeName: '$suppliers.tradeName',
+        registerStatus: 1,
+        viewstatus: 1,
+        status: 1,
+        streamrequestposts_count: 1,
+        streamEnd_Time: 1,
+        streamrequestposts: '$streamrequestposts',
+        image: 1,
+        teaser: 1,
+        primarycommunication: 1,
+        secondarycommunication: 1,
+        broucher: 1,
+        streamCurrent_Watching: 1,
+        shortsLink:1
+      },
+    },
+    { $skip: 5 * page },
+    { $limit: 5 },
+    // { $sort: { startTime: -1 } },
+  ])
+  let next = await Streamrequest.aggregate([
+    { $match: { $and: [{ $or: [{ shortsuploadStatus: { $eq: "upload" } }, { _id: { $eq: short } }] }] } },
+    { $sort: { startTime: -1 } },
+    { $skip: 5 * (page + 1) },
+    { $limit: 5 },
+
+  ])
+
+  return { stream, next: next.length != 0 };
+}
+
 module.exports = {
   create_Plans,
   create_Plans_addon,
@@ -15495,5 +15697,6 @@ module.exports = {
   search_product_list,
   remove_post_stream,
   post_show_toggle,
-  upload_s3_shorts_video
+  upload_s3_shorts_video,
+  get_shorts_all
 };

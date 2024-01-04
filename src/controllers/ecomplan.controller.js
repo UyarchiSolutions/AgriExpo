@@ -805,6 +805,11 @@ const search_product_list = catchAsync(async (req, res) => {
   res.send(data);
 });
 
+const get_shorts_all = catchAsync(async (req, res) => {
+  const data = await Ecomserive.get_shorts_all(req);
+  res.send(data);
+});
+
 module.exports = {
   create_Plans,
   UploadProof,
@@ -961,5 +966,6 @@ module.exports = {
   go_live_stream_host_details,
   get_subhost_token_details,
   front_end_code,
-  post_show_toggle
+  post_show_toggle,
+  get_shorts_all
 };

@@ -879,7 +879,7 @@ const send_livestream_link_assessment = async (req) => {
     user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
   } else {
     user.name = name;
-    user.recuiteUser = req.body.user;
+    user.recuiteUser = req.body.candidate;
     user.save();
   }
   const id = generateUniqueID();
@@ -894,7 +894,7 @@ const send_livestream_link_assessment = async (req) => {
     transaction: transaction,
     tokenExp: type == moment().add(1, 'days'),
     type: type,
-    recuiteUser: req.body.user
+    candidate: req.body.candidate,
   });
   const payload = {
     _id: user._id,
