@@ -879,7 +879,7 @@ const send_livestream_link_assessment = async (req) => {
     user = await Demoseller.create({ phoneNumber: phoneNumber, dateISO: moment(), name: name });
   } else {
     user.name = name;
-    user.recuiteUser = req.body.candidate;
+    user.candidate = req.body.candidate;
     user.save();
   }
   const id = generateUniqueID();
@@ -1195,7 +1195,19 @@ const join_stream_candidate = async (req) => {
   const { phoneNumber, name, type } = req.body;
 
   const streamId = req.query.id;
+  const stream = await Demostream.findById(streamId);
 
+  if (!stream) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
+  }
+
+  if (stream.candidate != phoneNumber) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Your Not Valid User');
+  }
+
+  if (stream.status != 'Pending') {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Contact Your Recruiter Team');
+  }
   let user = await Demobuyer.findOne({ phoneNumber: phoneNumber });
 
   if (!user) {
@@ -1206,10 +1218,6 @@ const join_stream_candidate = async (req) => {
     user.save();
   }
 
-  const stream = await Demostream.findById(streamId);
-  if (!stream) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Stream not found');
-  }
 
   let demotoken = await DemostreamToken.findOne({ userID: user._id, streamID: stream._id });
   if (!demotoken) {

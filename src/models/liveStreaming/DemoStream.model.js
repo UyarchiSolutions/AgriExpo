@@ -132,6 +132,9 @@ const demostreamchema = mongoose.Schema({
   },
   raiseUser: {
     type: String,
+  },
+  candidate: {
+    type: Number,
   }
 });
 
