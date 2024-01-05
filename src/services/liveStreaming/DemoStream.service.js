@@ -1202,11 +1202,11 @@ const join_stream_candidate = async (req) => {
   }
 
   if (stream.candidate != phoneNumber) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Your Not Valid User');
+    throw new ApiError(httpStatus.NOT_FOUND, 'You are Not a Valid User');
   }
 
   if (stream.condidate_join == true) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Contact Your Recruiter Team');
+    throw new ApiError(httpStatus.NOT_FOUND, 'This Number has already login');
   }
   let user = await Demobuyer.findOne({ phoneNumber: phoneNumber });
 
