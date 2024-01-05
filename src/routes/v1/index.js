@@ -109,6 +109,7 @@ const supplierRaisedRoute = require('./supplier.raised.unbilled.route');
 const CustomerWallet = require('./customer.wallet.route');
 const shopEnrollmentEnquiryRoute = require('./shopEnrollmentEnquiry.route');
 const EcomPlan = require('./ecomplan.route');
+const influencer = require('./influencer.route.js');
 const purchasePlan = require('./purchasePlan.route');
 const subHostRoute = require('./subHost.route');
 const SellerRoute = require('./seller.route');
@@ -602,7 +603,10 @@ const defaultRoutes = [
     path: '/ecomplan',
     route: EcomPlan,
   },
-
+  {
+    path: '/influencer',
+    route: influencer,
+  },
   // {
   //   path: '/sales',
   //   route: salesApp,
