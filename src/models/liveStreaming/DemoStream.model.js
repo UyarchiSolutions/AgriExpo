@@ -135,6 +135,10 @@ const demostreamchema = mongoose.Schema({
   },
   candidate: {
     type: Number,
+  },
+  condidate_join: {
+    type: Boolean,
+    default: false
   }
 });
 

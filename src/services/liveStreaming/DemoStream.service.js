@@ -1205,7 +1205,7 @@ const join_stream_candidate = async (req) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Your Not Valid User');
   }
 
-  if (stream.status != 'Pending') {
+  if (stream.condidate_join == true) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Contact Your Recruiter Team');
   }
   let user = await Demobuyer.findOne({ phoneNumber: phoneNumber });
@@ -1239,12 +1239,12 @@ const join_stream_candidate = async (req) => {
     });
   }
   let register = await DemostreamToken.find({ streamID: demotoken.streamID, status: 'resgistered' }).count();
+  stream.condidate_join = true;
   if (stream.type == 'demo') {
     if (register < 5) {
       demotoken.golive = true;
       if (stream.status == 'Pending') {
         stream.status = 'Ready';
-        stream.save();
       }
     } else {
       demotoken.golive = false;
@@ -1255,7 +1255,6 @@ const join_stream_candidate = async (req) => {
       demotoken.golive = true;
       if (stream.status == 'Pending') {
         stream.status = 'Ready';
-        stream.save();
       }
     } else {
       demotoken.golive = false;
@@ -1266,12 +1265,12 @@ const join_stream_candidate = async (req) => {
       demotoken.golive = true;
       if (stream.status == 'Pending') {
         stream.status = 'Ready';
-        stream.save();
       }
     } else {
       demotoken.golive = false;
     }
   }
+  stream.save();
   demotoken.status = 'resgistered';
   demotoken.save();
   setTimeout(async () => {
