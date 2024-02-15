@@ -10,6 +10,12 @@ const create_influencer = catchAsync(async (req, res) => {
 
 });
 
+const get_influencer = catchAsync(async (req, res) => {
+    const value = await influencer.get_influencer(req);
+    res.send(value);
+});
+
 module.exports = {
-    create_influencer
+    create_influencer,
+    get_influencer
 };
